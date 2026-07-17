@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập Hệ thống Quản trị - KN Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00', 'kn-dark': '#0f172a' } } } }
+    </script>
+</head>
+<body class="bg-slate-900 font-sans h-screen flex items-center justify-center relative overflow-hidden">
+
+    <div class="absolute w-96 h-96 bg-kn-blue/10 rounded-full blur-3xl -top-20 -left-20 animate-pulse"></div>
+    <div class="absolute w-96 h-96 bg-kn-orange/10 rounded-full blur-3xl -bottom-20 -right-20 animate-pulse"></div>
+
+    <div class="bg-slate-800 p-8 rounded-xl shadow-2xl max-w-md w-full border border-slate-700 relative z-10">
+        <div class="text-center mb-8">
+            <div class="inline-block bg-slate-950 px-4 py-2 rounded-md border border-slate-800 mb-3">
+                <span class="text-xl font-black tracking-wider text-white">Khangnamvina <span class="text-kn-orange">ADMIN</span></span>
+            </div>
+            <h1 class="text-xl font-bold text-white tracking-tight">HỆ THỐNG QUẢN TRỊ NỘI BỘ</h1>
+            <p class="text-slate-400 text-xs mt-1">Vui lòng đăng nhập bằng tài khoản nhân viên được cấp quyền</p>
+        </div>
+
+        <form id="adminLoginForm" class="space-y-5">
+            <div>
+                <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Email nhân viên</label>
+                <div class="relative">
+                    <input type="email" id="email" placeholder="name@khangnam.com" class="w-full bg-slate-950 border border-slate-700 rounded px-4 py-2.5 text-white placeholder-slate-600 text-sm focus:border-kn-orange focus:ring-1 focus:ring-kn-orange outline-none transition" required>
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Mật khẩu</label>
+                <input type="password" id="password" placeholder="••••••••" class="w-full bg-slate-950 border border-slate-700 rounded px-4 py-2.5 text-white placeholder-slate-600 text-sm focus:border-kn-orange focus:ring-1 focus:ring-kn-orange outline-none transition" required>
+            </div>
+            
+            <button type="submit" id="loginBtn" class="w-full bg-kn-orange hover:bg-orange-600 text-white font-bold py-3 rounded text-sm transition shadow-lg mt-6 flex justify-center items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Xác Thực Đăng Nhập
+            </button>
+        </form>
+
+        <!-- <div class="mt-8 pt-4 border-t border-slate-700 text-center">
+            <a href="../index.html" class="text-xs text-slate-400 hover:text-white transition flex items-center justify-center">
+                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Quay lại Trang chủ Khách hàng
+            </a>
+        </div> -->
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://wnhrkziiujbswnrfnlly.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_mCpQQA5h6TQHP7ueyYv1qg_vxnTQIRk'; 
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        document.getElementById('adminLoginForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Chặn tải lại trang
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+
+            btn.innerHTML = 'Đang kiểm tra hệ thống...';
+            btn.disabled = true;
+
+            try {
+                // 1. Gọi lệnh đăng nhập lên Supabase
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
+
+                if (error) throw error;
+
+                // 2. Lấy ngay thông tin role trong metadata của user vừa đăng nhập
+                const userRole = data.session.user.user_metadata?.role;
+
+                // 3. KIỂM TRA QUYỀN SẮC BÉN
+                if (userRole === 'admin') {
+                    // alert("Chào mừng Sếp quay trở lại kho hàng!");
+                    // Vì file login này nằm trong thư mục admin/ luôn nên gọi thẳng dashboard.html
+                    window.location.href = "dashboard.html"; 
+                } else {
+                    // BẪY BẢO MẬT: Nếu là tài khoản khách hàng lọt vào đây
+                    alert("Cảnh báo nguy hiểm: Tài khoản này không có quyền Admin! Từ chối truy cập.");
+                    
+                    // Ép buộc đăng xuất ngay lập tức để xóa sạch Token trên trình duyệt
+                    await supabaseClient.auth.signOut();
+                    
+                    // Tải lại trang đăng nhập để reset
+                    window.location.reload();
+                }
+                
+            } catch (error) {
+                alert("Đăng nhập thất bại: " + error.message);
+                btn.innerHTML = 'Xác Thực Đăng Nhập';
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

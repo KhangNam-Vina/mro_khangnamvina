@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tổng quan - MRO Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00', 'kn-light': '#f5f6f8' } } } }
+    </script>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800 flex h-screen overflow-hidden">
+
+    <!-- SIDEBAR BÊN TRÁI -->
+    <aside class="w-64 bg-gray-900 text-white flex flex-col hidden md:flex shrink-0">
+        <div class="h-16 flex items-center px-6 bg-gray-950 border-b border-gray-800">
+            <span class="text-xl font-black tracking-wider text-white">Khangnam <span class="text-kn-orange">ADMIN</span></span>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4">
+            <nav class="space-y-1 px-3">
+                <a href="dashboard.html" class="flex items-center px-3 py-2.5 bg-kn-blue text-white rounded-md transition shadow">Tổng quan</a>
+                <a href="manage-products.html" class="flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Sản phẩm</a>
+                <a href="rfq-detail.html" class="flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Yêu cầu Báo giá</a>
+                <a href="manage-contacts.html" class="flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Liên hệ</a>
+                <a href="manage-industries.html" class="flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Ngành hàng</a>
+                <a href="manage-families.html" class="flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Dòng sản phẩm</a>
+                <a href="manage-blog.html" class="flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Blog</a>
+            </nav>
+        </div>
+        <div class="p-4 border-t border-gray-800">
+            <button onclick="handleAdminLogout()" class="flex items-center text-sm text-gray-400 hover:text-white transition-colors w-full">Đăng xuất</button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+        
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Bảng Điều Khiển</h2>
+            <!-- TÌM KIẾM TOÀN CỤC (Sẽ gắn logic sau) -->
+            <div class="relative w-64 hidden md:block">
+                <input type="text" placeholder="Tìm kiếm nhanh..." class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-kn-blue shadow-sm">
+                <svg class="w-4 h-4 text-gray-400 absolute right-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+        </div>
+
+        <!-- 1. QUICK ACTIONS (THAO TÁC NHANH) -->
+        <div class="flex flex-wrap gap-3 mb-6">
+            <button onclick="window.location.href='manage-products.html'" class="bg-white border border-gray-200 text-gray-700 hover:text-kn-blue hover:border-kn-blue hover:shadow px-4 py-2 rounded-md text-sm font-bold transition flex items-center">
+                <span class="text-kn-blue mr-2 text-lg leading-none">+</span> Thêm Sản Phẩm
+            </button>
+            <button onclick="window.location.href='manage-blog.html'" class="bg-white border border-gray-200 text-gray-700 hover:text-kn-orange hover:border-kn-orange hover:shadow px-4 py-2 rounded-md text-sm font-bold transition flex items-center">
+                <span class="text-kn-orange mr-2 text-lg leading-none">+</span> Viết Blog
+            </button>
+        </div>
+
+        <!-- 2. KPI THỰC CHIẾN -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-orange-500">
+                <p class="text-sm text-gray-500 font-bold uppercase tracking-wider mb-1">Yêu cầu Báo giá mới</p>
+                <div class="flex items-end justify-between">
+                    <h3 id="kpiRfq" class="text-3xl font-black text-gray-800">--</h3>
+                    <span class="text-xs font-bold text-orange-600 bg-orange-100 px-2 py-1 rounded">Chờ xử lý</span>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-red-500">
+                <p class="text-sm text-gray-500 font-bold uppercase tracking-wider mb-1">Liên hệ / Hỗ trợ</p>
+                <div class="flex items-end justify-between">
+                    <h3 id="kpiContact" class="text-3xl font-black text-gray-800">--</h3>
+                    <span class="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded">Mới nhất</span>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-kn-blue">
+                <p class="text-sm text-gray-500 font-bold uppercase tracking-wider mb-1">Tổng Sản Phẩm</p>
+                <div class="flex items-end justify-between">
+                    <h3 id="kpiProduct" class="text-3xl font-black text-gray-800">--</h3>
+                    <span class="text-xs font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded">Mã SKU</span>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-5 border-l-4 border-green-500">
+                <p class="text-sm text-gray-500 font-bold uppercase tracking-wider mb-1">Bài viết Blog</p>
+                <div class="flex items-end justify-between">
+                    <h3 id="kpiBlog" class="text-3xl font-black text-gray-800">--</h3>
+                    <span class="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded">Đã xuất bản</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. MAIN GRID (CHART & RECENT ACTIVITY) -->
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+            <!-- Khu vực Biểu đồ -->
+            <div class="xl:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col">
+                <h3 class="font-bold text-gray-800 mb-4 uppercase text-sm border-b pb-2">Tần suất Yêu cầu Báo giá</h3>
+                <div class="relative flex-1 min-h-[300px]">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Khu vực Recent Activity -->
+            <div class="xl:col-span-1 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h3 class="font-bold text-gray-800 uppercase text-sm">Hoạt động gần đây</h3>
+                </div>
+                <div class="p-6 flex-1 overflow-y-auto">
+                    <!-- Khung Skeleton Loading (Sẽ ẩn khi có data) -->
+                    <div id="activitySkeleton" class="space-y-4 animate-pulse">
+                        <div class="flex gap-3"><div class="w-2 h-2 mt-2 bg-gray-300 rounded-full"></div><div class="flex-1"><div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div><div class="h-3 bg-gray-200 rounded w-1/4"></div></div></div>
+                        <div class="flex gap-3"><div class="w-2 h-2 mt-2 bg-gray-300 rounded-full"></div><div class="flex-1"><div class="h-4 bg-gray-200 rounded w-full mb-2"></div><div class="h-3 bg-gray-200 rounded w-1/3"></div></div></div>
+                        <div class="flex gap-3"><div class="w-2 h-2 mt-2 bg-gray-300 rounded-full"></div><div class="flex-1"><div class="h-4 bg-gray-200 rounded w-5/6 mb-2"></div><div class="h-3 bg-gray-200 rounded w-1/2"></div></div></div>
+                    </div>
+                    
+                    <!-- Bãi đáp Data từ JS -->
+                    <ul id="activityFeed" class="space-y-5 hidden relative before:absolute before:inset-0 before:ml-[5px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 before:to-transparent">
+                        <!-- Items sẽ được bơm vào đây -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- JS CHUẨN MỰC -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/common.js"></script>
+    <script src="../assets/adminjs/admin.js"></script>
+</body>
+</html>

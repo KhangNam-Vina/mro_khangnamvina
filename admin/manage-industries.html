@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Ngành hàng - MRO Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00', 'kn-light': '#f5f6f8' } } } }
+    </script>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800 flex h-screen overflow-hidden relative">
+
+    <!-- TOAST CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none"></div>
+
+    <!-- SIDEBAR CHUẨN MỰC -->
+    <aside class="w-64 bg-gray-900 text-white flex flex-col hidden md:flex shrink-0">
+        <div class="h-16 flex items-center px-6 bg-gray-950 border-b border-gray-800">
+            <span class="text-xl font-black tracking-wider text-white">Khangnam <span class="text-kn-orange">ADMIN</span></span>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto py-4">
+            <nav class="space-y-1 px-3">
+                <!-- 1. Tổng quan -->
+                <a href="dashboard.html" class="flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md group">
+                    <svg class="w-5 h-5 mr-3 text-kn-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    Tổng quan
+                </a>
+                <!-- 2. Quản lý báo giá -->
+                <a href="rfq-detail.html" class="flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md group">
+                    <svg class="w-5 h-5 mr-3 text-kn-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Quản lý báo giá 
+                </a>
+                <!-- 3. Quản lý sản phẩm -->
+                <a href="manage-products.html" class="flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md group">
+                    <svg class="w-5 h-5 mr-3 text-kn-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Quản lý sản phẩm
+                </a>
+                <!-- 5. Quản lý ngành hàng -->
+                <a href="manage-industries.html" class="flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md group">
+                    <svg class="w-5 h-5 mr-3 text-kn-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    Quản lý ngành hàng
+                </a>
+                <a href="manage-families.html" class="flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md group">
+                    <svg class="w-5 h-5 mr-3 text-kn-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                   Quản lý dòng sản phẩm
+                </a>
+                <!-- 6. Quản lý trang blog -->
+                <a href="manage-blog.html" class="flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md group">
+                    <svg class="w-5 h-5 mr-3 text-kn-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+                    Quản lý trang blog
+                </a>
+                <!-- 7. Quản lý liên hệ -->
+                <a href="manage-contacts.html" class="flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md group">
+                    <svg class="w-5 h-5 mr-3 text-kn-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    Quản lý liên hệ
+                </a>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-gray-800">
+            <a href="../admin/login.html" class="flex items-center text-sm text-gray-400 hover:text-white transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Đăng xuất
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6 flex flex-col">
+        <div class="mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <h2 class="text-2xl font-bold text-gray-800">Cấu hình Ngành hàng (Industry)</h2>
+
+            <!-- SEARCH BAR CHUẨN MỰC -->
+            <div class="relative w-full md:w-72">
+                <input type="text" id="searchIndustryInput" placeholder="Tìm tên ngành hàng..." class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-kn-blue shadow-sm">
+                <svg class="w-4 h-4 text-gray-400 absolute right-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 flex-1">
+
+            <!-- FORM NGÀNH HÀNG -->
+            <div class="xl:col-span-1">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-6">
+                    <h3 id="formTitle" class="font-bold text-gray-800 uppercase text-sm mb-4 border-b pb-2">Thêm Ngành Hàng Mới</h3>
+                    <form id="industryForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Tên Ngành hàng *</label>
+                            <input type="text" id="inName" required maxlength="100" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-kn-blue outline-none" placeholder="VD: Dụng cụ cầm tay...">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Link Ảnh (Icon)</label>
+                            <input type="url" id="inImg" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-kn-blue outline-none text-sm text-gray-600" placeholder="https://...">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Mô tả ngắn</label>
+                            <textarea id="inDesc" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-kn-blue outline-none text-sm" placeholder="Mô tả ngành hàng..."></textarea>
+                        </div>
+                        <div class="pt-2 flex flex-col space-y-2">
+                            <button type="submit" id="btnSaveIndustry" class="w-full bg-kn-blue hover:bg-blue-800 text-white font-bold py-2.5 rounded shadow transition flex justify-center items-center">
+                                Thêm Mới
+                            </button>
+                            <button type="button" id="btnCancelEdit" class="hidden w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2.5 rounded transition">
+                                Hủy Sửa
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- BẢNG DỮ LIỆU -->
+            <div class="xl:col-span-2 flex flex-col">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex-1 flex flex-col">
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-left text-sm text-gray-600">
+                            <thead class="bg-gray-100 text-gray-700 font-bold border-b text-xs uppercase tracking-wider">
+                                <tr>
+                                    <th class="p-4 text-center w-12">#</th>
+                                    <th class="p-4 w-20">Ảnh</th>
+                                    <th class="p-4 w-48">Tên Ngành Hàng</th>
+                                    <th class="p-4">Mô tả</th>
+                                    <th class="p-4 text-right w-36">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <!-- Data Bơm từ JS -->
+                            <tbody id="industryTableBody" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Phân trang -->
+                    <div id="paginationContainer" class="p-4 flex justify-center space-x-2 border-t border-gray-200 bg-gray-50"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- CHỈ GỌI JS MODULE -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/common.js"></script>
+    <script src="../assets/js/services/industryService.js"></script>
+    <script src="../assets/js/admin/admin-industries.js"></script>
+</body>
+</html>

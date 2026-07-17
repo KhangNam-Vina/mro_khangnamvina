@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thương hiệu đối tác - MRO Khang Nam B2B</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { 
+            theme: { 
+                extend: { 
+                    colors: { 
+                        'kn-blue': '#00479b', 
+                        'kn-orange': '#ff5e00', 
+                        'kn-light': '#f5f6f8',
+                        'kn-dark': '#003370'
+                    } 
+                } 
+            } 
+        }
+    </script>
+</head>
+<body class="bg-kn-light font-sans text-gray-800">
+
+    <!-- CHỖ NÀY ĐỂ RÁP HEADER BẰNG JAVASCRIPT -->
+    <div id="app-header"></div>
+
+    <!-- 3. PAGE HEADER / BANNER -->
+    <div class="bg-gray-900 text-white py-12 relative overflow-hidden">
+        <img src="../assets/world mark.png" alt="Brands Banner" class="absolute inset-0 w-full h-full object-cover opacity-20">
+        <div class="container mx-auto px-4 relative z-10">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">Thương Hiệu Phân Phối</h1>
+            <p class="text-gray-300 max-w-2xl text-sm leading-relaxed">
+                MRO Khang Nam tự hào là đối tác phân phối chính thức của hơn 100+ thương hiệu vật tư công nghiệp hàng đầu thế giới. Cam kết 100% hàng chính hãng, đầy đủ chứng từ CO/CQ.
+            </p>
+        </div>
+    </div>
+
+    <!-- 4. MAIN CONTENT -->
+    <main class="container mx-auto px-4 py-10">
+        <div class="mb-6 flex justify-between items-end border-b-2 border-kn-blue pb-2">
+            <h2 class="text-2xl font-bold text-gray-800 uppercase tracking-wide">Thương hiệu Nổi bật</h2>
+            <span class="text-sm text-gray-500 font-medium">Hiển thị 12 thương hiệu hàng đầu</span>
+        </div>
+
+        <div id="brandGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            <div class="col-span-full flex justify-center py-10">
+                <svg class="animate-spin h-8 w-8 text-kn-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="4" class="opacity-25"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            </div>
+        </div>
+    </main>
+
+    <!-- CHỖ NÀY ĐỂ RÁP FOOTER BẰNG JAVASCRIPT -->
+    <div id="app-footer"></div>
+
+    <!-- ========================================== -->
+    <!-- PHẦN GỌI SCRIPT ĐƯỢC QUY HOẠCH GỌN GÀNG LẠI -->
+    <!-- ========================================== -->
+
+    <!-- 1. GỌI SCRIPT COMPONENT HEADER/FOOTER -->
+    <script src="../assets/components/header.js"></script>
+    <script src="../assets/components/footer.js"></script>
+
+    <!-- 2. GỌI THƯ VIỆN & SCRIPT DÙNG CHUNG -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/common.js"></script>
+
+    <!-- 3. SCRIPT LOGIC RIÊNG CỦA TRANG NÀY (CỰC SẠCH) -->
+    <script src="../assets/js/brands.js"></script>
+</body>
+</html>

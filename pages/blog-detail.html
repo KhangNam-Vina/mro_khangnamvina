@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đang tải bài viết... - MRO Khang Nam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00', 'kn-light': '#f5f6f8' } } } }
+    </script>
+    
+    <!-- CSS KHÔI PHỤC ĐỊNH DẠNG CHO BÀI VIẾT TỪ CKEDITOR -->
+    <style>
+        .blog-content h2 { font-size: 1.875rem; font-weight: 700; color: #00479b; margin-top: 2rem; margin-bottom: 1rem; }
+        .blog-content h3 { font-size: 1.5rem; font-weight: 700; color: #1f2937; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+        .blog-content p { margin-bottom: 1rem; line-height: 1.75; color: #4b5563; }
+        .blog-content strong { font-weight: 700; color: #1f2937; }
+        .blog-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; color: #4b5563; }
+        .blog-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; color: #4b5563; }
+        .blog-content li { margin-bottom: 0.5rem; }
+        .blog-content a { color: #ff5e00; text-decoration: underline; font-weight: 600; }
+        .blog-content a:hover { color: #c2410c; }
+        .blog-content img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 1.5rem auto; display: block; }
+        .blog-content blockquote { border-left: 4px solid #ff5e00; padding-left: 1rem; font-style: italic; color: #6b7280; background: #f9fafb; padding: 1rem; margin-bottom: 1rem;}
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 flex flex-col min-h-screen">
+
+    <!-- CHỖ NÀY ĐỂ RÁP HEADER BẰNG JAVASCRIPT -->
+    <div id="app-header"></div>
+
+    <!-- NỘI DUNG BÀI VIẾT -->
+    <main class="flex-grow py-12">
+        <div class="container mx-auto px-4 max-w-4xl">
+            
+            <!-- Breadcrumb -->
+            <div class="text-sm text-gray-500 mb-6 font-medium">
+                <a href="../index.html" class="hover:text-kn-blue">Trang chủ</a> 
+                <span class="mx-2">/</span> 
+                <a href="blog.html" class="hover:text-kn-blue">Tin tức & Kiến thức</a>
+                <span class="mx-2">/</span> 
+                <span id="breadcrumbTitle" class="text-gray-400">Đang tải...</span>
+            </div>
+
+            <!-- Vùng chờ dữ liệu -->
+            <div id="loadingState" class="flex justify-center items-center py-20">
+                <svg class="animate-spin h-10 w-10 text-kn-orange" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            </div>
+
+            <!-- Vùng hiển thị lỗi 404 -->
+            <div id="errorState" class="hidden text-center py-20 bg-white rounded-xl shadow-sm border border-gray-200">
+                <h1 class="text-3xl font-black text-gray-800 mb-4">404</h1>
+                <p class="text-gray-500 mb-6">Bài viết không tồn tại hoặc đã bị xóa.</p>
+                <a href="blog.html" class="bg-kn-blue text-white px-6 py-2.5 rounded font-bold hover:bg-blue-800 transition">Quay lại trang Blog</a>
+            </div>
+
+            <!-- NỘI DUNG CHÍNH CỦA BÀI YẾT (Ban đầu ẩn đi) -->
+            <article id="blogArticle" class="hidden bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                
+                <!-- Ảnh bìa -->
+                <div class="w-full h-[300px] md:h-[450px] relative">
+                    <img id="blogThumb" src="" alt="" class="w-full h-full object-cover">
+                </div>
+
+                <div class="p-6 md:p-12">
+                    <!-- Tiêu đề & Ngày tháng -->
+                    <header class="mb-8 border-b border-gray-100 pb-8">
+                        <h1 id="blogTitle" class="text-3xl md:text-4xl font-black text-gray-900 mb-4 leading-tight"></h1>
+                        <div class="flex items-center text-sm text-gray-500 font-medium">
+                            <svg class="w-4 h-4 mr-1.5 text-kn-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <span id="blogDate"></span>
+                            <span class="mx-3 border-l border-gray-300 h-4"></span>
+                            <span>Đăng bởi: Khang Nam Admin</span>
+                        </div>
+                    </header>
+
+                    <!-- VÙNG CHỨA HTML TỪ CKEDITOR -->
+                    <div id="blogContent" class="blog-content">
+                        <!-- Nội dung sẽ đổ vào đây -->
+                    </div>
+                    
+                </div>
+            </article>
+        </div>
+    </main>
+
+     <!-- CHỖ NÀY ĐỂ RÁP FOOTER BẰNG JAVASCRIPT -->
+    <div id="app-footer"></div>
+
+    <!-- ========================================== -->
+    <!-- PHẦN GỌI SCRIPT ĐƯỢC QUY HOẠCH GỌN GÀNG LẠI -->
+    <!-- ========================================== -->
+
+    <!-- 1. GỌI SCRIPT COMPONENT HEADER/FOOTER -->
+    <script src="../assets/components/header.js"></script>
+    <script src="../assets/components/footer.js"></script>
+
+    <!-- 2. GỌI THƯ VIỆN & SCRIPT DÙNG CHUNG -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/common.js"></script>
+
+    <!-- 3. SCRIPT LOGIC RIÊNG CỦA TRANG NÀY -->
+    <script>
+        
+        async function fetchBlogDetail() {
+            // Lấy slug từ thanh địa chỉ (URL)
+            const urlParams = new URLSearchParams(window.location.search);
+            const slug = urlParams.get('slug');
+
+            if (!slug) {
+                showError();
+                return;
+            }
+
+            try {
+                // Kéo dữ liệu từ database dựa trên slug
+                const { data, error } = await supabaseClient
+                    .from('blogs')
+                    .select('*')
+                    .eq('slug', slug)
+                    .single(); // Lấy đúng 1 bài
+
+                if (error || !data) throw error;
+
+                // Ẩn loading, hiện bài viết
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('blogArticle').classList.remove('hidden');
+
+                // Bơm dữ liệu vào các thẻ HTML
+                document.title = data.title + " - MRO Khang Nam"; // Đổi title trên tab trình duyệt (RẤT TỐT CHO SEO)
+                document.getElementById('breadcrumbTitle').innerText = data.title;
+                document.getElementById('blogTitle').innerText = data.title;
+                document.getElementById('blogThumb').src = data.thumbnail;
+                document.getElementById('blogThumb').alt = data.title;
+                document.getElementById('blogDate').innerText = new Date(data.created_at).toLocaleDateString('vi-VN');
+                
+                // Bơm HTML của bài viết vào
+                document.getElementById('blogContent').innerHTML = data.content;
+
+            } catch (error) {
+                console.error("Lỗi:", error);
+                showError();
+            }
+        }
+
+        function showError() {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('errorState').classList.remove('hidden');
+        }
+
+        window.onload = function() {
+            checkCustomerAuth(); // Kiểm tra đăng nhập (Lấy từ common.js)
+            fetchBlogDetail();
+        };
+        
+    </script>
+</body>
+</html>

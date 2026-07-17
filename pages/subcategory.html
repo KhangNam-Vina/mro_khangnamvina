@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh Mục Con - MRO Khang Nam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00', 'kn-light': '#f5f6f8' } } } }
+    </script>
+</head>
+<body class="bg-kn-light flex flex-col min-h-screen">
+
+    <!-- CHỖ NÀY ĐỂ RÁP HEADER BẰNG JAVASCRIPT -->
+    <div id="app-header"></div>
+
+    <!-- 3. MAIN CONTENT: LƯỚI DANH MỤC CON -->
+    <main class="flex-grow container mx-auto px-4 py-10">
+        <!-- BREADCRUMB -->
+        <div class="text-sm font-medium mb-6 text-gray-500 flex items-center space-x-2">
+            <a href="../index.html" class="hover:text-kn-orange">Home</a> 
+            <span>/</span>
+            <span id="bcCategory" class="text-kn-blue font-bold uppercase">Đang tải...</span>
+        </div>
+
+        <div class="flex justify-between items-end mb-6 border-b border-gray-200 pb-4">
+            <div>
+                <h1 id="pageTitle" class="text-3xl font-bold text-kn-blue uppercase">Danh Mục Phân Loại</h1>
+                <p class="text-gray-500 mt-1">Chọn một phân loại để xem các dòng sản phẩm chi tiết</p>
+            </div>
+        </div>
+
+        <!-- BÃI ĐÁP SUBCATEGORY -->
+        <div id="subCategoryContainer" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div class="col-span-full flex justify-center py-10">
+                <svg class="animate-spin h-8 w-8 text-kn-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="4" class="opacity-25"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            </div>
+        </div>
+    </main>
+
+    <!-- CHỖ NÀY ĐỂ RÁP FOOTER BẰNG JAVASCRIPT -->
+    <div id="app-footer"></div>
+    
+    <!-- ========================================== -->
+    <!-- PHẦN GỌI SCRIPT ĐƯỢC QUY HOẠCH GỌN GÀNG LẠI -->
+    <!-- ========================================== -->
+
+    <!-- 1. GỌI SCRIPT COMPONENT HEADER/FOOTER -->
+    <script src="../assets/components/header.js"></script>
+    <script src="../assets/components/footer.js"></script>
+
+    <!-- 2. GỌI THƯ VIỆN & SCRIPT DÙNG CHUNG -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/common.js"></script>
+
+    <!-- 3. SCRIPT LOGIC RIÊNG CỦA TRANG NÀY (CỰC SẠCH) -->
+    <script src="../assets/js/subcategory.js"></script>
+</body>
+</html>

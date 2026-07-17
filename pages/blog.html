@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tin Tức MRO - Khang Nam Vina</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00', 'kn-light': '#f5f6f8' } } } }
+    </script>
+</head>
+<body class="bg-kn-light flex flex-col min-h-screen">
+
+    <!-- CHỖ NÀY ĐỂ RÁP HEADER BẰNG JAVASCRIPT -->
+    <div id="app-header"></div> 
+
+    <!-- 3. PAGE HEADER / BANNER -->
+    <div class="bg-gray-900 text-white py-12 relative overflow-hidden">
+        <img src="../assets/world mark.png" alt="Brands Banner" class="absolute inset-0 w-full h-full object-cover opacity-20">
+        <div class="container mx-auto px-4 relative z-10">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">Tin Tức & Kiến Thức MRO</h1>
+            <p class="text-gray-300 max-w-2xl text-sm leading-relaxed">
+                Cập nhật những xu hướng công nghệ mới nhất và bí quyết tối ưu hóa dây chuyền sản xuất công nghiệp.
+            </p> <!-- ĐÃ FIX LỖI THIẾU THẺ ĐÓNG Ở ĐÂY -->
+        </div>
+    </div>
+
+
+    <!-- MAIN CONTENT: DANH SÁCH BLOG -->
+    <main class="flex-grow bg-kn-light py-12">
+        <div class="container mx-auto px-4">
+            <!-- LƯỚI BÀI VIẾT -->
+            <div id="blogGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Icon Loading -->
+                <div class="col-span-full flex justify-center py-20">
+                    <svg class="animate-spin h-10 w-10 text-kn-orange" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- CHỖ NÀY ĐỂ RÁP FOOTER BẰNG JAVASCRIPT -->
+    <div id="app-footer"></div>
+
+    <!-- ========================================== -->
+    <!-- PHẦN GỌI SCRIPT ĐƯỢC QUY HOẠCH GỌN GÀNG LẠI -->
+    <!-- ========================================== -->
+
+    <!-- 1. GỌI SCRIPT COMPONENT HEADER/FOOTER -->
+    <script src="../assets/components/header.js"></script>
+    <script src="../assets/components/footer.js"></script>
+
+    <!-- 2. GỌI THƯ VIỆN & SCRIPT DÙNG CHUNG -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/common.js"></script>
+
+    <!-- 3. SCRIPT LOGIC RIÊNG CỦA TRANG NÀY -->
+    <script>
+        async function loadBlogs() {
+            const grid = document.getElementById('blogGrid');
+            if(!grid) return;
+ 
+            try {
+                const { data, error } = await supabaseClient
+                    .from('blogs')
+                    .select('id, title, slug, thumbnail, summary, created_at')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    grid.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">Chưa có bài viết nào.</div>`;
+                    return;
+                }
+
+                grid.innerHTML = '';
+                data.forEach(post => {
+                    const date = new Date(post.created_at).toLocaleDateString('vi-VN');
+                    
+                    grid.innerHTML += `
+                        <div class="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200 hover:shadow-lg transition flex flex-col h-full group">
+                            <a href="blog-detail.html?slug=${post.slug}" class="block h-56 overflow-hidden relative">
+                                <img src="${post.thumbnail || 'https://via.placeholder.com/600x400?text=Blog+Image'}" alt="${post.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <div class="absolute top-4 left-4 bg-kn-orange text-white text-xs font-bold px-3 py-1 rounded shadow">${date}</div>
+                            </a>
+                            <div class="p-6 flex-grow flex flex-col">
+                                <a href="blog-detail.html?slug=${post.slug}">
+                                    <h3 class="text-lg font-bold text-gray-800 mb-3 group-hover:text-kn-blue transition-colors line-clamp-2">${post.title}</h3>
+                                </a>
+                                <p class="text-gray-500 text-sm mb-4 line-clamp-3">${post.summary || ''}</p>
+                                <a href="blog-detail.html?slug=${post.slug}" class="mt-auto inline-flex items-center text-kn-blue font-bold text-sm hover:text-kn-orange transition-colors">
+                                    Đọc tiếp
+                                    <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error("Lỗi tải blog:", error);
+                grid.innerHTML = `<div class="col-span-full text-center text-red-500">Lỗi: ${error.message}</div>`;
+            }
+        }
+
+        // Gom các lệnh khởi chạy lúc mở trang vào chung 1 hàm window.onload
+        window.onload = function() {
+            checkCustomerAuth(); // Kiểm tra đăng nhập (Lấy từ common.js)
+            loadBlogs();         // Tải danh sách bài viết
+        };
+    </script>
+</body>
+</html>

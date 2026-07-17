@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giới thiệu - MRO Khang Nam Vina</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00', 'kn-light': '#f5f6f8' } } } }
+    </script>
+</head>
+<body class="bg-kn-light flex flex-col min-h-screen">
+
+    <div id="app-header"></div>
+    
+    <!-- 3. PAGE HEADER / BANNER -->
+    <div class="bg-gray-900 text-white py-12 relative overflow-hidden">
+        <img src="../assets/world mark.png" alt="Brands Banner" class="absolute inset-0 w-full h-full object-cover opacity-20">
+        <div class="container mx-auto px-4 relative z-10">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">Đối Tác MRO Toàn Diện Của Bạn</h1>
+            <p class="text-gray-300 max-w-2xl text-sm leading-relaxed">
+                Công ty TNHH Thương mại – Dịch vụ Khang Nam Vina tự hào là đơn vị hàng đầu chuyên cung cấp giải pháp vật tư công nghiệp, trang thiết bị văn phòng và nhà xưởng. Tọa lạc tại trung tâm Khu Công nghệ cao, TP. Thủ Đức, chúng tôi cam kết mang đến chuỗi cung ứng bền vững và tối ưu nhất cho doanh nghiệp của bạn.
+            </p>
+        </div>
+    </div>
+
+    <!-- 5. TẦM NHÌN & SỨ MỆNH -->
+    <section class="py-16 container mx-auto px-4">
+        <div class="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto">
+            <div class="bg-white p-8 rounded-xl shadow-sm border-t-4 border-kn-blue hover:shadow-lg transition-shadow">
+                <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-6">
+                    <svg class="w-8 h-8 text-kn-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                </div>
+                <h3 class="text-2xl font-black text-gray-800 mb-4 uppercase">Tầm Nhìn</h3>
+                <p class="text-gray-600 leading-relaxed">Trở thành nền tảng thương mại điện tử B2B số 1 tại Việt Nam trong lĩnh vực cung ứng vật tư MRO, là cầu nối vững chắc giữa các nhà sản xuất quốc tế và các nhà máy, doanh nghiệp trong nước.</p>
+            </div>
+            
+            <div class="bg-white p-8 rounded-xl shadow-sm border-t-4 border-kn-orange hover:shadow-lg transition-shadow">
+                <div class="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mb-6">
+                    <svg class="w-8 h-8 text-kn-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <h3 class="text-2xl font-black text-gray-800 mb-4 uppercase">Sứ Mệnh</h3>
+                <p class="text-gray-600 leading-relaxed">Tối ưu hóa quy trình mua sắm, tiết kiệm thời gian và chi phí cho khách hàng thông qua hệ thống sản phẩm đa dạng, minh bạch giá cả và dịch vụ giao hàng thần tốc.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. TẠI SAO CHỌN CHÚNG TÔI -->
+    <section class="bg-white py-16 border-t border-gray-200">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-black text-kn-blue mb-12 uppercase">Thế mạnh của Khang Nam Vina</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <div class="p-6">
+                    <div class="text-4xl mb-4">🏭</div>
+                    <h4 class="text-lg font-bold text-gray-800 mb-2 uppercase">Hàng Hóa Đa Dạng</h4>
+                    <p class="text-sm text-gray-500">Hàng ngàn mã sản phẩm từ dụng cụ cầm tay, thiết bị cắt gọt đến vật tư tiêu hao nhà xưởng.</p>
+                </div>
+                <div class="p-6 border-x border-gray-100">
+                    <div class="text-4xl mb-4">✅</div>
+                    <h4 class="text-lg font-bold text-gray-800 mb-2 uppercase">100% Chính Hãng</h4>
+                    <p class="text-sm text-gray-500">Phân phối trực tiếp từ các thương hiệu toàn cầu với đầy đủ giấy tờ CO/CQ chứng nhận chất lượng.</p>
+                </div>
+                <div class="p-6">
+                    <div class="text-4xl mb-4">⚡</div>
+                    <h4 class="text-lg font-bold text-gray-800 mb-2 uppercase">Quy Trình Tối Ưu</h4>
+                    <p class="text-sm text-gray-500">Hệ thống Yêu cầu Báo giá (RFQ) thông minh, giúp doanh nghiệp chốt đơn nhanh chóng, chuyên nghiệp.</p>
+                </div> 
+            </div>
+        </div>
+    </section>
+
+   <!-- CHỖ NÀY ĐỂ RÁP FOOTER BẰNG JAVASCRIPT -->
+    <div id="app-footer"></div>
+
+    <!-- GỌI SCRIPT COMPONENT HEADER/FOOTER -->
+    <script src="../assets/components/header.js"></script>
+    <script src="../assets/components/footer.js"></script>
+
+    <!-- 1. Gọi thư viện Supabase (bắt buộc) - Đã thêm dấu < bị thiếu -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- 2. Gọi file common.js của anh em mình -->
+    <script src="../assets/js/common.js"></script>
+    
+    <!-- 3. Viết script riêng cho trang này (nếu có) -->
+    <script>
+        window.onload = function() {
+            checkCustomerAuth(); // Hàm này giờ được gọi từ common.js
+            
+        };
+    </script>
+</body>
+</html>

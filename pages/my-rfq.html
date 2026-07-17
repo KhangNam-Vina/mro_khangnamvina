@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn hàng của tôi - MRO Khang Nam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00', 'kn-light': '#f5f6f8' } } } }
+    </script>
+</head>
+<body class="bg-kn-light flex flex-col min-h-screen font-sans text-gray-800">
+
+    <!-- CHỖ NÀY ĐỂ RÁP HEADER BẰNG JAVASCRIPT -->
+    <div id="app-header"></div>
+
+
+    <!-- NỘI DUNG CHÍNH -->
+    <main class="flex-grow container mx-auto px-4 py-10">
+        <div class="max-w-5xl mx-auto">
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                <h1 class="text-2xl md:text-3xl font-black text-kn-blue uppercase tracking-tight">
+                    Lịch sử Yêu cầu báo giá
+                </h1>
+                <a href="products.html" class="bg-kn-orange text-white px-6 py-2.5 rounded-md font-bold text-sm hover:bg-orange-600 transition shadow flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Tạo Yêu Cầu Mới
+                </a>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200 text-sm text-gray-600 uppercase tracking-wide">
+                                <th class="py-4 px-6 font-bold">Mã RFQ</th>
+                                <th class="py-4 px-6 font-bold">Ngày gửi</th>
+                                <th class="py-4 px-6 font-bold">Công ty</th>
+                                <th class="py-4 px-6 font-bold text-center">Trạng thái</th>
+                                <th class="py-4 px-6 font-bold text-right">Chi tiết</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rfqTableBody" class="divide-y divide-gray-100">
+                            <!-- Javascript sẽ bơm danh sách vào đây -->
+                            <tr>
+                                <td colspan="5" class="py-12 text-center">
+                                    <svg class="animate-spin h-8 w-8 text-kn-orange mx-auto mb-3" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    <p class="text-gray-500 font-medium text-sm">Đang tải lịch sử đơn hàng...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- CHỖ NÀY ĐỂ RÁP FOOTER BẰNG JAVASCRIPT -->
+    <div id="app-footer"></div>
+
+    <!-- ========================================== -->
+    <!-- PHẦN GỌI SCRIPT ĐƯỢC QUY HOẠCH GỌN GÀNG LẠI -->
+    <!-- ========================================== -->
+
+    <!-- 1. GỌI SCRIPT COMPONENT HEADER/FOOTER -->
+    <script src="../assets/components/header.js"></script>
+    <script src="../assets/components/footer.js"></script>
+
+    <!-- 2. GỌI THƯ VIỆN & SCRIPT DÙNG CHUNG -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/common.js"></script>
+
+    <!-- 3. SCRIPT LOGIC RIÊNG CỦA TRANG NÀY -->
+    <script>
+        async function loadMyRFQs() {
+            const tbody = document.getElementById('rfqTableBody');
+
+            // 1. Lấy thông tin user đang đăng nhập từ Supabase
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            
+            // Nếu chưa đăng nhập thì báo lỗi và dừng lại
+            if (!session) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-red-500 font-bold">Vui lòng đăng nhập để xem lịch sử đơn hàng.</td></tr>`;
+                return;
+            }
+
+            // Gán ID của user vào biến
+            const currentUserId = session.user.id;
+
+            try {
+                // 2. Kéo dữ liệu từ DB (Lưu ý: Nếu DB của ông đổi tên thành 'rfq_orders' thì sửa lại chỗ 'rfqs' này nha)
+                const { data, error } = await supabaseClient
+                    .from('rfqs') 
+                    .select('*')
+                    .eq('user_id', currentUserId) // Bây giờ thì biến này đã có dữ liệu hợp lệ
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-gray-500">Bạn chưa gửi Yêu cầu báo giá nào.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = data.map(item => {
+                    const dateObj = new Date(item.created_at);
+                    const formattedDate = dateObj.toLocaleDateString('vi-VN') + ' ' + dateObj.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                    
+                    const status = item.status || 'Chờ xử lý';
+                    let statusHtml = '';
+                    if (status.toLowerCase().includes('đã báo giá') || status.toLowerCase().includes('thành công')) {
+                        statusHtml = `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200">${status}</span>`;
+                    } else if (status.toLowerCase().includes('từ chối') || status.toLowerCase().includes('hủy')) {
+                        statusHtml = `<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold border border-red-200">${status}</span>`;
+                    } else {
+                        statusHtml = `<span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold border border-orange-200">${status}</span>`;
+                    }
+
+                    return `
+                        <tr class="hover:bg-blue-50 transition-colors">
+                            <td class="py-4 px-6 font-bold text-kn-blue">${item.rfq_code || 'RFQ-???'}</td>
+                            <td class="py-4 px-6 text-sm text-gray-600">${formattedDate}</td>
+                            <td class="py-4 px-6 text-sm text-gray-800 font-medium">${item.company_name || 'Khách lẻ'}</td>
+                            <td class="py-4 px-6 text-center">${statusHtml}</td>
+                            <td class="py-4 px-6 text-right">
+                                <button onclick="alert('Đang nâng cấp tính năng xem chi tiết!')" class="text-sm font-bold text-kn-orange hover:underline">
+                                    Xem chi tiết
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error("Lỗi tải RFQ:", err);
+                tbody.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-red-500">Lỗi mạng: ${err.message}</td></tr>`;
+            }
+        }
+
+        window.onload = function() {
+            checkCustomerAuth(); 
+            loadMyRFQs();
+        };
+
+    </script>
+</body>
+</html>

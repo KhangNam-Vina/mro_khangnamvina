@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đang đăng xuất... - MRO Khang Nam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00', 'kn-light': '#f5f6f8' } } } }
+    </script>
+</head>
+<body class="bg-gray-900 h-screen flex flex-col items-center justify-center text-white overflow-hidden">
+
+    <!-- Logo Admin -->
+    <div class="mb-10 transform scale-125">
+        <span class="text-4xl font-black tracking-wider text-white flex items-center">
+            KN <span class="text-kn-orange ml-2">ADMIN</span>
+        </span>
+    </div>
+
+    <!-- Hiệu ứng Spinner Loading xoay vòng -->
+    <div class="relative w-16 h-16 mb-6">
+        <!-- Vòng mờ phía sau -->
+        <div class="absolute inset-0 border-4 border-gray-700 rounded-full"></div>
+        <!-- Vòng cam chạy phía trước -->
+        <div class="absolute inset-0 border-4 border-kn-orange rounded-full border-t-transparent animate-spin"></div>
+    </div>
+
+    <!-- Thông báo -->
+    <h2 class="text-xl font-medium text-gray-300">Đang đăng xuất khỏi hệ thống...</h2>
+    <p class="text-sm text-gray-500 mt-2">Vui lòng đợi trong giây lát, hệ thống đang làm sạch dữ liệu phiên làm việc.</p>
+
+    <!-- Script giả lập độ trễ rồi đá về trang Login -->
+    <!-- Ở dưới cùng file logout.html -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseClient = supabase.createClient('https://wnhrkziiujbswnrfnlly.supabase.co', 'sb_publishable_mCpQQA5h6TQHP7ueyYv1qg_vxnTQIRk');
+
+        async function doLogout() {
+            // Xóa session trên Supabase
+            await supabaseClient.auth.signOut();
+            
+            // Đợi 1.5 giây cho hiệu ứng loading đẹp mắt rồi đá về login
+            setTimeout(function() {
+                window.location.href = "../pages/login.html";
+            }, 1500);
+        }
+
+        doLogout();
+    </script>
+
+</body>
+</html>
