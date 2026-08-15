@@ -1,74 +1,326 @@
 // ========================================================
-// FILE: assets/js/index.js
-// XỬ LÝ LOGIC 
+// FILE: assets/js/users/category.js
+// QUẢN LÝ DANH MỤC GỐC
+// Luồng:
+// Category -> Subcategory -> Family -> Products
 // ========================================================
 
-// Hàm 2: Phép thuật kéo danh mục
-        async function loadCategoryHub() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const catId = urlParams.get('category_id');
-            const grid = document.getElementById('subCategoryGrid');
-            const breadcrumbName = document.getElementById('breadcrumbCategoryName');
+async function loadCategories() {
 
-            if (!catId) {
-                grid.innerHTML = '<p class="col-span-full text-center text-red-500 font-bold py-10">Không tìm thấy mã danh mục. Vui lòng thử lại!</p>';
-                breadcrumbName.innerText = "Lỗi";
-                return;
+    const skeleton =
+        document.getElementById(
+            'skeletonLoading'
+        );
+
+    const grid =
+        document.getElementById(
+            'categoryGrid'
+        );
+
+    const emptyState =
+        document.getElementById(
+            'emptyState'
+        );
+
+    const counter =
+        document.getElementById(
+            'totalCategoriesCount'
+        );
+
+
+    if (!grid || !skeleton) {
+        return;
+    }
+
+
+    try {
+
+        // ==================================================
+        // LẤY DANH MỤC GỐC
+        // ==================================================
+
+        const {
+            data,
+            error
+        } = await window.supabaseClient
+            .from('categories')
+            .select('id, name')
+            .order(
+                'name',
+                {
+                    ascending: true
+                }
+            );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        // ==================================================
+        // CẬP NHẬT COUNTER
+        // ==================================================
+
+        if (counter) {
+
+            counter.textContent =
+                data
+                    ? data.length
+                    : 0;
+
+        }
+
+
+        // ==================================================
+        // ẨN SKELETON
+        // ==================================================
+
+        skeleton.classList.add(
+            'is-hidden'
+        );
+
+
+        // ==================================================
+        // EMPTY STATE
+        // ==================================================
+
+        if (
+            !data ||
+            data.length === 0
+        ) {
+
+            emptyState?.classList.remove(
+                'is-hidden'
+            );
+
+            return;
+        }
+
+
+        // ==================================================
+        // HIỆN GRID
+        // ==================================================
+
+        grid.classList.remove(
+            'is-hidden'
+        );
+
+
+        let html = '';
+
+
+        const fallbackIcons = [
+            '🔩',
+            '⚙️',
+            '🔧',
+            '🧰',
+            '📦',
+            '🦺',
+            '🔌',
+            '🗜️'
+        ];
+
+
+        // ==================================================
+        // RENDER CATEGORY
+        // ==================================================
+
+        data.forEach(
+            (cat, index) => {
+
+                const categoryName =
+                    cat.name || '';
+
+
+                const initials =
+                    categoryName
+                        .trim()
+                        .split(/\s+/)
+                        .slice(0, 3)
+                        .map(
+                            word =>
+                                word[0]
+                        )
+                        .join('')
+                        .toUpperCase();
+
+
+                const icon =
+                    fallbackIcons[
+                        index %
+                        fallbackIcons.length
+                    ];
+
+
+                // ==================================================
+                // LUỒNG CATEGORY
+                // Category -> Subcategory
+                // ==================================================
+
+                const targetUrl =
+                    `subcategory.html?category_id=${encodeURIComponent(cat.id)}`;
+
+
+                html += `
+                    <a
+                        href="${targetUrl}"
+                        class="catalog-category-card"
+                        aria-label="Xem danh mục ${escapeCategoryHTML(categoryName)}"
+                    >
+
+                        <div class="catalog-category-icon">
+
+                            <span>
+                                ${icon}
+                            </span>
+
+                        </div>
+
+
+                        <h2 class="catalog-category-title">
+                            ${escapeCategoryHTML(categoryName)}
+                        </h2>
+
+
+                        <div class="catalog-category-initials">
+                            ${escapeCategoryHTML(initials)}
+                        </div>
+
+                    </a>
+                `;
             }
+        );
+
+
+        grid.innerHTML =
+            html;
+
+
+    } catch (error) {
+
+        console.error(
+            'Lỗi tải danh mục gốc:',
+            error
+        );
+
+
+        skeleton.classList.add(
+            'is-hidden'
+        );
+
+
+        grid.classList.remove(
+            'is-hidden'
+        );
+
+
+        grid.innerHTML = `
+            <div class="catalog-error">
+                Lỗi kết nối máy chủ:
+                ${escapeCategoryHTML(
+                    error.message
+                )}
+            </div>
+        `;
+
+    }
+}
+
+
+// ========================================================
+// ESCAPE HTML
+// ========================================================
+
+function escapeCategoryHTML(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+        return '';
+    }
+
+
+    const div =
+        document.createElement(
+            'div'
+        );
+
+
+    div.textContent =
+        String(value);
+
+
+    return div.innerHTML;
+}
+
+
+// ========================================================
+// INIT
+// ========================================================
+
+document.addEventListener(
+    'DOMContentLoaded',
+    async () => {
+
+        // 1. Load category
+        await loadCategories();
+
+
+        // 2. Auth
+        if (
+            typeof window.checkCustomerAuth ===
+            'function'
+        ) {
 
             try {
-                // Phóng lên Supabase kéo 1 Danh mục gốc và đống Danh mục con bên trong
-                const { data, error } = await supabaseClient
-                    .from('categories')
-                    .select('name, sub_categories(id, name)')
-                    .eq('id', catId)
-                    .single();
 
-                if (error) throw error;
+                const user =
+                    await window.checkCustomerAuth();
 
-                // Điền tên danh mục vào Breadcrumb cho đẹp
-                breadcrumbName.innerText = data.name;
-                document.title = data.name + " - MRO Khang Nam";
 
-                // Xóa icon loading
-                grid.innerHTML = '';
+                if (user) {
 
-                if (!data.sub_categories || data.sub_categories.length === 0) {
-                    grid.innerHTML = '<p class="col-span-full text-center text-gray-500 py-10 font-bold">Danh mục này hiện chưa có phân loại nhỏ hơn.</p>';
-                    return;
+                    // Ẩn Login
+                    document
+                        .getElementById(
+                            'btnGuestLogin'
+                        )
+                        ?.classList.add(
+                            'is-hidden'
+                        );
+
+
+                    // Hiện Profile
+                    const userProfileBtn =
+                        document.getElementById(
+                            'btnUserProfile'
+                        );
+
+
+                    if (userProfileBtn) {
+
+                        userProfileBtn.classList.remove(
+                            'is-hidden'
+                        );
+
+                    }
+
                 }
 
-                // Vẽ các ô Danh mục con theo thiết kế của bro
-                data.sub_categories.sort((a, b) => a.id - b.id).forEach(sub => {
-                    
-                    // Logic tự động lấy 2 chữ cái đầu làm icon
-                    let initials = "MRO"; 
-                    if (sub.name) {
-                        const words = sub.name.trim().split(' ');
-                        if (words.length >= 2) {
-                            initials = (words[0][0] + words[1][0]).toUpperCase();
-                        } else {
-                            initials = sub.name.substring(0, 2).toUpperCase();
-                        }
-                    }
-                    
-                    grid.innerHTML += `
-                        <a href="products.html?sub_category_id=${sub.id}" class="group bg-white p-6 rounded-lg border border-gray-200 text-center hover:border-kn-orange hover:shadow-lg transition-all block">
-                            <div class="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4 group-hover:bg-orange-50 transition-colors">
-                                <span class="font-bold text-xl text-gray-400 group-hover:text-kn-orange">${initials}</span>
-                            </div>
-                            <h3 class="font-bold text-kn-blue uppercase group-hover:text-kn-orange">${sub.name}</h3>
-                            <p class="text-xs text-gray-500 mt-2">Xem chi tiết các mã ${sub.name.toLowerCase()}...</p>
-                        </a>
-                    `;
-                });
+            } catch (error) {
 
-            } catch (err) {
-                console.error("Lỗi:", err);
-                grid.innerHTML = `<p class="col-span-full text-center text-red-500 py-10">Lỗi kết nối: ${err.message}</p>`;
+                console.error(
+                    'Lỗi xác thực:',
+                    error
+                );
+
             }
+
         }
-        window.onload = function() {
-            checkCustomerAuth(); // Kiểm tra đăng nhập (Lấy từ common.js)
-            loadCategoryHub();         // Tải danh sách bài viết
-        };
+
+    }
+);

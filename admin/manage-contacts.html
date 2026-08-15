@@ -3,114 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Liên hệ - MRO Admin</title>
+    <title>Quản lý Liên hệ - KN Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00', 'kn-light': '#f5f6f8' } } } }
+        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00' } } } }
     </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #00479b; border-radius: 10px; }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans text-gray-800 flex h-screen overflow-hidden relative">
+<body class="bg-gray-50 font-sans text-gray-800 flex h-screen overflow-hidden relative">
 
-    <!-- SIDEBAR CHUẨN MỰC -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none"></div>
+
     <aside class="w-64 bg-gray-900 text-white flex flex-col hidden md:flex shrink-0">
         <div class="h-16 flex items-center px-6 bg-gray-950 border-b border-gray-800">
             <span class="text-xl font-black tracking-wider text-white">Khangnam <span class="text-kn-orange">ADMIN</span></span>
         </div>
-
         <div class="flex-1 overflow-y-auto py-4">
-            <nav class="space-y-1 px-3">
-                <!-- 1. Tổng quan -->
-                <a href="dashboard.html" class="flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md group">
-                    <svg class="w-5 h-5 mr-3 text-kn-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                    Tổng quan
-                </a>
-                <!-- 2. Quản lý báo giá -->
-                <a href="rfq-detail.html" class="flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md group">
-                    <svg class="w-5 h-5 mr-3 text-kn-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    Quản lý báo giá 
-                </a>
-                <!-- 3. Quản lý sản phẩm -->
-                <a href="manage-products.html" class="flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md group">
-                    <svg class="w-5 h-5 mr-3 text-kn-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    Quản lý sản phẩm
-                </a>
-                <!-- 5. Quản lý ngành hàng -->
-                <a href="manage-industries.html" class="flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md group">
-                    <svg class="w-5 h-5 mr-3 text-kn-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                    Quản lý ngành hàng
-                </a>
-                <a href="manage-families.html" class="flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md group">
-                    <svg class="w-5 h-5 mr-3 text-kn-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                   Quản lý dòng sản phẩm
-                </a>
-                <!-- 6. Quản lý trang blog -->
-                <a href="manage-blog.html" class="flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md group">
-                    <svg class="w-5 h-5 mr-3 text-kn-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
-                    Quản lý trang blog
-                </a>
-                <!-- 7. Quản lý liên hệ -->
-                <a href="manage-contacts.html" class="flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md group">
-                    <svg class="w-5 h-5 mr-3 text-kn-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                    Quản lý liên hệ
-                </a>
-            </nav>
+            <nav class="space-y-1 px-3" id="adminSidebarNav">
+                <a href="dashboard.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Tổng quan & Đơn hàng</a>
+                <a href="manage-categories.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Danh mục</a>
+                <a href="manage-subcategories.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Nhóm hàng</a>
+                <a href="manage-families.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Dòng sản phẩm</a>
+                <a href="manage-products.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Sản phẩm</a>
+                <a href="manage-industries.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Ngành hàng</a>
+                <a href="manage-blog.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Bài viết</a>
+                <a href="manage-about.html"class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Giới thiệu</a>
+                <a href="manage-contacts.html" class="nav-link flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md transition font-bold">Quản lý Liên hệ</a>
+                <a href="manage-users.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Người dùng</a>
+                <a href="manage-settings.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Cấu hình</a>
+            </nav> 
         </div>
-
         <div class="p-4 border-t border-gray-800">
-            <a href="../admin/login.html" class="flex items-center text-sm text-gray-400 hover:text-white transition-colors">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                Đăng xuất
-            </a>
+            <button onclick="handleAdminLogout()" class="flex items-center text-sm text-gray-400 hover:text-white transition-colors w-full">Đăng xuất</button>
         </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6 flex flex-col">
-        <div class="mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <h2 class="text-2xl font-bold text-gray-800">Khách hàng Liên hệ</h2>
+    <div class="flex-1 flex flex-col h-screen overflow-hidden">
+        <header class="bg-white shadow-sm px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center">
+            <div>
+                <h2 class="text-xl font-bold text-gray-900">Quản lý Phản hồi & Liên hệ</h2>
+                <p class="text-xs text-gray-500 mt-1">Tin nhắn tư vấn, yêu cầu hỗ trợ kỹ thuật từ khách hàng</p>
+            </div>
             
-            <!-- THANH CÔNG CỤ: TÌM KIẾM & LỌC -->
-            <div class="flex items-center space-x-3 w-full md:w-auto">
-                <div class="relative flex-1 md:w-64">
-                    <input type="text" id="searchContactInput" placeholder="Tìm tên, SĐT, Email..." class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-kn-blue shadow-sm">
-                    <svg class="w-4 h-4 text-gray-400 absolute right-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </div>
-                <select id="filterDateSelect" class="border border-gray-300 bg-white text-gray-700 py-2 px-3 rounded-md text-sm focus:outline-none focus:border-kn-blue shadow-sm cursor-pointer">
+            <!-- NHÓM TÌM KIẾM/LỌC (Sẽ ẩn khi ở Tab Cài đặt) -->
+            <div id="headerFilters" class="flex space-x-3 w-full md:w-auto mt-3 md:mt-0 transition-opacity duration-300">
+                <select id="filterDateSelect" class="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue">
                     <option value="all">Tất cả thời gian</option>
                     <option value="today">Hôm nay</option>
                     <option value="7days">7 ngày qua</option>
                     <option value="30days">30 ngày qua</option>
                 </select>
+                <div class="flex items-center space-x-2 bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 focus-within:border-kn-blue transition flex-1 md:flex-none w-full md:w-64">
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" id="searchContactInput" placeholder="Tìm người gửi, email..." class="bg-transparent border-none outline-none text-sm text-gray-700 w-full">
+                </div>
             </div>
+        </header>
+
+        <!-- THANH ĐIỀU HƯỚNG TABS -->
+        <div class="bg-white border-b border-gray-200 px-6 flex space-x-8 z-10 shadow-sm relative">
+            <button id="tabInboxBtn" onclick="switchTab('inbox')" class="py-3 text-kn-blue border-b-2 border-kn-blue font-bold text-sm transition">Hộp Thư Đến</button>
+            <button id="tabConfigBtn" onclick="switchTab('config')" class="py-3 text-gray-500 border-b-2 border-transparent hover:text-kn-blue font-bold text-sm transition">Cài Đặt Hiển Thị</button>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex-1 flex flex-col">
-            <div class="overflow-x-auto flex-1">
-                <table class="w-full text-left text-sm text-gray-600">
-                    <thead class="bg-gray-100 text-gray-700 font-bold border-b text-xs uppercase tracking-wider sticky top-0">
-                        <tr>
-                            <th class="p-4 text-center w-12">#</th>
-                            <th class="p-4 w-48">Khách hàng</th>
-                            <th class="p-4 w-56">Thông tin liên lạc</th>
-                            <th class="p-4">Nội dung tin nhắn</th>
-                            <th class="p-4 w-36">Ngày gửi</th>
-                            <th class="p-4 text-right w-24">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <!-- Data Bơm từ JS -->
-                    <tbody id="contactTableBody" class="divide-y divide-gray-100"></tbody>
-                </table>
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6 custom-scrollbar">
+            
+            <!-- TAB 1: DANH SÁCH TIN NHẮN (Mặc định hiển thị) -->
+            <div id="tabInbox" class="block h-full flex flex-col">
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6 flex-1">
+                    <table class="w-full text-left text-sm text-gray-600">
+                        <thead class="bg-gray-50 text-gray-700 font-bold border-b border-gray-200 text-xs uppercase tracking-wider sticky top-0">
+                            <tr>
+                                <th class="p-4 text-center w-12">#</th>
+                                <th class="p-4 w-48">Khách hàng</th>
+                                <th class="p-4 w-52">Liên hệ</th>
+                                <th class="p-4">Nội dung tin nhắn</th>
+                                <th class="p-4 w-36">Ngày gửi</th>
+                                <th class="p-4 text-right w-32">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="contactTableBody" class="divide-y divide-gray-100 bg-white">
+                            <tr><td colspan="6" class="text-center py-8 text-gray-400">Đang tải danh sách liên hệ...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="paginationContainer" class="flex justify-between items-center text-sm py-2"></div>
             </div>
 
-            <!-- Phân trang -->
-            <div id="paginationContainer" class="p-4 flex justify-center space-x-2 border-t border-gray-200 bg-gray-50"></div>
-        </div>
-    </main>
+            <!-- TAB 2: FORM CẤU HÌNH GIAO DIỆN TRANG LIÊN HỆ -->
+            <div id="tabConfig" class="hidden max-w-4xl mx-auto space-y-6 pb-10">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-lg font-black text-gray-800">Cấu hình trang "Liên Hệ" (Khách hàng)</h3>
+                    <button id="btnSaveConfig" onclick="saveContactConfig()" class="px-6 py-2 bg-kn-blue text-white font-bold rounded-lg hover:bg-blue-800 transition shadow-sm text-sm">
+                        Lưu Thay Đổi
+                    </button>
+                </div>
 
-    <!-- 100% SẠCH SẼ: CHỈ CÒN NHÚNG SCRIPT -->
+                <!-- Section 1: Thông tin liên hệ nhanh -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h4 class="text-md font-bold text-gray-900 mb-4 border-b pb-2">1. Thông tin liên hệ chung</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Hotline B2B</label>
+                            <input type="text" id="cfgHotline" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none text-sm" placeholder="VD: 0919 699 942">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Email Báo Giá</label>
+                            <input type="email" id="cfgEmail" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none text-sm" placeholder="VD: sales@khangnam.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Địa chỉ kho / văn phòng</label>
+                            <input type="text" id="cfgAddress" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none text-sm" placeholder="VD: Khu CNC, TP.Thủ Đức">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Thời gian hỗ trợ</label>
+                            <input type="text" id="cfgSupportTime" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none text-sm" placeholder="VD: 8:00 - 17:00 (T2-T7)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Bản đồ Map -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h4 class="text-md font-bold text-gray-900 mb-2 border-b pb-2">2. Bản đồ Google Maps</h4>
+                    <p class="text-xs text-gray-500 mb-4">Vào Google Maps > Chia sẻ > Nhúng bản đồ > Copy đoạn link bên trong thuộc tính <code class="bg-gray-100 text-red-500 px-1 rounded">src="..."</code></p>
+                    <div>
+                        <textarea id="cfgMapUrl" rows="3" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none text-sm font-mono text-gray-600" placeholder="https://www.google.com/maps/embed?pb=..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Section 3: Uy tín (Social Proof) -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h4 class="text-md font-bold text-gray-900 mb-4 border-b pb-2">3. Các điểm uy tín (Social Proof)</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <span class="bg-green-100 text-green-700 p-1.5 rounded-full"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></span>
+                            <input type="text" id="cfgProof1" class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none text-sm">
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="bg-green-100 text-green-700 p-1.5 rounded-full"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></span>
+                            <input type="text" id="cfgProof2" class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none text-sm">
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="bg-green-100 text-green-700 p-1.5 rounded-full"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></span>
+                            <input type="text" id="cfgProof3" class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none text-sm">
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="bg-green-100 text-green-700 p-1.5 rounded-full"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></span>
+                            <input type="text" id="cfgProof4" class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none text-sm">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../assets/js/common.js"></script>
-    <script src="../assets/js/services/contactService.js"></script>
-    <script src="../assets/js/services/contactService.js"></script>
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/common/utils.js"></script>
+    <script src="../assets/js/admin/admin-core.js"></script>
+    <script src="../assets/js/admin/admin-contacts.js"></script>
 </body>
 </html>

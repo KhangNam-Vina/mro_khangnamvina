@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Danh mục Vật tư - KN Admin</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'kn-blue': '#00479b',
+                        'kn-orange': '#ff5e00'
+                    }
+                }
+            }
+        }
+    </script>
+</head> 
+<body class="bg-gray-50 font-sans text-gray-800 flex h-screen overflow-hidden relative">
+
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none"></div>
+
+    <aside class="w-64 bg-gray-900 text-white flex flex-col hidden md:flex shrink-0">
+        <div class="h-16 flex items-center px-6 bg-gray-950 border-b border-gray-800">
+            <span class="text-xl font-black tracking-wider text-white">Khangnam <span class="text-kn-orange">ADMIN</span></span>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4">
+            <nav class="space-y-1 px-3" id="adminSidebarNav">
+                <a href="dashboard.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Tổng quan & Đơn hàng</a>
+                <a href="manage-categories.html" class="nav-link flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md transition font-bold">Quản lý Danh mục</a>
+                <a href="manage-subcategories.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Nhóm hàng</a>
+                <a href="manage-families.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Dòng sản phẩm</a>
+                <a href="manage-products.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Sản phẩm</a>
+                <a href="manage-industries.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Ngành hàng</a>
+                <a href="manage-blog.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Bài viết</a>
+                <a href="manage-about.html"class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Giới thiệu</a>
+                <a href="manage-contacts.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Liên hệ</a>
+                <a href="manage-users.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Người dùng</a>
+                <a href="manage-settings.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Cấu hình</a>
+            </nav> 
+        </div>
+        <div class="p-4 border-t border-gray-800">
+            <button onclick="handleAdminLogout()" class="flex items-center text-sm text-gray-400 hover:text-white transition-colors w-full">Đăng xuất</button>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col overflow-hidden">
+        
+        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shrink-0">
+            <div class="flex items-center gap-3">
+                <h1 class="text-xl font-black text-gray-800 uppercase tracking-tight">Quản Lý Danh Mục</h1>
+                <span id="categoryStats" class="bg-blue-50 text-kn-blue text-xs font-bold px-2.5 py-1 rounded-full border border-blue-100">
+                    -- danh mục
+                </span>
+            </div>
+            <button onclick="openModal()" class="bg-kn-blue hover:bg-blue-800 text-white font-bold px-4 py-2 rounded-lg text-sm transition shadow flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                Thêm Danh Mục Mới
+            </button>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-6">
+            
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm mb-6 flex flex-col sm:flex-row justify-between gap-4 items-center">
+                <div class="relative w-full sm:w-80">
+                    <input type="text" id="searchCategoryInput" placeholder="Tìm theo tên hoặc slug..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:border-kn-blue outline-none">
+                    <svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <select id="filterStatusSelect" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-kn-blue outline-none bg-white">
+                        <option value="all">Tất cả trạng thái</option>
+                        <option value="active">Đang hiển thị (Active)</option>
+                        <option value="hidden">Đang ẩn (Hidden)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                <th class="py-3.5 px-4 w-16 text-center">ID</th>
+                                <th class="py-3.5 px-4 w-20 text-center">Icon</th>
+                                <th class="py-3.5 px-4">Tên Danh Mục</th>
+                                <th class="py-3.5 px-4">Đường Dẫn (Slug)</th>
+                                <th class="py-3.5 px-4 w-36 text-center">Trạng Thái</th>
+                                <th class="py-3.5 px-4 w-28 text-right">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoryTableBody" class="divide-y divide-gray-100 text-sm">
+                            <tr>
+                                <td colspan="6" class="text-center py-12 text-gray-400">
+                                    <svg class="animate-spin h-8 w-8 text-kn-orange mx-auto mb-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    Đang tải danh sách danh mục...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="categoryModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            
+            <div class="bg-kn-blue px-6 py-4 text-white flex justify-between items-center">
+                <h3 id="modalTitle" class="font-black uppercase tracking-wide">Thêm Danh Mục Mới</h3>
+                <button onclick="closeModal()" class="text-white/80 hover:text-white text-xl font-bold">&times;</button>
+            </div>
+
+            <form id="categoryForm" class="p-6 space-y-4">
+                <input type="hidden" id="categoryId">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Tên Danh Mục <span class="text-red-500">*</span></label>
+                        <input type="text" id="categoryName" required placeholder="VD: Vòng bi (Bearings)" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-kn-blue outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Đường dẫn tĩnh (Slug) <span class="text-red-500">*</span></label>
+                        <input type="text" id="categorySlug" required placeholder="VD: vong-bi" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-kn-blue outline-none bg-gray-50">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">URL Icon (Hoặc Emoji/SVG)</label>
+                        <input type="text" id="categoryIcon" placeholder="VD: ⚙️ hoặc https://link-icon.png" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-kn-blue outline-none">
+                    </div>
+                    <div class="flex items-end pb-2">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="categoryIsActive" checked class="w-4 h-4 text-kn-blue border-gray-300 rounded focus:ring-kn-blue">
+                            <span class="ml-2 text-xs font-bold text-gray-700">Hiển thị ra Web (Active)</span>
+                        </label>
+                    </div> 
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Mô tả danh mục</label>
+                    <textarea id="categoryDescription" rows="2" placeholder="Mô tả ngắn gọn về danh mục này..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-kn-blue outline-none"></textarea>
+                </div>
+
+                <div class="bg-blue-50/60 p-4 rounded-xl border border-blue-100 space-y-3">
+                    <h4 class="text-xs font-black text-kn-blue uppercase tracking-wider flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m-9 9a9 9 0 019-9"></path></svg> 
+                        Cấu Hình SEO Google
+                    </h4>
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-600 mb-1">SEO Meta Title</label>
+                        <input type="text" id="categoryMetaTitle" placeholder="VD: Vòng bi SKF, NSK Chính Hãng | MRO Khang Nam" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-kn-blue outline-none bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-600 mb-1">SEO Meta Description</label>
+                        <textarea id="categoryMetaDescription" rows="2" placeholder="Mô tả xuất hiện trên Google search (150-160 ký tự)" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-kn-blue outline-none bg-white"></textarea>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-3 border-t border-gray-200">
+                    <button type="button" onclick="closeModal()" class="px-5 py-2 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition">Hủy</button>
+                    <button type="submit" id="btnSubmitForm" class="px-5 py-2 text-sm font-bold text-white bg-kn-blue hover:bg-blue-800 rounded-lg transition shadow">Lưu Dữ Liệu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/admin/admin-categories.js"></script>
+</body>
+</html>

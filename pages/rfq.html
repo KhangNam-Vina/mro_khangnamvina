@@ -1,102 +1,638 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh Mục Vật Tư & Gửi RFQ - MRO Khang Nam</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00', 'kn-light': '#f5f6f8', 'kn-dark': '#003370' } } } }
-    </script>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Yêu cầu báo giá vật tư công nghiệp | MRO Khang Nam
+    </title>
+
+    <meta
+        name="description"
+        content="Gửi yêu cầu báo giá vật tư công nghiệp B2B tại MRO Khang Nam. Hỗ trợ báo giá số lượng lớn, CO/CQ và tư vấn kỹ thuật."
+    >
+
+    <meta
+        name="robots"
+        content="index,follow"
+    >
+
+    <meta
+        property="og:title"
+        content="Yêu cầu báo giá vật tư công nghiệp | MRO Khang Nam"
+    >
+
+    <meta
+        property="og:description"
+        content="Hệ thống tiếp nhận yêu cầu báo giá vật tư B2B dành cho nhà máy và doanh nghiệp."
+    >
+
+    <meta
+        property="og:image"
+        content="../assets/banner-brands.webp"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="../assets/images/world mark.png"
+    >
+
+    <!-- GOOGLE FONT -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- CSS CHUNG -->
+    <link
+        rel="stylesheet"
+        href="../assets/css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/header.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/footer.css"
+    >
+
+    <!-- CSS RIÊNG RFQ -->
+    <link
+        rel="stylesheet"
+        href="../assets/css/rfq.css"
+    >
 </head>
-<body class="bg-kn-light font-sans text-gray-800 flex flex-col min-h-screen">
 
-    <!-- CHỖ NÀY ĐỂ RÁP HEADER BẰNG JAVASCRIPT -->
-    <div id="app-header"></div>
 
-    <!-- 3. PAGE HEADER / BANNER -->
-    <div class="bg-gray-900 text-white py-12 relative overflow-hidden">
-        <img src="../assets/world mark.png" alt="Brands Banner" class="absolute inset-0 w-full h-full object-cover opacity-20">
-        <div class="container mx-auto px-4 relative z-10">
-            <h1 class="text-3xl md:text-4xl font-bold mb-4">Trung Tâm Tra Cứu Vật Tư & Báo Giá.</h1>
-            <p class="text-gray-300 max-w-2xl text-sm leading-relaxed">
-                Chọn sản phẩm công nghiệp trực tiếp từ kho Supabase và gửi yêu cầu RFQ nhanh chóng.
+<body class="rfq-page">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div
+        id="app-header"
+        class="site-header-placeholder"
+    ></div>
+
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="rfq-hero">
+
+        <div class="rfq-hero-overlay"></div>
+
+        <div class="rfq-container">
+
+            <nav
+                aria-label="Breadcrumb"
+                class="rfq-breadcrumb"
+            >
+
+                <a
+                    href="../index.html"
+                    class="rfq-breadcrumb-link"
+                >
+                    Trang chủ
+                </a>
+
+                <span
+                    class="rfq-breadcrumb-separator"
+                    aria-hidden="true"
+                >
+                    /
+                </span>
+
+                <span class="rfq-breadcrumb-current">
+                    Yêu Cầu Báo Giá
+                </span>
+
+            </nav>
+
+
+            <h1 class="rfq-hero-title">
+                Trung Tâm Yêu Cầu Báo Giá (RFQ)
+            </h1>
+
+
+            <p class="rfq-hero-description">
+                Hệ thống tiếp nhận yêu cầu báo giá vật tư B2B tự động.
+                Gửi danh sách của bạn để nhận báo giá chiết khấu tốt nhất
+                dành cho nhà máy.
             </p>
-        </div>
-    </div>
- 
-    <main class="container mx-auto px-4 py-10 flex-grow">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <div class="lg:col-span-2 space-y-6">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                    <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-kn-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
-                        Danh sách sản phẩm trong kho hiện tại
-                    </h2>
 
-                    <div id="productLoading" class="text-center py-10 text-gray-400">
-                        <div class="inline-block w-6 h-6 border-2 border-kn-blue border-t-transparent rounded-full animate-spin mb-2"></div>
-                        <p class="text-xs">Đang bốc sản phẩm từ Supabase...</p>
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="rfq-main">
+
+        <div class="rfq-container">
+
+            <div class="rfq-layout-wrapper">
+
+
+                <!-- =================================================
+                     TOOLBAR
+                ================================================= -->
+
+                <section class="rfq-toolbar">
+
+                    <div class="rfq-toolbar-left">
+
+                        <div class="rfq-toolbar-title-group">
+
+                            <h2 class="rfq-toolbar-title">
+                                Danh Sách Yêu Cầu
+                            </h2>
+
+                            <span
+                                id="cartCountHeader"
+                                class="rfq-toolbar-badge"
+                            >
+                                0 SP
+                            </span>
+
+                        </div>
+
+
+                        <div class="rfq-toolbar-search">
+
+                            <input
+                                type="text"
+                                id="searchCart"
+                                class="rfq-search-input"
+                                placeholder="Tìm SKU / Tên SP trong giỏ..."
+                                autocomplete="off"
+                            >
+
+                            <svg
+                                class="rfq-search-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                ></path>
+                            </svg>
+
+                        </div>
+
                     </div>
 
-                    <div id="productGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
-                        </div>
-                </div>
-            </div>
 
-            <div class="lg:col-span-1">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 sticky top-24">
-                    <h2 class="text-lg font-bold text-gray-800 border-b pb-3 mb-4 uppercase tracking-wider">Thông tin gửi đơn</h2>
-                    
-                    <form id="rfqForm" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Tên Công ty / Nhà máy *</label>
-                            <input type="text" id="company" placeholder="VD: Nhà máy nhựa Thủ Đức..." class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-kn-blue outline-none" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Người liên hệ (Purchasing) *</label>
-                            <input type="text" id="name" placeholder="Họ và tên..." class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-kn-blue outline-none" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Số điện thoại / Zalo *</label>
-                            <input type="tel" id="phone" placeholder="0909 xxx xxx" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-kn-blue outline-none" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Email nhận báo giá *</label>
-                            <input type="email" id="email" placeholder="purchasing@factory.com" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-kn-blue outline-none" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 mb-1">Ghi chú giao hàng</label>
-                            <textarea id="notes" rows="2" placeholder="Yêu cầu chứng chỉ CO/CQ hoặc thời gian giao..." class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-kn-blue outline-none resize-none"></textarea>
-                        </div>
+                    <div class="rfq-toolbar-actions">
 
-                        <button type="button" id="submitRfqBtn" onclick="submitRFQ()" class="w-full mt-4 bg-kn-orange text-white font-bold py-3 px-4 rounded hover:bg-orange-600 transition shadow flex justify-center items-center text-sm">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                            Gửi Yêu Cầu Báo Giá Real-time
+                        <a
+                            href="quick-order.html"
+                            class="rfq-btn rfq-btn-orange"
+                        >
+
+                            <svg
+                                class="rfq-btn-icon rfq-icon-pulse"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                                ></path>
+                            </svg>
+
+                            Nhập Mã Nhanh
+
+                        </a>
+
+
+                        <a
+                            href="products.html"
+                            class="rfq-btn rfq-btn-blue"
+                        >
+
+                            <svg
+                                class="rfq-btn-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                ></path>
+                            </svg>
+
+                            Thêm SP Khác
+
+                        </a>
+
+
+                        <button
+                            type="button"
+                            onclick="exportCartToCSV()"
+                            class="rfq-btn rfq-btn-green"
+                        >
+
+                            <svg
+                                class="rfq-btn-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                                ></path>
+                            </svg>
+
+                            Xuất Excel
+
                         </button>
-                    </form>
+
+
+                        <button
+                            type="button"
+                            onclick="clearAllCart()"
+                            class="rfq-btn rfq-btn-red"
+                        >
+
+                            <svg
+                                class="rfq-btn-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                ></path>
+                            </svg>
+
+                            Xóa Hết
+
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================================
+                     MAIN GRID
+                ================================================== -->
+
+                <div class="rfq-grid-layout">
+
+
+                    <!-- =================================================
+                         PRODUCT COLUMN
+                    ================================================== -->
+
+                    <section class="rfq-col-main">
+
+                        <div
+                            id="productGrid"
+                            class="rfq-product-grid"
+                        >
+
+                            <div class="rfq-loading-wrapper">
+
+                                <svg
+                                    class="rfq-loading-spinner"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    aria-hidden="true"
+                                >
+                                    <circle
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        stroke-width="4"
+                                        class="rfq-spinner-track"
+                                    ></circle>
+
+                                    <path
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                                        class="rfq-spinner-head"
+                                    ></path>
+
+                                </svg>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =================================================
+                         SIDEBAR
+                    ================================================== -->
+
+                    <aside class="rfq-col-sidebar">
+
+
+                        <!-- FORM CARD -->
+
+                        <section class="rfq-sidebar-card">
+
+                            <div class="rfq-sidebar-header">
+
+                                <h2>
+                                    Thông Tin Doanh Nghiệp
+                                </h2>
+
+                                <p>
+                                    Hoàn tất biểu mẫu để nhận báo giá chiết khấu
+                                </p>
+
+                            </div>
+
+
+                            <div class="rfq-sidebar-body">
+
+                                <div class="rfq-selected-count">
+
+                                    <span>
+                                        Đã chọn:
+                                    </span>
+
+                                    <span id="cartCountForm">
+                                        0 Sản phẩm
+                                    </span>
+
+                                </div>
+
+
+                                <form
+                                    id="rfqForm"
+                                    class="rfq-form"
+                                >
+
+                                    <div class="rfq-form-group">
+
+                                        <label for="company">
+                                            Công ty / Nhà máy
+                                            <span>*</span>
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="company"
+                                            required
+                                            placeholder="VD: Công ty TNHH ABC"
+                                        >
+
+                                    </div>
+
+
+                                    <div class="rfq-form-group">
+
+                                        <label for="name">
+                                            Người liên hệ
+                                            <span>*</span>
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="name"
+                                            required
+                                            placeholder="Họ và tên"
+                                        >
+
+                                    </div>
+
+
+                                    <div class="rfq-form-group">
+
+                                        <label for="phone">
+                                            Số điện thoại
+                                            <span>*</span>
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="phone"
+                                            required
+                                            placeholder="09xx..."
+                                        >
+
+                                    </div>
+
+
+                                    <div class="rfq-form-group">
+
+                                        <label for="email">
+                                            Email
+                                            <span>*</span>
+                                        </label>
+
+                                        <input
+                                            type="email"
+                                            id="email"
+                                            required
+                                            placeholder="Email công ty"
+                                        >
+
+                                    </div>
+
+
+                                    <div class="rfq-form-group">
+
+                                        <label for="notes">
+                                            Ghi chú
+                                            <small>(Tùy chọn)</small>
+                                        </label>
+
+                                        <textarea
+                                            id="notes"
+                                            rows="3"
+                                            placeholder="Yêu cầu giao hàng, CO/CQ, VAT..."
+                                        ></textarea>
+
+                                    </div>
+
+
+                                    <button
+                                        type="button"
+                                        id="submitRfqBtn"
+                                        onclick="submitRFQ()"
+                                        class="rfq-btn-submit"
+                                    >
+
+                                        <svg
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                            aria-hidden="true"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                                            ></path>
+                                        </svg>
+
+                                        Gửi Yêu Cầu Báo Giá
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </section>
+
+
+                        <!-- COMMITMENT -->
+
+                        <section class="rfq-commitment-card">
+
+                            <ul>
+
+                                <li>
+
+                                    <svg
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                        ></path>
+                                    </svg>
+
+                                    Phản hồi báo giá trong 2 giờ
+
+                                </li>
+
+
+                                <li>
+
+                                    <svg
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                        ></path>
+                                    </svg>
+
+                                    100% Vật tư chính hãng
+
+                                </li>
+
+
+                                <li>
+
+                                    <svg
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                        ></path>
+                                    </svg>
+
+                                    Hỗ trợ công nợ nhà máy
+
+                                </li>
+
+                            </ul>
+
+                        </section>
+
+                    </aside>
+
                 </div>
+
             </div>
+
         </div>
+
     </main>
 
-    <!-- CHỖ NÀY ĐỂ RÁP FOOTER BẰNG JAVASCRIPT -->
+
+    <!-- FOOTER -->
     <div id="app-footer"></div>
 
-    <!-- ========================================== -->
-    <!-- PHẦN GỌI SCRIPT ĐƯỢC QUY HOẠCH GỌN GÀNG LẠI -->
-    <!-- ========================================== -->
 
-    <!-- 1. GỌI SCRIPT COMPONENT HEADER/FOOTER -->
+    <!-- =====================================================
+         JS
+    ====================================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/common/auth.js"></script>
+    <script src="../assets/js/common/utils.js"></script>
+
     <script src="../assets/components/header.js"></script>
     <script src="../assets/components/footer.js"></script>
 
-    <!-- 2. GỌI THƯ VIỆN & SCRIPT DÙNG CHUNG -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../assets/js/common.js"></script>
+    <script src="../assets/js/users/auth-ui.js"></script>
+    <script src="../assets/js/users/rfq.js"></script>
 
-    <!-- 3. SCRIPT LOGIC RIÊNG CỦA TRANG NÀY (CỰC SẠCH) -->
-    <script src="../assets/js/rfq.js"></script>
 </body>
 </html>

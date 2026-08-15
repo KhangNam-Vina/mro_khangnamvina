@@ -1,81 +1,211 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng ký Tài khoản Khách hàng - MRO Khang Nam</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00', 'kn-light': '#f5f6f8' } } } }
-    </script>
-</head>
-<body class="bg-kn-light font-sans h-screen flex items-center justify-center">
 
-    <div class="bg-white p-8 rounded-xl shadow-md max-w-md w-full border border-gray-200">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-black text-kn-blue mb-2">MRO KHANG NAM</h1>
-            <p class="text-gray-500 text-sm">Đăng ký tài khoản đối tác B2B</p>
+    <title>Đăng ký Tài khoản Khách hàng - MRO Khang Nam</title>
+
+    <meta
+        name="description"
+        content="Đăng ký tài khoản đối tác B2B MRO Khang Nam."
+    >
+
+    <!-- GOOGLE FONT -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- CSS CHUNG -->
+    <link
+        rel="stylesheet"
+        href="../assets/css/style.css"
+    >
+
+    <!-- CSS AUTH -->
+    <link
+        rel="stylesheet"
+        href="../assets/css/auth.css"
+    >
+</head>
+
+
+<body class="auth-page">
+
+    <main class="auth-container">
+
+        <!-- LOGO -->
+        <div class="auth-logo-wrapper">
+
+            <a
+                href="../index.html"
+                class="auth-logo-link"
+                aria-label="MRO Khang Nam - Trang chủ"
+            >
+
+                <img
+                    src="../assets/images/world mark.png"
+                    alt="MRO Khang Nam Logo"
+                    class="auth-logo"
+                >
+
+            </a>
+
         </div>
 
-        <form id="registerForm" class="space-y-5">
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1">Email doanh nghiệp</label>
-                <input type="email" id="email" placeholder="purchasing@company.com" class="w-full border border-gray-300 rounded px-4 py-2.5 focus:border-kn-blue focus:ring-1 focus:ring-kn-blue outline-none" required>
+
+        <!-- TITLE -->
+        <h1 class="auth-title">
+            Mở Tài Khoản
+        </h1>
+
+        <p class="auth-description">
+            Đăng ký tài khoản đối tác B2B của MRO Khang Nam
+        </p>
+
+
+        <!-- FORM ĐĂNG KÝ -->
+        <form
+            id="registerForm"
+            class="auth-form"
+        >
+
+            <!-- EMAIL -->
+            <div class="auth-field">
+
+                <label
+                    for="email"
+                    class="auth-label"
+                >
+                    Email doanh nghiệp
+                    <span class="auth-required">*</span>
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    required
+                    autocomplete="email"
+                    placeholder="purchasing@company.com"
+                    class="auth-input"
+                >
+
             </div>
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1">Mật khẩu</label>
-                <input type="password" id="password" placeholder="Tạo mật khẩu (ít nhất 6 ký tự)" class="w-full border border-gray-300 rounded px-4 py-2.5 focus:border-kn-blue focus:ring-1 focus:ring-kn-blue outline-none" required>
+
+
+            <!-- PASSWORD -->
+            <div class="auth-field">
+
+                <label
+                    for="password"
+                    class="auth-label"
+                >
+                    Mật khẩu
+                    <span class="auth-required">*</span>
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    required
+                    minlength="6"
+                    autocomplete="new-password"
+                    placeholder="Tạo mật khẩu (ít nhất 6 ký tự)..."
+                    class="auth-input"
+                >
+
             </div>
-            
-            <button type="submit" id="registerBtn" class="w-full bg-kn-blue text-white font-bold py-3 rounded hover:bg-blue-800 transition shadow-md mt-4">
+
+
+            <!-- CONFIRM PASSWORD -->
+            <div class="auth-field">
+
+                <label
+                    for="confirmPassword"
+                    class="auth-label"
+                >
+                    Xác nhận mật khẩu
+                    <span class="auth-required">*</span>
+                </label>
+
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    required
+                    minlength="6"
+                    autocomplete="new-password"
+                    placeholder="Nhập lại mật khẩu..."
+                    class="auth-input"
+                >
+
+            </div>
+
+
+            <!-- SUBMIT -->
+            <button
+                type="submit"
+                id="registerBtn"
+                class="auth-submit"
+            >
                 Tạo Tài Khoản
             </button>
+
         </form>
 
-        <div class="mt-6 text-center text-sm text-gray-600">
-            Đã có tài khoản? <a href="login.html" class="text-kn-orange font-bold hover:underline">Đăng nhập ngay</a>
+
+        <!-- ĐƯỜNG KẺ -->
+        <div class="auth-divider">
+
+            <span class="auth-divider-line"></span>
+
+            <span class="auth-divider-text">
+                Hoặc
+            </span>
+
+            <span class="auth-divider-line"></span>
+
         </div>
-    </div>
+
+
+        <!-- LOGIN -->
+        <div class="auth-footer">
+
+            <span>
+                Đã có tài khoản?
+            </span>
+
+            <a href="login.html">
+                Đăng nhập ngay
+            </a>
+
+        </div>
+
+    </main>
+
+
+    <!-- JAVASCRIPT -->
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        const SUPABASE_URL = 'https://wnhrkziiujbswnrfnlly.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_mCpQQA5h6TQHP7ueyYv1qg_vxnTQIRk'; 
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        document.getElementById('registerForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const btn = document.getElementById('registerBtn');
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/common/utils.js"></script>
+    <script src="../assets/js/common/auth.js"></script>
 
-            if (password.length < 6) {
-                alert("Mật khẩu phải từ 6 ký tự trở lên nha ní!");
-                return;
-            }
+    <script src="../assets/js/users/register.js"></script>
 
-            btn.innerHTML = 'Đang xử lý...';
-            btn.disabled = true;
-
-            try {
-                // Hàm tạo tài khoản mới của Supabase
-                const { data, error } = await supabaseClient.auth.signUp({
-                    email: email,
-                    password: password,
-                });
-
-                if (error) throw error;
-
-                // alert("Đỉnh! Tạo tài khoản thành công. Giờ ní đăng nhập thử nha.");
-                window.location.href = "login.html"; // Đá qua trang login
-                
-            } catch (error) {
-                alert("Lỗi rồi: " + error.message);
-                btn.innerHTML = 'Tạo Tài Khoản';
-                btn.disabled = false;
-            }
-        });
-    </script>
 </body>
+
 </html>

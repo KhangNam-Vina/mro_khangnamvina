@@ -10,7 +10,10 @@ window.FamilyService = {
         let query = supabaseClient
             .from('families')
             .select('id, name, created_at, sub_category_id, sub_categories(name)', { count: 'exact' })
-            .order('created_at', { ascending: false })
+            .order('created_at', {
+            ascending: false,
+            nullsFirst: false
+     })
             .range(from, to);
 
         if (search) query = query.ilike('name', `%${search}%`);
@@ -20,10 +23,10 @@ window.FamilyService = {
     async checkExist(name, subCatId, ignoreId = null) {
         let query = supabaseClient.from('families').select('id').eq('name', name).eq('sub_category_id', subCatId);
         if (ignoreId) query = query.neq('id', ignoreId);
-        return await query.maybeSingle();
+        return await query.maybeSingle();   
     },
 
-    async create(payload) {
+    async create(payload) { 
         return await supabaseClient.from('families').insert([payload]);
     },
 

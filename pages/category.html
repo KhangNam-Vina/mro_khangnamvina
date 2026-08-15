@@ -1,48 +1,281 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh mục - MRO Khang Nam</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00', 'kn-light': '#f5f6f8' } } } }
-    </script>
+
+    <title>Danh mục vật tư công nghiệp | MRO Khang Nam</title>
+
+    <meta
+        name="description"
+        content="MRO Khang Nam cung cấp danh mục vật tư công nghiệp, linh kiện thay thế và thiết bị bảo trì chính hãng cho doanh nghiệp."
+    >
+
+    <meta name="robots" content="index,follow">
+
+    <!-- Open Graph -->
+    <meta
+        property="og:title"
+        content="Danh mục vật tư công nghiệp | MRO Khang Nam"
+    >
+
+    <meta
+        property="og:description"
+        content="Khám phá hệ thống danh mục vật tư công nghiệp chính hãng tại MRO Khang Nam."
+    >
+
+    <meta
+        property="og:image"
+        content="../assets/banner-brands.webp"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="../assets/images/world mark.png"
+    >
+
+    <!-- CSS DÙNG CHUNG -->
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link
+        rel="stylesheet"
+        href="../assets/css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/header.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/footer.css"
+    >
+
+    <!-- CSS CATALOG DÙNG CHUNG:
+         Products / Category / Subcategory / Family -->
+    <link
+        rel="stylesheet"
+        href="../assets/css/catalog.css"
+    >
 </head>
-<body class="bg-kn-light flex flex-col min-h-screen">
 
-    <!-- CHỖ NÀY ĐỂ RÁP HEADER BẰNG JAVASCRIPT -->
-    <div id="app-header"></div>
 
-    <main class="flex-grow container mx-auto px-4 py-10">
-        <div id="breadcrumb" class="text-sm font-medium mb-6 text-gray-500">
-            <a href="products.html" class="hover:text-kn-orange">Products</a> / 
-            <span id="breadcrumbCategoryName" class="text-kn-blue font-bold">Đang tải...</span>
-        </div>
+<body class="catalog-page">
 
-        <div id="subCategoryGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <div class="col-span-full flex justify-center py-10">
-                <svg class="animate-spin h-8 w-8 text-kn-orange mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="4" class="opacity-25"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+    <!-- HEADER -->
+    <div
+        id="app-header"
+        class="site-header-placeholder"
+    ></div>
+
+
+    <!-- ====================================================
+         PAGE HERO
+    ===================================================== -->
+
+    <section class="catalog-hero">
+
+        <div class="catalog-hero-overlay"></div>
+
+        <div class="catalog-hero-container">
+
+            <!-- BREADCRUMB -->
+
+            <nav
+                class="catalog-breadcrumb"
+                aria-label="Breadcrumb"
+            >
+
+                <a
+                    href="../index.html"
+                    class="catalog-breadcrumb-link"
+                >
+                    Trang chủ
+                </a>
+
+                <span
+                    class="catalog-breadcrumb-separator"
+                    aria-hidden="true"
+                >
+                    /
+                </span>
+
+                <span
+                    class="catalog-breadcrumb-current"
+                >
+                    Tất Cả Danh Mục
+                </span>
+
+            </nav>
+
+
+            <!-- HERO CONTENT -->
+
+            <div class="catalog-hero-content">
+
+                <h1 class="catalog-hero-title">
+                    Danh Mục Vật Tư MRO
+                </h1>
+
+                <p class="catalog-hero-description">
+                    Khám phá hệ thống hàng ngàn sản phẩm vật tư công nghiệp,
+                    linh kiện thay thế và thiết bị bảo trì chính hãng.
+                </p>
+
             </div>
+
         </div>
+
+    </section>
+
+
+    <!-- ====================================================
+         MAIN CONTENT
+    ===================================================== -->
+
+    <main class="catalog-main">
+
+        <div class="catalog-container">
+
+
+            <!-- TOTAL COUNTER -->
+
+            <div class="catalog-counter-wrapper">
+
+                <div class="catalog-counter">
+
+                    <span>
+                        Tổng cộng:
+                    </span>
+
+                    <span
+                        id="totalCategoriesCount"
+                        class="catalog-counter-number"
+                    >
+                        --
+                    </span>
+
+                    <span>
+                        Danh mục
+                    </span>
+
+                </div>
+
+            </div>
+
+ 
+            <!-- ==================================================
+                 LOADING SKELETON
+            =================================================== -->
+
+            <div
+                id="skeletonLoading"
+                class="catalog-grid catalog-category-grid"
+            >
+
+                <div class="catalog-category-skeleton">
+                    <div class="catalog-skeleton-icon"></div>
+                    <div class="catalog-skeleton-title"></div>
+                </div>
+
+                <div class="catalog-category-skeleton">
+                    <div class="catalog-skeleton-icon"></div>
+                    <div class="catalog-skeleton-title"></div>
+                </div>
+
+                <div class="catalog-category-skeleton">
+                    <div class="catalog-skeleton-icon"></div>
+                    <div class="catalog-skeleton-title"></div>
+                </div>
+
+                <div class="catalog-category-skeleton">
+                    <div class="catalog-skeleton-icon"></div>
+                    <div class="catalog-skeleton-title"></div>
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 CATEGORY GRID
+            =================================================== -->
+
+            <div
+                id="categoryGrid"
+                class="catalog-grid catalog-category-grid is-hidden"
+            ></div>
+
+
+            <!-- ==================================================
+                 EMPTY STATE
+            =================================================== -->
+
+            <div
+                id="emptyState"
+                class="catalog-empty-state is-hidden"
+            >
+
+                <svg
+                    class="catalog-empty-icon"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.5"
+                        d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+                    ></path>
+                </svg>
+
+                <h2 class="catalog-empty-title">
+                    Thư mục trống
+                </h2>
+
+                <p class="catalog-empty-description">
+                    Hệ thống đang cập nhật dữ liệu danh mục vật tư.
+                </p>
+
+                <a
+                    href="products.html"
+                    class="catalog-empty-button"
+                >
+                    &larr; Quay lại Kho hàng
+                </a>
+
+            </div>
+
+        </div>
+
     </main>
 
-    <!-- CHỖ NÀY ĐỂ RÁP FOOTER BẰNG JAVASCRIPT -->
+
+    <!-- FOOTER -->
     <div id="app-footer"></div>
 
-    <!-- ========================================== -->
-    <!-- PHẦN GỌI SCRIPT ĐƯỢC QUY HOẠCH GỌN GÀNG LẠI -->
-    <!-- ========================================== -->
 
-    <!-- 1. GỌI SCRIPT COMPONENT HEADER/FOOTER -->
+    <!-- ====================================================
+         JAVASCRIPT
+    ===================================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/common/utils.js"></script>
+    <script src="../assets/js/common/auth.js"></script>
+
     <script src="../assets/components/header.js"></script>
     <script src="../assets/components/footer.js"></script>
 
-    <!-- 2. GỌI THƯ VIỆN & SCRIPT DÙNG CHUNG -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../assets/js/common.js"></script>
+    <script src="../assets/js/users/auth-ui.js"></script>
+    <script src="../assets/js/users/category.js"></script>
 
-    <!-- 3. SCRIPT LOGIC RIÊNG CỦA TRANG NÀY (CỰC SẠCH) -->
-    <script src="../assets/js/category.js"></script>
 </body>
+
 </html>

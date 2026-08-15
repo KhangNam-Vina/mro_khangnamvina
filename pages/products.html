@@ -1,82 +1,436 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sản Phẩm - MRO Khang Nam</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00', 'kn-light': '#f5f6f8' } } } }
-    </script>
-    <style>
-        /* Tùy chỉnh thanh cuộn cho Sidebar */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 5px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-            border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #00479b; /* Màu xanh kn-blue */
-            border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #ff5e00; /* Màu cam kn-orange */
-        }
-    </style>
+
+    <title>Sản phẩm | MRO Khang Nam</title>
+
+    <meta
+        name="description"
+        content="MRO Khang Nam cung cấp giải pháp vật tư công nghiệp, trang thiết bị văn phòng và nhà xưởng chính hãng cho doanh nghiệp."
+    >
+
+    <meta name="robots" content="index,follow">
+
+    <meta
+        property="og:title"
+        content="Sản phẩm | MRO Khang Nam"
+    >
+
+    <meta
+        property="og:description"
+        content="Khám phá danh mục sản phẩm vật tư công nghiệp chính hãng tại MRO Khang Nam."
+    >
+
+    <meta
+        property="og:image"
+        content="../assets/banner-brands.webp"
+    >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link
+        rel="icon"
+        type="image/png"
+        href="../assets/images/world mark.png"
+    >
+    <link
+        rel="stylesheet"
+        href="../assets/css/style.css"
+    >
+    <link
+        rel="stylesheet"
+        href="../assets/css/header.css"
+    >
+    <link
+        rel="stylesheet"
+        href="../assets/css/footer.css"
+    >
+    <link
+        rel="stylesheet"
+        href="../assets/css/catalog.css"
+    >
 </head>
-<body class="bg-kn-light flex flex-col min-h-screen">
 
-    <!-- CHỖ NÀY ĐỂ RÁP HEADER BẰNG JAVASCRIPT -->
-    <div id="app-header"></div>
 
-    <main class="flex-grow container mx-auto px-4 py-10">
-        <div class="flex flex-col lg:flex-row gap-8">
-            
-            <!-- CỘT TRÁI: SIDEBAR LỌC SẢN PHẨM (Ráp bằng JS) -->
-            <aside class="lg:w-1/4 shrink-0" id="app-sidebar"></aside>
+<body class="catalog-page">
 
-            <!-- CỘT PHẢI: LƯỚI SẢN PHẨM (Khu vực cũ của ông) -->
-            <section class="lg:w-3/4 flex-grow">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 id="pageTitle" class="text-2xl font-bold text-kn-blue uppercase">Danh sách sản phẩm</h1>
-                    <!-- <select class="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:border-kn-orange text-gray-600">
-                        <option>Mới nhất</option>
-                        <option>Giá tăng dần</option>
-                        <option>Giá giảm dần</option>
-                    </select> -->
-                </div>
 
-                <!-- BÃI ĐÁP SẢN PHẨM -->
-                <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-                    <!-- Dữ liệu sản phẩm sẽ được Javascript nhét vào đây giống y như cũ -->
-                </div>
+    <!-- ====================================================
+         HEADER
+    ===================================================== -->
 
-                <!-- Phân trang -->
-                <div id="paginationContainer" class="mt-10 flex justify-center space-x-2"></div>
-            </section>
+    <div
+        id="app-header"
+        class="site-header-placeholder"
+    ></div>
+
+
+    <!-- ====================================================
+         HERO
+    ===================================================== -->
+
+    <section class="catalog-hero products-hero">
+
+        <div class="catalog-hero-overlay"></div>
+
+        <div class="catalog-hero-container">
+
+            <nav
+                class="catalog-breadcrumb"
+                aria-label="Breadcrumb"
+            >
+
+                <a
+                    href="../index.html"
+                    class="catalog-breadcrumb-link"
+                >
+                    Trang chủ
+                </a>
+
+                <span
+                    class="catalog-breadcrumb-separator"
+                    aria-hidden="true"
+                >
+                    /
+                </span>
+
+                <span
+                    id="breadcrumbCurrent"
+                    class="catalog-breadcrumb-current"
+                >
+                    Sản phẩm
+                </span>
+
+            </nav>
+
+
+            <div class="catalog-hero-content">
+
+                <h1 class="catalog-hero-title">
+                    Sản phẩm
+                </h1>
+
+                <p class="catalog-hero-description">
+                    Công ty TNHH Thương mại – Dịch vụ Khang Nam Vina tự hào
+                    là đơn vị chuyên cung cấp giải pháp vật tư công nghiệp,
+                    trang thiết bị văn phòng và nhà xưởng.
+                </p>
+
+            </div>
+
         </div>
+
+    </section>
+
+
+    <!-- ====================================================
+         MAIN
+    ===================================================== -->
+
+    <main class="catalog-main products-main">
+
+        <div class="catalog-products-layout">
+
+
+            <!-- ==================================================
+                 SIDEBAR
+            =================================================== -->
+
+            <aside
+                id="app-sidebar"
+                class="products-sidebar"
+            >
+
+                <!-- PHÂN LOẠI -->
+
+                <div
+                    id="filterCategoryBlock"
+                    class="products-filter-card"
+                >
+
+                    <h2 class="products-filter-title">
+                        Phân Loại
+                    </h2>
+
+
+                    <div class="products-local-search">
+
+                        <input
+                            type="text"
+                            id="searchSubcatLocal"
+                            class="products-filter-search"
+                            placeholder="Tìm phân loại..."
+                            autocomplete="off"
+                        >
+
+                        <svg
+                            class="products-filter-search-icon"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            ></path>
+                        </svg>
+
+                    </div>
+
+
+                    <div
+                        id="subCategoryFilterContainer"
+                        class="products-filter-list"
+                    ></div>
+
+                </div>
+
+
+                <!-- THƯƠNG HIỆU -->
+
+                <div
+                    id="filterBrandBlock"
+                    class="products-filter-card"
+                >
+
+                    <h2 class="products-filter-title">
+                        Thương Hiệu
+                    </h2>
+
+
+                    <div class="products-local-search">
+
+                        <input
+                            type="text"
+                            id="searchBrandLocal"
+                            class="products-filter-search"
+                            placeholder="Tìm thương hiệu..."
+                            autocomplete="off"
+                        >
+
+                        <svg
+                            class="products-filter-search-icon"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            ></path>
+                        </svg>
+
+                    </div>
+
+
+                    <div
+                        id="brandFilterContainer"
+                        class="products-filter-list"
+                    >
+
+                        <div class="products-loading-mini">
+                            <span class="products-spinner"></span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </aside>
+
+
+            <!-- ==================================================
+                 PRODUCT AREA
+            =================================================== -->
+
+            <section class="products-content">
+
+
+                <!-- HEADER TOOLBAR -->
+
+                <div class="products-toolbar">
+
+                    <div>
+
+                        <h2
+                            id="pageTitle"
+                            class="products-page-title"
+                        >
+                            Danh sách sản phẩm
+                        </h2>
+
+                        <p class="products-count-text">
+                            Hiển thị
+                            <span id="productCount">
+                                ...
+                            </span>
+                            sản phẩm
+                        </p>
+
+                    </div>
+
+
+                    <select
+                        id="sortDropdown"
+                        class="products-sort"
+                        aria-label="Sắp xếp sản phẩm"
+                    >
+                        <option value="newest">
+                            Mới nhất
+                        </option>
+
+                        <option value="price_asc">
+                            Giá tăng dần
+                        </option>
+
+                        <option value="price_desc">
+                            Giá giảm dần
+                        </option>
+
+                        <option value="name_asc">
+                            Tên A-Z
+                        </option>
+                    </select>
+
+                </div>
+
+
+                <!-- ACTIVE FILTERS -->
+
+                <div
+                    id="activeFiltersContainer"
+                    class="products-active-filters"
+                ></div>
+
+
+                <!-- PRODUCT GRID -->
+
+                <div
+                    id="productGrid"
+                    class="products-grid"
+                ></div>
+
+
+                <!-- PAGINATION -->
+
+                <div
+                    id="paginationContainer"
+                    class="products-pagination"
+                ></div>
+
+
+                <!-- SEO / CTA -->
+
+                <section class="products-seo-card">
+
+                    <div class="products-seo-content">
+
+                        <div class="products-seo-text">
+
+                            <h2>
+                                Cung cấp thiết bị &amp;
+                                Vật tư Công nghiệp (MRO)
+                            </h2>
+
+                            <p>
+                                Chúng tôi phân phối chính hãng hàng ngàn
+                                sản phẩm vật tư tiêu hao, dụng cụ cầm tay,
+                                linh kiện cơ khí và thiết bị bảo hộ lao động
+                                từ các thương hiệu uy tín toàn cầu. Các sản
+                                phẩm đều được cam kết đầy đủ chứng từ CO/CQ,
+                                đảm bảo chất lượng và đáp ứng khắt khe các
+                                tiêu chuẩn an toàn trong sản xuất, xây dựng
+                                và bảo trì nhà máy.
+                            </p>
+
+                            <p>
+                                Hiểu được đặc thù của ngành công nghiệp,
+                                hệ thống danh mục được tối ưu hóa giúp quý
+                                doanh nghiệp dễ dàng tra cứu thông số kỹ
+                                thuật, so sánh mã hàng hóa (SKU) và tối ưu
+                                chi phí mua sắm vật tư định kỳ.
+                            </p>
+
+                        </div>
+
+
+                        <div class="products-rfq-card">
+
+                            <svg
+                                class="products-rfq-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                ></path>
+                            </svg>
+
+                            <h3>
+                                Chưa tìm thấy mã sản phẩm?
+                            </h3>
+
+                            <p>
+                                Gửi danh sách vật tư (BOM/RFQ) để nhận
+                                báo giá sỉ ưu đãi trong vòng 2 giờ
+                                làm việc.
+                            </p>
+
+                            <a
+                                href="contact.html"
+                                class="products-rfq-button"
+                            >
+                                Gửi Yêu Cầu Báo Giá
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </section>
+
+        </div>
+
     </main>
 
-    <!-- CHỖ NÀY ĐỂ RÁP FOOTER BẰNG JAVASCRIPT -->
+
+    <!-- FOOTER -->
+
     <div id="app-footer"></div>
 
-    <!-- ========================================== -->
-    <!-- PHẦN GỌI SCRIPT ĐƯỢC QUY HOẠCH GỌN GÀNG LẠI -->
-    <!-- ========================================== -->
 
-    <!-- 1. GỌI SCRIPT COMPONENT HEADER/FOOTER -->
+    <!-- ====================================================
+         JAVASCRIPT
+    ===================================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/common/utils.js"></script>
+    <script src="../assets/js/common/auth.js"></script>
+
     <script src="../assets/components/header.js"></script>
     <script src="../assets/components/footer.js"></script>
-    <script src="../assets/components/sidebar.js"></script>
+ 
+    <script src="../assets/js/users/auth-ui.js"></script>
+    <script src="../assets/js/users/products.js"></script>
 
-    <!-- 2. GỌI THƯ VIỆN & SCRIPT DÙNG CHUNG -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../assets/js/common.js"></script>
-
-    <!-- 3. SCRIPT LOGIC RIÊNG CỦA TRANG NÀY (CỰC SẠCH) -->
-    <script src="../assets/js/products.js"></script>
-    
 </body>
+
 </html>

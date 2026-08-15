@@ -1,11 +1,8 @@
 // ========================================================
-// FILE: assets/js/admin-blog.js
+// FILE: assets/js/admin/admin-blog.js
 // QUẢN LÝ BLOG - CẤU TRÚC CHUẨN SENIOR (REFACTORED)
 // ========================================================
 
-// --------------------------------------------------------
-// 1. STATE & DOM CACHE (Quản lý trạng thái tập trung)
-// --------------------------------------------------------
 const state = {
     blogs: [],
     editingId: null,
@@ -15,31 +12,56 @@ const state = {
 };
 
 const DOM = {
+    listView: document.getElementById('blogListView'),
+    formView: document.getElementById('blogFormView'),
     form: document.getElementById('blogForm'),
+    formTitle: document.getElementById('formTitle'),
     title: document.getElementById('inTitle'),
     slug: document.getElementById('inSlug'),
+    // BỔ SUNG BIẾN DOM
+    summary: document.getElementById('inSummary'),
+    category: document.getElementById('inCategory'),
+    isActive: document.getElementById('inActive'),
+    
     thumbnail: document.getElementById('inThumbnail'),
     preview: document.getElementById('thumbnailPreview'),
     btnSave: document.getElementById('btnSaveBlog'),
-    btnCancel: document.getElementById('btnCancelEdit'),
     tbody: document.getElementById('blogTableBody'),
-    pagination: document.getElementById('paginationContainer')
+    pagination: document.getElementById('paginationContainer'),
+    toastContainer: document.getElementById('toastContainer')
 };
 
-// --------------------------------------------------------
-// 2. INIT (Khởi tạo sự kiện 1 lần duy nhất)
-// --------------------------------------------------------
+const utils = {
+    escapeHTML: (str) => {
+        if (!str) return '';
+        return str.toString().replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+    },
+    generateSlug: (text) => {
+        return text.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
+    },
+    showToast: (message, type = 'success') => {
+        if (!DOM.toastContainer) return;
+        const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+        const toast = document.createElement('div');
+        toast.className = `${bgColor} text-white px-4 py-2 rounded shadow-lg transform transition-all duration-300 mb-2 font-bold text-sm`;
+        toast.innerHTML = type === 'success' ? `✔ ${message}` : `⚠ ${message}`;
+        DOM.toastContainer.appendChild(toast);
+        setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => toast.remove(), 300); }, 3000);
+    },
+    toggleButtonLoading: (btn, isLoading, text) => {
+        if (!btn) return;
+        btn.disabled = isLoading;
+        btn.innerHTML = isLoading ? `<span class="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span> ${text}` : text;
+    }
+};
+
 window.addEventListener('load', function() {
-    // Tự tạo slug khi gõ Tiêu đề (chỉ khi thêm mới)
     if (DOM.title) {
         DOM.title.addEventListener('input', (e) => {
-            if (!state.editingId) {
-                DOM.slug.value = utils.generateSlug(e.target.value);
-            }
+            if (!state.editingId) DOM.slug.value = utils.generateSlug(e.target.value);
         });
     }
 
-    // Preview Thumbnail
     if (DOM.thumbnail) {
         DOM.thumbnail.addEventListener('input', (e) => {
             const url = e.target.value;
@@ -52,18 +74,50 @@ window.addEventListener('load', function() {
         });
     }
 
-    // Tải dữ liệu lần đầu
-    loadBlogs(state.currentPage);
+    window.loadBlogs(state.currentPage);
 });
 
-// --------------------------------------------------------
-// 3. CORE FUNCTIONS (Logic chính)
-// --------------------------------------------------------
+window.showCreateBlogForm = function() {
+    state.editingId = null;
+    DOM.form.reset();
+    DOM.slug.value = '';
+    DOM.preview.src = '';
+    DOM.preview.classList.add('hidden');
+    
+    // RESET DỮ LIỆU BỔ SUNG
+    if(DOM.summary) DOM.summary.value = '';
+    if(DOM.category) DOM.category.value = 'ALL';
+    if(DOM.isActive) DOM.isActive.checked = true;
+    
+    if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances.inContent) {
+        CKEDITOR.instances.inContent.setData('');
+    }
+    
+    DOM.formTitle.innerText = "Viết Bài Mới";
+    DOM.btnSave.innerHTML = "Lưu Bài Viết";
+    DOM.listView.classList.add('hidden');
+    DOM.formView.classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
 
-async function loadBlogs(page = 1) {
+window.cancelEdit = function() {
+    state.editingId = null;
+    DOM.form.reset();
+    DOM.slug.value = '';
+    DOM.preview.src = "";
+    DOM.preview.classList.add('hidden');
+    
+    if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances.inContent) {
+        CKEDITOR.instances.inContent.setData('');
+    }
+    
+    DOM.formView.classList.add('hidden');
+    DOM.listView.classList.remove('hidden');
+};
+
+window.loadBlogs = async function(page = 1) {
     state.currentPage = page;
     
-    // Skeleton Loading
     if (DOM.tbody) {
         DOM.tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10"><div class="w-8 h-8 border-4 border-kn-blue border-t-transparent rounded-full animate-spin mx-auto mb-2"></div><span class="text-gray-500 font-bold">Đang tải danh sách bài viết...</span></td></tr>`;
     }
@@ -87,36 +141,36 @@ async function loadBlogs(page = 1) {
         renderPagination();
 
     } catch (error) {
-        console.error("Lỗi tải Blog:", error);
         utils.showToast(`Lỗi tải danh sách: ${error.message}`, 'error');
         if (DOM.tbody) DOM.tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-red-500 font-bold">Lỗi: ${error.message}</td></tr>`;
     }
-}
+};
 
-async function saveBlog(event) {
-    event.preventDefault();
-    
-    // Khóa nút & đổi text Loading
+window.saveBlog = async function(event) {
+    if(event) event.preventDefault();
     utils.toggleButtonLoading(DOM.btnSave, true, "Đang lưu...");
 
     const title = DOM.title.value.trim();
     const slug = DOM.slug.value.trim();
     const thumbnail = DOM.thumbnail.value.trim();
-    let content = '';
+    
+    // LẤY DỮ LIỆU MỚI
+    const summary = DOM.summary ? DOM.summary.value.trim() : '';
+    const category = DOM.category ? DOM.category.value : 'ALL';
+    const is_active = DOM.isActive ? DOM.isActive.checked : true;
 
-    // Kiểm tra an toàn CKEditor
-    if (CKEDITOR && CKEDITOR.instances && CKEDITOR.instances.inContent) {
+    let content = '';
+    if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances.inContent) {
         content = CKEDITOR.instances.inContent.getData();
     }
 
-    if (!title || !slug || !content) {
-        utils.showToast("Vui lòng nhập đủ Tiêu đề, Slug và Nội dung!", 'error');
+    if (!title || !slug || !content || !summary) {
+        utils.showToast("Vui lòng nhập đủ Tiêu đề, Tóm tắt, Slug và Nội dung!", 'error');
         utils.toggleButtonLoading(DOM.btnSave, false, state.editingId ? 'Cập Nhật' : 'Lưu Bài Viết');
         return;
     }
 
     try {
-        // Kiểm tra Slug trùng (Validate)
         let checkQuery = supabaseClient.from('blogs').select('id').eq('slug', slug);
         if (state.editingId) checkQuery = checkQuery.neq('id', state.editingId);
         
@@ -130,8 +184,8 @@ async function saveBlog(event) {
             return;
         }
 
-        const payload = { title, slug, thumbnail, content };
-        // (Nếu Database có cột summary, thêm summary vào payload tại đây)
+        // BƠM PAYLOAD MỚI
+        const payload = { title, slug, thumbnail, summary, category, is_active, content };
 
         if (state.editingId) {
             const { error } = await supabaseClient.from('blogs').update(payload).eq('id', state.editingId);
@@ -143,99 +197,72 @@ async function saveBlog(event) {
             utils.showToast("Thêm bài viết mới thành công!", 'success');
         }
         
-        cancelEdit();
-        loadBlogs(state.currentPage); 
+        window.cancelEdit();
+        window.loadBlogs(state.currentPage); 
 
     } catch (error) {
-        console.error("Lỗi lưu Blog:", error);
         utils.showToast(`Lỗi: ${error.message}`, 'error');
     } finally {
-        utils.toggleButtonLoading(DOM.btnSave, false, state.editingId ? 'Cập Nhật' : 'Lưu Bài Viết');
+        utils.toggleButtonLoading(DOM.btnSave, false, state.editingId ? 'Cập Nhật Bài Viết' : 'Lưu Bài Viết');
     }
-}
+};
 
-async function editBlog(id) {
-    // Lấy bài viết từ DB (Thay vì lấy từ List tạm theo chuẩn Senior)
+window.editBlog = async function(id) {
     try {
         const { data: item, error } = await supabaseClient.from('blogs').select('*').eq('id', id).single();
         if (error || !item) throw new Error("Không tìm thấy dữ liệu bài viết.");
         
         state.editingId = item.id;
         
-        // Đổ data lên DOM
         DOM.title.value = item.title;
         DOM.slug.value = item.slug;
         DOM.thumbnail.value = item.thumbnail;
+        
+        // ĐỔ DỮ LIỆU CŨ LÊN FORM
+        if(DOM.summary) DOM.summary.value = item.summary || '';
+        if(DOM.category) DOM.category.value = item.category || 'ALL';
+        if(DOM.isActive) DOM.isActive.checked = item.is_active !== false;
         
         if (item.thumbnail) {
             DOM.preview.src = item.thumbnail;
             DOM.preview.classList.remove('hidden');
         }
 
-        if (CKEDITOR && CKEDITOR.instances && CKEDITOR.instances.inContent) {
+        if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances.inContent) {
             CKEDITOR.instances.inContent.setData(item.content || '');
         }
         
-        // Đổi UI Nút
-        DOM.btnSave.innerHTML = "Cập Nhật";
-        DOM.btnSave.classList.replace('bg-kn-blue', 'bg-green-600');
-        DOM.btnSave.classList.replace('hover:bg-blue-800', 'hover:bg-green-700');
-        DOM.btnCancel.classList.remove('hidden');
-        
+        DOM.formTitle.innerText = "Sửa Bài Viết";
+        DOM.btnSave.innerHTML = "Cập Nhật Bài Viết";
+        DOM.listView.classList.add('hidden');
+        DOM.formView.classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
     } catch (error) {
         utils.showToast(error.message, 'error');
     }
-}
+};
 
-function cancelEdit() {
-    state.editingId = null;
-    DOM.form.reset();
-    
-    if (CKEDITOR && CKEDITOR.instances && CKEDITOR.instances.inContent) {
-        CKEDITOR.instances.inContent.setData('');
-    }
-    
-    DOM.preview.src = "";
-    DOM.preview.classList.add('hidden');
-    
-    DOM.btnSave.innerHTML = "Lưu Bài Viết";
-    DOM.btnSave.classList.replace('bg-green-600', 'bg-kn-blue');
-    DOM.btnSave.classList.replace('hover:bg-green-700', 'hover:bg-blue-800');
-    DOM.btnCancel.classList.add('hidden');
-    
-    DOM.title.focus();
-}
-
-async function deleteBlog(id) {
+window.deleteBlog = async function(id) {
     if (!confirm("Bạn có chắc chắn muốn xóa bài viết này vĩnh viễn?")) return;
-    
     try {
         const { error } = await supabaseClient.from('blogs').delete().eq('id', id);
         if (error) throw error; 
         
         utils.showToast("Đã xóa bài viết!", 'success');
-        
-        // Logic: Nếu xóa bài cuối cùng của trang, lùi về trang trước
         if (state.blogs.length === 1 && state.currentPage > 1) {
             state.currentPage--;
         }
-        loadBlogs(state.currentPage);
-
+        window.loadBlogs(state.currentPage);
     } catch (error) {
         utils.showToast(`Lỗi xóa: ${error.message}`, 'error');
     }
-}
+};
 
-// --------------------------------------------------------
-// 4. RENDER UI (Vẽ giao diện)
-// --------------------------------------------------------
 function renderTable() {
     if (!DOM.tbody) return;
-
     if (state.totalItems === 0) {
-        DOM.tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-gray-500">Chưa có bài viết nào!</td></tr>`;
+        DOM.tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-gray-400">Chưa có bài viết nào!</td></tr>`;
         return;
     }
 
@@ -244,84 +271,53 @@ function renderTable() {
 
     state.blogs.forEach((item, index) => {
         const dateStr = new Date(item.created_at).toLocaleDateString('vi-VN');
+        const catName = item.category && item.category !== 'ALL' ? item.category : 'Chung';
+        
+        // NÚT TRẠNG THÁI ẨN/HIỆN
+        const statusBadge = item.is_active !== false 
+            ? '<span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-[10px] font-bold border border-green-200 inline-block whitespace-nowrap">Đang hiện</span>' 
+            : '<span class="bg-gray-100 text-gray-500 px-2 py-1 rounded-full text-[10px] font-bold border border-gray-200 inline-block whitespace-nowrap">Đang ẩn</span>';
+
         html += `
-            <tr class="hover:bg-gray-50 border-b border-gray-100 transition">
-                <td class="p-4 text-center font-bold text-gray-500">${from + index + 1}</td>
+            <tr class="border-b border-gray-100 hover:bg-gray-50 transition group">
+                <td class="p-4 text-center font-bold text-gray-400 text-xs">${from + index + 1}</td>
                 <td class="p-4">
-                    <img src="${item.thumbnail}" onerror="this.src='https://placehold.co/100x60?text=No+Image'" class="w-16 h-10 object-cover rounded shadow-sm border border-gray-200">
+                    <img src="${utils.escapeHTML(item.thumbnail)}" onerror="this.src='https://placehold.co/100x60?text=No+Image'" class="w-16 h-10 object-cover rounded-md shadow-sm border border-gray-200">
                 </td>
                 <td class="p-4">
-                    <p class="font-bold text-gray-800 line-clamp-1">${item.title}</p>
-                    <p class="text-xs text-gray-400">/${item.slug}</p>
+                    <p class="font-bold text-gray-900 line-clamp-1">${utils.escapeHTML(item.title)}</p>
+                    <div class="flex gap-2 items-center mt-1">
+                        <span class="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-bold uppercase">${utils.escapeHTML(catName)}</span>
+                        <span class="text-xs text-gray-400 font-mono">/${utils.escapeHTML(item.slug)}</span>
+                    </div>
                 </td>
-                <td class="p-4 text-sm text-gray-600">${dateStr}</td>
-                <td class="p-4 text-right space-x-2">
-                    <button onclick="editBlog('${item.id}')" class="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded font-bold hover:bg-blue-200 transition">Sửa</button>
-                    <button onclick="deleteBlog('${item.id}')" class="text-xs bg-red-100 text-red-700 px-3 py-1.5 rounded font-bold hover:bg-red-200 transition">Xóa</button>
+                <td class="p-4 text-center">${statusBadge}</td>
+                <td class="p-4 text-center">
+                    <div class="flex items-center justify-center space-x-1">
+                        <button onclick="window.editBlog('${item.id}')" class="p-1.5 text-gray-400 hover:text-kn-blue hover:bg-blue-50 rounded-lg transition" title="Sửa">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        </button>
+                        <button onclick="window.deleteBlog('${item.id}')" class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition" title="Xóa">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
                 </td>
             </tr>
         `;
     });
-    
-    // Tối ưu DOM: Gán innerHTML 1 lần duy nhất ngoài vòng lặp
     DOM.tbody.innerHTML = html;
 }
 
 function renderPagination() {
     if (!DOM.pagination) return;
     DOM.pagination.innerHTML = '';
-    
     const totalPages = Math.ceil(state.totalItems / state.itemsPerPage);
     if (totalPages <= 1) return;
 
-    let html = '';
-    
-    if (state.currentPage > 1) {
-        html += `<button onclick="loadBlogs(${state.currentPage - 1})" class="px-3 py-1 bg-white border rounded text-sm text-gray-600 hover:bg-gray-50">&laquo;</button>`;
-    }
-    
+    let html = `<button onclick="window.loadBlogs(${state.currentPage - 1})" ${state.currentPage === 1 ? 'disabled class="px-3 py-1.5 rounded-lg text-gray-400 bg-transparent"' : 'class="px-3 py-1.5 rounded-lg text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 shadow-sm font-bold"'}>&laquo; Prev</button><div class="flex space-x-1">`;
     for (let i = 1; i <= totalPages; i++) {
-        if (i === state.currentPage) {
-            html += `<button class="px-3 py-1 bg-kn-orange text-white border border-kn-orange rounded text-sm font-bold">${i}</button>`;
-        } else {
-            html += `<button onclick="loadBlogs(${i})" class="px-3 py-1 bg-white border rounded text-sm text-kn-blue hover:bg-blue-50">${i}</button>`;
-        }
+        html += `<button onclick="window.loadBlogs(${i})" class="px-3 py-1.5 rounded-lg font-bold shadow-sm transition ${i === state.currentPage ? 'bg-gray-900 text-white border border-gray-900' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}">${i}</button>`;
     }
-    
-    if (state.currentPage < totalPages) {
-        html += `<button onclick="loadBlogs(${state.currentPage + 1})" class="px-3 py-1 bg-white border rounded text-sm text-gray-600 hover:bg-gray-50">&raquo;</button>`;
-    }
-
+    html += `</div><button onclick="window.loadBlogs(${state.currentPage + 1})" ${state.currentPage === totalPages ? 'disabled class="px-3 py-1.5 rounded-lg text-gray-400 bg-transparent"' : 'class="px-3 py-1.5 rounded-lg text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 shadow-sm font-bold"'}>Next &raquo;</button>`;
     DOM.pagination.innerHTML = html;
 }
-
-// --------------------------------------------------------
-// 5. UTILITIES (Công cụ hỗ trợ)
-// --------------------------------------------------------
-const utils = {
-    generateSlug: (text) => {
-        return text.toString().toLowerCase()
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-            .replace(/đ/g, "d").replace(/Đ/g, "D")
-            .replace(/\s+/g, '-')
-            .replace(/[^\w\-]+/g, '')
-            .replace(/\-\-+/g, '-')
-            .replace(/^-+/, '').replace(/-+$/, '');
-    },
-    
-    showToast: (message, type = 'info') => {
-        // Tạm thời dùng alert, có thể nâng cấp thư viện Toastify.js sau
-        if (type === 'error') console.error(message);
-        alert(message);
-    },
-
-    toggleButtonLoading: (btn, isLoading, text) => {
-        if (!btn) return;
-        btn.disabled = isLoading;
-        if (isLoading) {
-            btn.innerHTML = `<span class="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span> ${text}`;
-        } else {
-            btn.innerHTML = text;
-        }
-    }
-};

@@ -1,94 +1,437 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giới thiệu - MRO Khang Nam Vina</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00', 'kn-light': '#f5f6f8' } } } }
-    </script>
+
+    <!-- SEO -->
+    <title id="pageTitle">
+        Giới thiệu MRO Khang Nam | Nhà cung cấp vật tư công nghiệp
+    </title>
+
+    <meta
+        id="pageDescription"
+        name="description"
+        content="MRO Khang Nam phân phối hơn 100 thương hiệu vật tư công nghiệp chính hãng..."
+    >
+
+    <meta
+        name="robots"
+        content="index,follow"
+    >
+
+    <!-- OPEN GRAPH -->
+    <meta
+        property="og:title"
+        content="Thương hiệu vật tư công nghiệp | MRO Khang Nam"
+    >
+
+    <meta
+        property="og:image"
+        content="../assets/banner-brands.webp"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="../assets/images/world mark.png"
+    >
+
+    <!-- FONT INTER -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- CSS DÙNG CHUNG -->
+    <link
+        rel="stylesheet"
+        href="../assets/css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/header.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/footer.css"
+    >
+
+    <!-- CSS RIÊNG TRANG ABOUT -->
+    <link
+        rel="stylesheet"
+        href="../assets/css/about.css"
+    >
 </head>
-<body class="bg-kn-light flex flex-col min-h-screen">
 
-    <div id="app-header"></div>
-    
-    <!-- 3. PAGE HEADER / BANNER -->
-    <div class="bg-gray-900 text-white py-12 relative overflow-hidden">
-        <img src="../assets/world mark.png" alt="Brands Banner" class="absolute inset-0 w-full h-full object-cover opacity-20">
-        <div class="container mx-auto px-4 relative z-10">
-            <h1 class="text-3xl md:text-4xl font-bold mb-4">Đối Tác MRO Toàn Diện Của Bạn</h1>
-            <p class="text-gray-300 max-w-2xl text-sm leading-relaxed">
-                Công ty TNHH Thương mại – Dịch vụ Khang Nam Vina tự hào là đơn vị hàng đầu chuyên cung cấp giải pháp vật tư công nghiệp, trang thiết bị văn phòng và nhà xưởng. Tọa lạc tại trung tâm Khu Công nghệ cao, TP. Thủ Đức, chúng tôi cam kết mang đến chuỗi cung ứng bền vững và tối ưu nhất cho doanh nghiệp của bạn.
-            </p>
-        </div>
-    </div>
+<body class="about-page">
 
-    <!-- 5. TẦM NHÌN & SỨ MỆNH -->
-    <section class="py-16 container mx-auto px-4">
-        <div class="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto">
-            <div class="bg-white p-8 rounded-xl shadow-sm border-t-4 border-kn-blue hover:shadow-lg transition-shadow">
-                <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-6">
-                    <svg class="w-8 h-8 text-kn-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                </div>
-                <h3 class="text-2xl font-black text-gray-800 mb-4 uppercase">Tầm Nhìn</h3>
-                <p class="text-gray-600 leading-relaxed">Trở thành nền tảng thương mại điện tử B2B số 1 tại Việt Nam trong lĩnh vực cung ứng vật tư MRO, là cầu nối vững chắc giữa các nhà sản xuất quốc tế và các nhà máy, doanh nghiệp trong nước.</p>
+
+    <!-- HEADER -->
+    <div
+        id="app-header"
+        class="site-header-placeholder"
+    ></div>
+
+
+    <!-- HERO -->
+    <section class="about-hero">
+
+        <div class="about-hero-overlay"></div>
+
+        <div class="about-container">
+
+            <!-- BREADCRUMB -->
+            <nav
+                aria-label="Breadcrumb"
+                class="about-breadcrumb"
+            >
+
+                <a
+                    href="../index.html"
+                    class="about-breadcrumb-link"
+                >
+                    Trang chủ
+                </a>
+
+                <span class="about-breadcrumb-separator">
+                    /
+                </span>
+
+                <span
+                    class="about-breadcrumb-current"
+                    aria-current="page"
+                >
+                    Về Chúng Tôi
+                </span>
+
+            </nav>
+
+
+            <!-- HERO CONTENT -->
+            <div class="about-hero-content">
+
+                <h1
+                    id="heroHeading"
+                    class="about-hero-title"
+                >
+                    Đối Tác MRO Toàn Diện Của Bạn
+                </h1>
+
+                <p
+                    id="heroDescription"
+                    class="about-hero-description"
+                >
+                    Công ty TNHH Thương mại – Dịch vụ Khang Nam Vina
+                    tự hào là đơn vị hàng đầu chuyên cung cấp giải pháp
+                    vật tư công nghiệp. Chúng tôi cam kết mang đến
+                    chuỗi cung ứng bền vững và tối ưu nhất cho doanh nghiệp
+                    của bạn.
+                </p>
+
             </div>
-            
-            <div class="bg-white p-8 rounded-xl shadow-sm border-t-4 border-kn-orange hover:shadow-lg transition-shadow">
-                <div class="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mb-6">
-                    <svg class="w-8 h-8 text-kn-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                </div>
-                <h3 class="text-2xl font-black text-gray-800 mb-4 uppercase">Sứ Mệnh</h3>
-                <p class="text-gray-600 leading-relaxed">Tối ưu hóa quy trình mua sắm, tiết kiệm thời gian và chi phí cho khách hàng thông qua hệ thống sản phẩm đa dạng, minh bạch giá cả và dịch vụ giao hàng thần tốc.</p>
-            </div>
+
         </div>
+
     </section>
 
-    <!-- 6. TẠI SAO CHỌN CHÚNG TÔI -->
-    <section class="bg-white py-16 border-t border-gray-200">
-        <div class="container mx-auto px-4 text-center">
-            <h2 class="text-3xl font-black text-kn-blue mb-12 uppercase">Thế mạnh của Khang Nam Vina</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                <div class="p-6">
-                    <div class="text-4xl mb-4">🏭</div>
-                    <h4 class="text-lg font-bold text-gray-800 mb-2 uppercase">Hàng Hóa Đa Dạng</h4>
-                    <p class="text-sm text-gray-500">Hàng ngàn mã sản phẩm từ dụng cụ cầm tay, thiết bị cắt gọt đến vật tư tiêu hao nhà xưởng.</p>
-                </div>
-                <div class="p-6 border-x border-gray-100">
-                    <div class="text-4xl mb-4">✅</div>
-                    <h4 class="text-lg font-bold text-gray-800 mb-2 uppercase">100% Chính Hãng</h4>
-                    <p class="text-sm text-gray-500">Phân phối trực tiếp từ các thương hiệu toàn cầu với đầy đủ giấy tờ CO/CQ chứng nhận chất lượng.</p>
-                </div>
-                <div class="p-6">
-                    <div class="text-4xl mb-4">⚡</div>
-                    <h4 class="text-lg font-bold text-gray-800 mb-2 uppercase">Quy Trình Tối Ưu</h4>
-                    <p class="text-sm text-gray-500">Hệ thống Yêu cầu Báo giá (RFQ) thông minh, giúp doanh nghiệp chốt đơn nhanh chóng, chuyên nghiệp.</p>
-                </div> 
-            </div>
-        </div>
-    </section>
 
-   <!-- CHỖ NÀY ĐỂ RÁP FOOTER BẰNG JAVASCRIPT -->
+    <!-- MAIN -->
+    <main class="about-main">
+
+
+        <!-- LOADING -->
+        <div
+            id="loadingIndicator"
+            class="about-loading"
+        >
+            <div class="about-spinner"></div>
+        </div>
+
+
+        <!-- CONTENT -->
+        <div
+            id="aboutContentWrapper"
+            class="about-content-wrapper is-hidden"
+        >
+
+
+            <!-- =================================================
+            KPI
+            ================================================= -->
+            <section class="about-container about-kpi-section">
+
+                <div class="about-kpi-grid">
+
+
+                    <!-- YEARS -->
+                    <div class="about-kpi-item">
+
+                        <div class="about-kpi-number about-kpi-orange">
+                            <span id="kpiYears">20</span>+
+                        </div>
+
+                        <div class="about-kpi-label">
+                            Năm Kinh Nghiệm
+                        </div>
+
+                    </div>
+
+
+                    <!-- BRANDS -->
+                    <div class="about-kpi-item">
+
+                        <div class="about-kpi-number">
+                            <span id="kpiBrands">120</span>+
+                        </div>
+
+                        <div class="about-kpi-label">
+                            Thương Hiệu
+                        </div>
+
+                    </div>
+
+
+                    <!-- SKUS -->
+                    <div class="about-kpi-item">
+
+                        <div class="about-kpi-number">
+                            <span id="kpiSkus">50.000</span>+
+                        </div>
+
+                        <div class="about-kpi-label">
+                            Mã Sản Phẩm
+                        </div>
+
+                    </div>
+
+
+                    <!-- CUSTOMERS -->
+                    <div class="about-kpi-item">
+
+                        <div class="about-kpi-number">
+                            <span id="kpiCustomers">3.000</span>+
+                        </div>
+
+                        <div class="about-kpi-label">
+                            Khách Hàng
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+            WHY US
+            ================================================= -->
+            <section class="about-container about-why-section">
+
+
+                <div class="about-section-heading">
+
+                    <h2>
+                        Tại Sao Chọn MRO Khang Nam?
+                    </h2>
+
+                    <div class="about-section-line"></div>
+
+                </div>
+
+
+                <div class="about-benefits-grid">
+
+
+                    <!-- BENEFIT 1 -->
+                    <article class="about-benefit-card">
+
+                        <div class="about-benefit-icon">
+
+                            <svg
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                ></path>
+                            </svg>
+
+                        </div>
+
+                        <h3>
+                            100% Chính Hãng
+                        </h3>
+
+                        <p>
+                            Đại lý ủy quyền trực tiếp từ các thương hiệu
+                            hàng đầu thế giới.
+                        </p>
+
+                    </article>
+
+
+                    <!-- BENEFIT 2 -->
+                    <article class="about-benefit-card">
+
+                        <div class="about-benefit-icon">
+
+                            <svg
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                                ></path>
+                            </svg>
+
+                        </div>
+
+                        <h3>
+                            Kho Hàng Lớn
+                        </h3>
+
+                        <p>
+                            Sẵn sàng cung ứng vật tư tức thì,
+                            đảm bảo tiến độ sản xuất.
+                        </p>
+
+                    </article>
+
+
+                    <!-- BENEFIT 3 -->
+                    <article class="about-benefit-card">
+
+                        <div class="about-benefit-icon">
+
+                            <svg
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                                ></path>
+                            </svg>
+
+                        </div>
+
+                        <h3>
+                            Đội Ngũ Kỹ Sư
+                        </h3>
+
+                        <p>
+                            Tư vấn chuyên sâu, đưa ra giải pháp
+                            kỹ thuật tối ưu nhất.
+                        </p>
+
+                    </article>
+
+
+                    <!-- BENEFIT 4 -->
+                    <article class="about-benefit-card">
+
+                        <div class="about-benefit-icon">
+
+                            <svg
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                                ></path>
+                            </svg>
+
+                        </div>
+
+                        <h3>
+                            Giao Hàng Nhanh
+                        </h3>
+
+                        <p>
+                            Đội xe chuyên dụng, giao hàng siêu tốc
+                            trong 24h.
+                        </p>
+
+                    </article>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+            DYNAMIC CONTENT
+            ================================================= -->
+            <section class="about-container about-content-section">
+
+                <div
+                    id="dynamicHtmlContent"
+                    class="about-rich-content"
+                ></div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
     <div id="app-footer"></div>
 
-    <!-- GỌI SCRIPT COMPONENT HEADER/FOOTER -->
+
+    <!-- SUPABASE -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- COMMON -->
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/common/auth.js"></script>
+    <script src="../assets/js/common/utils.js"></script>
+
+    <!-- COMPONENTS -->
     <script src="../assets/components/header.js"></script>
     <script src="../assets/components/footer.js"></script>
 
-    <!-- 1. Gọi thư viện Supabase (bắt buộc) - Đã thêm dấu < bị thiếu -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <!-- 2. Gọi file common.js của anh em mình -->
-    <script src="../assets/js/common.js"></script>
-    
-    <!-- 3. Viết script riêng cho trang này (nếu có) -->
-    <script>
-        window.onload = function() {
-            checkCustomerAuth(); // Hàm này giờ được gọi từ common.js
-            
-        };
-    </script>
+    <!-- AUTH -->
+    <script src="../assets/js/users/auth-ui.js"></script>
+
+    <!-- PAGE -->
+    <script src="../assets/js/users/about.js"></script>
+
 </body>
 </html>

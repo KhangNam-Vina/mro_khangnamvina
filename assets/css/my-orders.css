@@ -1,0 +1,631 @@
+/* =========================================================
+   1. BASE
+   Chuẩn hóa theo PROFILE.CSS
+========================================================= */
+.profile-page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    background: #f5f6f8;
+    color: #1f2937;
+    font-family: "Inter", Arial, sans-serif;
+}
+
+.profile-page-wrapper *,
+.profile-page-wrapper *::before,
+.profile-page-wrapper *::after { box-sizing: border-box; }
+
+.profile-page-wrapper button,
+.profile-page-wrapper input,
+.profile-page-wrapper textarea { font-family: inherit; }
+
+.profile-page-wrapper a,
+.profile-page-wrapper button { -webkit-tap-highlight-color: transparent; }
+
+.is-hidden,
+.d-none { display: none !important; }
+
+.profile-container {
+    width: min(1536px, calc(100% - 32px));
+    margin: 0 auto;
+}
+
+.relative-z {
+    position: relative;
+    z-index: 10;
+}
+
+/* =========================================================
+   2. HERO
+========================================================= */
+.profile-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 48px 0;
+    background: linear-gradient(110deg, #003370 0%, #00479b 100%);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.profile-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 71, 155, .6);
+    pointer-events: none;
+}
+
+.profile-hero 
+.profile-container {
+    position: relative;
+    z-index: 2;
+}
+
+.profile-breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 20px;
+    color: #d1d5db;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.breadcrumb-link,
+.profile-breadcrumb-link {
+    color: #d1d5db;
+    text-decoration: none;
+    transition: color .2s;
+}
+
+.breadcrumb-link:hover,
+.profile-breadcrumb-link:hover { color: #ff5e00; }
+
+.breadcrumb-separator,
+.profile-breadcrumb-separator { color: #6b7280; }
+
+.breadcrumb-current,
+.profile-breadcrumb-current {
+    color: #fff;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.profile-hero-title {
+    margin: 0 0 10px;
+    color: #fff;
+    font-size: clamp(30px, 4vw, 42px);
+    line-height: 1.2;
+    font-weight: 900;
+    letter-spacing: -.02em;
+}
+
+.profile-hero-description {
+    max-width: 760px;
+    margin: 0;
+    color: #e5e7eb;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+/* =========================================================
+   3. MAIN & LAYOUT
+========================================================= */
+.profile-main-content {
+    flex: 1;
+    width: 100%;
+    padding: 40px 0 64px;
+    background: #f9fafb;
+}
+
+.profile-layout-grid {
+    width: min(1536px, calc(100% - 32px));
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 256px minmax(0, 1fr);
+    gap: 32px;
+    align-items: start;
+}
+
+/* =========================================================
+   4. SIDEBAR — GIỐNG PROFILE.CSS
+========================================================= */
+.profile-sidebar {
+    position: static;
+    align-self: start;
+    width: 100%;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .05);
+}
+
+.profile-sidebar-profile {
+    padding: 20px;
+    text-align: center;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.profile-avatar {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+    background: #00479b;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.profile-sidebar-name {
+    margin: 0 0 4px;
+    overflow: hidden;
+    color: #1f2937;
+    font-size: 14px;
+    font-weight: 800;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.profile-sidebar-email {
+    margin: 0;
+    overflow: hidden;
+    color: #6b7280;
+    font-size: 11px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.profile-sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+}
+
+.profile-sidebar-link,
+.profile-sidebar-logout {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #4b5563;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color .2s, color .2s;
+}
+
+.profile-sidebar-link:hover {
+    background: #f9fafb;
+    color: #00479b;
+}
+
+.profile-sidebar-link.is-active {
+    background: #eff6ff;
+    color: #00479b;
+    font-weight: 800;
+}
+
+.profile-sidebar-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    flex-shrink: 0;
+    color: #9ca3af;
+}
+
+.profile-sidebar-link.is-active .profile-sidebar-icon {
+    color: #00479b;
+}
+
+.profile-sidebar-divider {
+    height: 1px;
+    margin: 8px 4px;
+    background: #f3f4f6;
+}
+
+.profile-sidebar-logout { color: #dc2626; }
+
+.profile-sidebar-logout:hover {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.profile-sidebar-logout .profile-sidebar-icon { color: inherit; }
+
+/* =========================================================
+   5. CONTENT BASE
+========================================================= */
+.profile-content-area {
+    min-width: 0;
+}
+
+.content-card {
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .05);
+}
+
+.content-card-header {
+    padding: 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.content-title {
+    margin: 0 0 6px;
+    color: #00479b;
+    font-size: 21px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -.01em;
+}
+
+.content-card-body { padding: 24px; }
+
+/* =========================================================
+   6. TABLE
+========================================================= */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.mro-data-table {
+    width: 100%;
+    min-width: 700px;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 14px;
+}
+
+.mro-data-table th {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 12px;
+    padding: 16px;
+}
+
+.mro-data-table td {
+    padding: 16px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #374151;
+    vertical-align: middle;
+}
+
+.mro-data-table tr:hover td {
+    background-color: #f9fafb;
+}
+
+.order-code-text {
+    color: #00479b;
+    font-weight: 800;
+}
+
+.order-total-text {
+    color: #ff5e00;
+    font-weight: 900;
+}
+
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.mt-3 { margin-top: 12px; }
+
+/* =========================================================
+   7. STATUS BADGES
+========================================================= */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    border: 1px solid transparent;
+}
+
+.status-pending { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+.status-processing { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+.status-shipping { background: #faf5ff; color: #4338ca; border-color: #e9d5ff; }
+.status-completed { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+.status-cancelled { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+
+/* =========================================================
+   8. BUTTONS
+========================================================= */
+.btn-primary {
+    display: inline-block;
+    background: #00479b;
+    color: #fff;
+    font-weight: 700;
+    padding: 10px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.btn-primary:hover { 
+    background: #ff5e00; 
+}
+
+.btn-outline-blue {
+    display: inline-block;
+    border: 1px solid #00479b;
+    color: #00479b;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 6px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    background: transparent;
+    cursor: pointer;
+}
+
+.btn-outline-blue:hover {
+    background: #00479b;
+    color: #fff;
+}
+
+/* =========================================================
+   9. EMPTY / LOADING STATES
+========================================================= */
+.state-container {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #fed7aa;
+    border-top-color: #ff5e00;
+    border-radius: 50%;
+    animation: spin-my-orders 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+@keyframes spin-my-orders { 
+    to { transform: rotate(360deg); } 
+}
+
+.state-icon {
+    width: 64px;
+    height: 64px;
+    color: #d1d5db;
+    margin: 0 auto 16px;
+}
+
+.state-heading { 
+    font-size: 20px; 
+    font-weight: 800; 
+    color: #1f2937; 
+    margin: 0 0 8px; 
+}
+
+.state-desc { 
+    font-size: 14px; 
+    color: #6b7280; 
+    margin: 0; 
+}
+
+/* =========================================================
+   COMPATIBILITY SELECTORS
+   Giữ lại các selector dùng chung từ file cũ.
+   Giá trị được chuẩn hóa theo PROFILE.CSS.
+========================================================= */
+.profile-hero,
+.my-rfq-hero,
+.purchased-hero,
+.rfq-hero {
+    background: linear-gradient(110deg, #003370 0%, #00479b 100%);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .08);
+}
+
+.profile-hero-overlay,
+.my-rfq-hero-overlay,
+.purchased-hero-overlay,
+.rfq-hero-overlay {
+    background: rgba(0, 71, 155, .6);
+}
+
+.profile-breadcrumb,
+.my-rfq-breadcrumb,
+.purchased-breadcrumb,
+.rfq-breadcrumb {
+    color: #d1d5db;
+}
+
+.profile-breadcrumb-link,
+.my-rfq-breadcrumb-link,
+.purchased-breadcrumb-link,
+.rfq-breadcrumb-link,
+.breadcrumb-link {
+    color: #d1d5db;
+    text-decoration: none;
+}
+
+.profile-breadcrumb-link:hover,
+.my-rfq-breadcrumb-link:hover,
+.purchased-breadcrumb-link:hover,
+.rfq-breadcrumb-link:hover,
+.breadcrumb-link:hover {
+    color: #ff5e00;
+}
+
+.profile-breadcrumb-separator,
+.my-rfq-breadcrumb-separator,
+.purchased-breadcrumb-separator,
+.rfq-breadcrumb-separator,
+.breadcrumb-separator {
+    color: #6b7280;
+}
+
+.profile-breadcrumb-current,
+.my-rfq-breadcrumb-current,
+.purchased-breadcrumb-current,
+.rfq-breadcrumb-current,
+.breadcrumb-current {
+    color: #fff;
+    font-weight: 800;
+}
+
+.profile-hero-title,
+.my-rfq-hero-title,
+.purchased-hero-title,
+.rfq-hero-title {
+    margin: 0 0 10px;
+    color: #fff;
+    font-size: clamp(30px, 4vw, 42px);
+    line-height: 1.2;
+    font-weight: 900;
+}
+
+.profile-hero-description,
+.my-rfq-hero-description,
+.purchased-hero-description,
+.rfq-hero-description {
+    max-width: 760px;
+    margin: 0;
+    color: #e5e7eb;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+/* Cross-page containers remain available for shared templates. */
+.my-rfq-container,
+.purchased-container,
+.rfq-container {
+    width: min(1536px, calc(100% - 32px));
+    margin: 0 auto;
+}
+
+.content-badge {
+    background: #fff;
+    border: 1px solid #d1d5db;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #4b5563;
+}
+
+/* =========================================================
+   10. RESPONSIVE
+========================================================= */
+@media (max-width: 1000px) {
+    .profile-layout-grid {
+        grid-template-columns: 220px minmax(0, 1fr);
+        gap: 24px;
+    }
+
+    .profile-container,
+    .profile-layout-grid {
+        width: min(100%, calc(100% - 24px));
+    }
+}
+
+@media (max-width: 850px) {
+    .profile-layout-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-sidebar {
+        position: static;
+    }
+
+    .profile-sidebar-nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .profile-sidebar-divider,
+    .profile-sidebar-logout {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 700px) {
+    .profile-hero {
+        padding: 38px 0 42px;
+    }
+
+    .profile-hero-title {
+        font-size: 29px;
+    }
+
+    .profile-main-content {
+        padding: 28px 0 48px;
+    }
+}
+
+@media (max-width: 560px) {
+    .profile-container,
+    .profile-layout-grid {
+        width: calc(100% - 20px);
+    }
+
+    .profile-sidebar-nav {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-sidebar-divider,
+    .profile-sidebar-logout {
+        grid-column: auto;
+    }
+
+    .content-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+
+/* =========================================================
+   11. PRINT
+========================================================= */
+@media print {
+    #app-header,
+    #app-footer,
+    .profile-sidebar {
+        display: none !important;
+    }
+
+    .profile-page-wrapper,
+    .profile-main-content {
+        background: #fff;
+        padding: 0;
+    }
+
+    .profile-container,
+    .profile-layout-grid {
+        width: 100%;
+        max-width: none;
+    }
+
+    .profile-layout-grid {
+        display: block;
+    }
+
+    .content-card {
+        border: 0;
+        box-shadow: none;
+    }
+}

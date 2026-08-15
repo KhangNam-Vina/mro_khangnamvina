@@ -1,0 +1,1855 @@
+/* =========================================================
+   RFQ CENTER
+   MRO KHANG NAM
+   CSS TĨNH - KHÔNG DÙNG TAILWIND
+========================================================= */
+
+
+/* =========================================================
+   1. BASE
+========================================================= */
+
+.rfq-page {
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+
+    margin: 0;
+
+    background: #f5f6f8;
+
+    color: #1f2937;
+
+    font-family:
+        "Inter",
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+.rfq-page *,
+.rfq-page *::before,
+.rfq-page *::after {
+    box-sizing: border-box;
+}
+
+.rfq-page img {
+    display: block;
+    max-width: 100%;
+}
+
+.rfq-page button,
+.rfq-page input,
+.rfq-page textarea,
+.rfq-page select {
+    font-family: inherit;
+}
+
+.is-hidden {
+    display: none !important;
+}
+
+.is-disabled {
+    opacity: .5 !important;
+    cursor: not-allowed !important;
+}
+
+
+/* =========================================================
+   2. CONTAINER
+========================================================= */
+
+.rfq-container {
+    width: min(
+        1536px,
+        calc(100% - 32px)
+    );
+
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   3. HERO
+========================================================= */
+
+.rfq-hero {
+    position: relative;
+
+    width: 100%;
+    margin: 0;
+
+    overflow: hidden;
+
+    padding: 48px 0;
+
+    background: #00479b;
+
+    color: #ffffff;
+
+    box-shadow:
+        0 2px 8px rgba(
+            15,
+            23,
+            42,
+            .08
+        );
+}
+
+.rfq-hero-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            110deg,
+            rgba(0, 51, 112, .18) 0%,
+            rgba(0, 71, 155, .08) 100%
+        );
+
+    pointer-events: none;
+}
+
+.rfq-hero .rfq-container {
+    position: relative;
+
+    z-index: 2;
+}
+
+.rfq-hero-title {
+    margin: 0 0 10px;
+
+    color: #fff;
+
+    font-size: clamp(
+        30px,
+        4vw,
+        40px
+    );
+
+    line-height: 1.2;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+}
+
+.rfq-hero-description {
+    max-width: 780px;
+
+    margin: 0;
+
+    color: #e5e7eb;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   4. BREADCRUMB
+========================================================= */
+
+.rfq-breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-bottom: 24px;
+
+    color: #d1d5db;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    line-height: 1.5;
+}
+
+.rfq-breadcrumb-link {
+    color: #d1d5db;
+
+    text-decoration: none;
+
+    transition:
+        color .2s ease;
+}
+
+.rfq-breadcrumb-link:hover {
+    color: #ff5e00;
+}
+
+.rfq-breadcrumb-separator {
+    color: #6b7280;
+}
+
+.rfq-breadcrumb-current {
+    color: #fff;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   5. MAIN
+========================================================= */
+
+.rfq-main {
+    flex: 1;
+
+    width: 100%;
+
+    padding:
+        32px 0 64px;
+}
+
+.rfq-layout-wrapper {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 24px;
+}
+
+
+/* =========================================================
+   6. TOOLBAR
+========================================================= */
+
+.rfq-toolbar {
+    position: static;
+
+    width: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 16px;
+
+    padding: 12px;
+
+    background: #fff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 2px 6px rgba(15, 23, 42, .05);
+}
+
+.rfq-toolbar-left {
+    width: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 16px;
+}
+
+.rfq-toolbar-title-group {
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+.rfq-toolbar-title {
+    width: auto;
+
+    margin: 0;
+
+    color: #00479b;
+
+    font-size: 17px;
+
+    line-height: 1.25;
+
+    font-weight: 900;
+
+    text-align: center;
+
+    text-transform: uppercase;
+}
+
+.rfq-toolbar-badge {
+    width: 40px;
+    height: 40px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    padding: 0 8px;
+
+    background: #ff5e00;
+
+    border-radius: 999px;
+
+    color: #fff;
+
+    font-size: 11px;
+
+    line-height: 1.2;
+
+    font-weight: 900;
+
+    text-align: center;
+
+    box-shadow:
+        0 2px 5px rgba(0, 0, 0, .08);
+}
+
+.rfq-toolbar-search {
+    position: relative;
+
+    width: 100%;
+}
+
+.rfq-search-input {
+    width: 100%;
+
+    height: 40px;
+
+    padding:
+        0 12px 0 36px;
+
+    border:
+        1px solid #d1d5db;
+
+    border-radius: 6px;
+
+    background: #fff;
+
+    color: #374151;
+
+    font-size: 13px;
+
+    outline: none;
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease;
+}
+
+.rfq-search-input::placeholder {
+    color: #9ca3af;
+}
+
+.rfq-search-input:focus {
+    border-color:
+        #ff5e00;
+
+    box-shadow:
+        0 0 0 3px rgba(
+            255,
+            94,
+            0,
+            .08
+        );
+}
+
+.rfq-search-icon {
+    position: absolute;
+
+    left: 12px;
+    top: 50%;
+
+    width: 16px;
+    height: 16px;
+
+    transform:
+        translateY(-50%);
+
+    color: #9ca3af;
+
+    pointer-events: none;
+}
+
+.rfq-toolbar-actions {
+    width: 100%;
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    justify-content: flex-start;
+
+    gap: 8px;
+}
+
+
+/* =========================================================
+   7. BUTTONS
+========================================================= */
+
+.rfq-btn {
+    min-height: 40px;
+
+    flex:
+        1 1
+        0;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    padding:
+        0 14px;
+
+    border-radius: 6px;
+
+    font-size: 12px;
+
+    line-height: 1.2;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        background-color .2s ease,
+        border-color .2s ease,
+        color .2s ease,
+        box-shadow .2s ease,
+        transform .2s ease;
+}
+
+.rfq-btn:hover {
+    transform:
+        translateY(-1px);
+}
+
+.rfq-btn-icon {
+    width: 16px;
+    height: 16px;
+
+    flex-shrink: 0;
+}
+
+.rfq-icon-pulse {
+    animation:
+        rfq-pulse
+        2s
+        ease-in-out
+        infinite;
+}
+
+.rfq-btn-orange {
+    background: #ff5e00;
+
+    border:
+        1px solid #ff5e00;
+
+    color: #fff;
+
+    box-shadow:
+        0 2px 5px rgba(
+            255,
+            94,
+            0,
+            .12
+        );
+}
+
+.rfq-btn-orange:hover {
+    background: #ea580c;
+
+    border-color:
+        #ea580c;
+}
+
+.rfq-btn-blue {
+    background: #00479b;
+
+    border:
+        1px solid #00479b;
+
+    color: #fff;
+
+    box-shadow:
+        0 2px 5px rgba(
+            0,
+            71,
+            155,
+            .12
+        );
+}
+
+.rfq-btn-blue:hover {
+    background: #003b82;
+
+    border-color:
+        #003b82;
+}
+
+.rfq-btn-green {
+    background:
+        #f0fdf4;
+
+    border:
+        1px solid #bbf7d0;
+
+    color:
+        #15803d;
+}
+
+.rfq-btn-green:hover {
+    background:
+        #dcfce7;
+
+    color:
+        #166534;
+}
+
+.rfq-btn-red {
+    background:
+        #fef2f2;
+
+    border:
+        1px solid #fecaca;
+
+    color:
+        #ef4444;
+}
+
+.rfq-btn-red:hover {
+    background:
+        #fee2e2;
+
+    color:
+        #b91c1c;
+}
+
+@keyframes rfq-pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .5;
+    }
+}
+
+
+/* =========================================================
+   8. GRID LAYOUT
+========================================================= */
+
+.rfq-grid-layout {
+    display: grid;
+
+    grid-template-columns:
+        1fr;
+
+    gap: 24px;
+
+    align-items: start;
+}
+
+.rfq-col-main,
+.rfq-col-sidebar {
+    width: 100%;
+
+    min-width: 0;
+}
+
+
+/* =========================================================
+   9. PRODUCT GRID
+========================================================= */
+
+.rfq-product-grid {
+    display: grid;
+
+    grid-template-columns:
+        1fr;
+
+    gap: 16px;
+}
+
+.rfq-loading-wrapper {
+    grid-column:
+        1 / -1;
+
+    min-height: 280px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 48px 0;
+}
+
+.rfq-loading-spinner {
+    width: 34px;
+    height: 34px;
+
+    color:
+        #ff5e00;
+
+    animation:
+        rfq-spin
+        1s
+        linear
+        infinite;
+}
+
+.rfq-spinner-track {
+    opacity: .2;
+}
+
+.rfq-spinner-head {
+    opacity: .85;
+}
+
+@keyframes rfq-spin {
+    from {
+        transform:
+            rotate(0deg);
+    }
+
+    to {
+        transform:
+            rotate(360deg);
+    }
+}
+
+
+/* =========================================================
+   10. PRODUCT CARD - JS RENDER
+========================================================= */
+
+.rfq-product-card {
+    position: relative;
+
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: space-between;
+
+    padding: 16px;
+
+    background: #fff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius: 8px;
+
+    box-shadow:
+        0 1px 3px rgba(
+            15,
+            23,
+            42,
+            .03
+        );
+
+    transition:
+        border-color .25s ease,
+        box-shadow .25s ease,
+        transform .25s ease;
+}
+
+.rfq-product-card:hover {
+    border-color:
+        #ff5e00;
+
+    box-shadow:
+        0 8px 20px rgba(
+            15,
+            23,
+            42,
+            .08
+        );
+
+    transform:
+        translateY(-2px);
+}
+
+.rfq-product-card-top {
+    min-width: 0;
+
+    padding-right: 52px;
+}
+
+.rfq-product-remove {
+    position: absolute;
+
+    top: 12px;
+    right: 12px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-height: 28px;
+
+    padding:
+        0 9px;
+
+    background:
+        #fef2f2;
+
+    border:
+        1px solid #fecaca;
+
+    border-radius: 5px;
+
+    color:
+        #dc2626;
+
+    font-size:
+        10px;
+
+    line-height:
+        1;
+
+    font-weight:
+        900;
+
+    cursor:
+        pointer;
+
+    transition:
+        background-color .2s ease,
+        color .2s ease;
+}
+
+.rfq-product-remove:hover {
+    background:
+        #fee2e2;
+
+    color:
+        #b91c1c;
+}
+
+.rfq-product-brand {
+    margin-bottom:
+        4px;
+
+    color:
+        #ff5e00;
+
+    font-size:
+        10px;
+
+    line-height:
+        1.3;
+
+    font-weight:
+        900;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        .08em;
+}
+
+.rfq-product-name {
+    margin:
+        0 0 6px;
+
+    color:
+        #00479b;
+
+    font-size:
+        14px;
+
+    line-height:
+        1.4;
+
+    font-weight:
+        800;
+
+    display:
+        -webkit-box;
+
+    -webkit-box-orient:
+        vertical;
+
+    -webkit-line-clamp:
+        2;
+
+    overflow:
+        hidden;
+}
+
+.rfq-product-sku {
+    margin:
+        0;
+
+    color:
+        #6b7280;
+
+    font-size:
+        11px;
+
+    line-height:
+        1.5;
+}
+
+.rfq-product-sku strong {
+    color:
+        #374151;
+
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        monospace;
+
+    text-transform:
+        uppercase;
+}
+
+.rfq-product-footer {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        10px;
+
+    margin-top:
+        12px;
+
+    padding-top:
+        12px;
+
+    border-top:
+        1px solid #f3f4f6;
+}
+
+.rfq-product-unit {
+    color:
+        #6b7280;
+
+    font-size:
+        11px;
+
+    font-weight:
+        600;
+}
+
+.rfq-product-qty-wrap {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        6px;
+}
+
+.rfq-product-qty-label {
+    color:
+        #374151;
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+}
+
+.rfq-product-qty-input {
+    width:
+        64px;
+
+    height:
+        32px;
+
+    padding:
+        0 6px;
+
+    border:
+        1px solid #d1d5db;
+
+    border-radius:
+        5px;
+
+    background:
+        #f9fafb;
+
+    color:
+        #00479b;
+
+    font-size:
+        12px;
+
+    font-weight:
+        800;
+
+    text-align:
+        center;
+
+    outline:
+        none;
+
+    transition:
+        border-color .2s ease,
+        background-color .2s ease,
+        box-shadow .2s ease;
+}
+
+.rfq-product-qty-input:focus {
+    border-color:
+        #ff5e00;
+
+    background:
+        #fff;
+
+    box-shadow:
+        0 0 0 3px rgba(
+            255,
+            94,
+            0,
+            .08
+        );
+}
+
+
+/* =========================================================
+   11. EMPTY STATES
+========================================================= */
+
+.rfq-empty-state {
+    grid-column:
+        1 / -1;
+
+    min-height:
+        300px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        48px 24px;
+
+    background:
+        #fff;
+
+    border:
+        1px dashed #d1d5db;
+
+    border-radius:
+        12px;
+
+    text-align:
+        center;
+}
+
+.rfq-empty-icon {
+    width:
+        48px;
+
+    height:
+        48px;
+
+    margin-bottom:
+        12px;
+
+    color:
+        #d1d5db;
+}
+
+.rfq-empty-title {
+    margin:
+        0 0 16px;
+
+    color:
+        #6b7280;
+
+    font-size:
+        18px;
+
+    line-height:
+        1.4;
+
+    font-weight:
+        800;
+}
+
+.rfq-empty-button {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    min-height:
+        42px;
+
+    padding:
+        0 20px;
+
+    background:
+        #00479b;
+
+    border-radius:
+        6px;
+
+    color:
+        #fff;
+
+    font-size:
+        13px;
+
+    font-weight:
+        800;
+
+    text-decoration:
+        none;
+
+    transition:
+        background-color .2s ease;
+}
+
+.rfq-empty-button:hover {
+    background:
+        #ff5e00;
+}
+
+.rfq-filter-empty {
+    grid-column:
+        1 / -1;
+
+    padding:
+        48px 20px;
+
+    color:
+        #6b7280;
+
+    font-size:
+        14px;
+
+    font-weight:
+        700;
+
+    text-align:
+        center;
+}
+
+
+/* =========================================================
+   12. SIDEBAR
+========================================================= */
+
+.rfq-sidebar-card {
+    position: sticky;
+
+    top: 170px;
+
+    overflow:
+        hidden;
+
+    background:
+        #fff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius:
+        12px;
+
+    box-shadow:
+        0 4px 14px rgba(
+            15,
+            23,
+            42,
+            .08
+        );
+}
+
+.rfq-sidebar-header {
+    padding:
+        20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #003370,
+            #00479b
+        );
+
+    color:
+        #fff;
+}
+
+.rfq-sidebar-header h2 {
+    margin:
+        0 0 4px;
+
+    color:
+        #fff;
+
+    font-size:
+        18px;
+
+    line-height:
+        1.25;
+
+    font-weight:
+        900;
+
+    text-transform:
+        uppercase;
+}
+
+.rfq-sidebar-header p {
+    margin:
+        0;
+
+    color:
+        #bfdbfe;
+
+    font-size:
+        11px;
+
+    line-height:
+        1.5;
+}
+
+.rfq-sidebar-body {
+    padding:
+        20px;
+}
+
+.rfq-selected-count {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        10px;
+
+    margin-bottom:
+        20px;
+
+    padding:
+        12px;
+
+    background:
+        #eff6ff;
+
+    border:
+        1px solid #dbeafe;
+
+    border-radius:
+        6px;
+}
+
+.rfq-selected-count span:first-child {
+    color:
+        #00479b;
+
+    font-size:
+        13px;
+
+    font-weight:
+        800;
+}
+
+.rfq-selected-count span:last-child {
+    color:
+        #ff5e00;
+
+    font-size:
+        16px;
+
+    font-weight:
+        900;
+}
+
+
+/* =========================================================
+   13. FORM
+========================================================= */
+
+.rfq-form {
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        16px;
+}
+
+.rfq-form-group {
+    display:
+        flex;
+
+    flex-direction:
+        column;
+}
+
+.rfq-form-group label {
+    display:
+        block;
+
+    margin-bottom:
+        5px;
+
+    color:
+        #374151;
+
+    font-size:
+        12px;
+
+    line-height:
+        1.4;
+
+    font-weight:
+        800;
+}
+
+.rfq-form-group label span {
+    color:
+        #ef4444;
+}
+
+.rfq-form-group label small {
+    color:
+        #9ca3af;
+
+    font-size:
+        10px;
+
+    font-weight:
+        500;
+}
+
+.rfq-form-group input,
+.rfq-form-group textarea {
+    width:
+        100%;
+
+    padding:
+        10px 12px;
+
+    background:
+        #f9fafb;
+
+    border:
+        1px solid #d1d5db;
+
+    border-radius:
+        5px;
+
+    color:
+        #1f2937;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.5;
+
+    outline:
+        none;
+
+    transition:
+        border-color .2s ease,
+        background-color .2s ease,
+        box-shadow .2s ease;
+}
+
+.rfq-form-group textarea {
+    min-height:
+        88px;
+
+    resize:
+        vertical;
+}
+
+.rfq-form-group input::placeholder,
+.rfq-form-group textarea::placeholder {
+    color:
+        #9ca3af;
+}
+
+.rfq-form-group input:focus,
+.rfq-form-group textarea:focus {
+    border-color:
+        #ff5e00;
+
+    background:
+        #fff;
+
+    box-shadow:
+        0 0 0 3px rgba(
+            255,
+            94,
+            0,
+            .08
+        );
+}
+
+.rfq-btn-submit {
+    width:
+        100%;
+
+    min-height:
+        46px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        8px;
+
+    margin-top:
+        4px;
+
+    padding:
+        0 16px;
+
+    background:
+        #ff5e00;
+
+    border:
+        0;
+
+    border-radius:
+        6px;
+
+    color:
+        #fff;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.2;
+
+    font-weight:
+        900;
+
+    text-transform:
+        uppercase;
+
+    cursor:
+        pointer;
+
+    box-shadow:
+        0 4px 10px rgba(
+            255,
+            94,
+            0,
+            .18
+        );
+
+    transition:
+        background-color .2s ease,
+        box-shadow .2s ease,
+        transform .2s ease;
+}
+
+.rfq-btn-submit:hover:not(:disabled) {
+    background:
+        #ea580c;
+
+    box-shadow:
+        0 6px 14px rgba(
+            255,
+            94,
+            0,
+            .22
+        );
+
+    transform:
+        translateY(-1px);
+}
+
+.rfq-btn-submit:disabled {
+    opacity:
+        .5;
+
+    cursor:
+        not-allowed;
+}
+
+.rfq-btn-submit svg {
+    width:
+        18px;
+
+    height:
+        18px;
+
+    flex-shrink:
+        0;
+}
+
+
+/* =========================================================
+   14. COMMITMENT
+========================================================= */
+
+.rfq-commitment-card {
+    margin-top:
+        16px;
+
+    padding:
+        16px;
+
+    background:
+        #fff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius:
+        10px;
+
+    box-shadow:
+        0 1px 3px rgba(
+            15,
+            23,
+            42,
+            .03
+        );
+}
+
+.rfq-commitment-card ul {
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        10px;
+
+    margin:
+        0;
+
+    padding:
+        0;
+
+    list-style:
+        none;
+
+    color:
+        #374151;
+
+    font-size:
+        12px;
+
+    line-height:
+        1.5;
+
+    font-weight:
+        600;
+}
+
+.rfq-commitment-card li {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        8px;
+}
+
+.rfq-commitment-card li svg {
+    width:
+        16px;
+
+    height:
+        16px;
+
+    flex-shrink:
+        0;
+
+    color:
+        #22c55e;
+}
+
+
+/* =========================================================
+   15. RFQ SUBMIT LOADING
+========================================================= */
+
+.rfq-submit-loading {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        8px;
+}
+
+.rfq-submit-spinner {
+    width:
+        18px;
+
+    height:
+        18px;
+
+    animation:
+        rfq-spin
+        1s
+        linear
+        infinite;
+}
+
+.rfq-spinner-circle {
+    opacity:
+        .25;
+}
+
+.rfq-spinner-path {
+    opacity:
+        .85;
+}
+
+
+/* =========================================================
+   16. RFQ ERROR
+========================================================= */
+
+.rfq-message-error {
+    grid-column:
+        1 / -1;
+
+    padding:
+        24px;
+
+    background:
+        #fef2f2;
+
+    border:
+        1px solid #fecaca;
+
+    border-radius:
+        8px;
+
+    color:
+        #dc2626;
+
+    font-size:
+        13px;
+
+    font-weight:
+        700;
+
+    text-align:
+        center;
+}
+
+
+/* =========================================================
+   17. RESPONSIVE
+========================================================= */
+
+@media (min-width: 640px) {
+
+    .rfq-toolbar-left {
+        flex-direction:
+            row;
+    }
+
+    .rfq-toolbar-title {
+        text-align:
+            left;
+    }
+
+    .rfq-toolbar-search {
+        width:
+            260px;
+    }
+
+    .rfq-btn {
+        flex:
+            0 0 auto;
+    }
+
+    .rfq-product-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+@media (min-width: 1024px) {
+
+    .rfq-toolbar {
+    flex-direction: row;
+
+    align-items: center;
+
+    padding: 16px;
+}
+
+    .rfq-toolbar-left {
+        width:
+            auto;
+    }
+
+    .rfq-toolbar-actions {
+        width:
+            auto;
+
+        justify-content:
+            flex-end;
+    }
+
+    .rfq-grid-layout {
+        grid-template-columns:
+            repeat(10, minmax(0, 1fr));
+    }
+
+    .rfq-col-main {
+        grid-column:
+            span 7 / span 7;
+    }
+
+    .rfq-col-sidebar {
+        grid-column:
+            span 3 / span 3;
+    }
+
+    .rfq-sidebar-card {
+        top:
+            180px;
+    }
+}
+
+
+@media (min-width: 1280px) {
+
+    .rfq-product-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+}
+
+
+@media (max-width: 767px) {
+
+    .rfq-container {
+        width:
+            calc(100% - 24px);
+    }
+
+    .rfq-hero {
+        padding:
+            36px 0;
+    }
+
+    .rfq-hero-title {
+        font-size:
+            28px;
+    }
+
+    .rfq-hero-description {
+        font-size:
+            13px;
+    }
+
+    .rfq-main {
+        padding:
+            20px 0 48px;
+    }
+
+    .rfq-toolbar {
+        top:
+            0;
+    }
+
+    .rfq-sidebar-card {
+        position:
+            static;
+    }
+
+    .rfq-toolbar-actions {
+        display:
+            grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .rfq-btn {
+        width:
+            100%;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .rfq-container {
+        width:
+            calc(100% - 20px);
+    }
+
+    .rfq-toolbar {
+        padding:
+            10px;
+    }
+
+    .rfq-toolbar-actions {
+        grid-template-columns:
+            1fr;
+    }
+
+    .rfq-toolbar-title {
+        font-size:
+            15px;
+    }
+
+    .rfq-toolbar-badge {
+        width:
+            36px;
+
+        height:
+            36px;
+    }
+
+    .rfq-product-card {
+        padding:
+            14px;
+    }
+
+    .rfq-product-footer {
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+    }
+
+    .rfq-product-qty-wrap {
+        width:
+            100%;
+
+        justify-content:
+            space-between;
+    }
+
+    .rfq-sidebar-body {
+        padding:
+            16px;
+    }
+}
+
+
+/* =========================================================
+   18. PRINT
+========================================================= */
+
+@media print {
+
+    .rfq-hero,
+    .rfq-toolbar,
+    .rfq-col-sidebar,
+    #app-header,
+    #app-footer {
+        display:
+            none !important;
+    }
+
+    .rfq-main {
+        padding:
+            0;
+    }
+
+    .rfq-grid-layout {
+        display:
+            block;
+    }
+
+    .rfq-product-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .rfq-product-card {
+        break-inside:
+            avoid;
+
+        box-shadow:
+            none;
+    }
+}

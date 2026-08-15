@@ -1,0 +1,883 @@
+/* =========================================================
+   INDUSTRIES.CSS
+   NGÀNH HÀNG - MRO KHANG NAM
+   ========================================================= */
+
+
+/* =========================================================
+   1. BASE
+   ========================================================= */
+
+.industries-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    margin: 0;
+
+    background: #f5f6f8;
+    color: #1f2937;
+
+    font-family:
+        "Inter",
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+.industries-page *,
+.industries-page *::before,
+.industries-page *::after {
+    box-sizing: border-box;
+}
+
+.industries-container {
+    width: min(1536px, calc(100% - 32px));
+    margin: 0 auto;
+}
+
+.industries-page .hidden {
+    display: none !important;
+}
+
+
+/* =========================================================
+   2. HERO
+   ========================================================= */
+
+.industries-hero {
+    position: relative;
+    overflow: hidden;
+
+    padding: 48px 0;
+
+    color: #ffffff;
+
+    background:
+        linear-gradient(
+            110deg,
+            #003370 0%,
+            #00479b 100%
+        );
+
+    box-shadow:
+        0 2px 8px rgba(15, 23, 42, .08);
+}
+
+.industries-hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+
+    background:
+        rgba(0, 71, 155, .60);
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   3. BREADCRUMB
+   ========================================================= */
+
+.industries-breadcrumb {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    gap: 8px;
+
+    margin-bottom: 24px;
+
+    color: #d1d5db;
+
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.industries-breadcrumb-link {
+    color: #d1d5db;
+    text-decoration: none;
+
+    transition: color .2s ease;
+}
+
+.industries-breadcrumb-link:hover {
+    color: #ff5e00;
+}
+
+.industries-breadcrumb-separator {
+    color: #6b7280;
+}
+
+.industries-breadcrumb-current {
+    color: #ffffff;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   4. HERO TITLE
+   ========================================================= */
+
+.industries-hero-title {
+    position: relative;
+    z-index: 2;
+
+    margin: 0 0 24px;
+
+    color: #ffffff;
+
+    font-size: clamp(30px, 4vw, 42px);
+    line-height: 1.2;
+    font-weight: 900;
+
+    text-transform: uppercase;
+    letter-spacing: .02em;
+}
+
+.industries-hero-description {
+    position: relative;
+    z-index: 2;
+
+    max-width: 760px;
+
+    margin: 0;
+
+    color: #e5e7eb;
+
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   5. MAIN
+   ========================================================= */
+
+.industries-main {
+    flex: 1;
+
+    padding:
+        32px 0 64px;
+
+    background: #f9fafb;
+}
+
+
+/* =========================================================
+   6. TOOLBAR
+   ========================================================= */
+
+.industries-toolbar {
+    display: flex;
+
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    margin-bottom: 24px;
+
+    padding: 8px 0 16px;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    background: #f9fafb;
+}
+
+.industries-toolbar-info {
+    min-width: 0;
+}
+
+.industries-section-title {
+    margin: 0;
+
+    color: #00479b;
+
+    font-size: 24px;
+    line-height: 1.25;
+    font-weight: 900;
+
+    text-transform: uppercase;
+}
+
+.industries-count {
+    display: inline-block;
+
+    margin-top: 8px;
+
+    padding:
+        5px 12px;
+
+    border-radius: 999px;
+
+    background: #e5e7eb;
+
+    color: #6b7280;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   7. SEARCH
+   ========================================================= */
+
+.industries-search {
+    position: relative;
+
+    width: 320px;
+    max-width: 100%;
+}
+
+.industries-search-input {
+    width: 100%;
+    height: 42px;
+
+    padding:
+        0 16px 0 40px;
+
+    border:
+        1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #1f2937;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+
+    outline: none;
+
+    box-shadow:
+        0 2px 6px rgba(15, 23, 42, .05);
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease;
+}
+
+.industries-search-input::placeholder {
+    color: #9ca3af;
+}
+
+.industries-search-input:focus {
+    border-color: #ff5e00;
+
+    box-shadow:
+        0 0 0 3px rgba(255, 94, 0, .08);
+}
+
+.industries-search-icon {
+    position: absolute;
+
+    left: 12px;
+    top: 50%;
+
+    width: 20px;
+    height: 20px;
+
+    transform: translateY(-50%);
+
+    color: #9ca3af;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   8. GRID
+   ========================================================= */
+
+.industries-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 24px;
+}
+
+
+/* =========================================================
+   9. CARD
+   ========================================================= */
+
+.industry-card {
+    position: relative;
+
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    height: 100%;
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 2px 6px rgba(15, 23, 42, .05);
+
+    transition:
+        border-color .3s ease,
+        box-shadow .3s ease,
+        transform .3s ease;
+}
+
+.industry-card:hover {
+    border-color: #00479b;
+
+    box-shadow:
+        0 12px 28px rgba(15, 23, 42, .12);
+
+    transform:
+        translateY(-4px);
+}
+
+
+/* =========================================================
+   10. CARD IMAGE
+   ========================================================= */
+
+.industry-card-image {
+    position: relative;
+
+    width: 100%;
+    height: 190px;
+
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #eef2f7;
+
+    border-bottom:
+        1px solid #e5e7eb;
+}
+
+.industry-image {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    transition:
+        transform .6s ease;
+}
+
+.industry-card:hover .industry-image {
+    transform: scale(1.05);
+}
+
+
+/* Overlay */
+
+.industry-card-overlay {
+    position: absolute;
+
+    inset: 0;
+    z-index: 5;
+
+    background:
+        rgba(0, 71, 155, .08);
+
+    pointer-events: none;
+
+    transition:
+        background-color .3s ease;
+}
+
+.industry-card:hover .industry-card-overlay {
+    background:
+        rgba(0, 71, 155, 0);
+}
+
+
+/* =========================================================
+   11. HOVER BUTTON
+   ========================================================= */
+
+.industry-card-hover {
+    position: absolute;
+
+    inset: 0;
+    z-index: 10;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        rgba(0, 0, 0, .35);
+
+    opacity: 0;
+
+    transition:
+        opacity .3s ease;
+}
+
+.industry-card:hover .industry-card-hover {
+    opacity: 1;
+}
+
+.industry-card-hover-text {
+    padding:
+        8px 16px;
+
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    color: #00479b;
+
+    font-size: 11px;
+    font-weight: 900;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   12. CARD BODY
+   ========================================================= */
+
+.industry-card-body {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 22px;
+}
+
+.industry-card-title {
+    margin: 0 0 8px;
+
+    color: #00479b;
+
+    font-size: 18px;
+    line-height: 1.4;
+
+    font-weight: 900;
+
+    text-transform: uppercase;
+
+    letter-spacing: .02em;
+
+    transition:
+        color .2s ease;
+}
+
+.industry-card:hover .industry-card-title {
+    color: #ff5e00;
+}
+
+.industry-card-description {
+    margin: 0 0 16px;
+
+    color: #6b7280;
+
+    font-size: 14px;
+    line-height: 1.6;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   13. FEATURES
+   ========================================================= */
+
+.industry-feature-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+
+    margin:
+        auto 0 20px;
+
+    padding: 0;
+
+    list-style: none;
+
+    color: #4b5563;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.industry-feature {
+    display: flex;
+    align-items: center;
+
+    min-width: 0;
+}
+
+.industry-feature-icon {
+    width: 16px;
+    height: 16px;
+
+    flex-shrink: 0;
+
+    margin-right: 8px;
+
+    color: #22c55e;
+}
+
+.industry-feature-text {
+    min-width: 0;
+
+    overflow: hidden;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+}
+
+.industry-feature-empty {
+    color: #9ca3af;
+
+    font-size: 11px;
+    font-style: italic;
+}
+
+
+/* =========================================================
+   14. FOOTER CARD
+   ========================================================= */
+
+.industry-card-footer {
+    margin-top: auto;
+
+    padding-top: 16px;
+
+    border-top:
+        1px solid #f3f4f6;
+}
+
+.industry-card-link {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: #00479b;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    text-decoration: none;
+
+    transition:
+        color .2s ease;
+}
+
+.industry-card-link:hover {
+    color: #ff5e00;
+}
+
+.industry-card-arrow {
+    width: 16px;
+    height: 16px;
+
+    transition:
+        transform .2s ease;
+}
+
+.industry-card-link:hover .industry-card-arrow {
+    transform:
+        translateX(6px);
+}
+
+
+/* =========================================================
+   15. LOADING
+   ========================================================= */
+
+.industries-loading {
+    grid-column: 1 / -1;
+
+    min-height: 220px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.industries-spinner {
+    width: 32px;
+    height: 32px;
+
+    color: #ff5e00;
+
+    animation:
+        industries-spin
+        1s linear infinite;
+}
+
+.industries-spinner-track {
+    opacity: .25;
+}
+
+.industries-spinner-path {
+    opacity: .75;
+}
+
+@keyframes industries-spin {
+
+    to {
+        transform:
+            rotate(360deg);
+    }
+
+}
+
+
+/* =========================================================
+   16. PAGINATION
+   ========================================================= */
+
+.industries-pagination {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-top: 40px;
+}
+
+.industry-pagination-button {
+    min-width: 38px;
+    height: 38px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding:
+        0 10px;
+
+    border:
+        1px solid #d1d5db;
+
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    color: #00479b;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color .2s ease,
+        border-color .2s ease;
+}
+
+.industry-pagination-button:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.industry-pagination-current {
+    background: #ff5e00;
+
+    border-color: #ff5e00;
+
+    color: #ffffff;
+
+    cursor: default;
+}
+
+
+/* =========================================================
+   17. ERROR
+   ========================================================= */
+
+.industries-error {
+    grid-column: 1 / -1;
+
+    padding:
+        40px 20px;
+
+    border:
+        1px solid #fee2e2;
+
+    border-radius: 8px;
+
+    background: #fef2f2;
+
+    color: #dc2626;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   18. EMPTY
+   ========================================================= */
+
+.industries-empty {
+    margin-top: 24px;
+
+    padding:
+        64px 20px;
+
+    border:
+        1px dashed #d1d5db;
+
+    border-radius: 12px;
+
+    background: #ffffff;
+
+    text-align: center;
+}
+
+.industries-empty-icon {
+    width: 64px;
+    height: 64px;
+
+    margin:
+        0 auto 16px;
+
+    color: #d1d5db;
+}
+
+.industries-empty-title {
+    margin: 0 0 8px;
+
+    color: #1f2937;
+
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.industries-empty-description {
+    margin: 0;
+
+    color: #6b7280;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   19. RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1199px) {
+
+    .industries-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 900px) {
+
+    .industries-hero {
+        padding: 40px 0;
+    }
+
+    .industries-toolbar {
+        position: static;
+
+        align-items: stretch;
+
+        flex-direction: column;
+
+        gap: 16px;
+    }
+
+    .industries-search {
+        width: 100%;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .industries-container {
+        width:
+            calc(100% - 24px);
+    }
+
+    .industries-hero {
+        padding: 34px 0;
+    }
+
+    .industries-hero-title {
+        font-size: 28px;
+    }
+
+    .industries-main {
+        padding-bottom: 48px;
+    }
+
+    .industries-grid {
+        grid-template-columns: 1fr;
+
+        gap: 16px;
+    }
+
+    .industry-card-image {
+        height: 200px;
+    }
+
+}
+
+
+@media (max-width: 420px) {
+
+    .industries-hero-title {
+        font-size: 25px;
+    }
+
+    .industry-card-body {
+        padding: 18px;
+    }
+
+    .industry-card-title {
+        font-size: 16px;
+    }
+
+}

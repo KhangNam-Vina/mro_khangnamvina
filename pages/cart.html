@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Giỏ hàng mua sắm | MRO Khang Nam
+    </title>
+
+    <meta
+        name="description"
+        content="Quản lý các sản phẩm vật tư công nghiệp đã chọn trong giỏ hàng mua sắm tại MRO Khang Nam."
+    >
+
+    <meta
+        name="robots"
+        content="index,follow"
+    >
+
+    <meta
+        property="og:title"
+        content="Giỏ hàng mua sắm | MRO Khang Nam"
+    >
+
+    <meta
+        property="og:description"
+        content="Quản lý các sản phẩm vật tư công nghiệp đã chọn trong giỏ hàng mua sắm tại MRO Khang Nam."
+    >
+
+    <meta
+        property="og:image"
+        content="../assets/banner-brands.webp"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="../assets/images/world mark.png"
+    >
+
+
+    <!-- GOOGLE FONT -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- CSS CHUNG -->
+    <link
+        rel="stylesheet"
+        href="../assets/css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/header.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/footer.css"
+    >
+
+
+    <!-- CSS RIÊNG -->
+    <link
+        rel="stylesheet"
+        href="../assets/css/cart.css"
+    >
+
+</head>
+
+
+<body class="cart-page">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div
+        id="app-header"
+        class="site-header-placeholder"
+    ></div>
+
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="cart-hero">
+
+        <div class="cart-hero-overlay"></div>
+
+        <div class="cart-container">
+
+            <nav
+                class="cart-breadcrumb"
+                aria-label="Breadcrumb"
+            >
+
+                <a
+                    href="../index.html"
+                    class="cart-breadcrumb-link"
+                >
+                    Trang chủ
+                </a>
+
+                <span
+                    class="cart-breadcrumb-separator"
+                    aria-hidden="true"
+                >
+                    /
+                </span>
+
+                <span class="cart-breadcrumb-current">
+                    Giỏ hàng Mua sắm
+                </span>
+
+            </nav>
+
+
+            <h1 class="cart-hero-title">
+                Giỏ Hàng Của Bạn
+            </h1>
+
+
+            <p class="cart-hero-description">
+                Quản lý sản phẩm đã chọn và kiểm tra tổng giá trị
+                đơn hàng trước khi tiến hành thanh toán.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="cart-main">
+
+        <div class="cart-container">
+
+            <div class="cart-layout">
+
+
+                <!-- =================================================
+                     PRODUCT LIST
+                ================================================== -->
+
+                <section class="cart-products-section">
+
+                    <div class="cart-products-card">
+
+
+                        <!-- HEADER -->
+                        <div class="cart-products-header">
+
+                            <h2 class="cart-products-title">
+                                Chi tiết đơn hàng
+                            </h2>
+
+
+                            <span
+                                id="cartItemCountText"
+                                class="cart-products-count"
+                            >
+                                0 sản phẩm
+                            </span>
+
+                        </div>
+
+
+                        <!-- CONTENT -->
+                        <div class="cart-products-body">
+
+                            <div
+                                id="cartItemsContainer"
+                                class="cart-items-container"
+                            >
+
+                                <!--
+                                    Loading skeleton.
+                                    JS sẽ thay bằng danh sách thật.
+                                -->
+
+                                <div class="cart-loading-item">
+
+                                    <div class="cart-loading-image"></div>
+
+                                    <div class="cart-loading-content">
+
+                                        <div class="cart-loading-line cart-loading-line-large"></div>
+                                        <div class="cart-loading-line cart-loading-line-small"></div>
+                                        <div class="cart-loading-line cart-loading-line-price"></div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- EMPTY STATE -->
+
+                            <div
+                                id="emptyCartState"
+                                class="cart-empty-state is-hidden"
+                            >
+
+                                <div class="cart-empty-icon">
+
+                                    <svg
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="1.5"
+                                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                                        ></path>
+                                    </svg>
+
+                                </div>
+
+
+                                <h3 class="cart-empty-title">
+                                    Giỏ hàng trống
+                                </h3>
+
+
+                                <p class="cart-empty-description">
+                                    Bạn chưa có sản phẩm nào trong
+                                    giỏ hàng mua sắm.
+                                </p>
+
+
+                                <a
+                                    href="products.html"
+                                    class="cart-empty-button"
+                                >
+                                    Tiếp tục mua sắm
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================================
+                     ORDER SUMMARY
+                ================================================== -->
+
+                <aside class="cart-summary-section">
+
+                    <div class="cart-summary-card">
+
+                        <h3 class="cart-summary-title">
+                            Tổng đơn hàng
+                        </h3>
+
+
+                        <div class="cart-summary-list">
+
+                            <div class="cart-summary-row">
+
+                                <span>
+                                    Tạm tính:
+                                </span>
+
+                                <strong id="subtotalAmount">
+                                    0 đ
+                                </strong>
+
+                            </div>
+
+
+                            <div class="cart-summary-row">
+
+                                <span>
+                                    Phí vận chuyển:
+                                </span>
+
+                                <strong>
+                                    Liên hệ sau
+                                </strong>
+
+                            </div>
+
+
+                            <div class="cart-summary-row">
+
+                                <span>
+                                    Thuế VAT (8-10%):
+                                </span>
+
+                                <strong>
+                                    Chưa bao gồm
+                                </strong>
+
+                            </div>
+
+
+                            <div class="cart-summary-total">
+
+                                <span>
+                                    Tổng cộng:
+                                </span>
+
+                                <strong id="totalAmount">
+                                    0 đ
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            id="btnProceedCheckout"
+                            onclick="proceedToCheckout()"
+                            class="cart-checkout-button"
+                        >
+
+                            <span>
+                                Tiến hành Thanh toán
+                            </span>
+
+
+                            <svg
+                                class="cart-checkout-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                ></path>
+                            </svg>
+
+                        </button>
+
+
+                        <p class="cart-summary-note">
+                            * Chi phí vận chuyển và VAT sẽ được kế toán
+                            xác nhận lại sau khi bạn đặt hàng.
+                        </p>
+
+                    </div>
+
+                </aside>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <div id="app-footer"></div>
+
+
+    <!-- =====================================================
+         SCRIPT
+    ====================================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/common/auth.js"></script>
+    <script src="../assets/js/common/utils.js"></script>
+
+    <script src="../assets/components/header.js"></script>
+    <script src="../assets/components/footer.js"></script>
+
+    <script src="../assets/js/users/auth-ui.js"></script>
+    <script src="../assets/js/users/cart.js"></script>
+
+</body>
+
+</html>

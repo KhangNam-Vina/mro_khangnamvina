@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Nhóm Hàng (Subcategory) - KN Admin</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00' } } } }
+    </script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 flex h-screen overflow-hidden">
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2 pointer-events-none"></div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="w-64 bg-gray-900 text-white flex flex-col hidden md:flex shrink-0">
+        <div class="h-16 flex items-center px-6 bg-gray-950 border-b border-gray-800">
+            <span class="text-xl font-black tracking-wider text-white">Khangnam <span class="text-kn-orange">ADMIN</span></span>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4">
+            <nav class="space-y-1 px-3" id="adminSidebarNav">
+                <a href="dashboard.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Tổng quan & Đơn hàng</a>
+                <a href="manage-categories.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Danh mục</a>
+                <a href="manage-subcategories.html" class="nav-link flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md transition font-bold">Quản lý Nhóm hàng</a>
+                <a href="manage-families.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Dòng sản phẩm</a>
+                <a href="manage-products.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Sản phẩm</a>
+                <a href="manage-industries.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Ngành hàng</a>
+                <a href="manage-blog.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Bài viết</a>
+                <a href="manage-about.html"class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Giới thiệu</a>
+                <a href="manage-contacts.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Liên hệ</a>
+                <a href="manage-users.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Người dùng</a>
+                <a href="manage-settings.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Cấu hình</a>
+            </nav> 
+        </div>
+        <div class="p-4 border-t border-gray-800">
+            <button onclick="handleAdminLogout()" class="flex items-center text-sm text-gray-400 hover:text-white transition-colors w-full">Đăng xuất</button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTAINER -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        
+        <!-- HEADER -->
+        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shrink-0">
+            <div class="flex items-center gap-3">
+                <h1 class="text-xl font-black text-gray-800 uppercase tracking-tight">Quản Lý Nhóm Hàng</h1>
+                <span id="subcatStats" class="bg-blue-50 text-kn-blue text-xs font-bold px-2.5 py-1 rounded-full border border-blue-100">
+                    -- nhóm hàng
+                </span>
+            </div>
+            <button onclick="openModal()" class="bg-kn-blue hover:bg-blue-800 text-white font-bold px-4 py-2 rounded-lg text-sm transition shadow flex items-center">
+                + Thêm Nhóm Hàng
+            </button>
+        </header>
+
+        <!-- CONTENT -->
+        <main class="flex-1 overflow-y-auto p-6">
+            
+            <!-- TOOLBAR -->
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm mb-6 flex flex-col sm:flex-row justify-between gap-4 items-center">
+                <div class="relative w-full sm:w-80">
+                    <input type="text" id="searchInput" placeholder="Tìm tên hoặc slug..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:border-kn-blue outline-none">
+                    <span class="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400">🔍</span>
+                </div>
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <select id="filterParentSelect" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-kn-blue outline-none bg-white">
+                        <option value="all">Tất cả danh mục gốc</option>
+                        <!-- Đổ danh mục gốc vào đây -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- BẢNG DỮ LIỆU -->
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                <th class="py-3.5 px-4 w-16 text-center">ID</th>
+                                <th class="py-3.5 px-4">Tên Nhóm Hàng</th>
+                                <th class="py-3.5 px-4 text-kn-blue">Thuộc Danh Mục Gốc</th>
+                                <th class="py-3.5 px-4">Đường Dẫn (Slug)</th>
+                                <th class="py-3.5 px-4 w-28 text-right">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="divide-y divide-gray-100 text-sm">
+                            <tr><td colspan="5" class="text-center py-12 text-gray-400">Đang tải dữ liệu...</td></tr>
+                        </tbody>
+                    </table>
+                    </div>
+                <div id="paginationContainer" class="flex justify-between items-center text-sm p-4 border-t border-gray-100 bg-gray-50/50"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL THÊM/SỬA -->
+    <div id="formModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden">
+            <div class="bg-kn-blue px-6 py-4 text-white flex justify-between items-center">
+                <h3 id="modalTitle" class="font-black uppercase tracking-wide">Thêm Nhóm Hàng Mới</h3>
+                <button onclick="closeModal()" class="text-white/80 hover:text-white text-xl font-bold">&times;</button>
+            </div>
+
+            <form id="dataForm" class="p-6 space-y-4">
+                <input type="hidden" id="subId">
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Danh Mục Gốc <span class="text-red-500">*</span></label>
+                    <select id="parentCategory" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-kn-blue outline-none bg-white">
+                        <option value="">-- Chọn Danh Mục --</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Tên Nhóm Hàng <span class="text-red-500">*</span></label>
+                        <input type="text" id="subName" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-kn-blue outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Slug <span class="text-red-500">*</span></label>
+                        <input type="text" id="subSlug" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-kn-blue outline-none bg-gray-50">
+                    </div>
+                </div>
+
+                <div class="bg-blue-50/60 p-4 rounded-xl border border-blue-100 space-y-3">
+                    <h4 class="text-xs font-black text-kn-blue uppercase tracking-wider">Cấu Hình SEO Google</h4>
+                    <input type="text" id="subMetaTitle" placeholder="SEO Meta Title" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-kn-blue outline-none">
+                    <textarea id="subMetaDesc" rows="2" placeholder="SEO Meta Description" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-kn-blue outline-none"></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-3 border-t border-gray-200">
+                    <button type="button" onclick="closeModal()" class="px-5 py-2 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg">Hủy</button>
+                    <button type="submit" id="btnSubmit" class="px-5 py-2 text-sm font-bold text-white bg-kn-blue hover:bg-blue-800 rounded-lg">Lưu Dữ Liệu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPT -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/admin/admin-subcategories.js"></script>
+</body>
+</html>

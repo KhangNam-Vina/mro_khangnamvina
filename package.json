@@ -1,0 +1,13 @@
+{
+  "name": "mro-khangnam",
+  "version": "1.0.0",
+  "description": "MRO Khangnam Tailwind Build",
+  "scripts": {
+    "build:css": "tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --minify",
+    "watch:css": "tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.10",
+    "tailwindcss": "^3.3.0"
+  }
+}

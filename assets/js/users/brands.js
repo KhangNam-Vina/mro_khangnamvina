@@ -1,49 +1,669 @@
+// ========================================================
+// FILE: assets/js/users/brands.js
+// ENGINE LỌC, TÌM KIẾM & PHÂN TRANG THƯƠNG HIỆU CHUẨN B2B
+// ========================================================
+
+let allBrandsData = [];
+let currentFilteredData = [];
+let currentLetterFilter = 'ALL';
+
+let currentPage = 1;
+const ITEMS_PER_PAGE = 18;
 
 
-async function loadFeaturedBrands() {
-            const grid = document.getElementById('brandGrid');
-            
+// ========================================================
+// INIT
+// ========================================================
+
+async function initBrandsPage() {
+
+    if (!window.supabaseClient) {
+        console.error("Supabase chưa khởi tạo.");
+        return;
+    }
+
+    try {
+
+        const { data, error } = await window.supabaseClient
+            .from('brands')
+            .select('id, name, products(id)')
+            .order('name', { ascending: true });
+
+        if (error) throw error;
+
+        allBrandsData = (data || []).map(brand => ({
+            id: brand.id,
+            name: brand.name,
+            productCount: brand.products
+                ? brand.products.length
+                : 0
+        }));
+
+        currentFilteredData = allBrandsData;
+
+        const statBrands = document.getElementById('statBrands');
+
+        if (statBrands) {
+            statBrands.innerText = `${allBrandsData.length}+`;
+        }
+
+        buildAZFilter();
+        renderFeaturedBrands();
+        renderFilteredBrands();
+
+        const searchInput = document.getElementById('searchBrand');
+
+        if (searchInput) {
+            searchInput.addEventListener(
+                'input',
+                handleSearch
+            );
+        }
+
+    } catch (err) {
+
+        console.error(
+            "Lỗi lấy dữ liệu brands:",
+            err
+        );
+
+        const container =
+            document.getElementById(
+                'brandsContainer'
+            );
+
+        if (container) {
+
+            container.innerHTML = `
+                <div class="brand-error">
+                    Lỗi kết nối máy chủ:
+                    ${err.message}
+                </div>
+            `;
+        }
+    }
+}
+
+
+// ========================================================
+// A-Z FILTER
+// ========================================================
+
+function buildAZFilter() {
+
+    const filterContainer =
+        document.getElementById('azFilter');
+
+    if (!filterContainer) return;
+
+    const alphabet =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+    let html = `
+        <button
+            type="button"
+            onclick="filterByLetter('ALL')"
+            id="btn-filter-ALL"
+            class="brand-letter-button is-active"
+        >
+            All
+        </button>
+    `;
+
+    alphabet.forEach(letter => {
+
+        const hasBrands =
+            allBrandsData.some(
+                brand =>
+                    brand.name
+                        .toUpperCase()
+                        .startsWith(letter)
+            );
+
+        if (hasBrands) {
+
+            html += `
+                <button
+                    type="button"
+                    onclick="filterByLetter('${letter}')"
+                    id="btn-filter-${letter}"
+                    class="brand-letter-button"
+                >
+                    ${letter}
+                </button>
+            `;
+
+        } else {
+
+            html += `
+                <button
+                    type="button"
+                    disabled
+                    class="brand-letter-button is-disabled"
+                >
+                    ${letter}
+                </button>
+            `;
+        }
+
+    });
+
+    filterContainer.innerHTML = html;
+}
+
+
+// ========================================================
+// FILTER LETTER
+// ========================================================
+
+window.filterByLetter = function(letter) {
+
+    currentLetterFilter = letter;
+
+    const searchInput =
+        document.getElementById('searchBrand');
+
+    if (searchInput) {
+        searchInput.value = '';
+    }
+
+    currentPage = 1;
+
+    document
+        .querySelectorAll('#azFilter button')
+        .forEach(button => {
+
+            if (!button.disabled) {
+
+                button.classList.remove(
+                    'is-active'
+                );
+            }
+        });
+
+    const activeButton =
+        document.getElementById(
+            `btn-filter-${letter}`
+        );
+
+    if (activeButton) {
+        activeButton.classList.add(
+            'is-active'
+        );
+    }
+
+
+    if (letter !== 'ALL') {
+
+        currentFilteredData =
+            allBrandsData.filter(
+                brand =>
+                    brand.name
+                        .toUpperCase()
+                        .startsWith(letter)
+            );
+
+        const filterText =
+            document.getElementById(
+                'currentFilterText'
+            );
+
+        if (filterText) {
+            filterText.innerText =
+                `(Bắt đầu bằng chữ ${letter})`;
+        }
+
+    } else {
+
+        currentFilteredData =
+            allBrandsData;
+
+        const filterText =
+            document.getElementById(
+                'currentFilterText'
+            );
+
+        if (filterText) {
+            filterText.innerText = '';
+        }
+    }
+
+    renderFilteredBrands();
+};
+
+
+// ========================================================
+// SEARCH
+// ========================================================
+
+function handleSearch(event) {
+
+    const keyword =
+        event.target.value
+            .toLowerCase()
+            .trim();
+
+    currentPage = 1;
+
+    if (keyword) {
+
+        currentLetterFilter = 'ALL';
+
+        const filterText =
+            document.getElementById(
+                'currentFilterText'
+            );
+
+        if (filterText) {
+            filterText.innerText =
+                `(Kết quả tìm kiếm: "${keyword}")`;
+        }
+
+        document
+            .querySelectorAll('#azFilter button')
+            .forEach(button => {
+
+                if (!button.disabled) {
+                    button.classList.remove(
+                        'is-active'
+                    );
+                }
+            });
+
+        document
+            .getElementById('btn-filter-ALL')
+            ?.classList.add('is-active');
+
+    } else {
+
+        const filterText =
+            document.getElementById(
+                'currentFilterText'
+            );
+
+        if (filterText) {
+            filterText.innerText = '';
+        }
+    }
+
+
+    currentFilteredData =
+        allBrandsData.filter(
+            brand =>
+                brand.name
+                    .toLowerCase()
+                    .includes(keyword)
+        );
+
+    renderFilteredBrands();
+}
+
+
+// ========================================================
+// FEATURED
+// ========================================================
+
+function renderFeaturedBrands() {
+
+    const container =
+        document.getElementById(
+            'featuredBrands'
+        );
+
+    if (!container) return;
+
+    const featured =
+        [...allBrandsData]
+            .sort(
+                (a, b) =>
+                    b.productCount -
+                    a.productCount
+            )
+            .slice(0, 6);
+
+    let html = '';
+
+    featured.forEach(brand => {
+        html += generateBrandCard(
+            brand,
+            true
+        );
+    });
+
+    container.innerHTML = html;
+}
+
+
+// ========================================================
+// FILTERED BRANDS
+// ========================================================
+
+function renderFilteredBrands() {
+
+    const container =
+        document.getElementById(
+            'brandsContainer'
+        );
+
+    const emptyState =
+        document.getElementById(
+            'emptyState'
+        );
+
+    const countText =
+        document.getElementById(
+            'brandCountText'
+        );
+
+    const paginationContainer =
+        document.getElementById(
+            'paginationContainer'
+        );
+
+    if (!container) return;
+
+    const totalItems =
+        currentFilteredData.length;
+
+    if (countText) {
+        countText.innerText =
+            `${totalItems} Thương Hiệu`;
+    }
+
+
+    if (totalItems === 0) {
+
+        container.innerHTML = '';
+
+        container.classList.add(
+            'is-hidden'
+        );
+
+        emptyState?.classList.remove(
+            'is-hidden'
+        );
+
+        if (paginationContainer) {
+            paginationContainer.innerHTML = '';
+        }
+
+        return;
+    }
+
+
+    container.classList.remove(
+        'is-hidden'
+    );
+
+    emptyState?.classList.add(
+        'is-hidden'
+    );
+
+
+    const totalPages =
+        Math.ceil(
+            totalItems /
+            ITEMS_PER_PAGE
+        );
+
+    const startIndex =
+        (currentPage - 1) *
+        ITEMS_PER_PAGE;
+
+    const endIndex =
+        startIndex +
+        ITEMS_PER_PAGE;
+
+    const paginatedData =
+        currentFilteredData.slice(
+            startIndex,
+            endIndex
+        );
+
+
+    let html = '';
+
+    paginatedData.forEach(brand => {
+
+        html += generateBrandCard(
+            brand,
+            false
+        );
+
+    });
+
+    container.innerHTML = html;
+
+    renderPagination(totalPages);
+}
+
+
+// ========================================================
+// PAGINATION
+// ========================================================
+
+function renderPagination(totalPages) {
+
+    const container =
+        document.getElementById(
+            'paginationContainer'
+        );
+
+    if (!container) return;
+
+    if (totalPages <= 1) {
+
+        container.innerHTML = '';
+        return;
+    }
+
+    let html = '';
+
+
+    if (currentPage > 1) {
+
+        html += `
+            <button
+                type="button"
+                onclick="changePage(${currentPage - 1})"
+                class="brand-pagination-button brand-pagination-arrow"
+            >
+                «
+            </button>
+        `;
+    }
+
+
+    for (
+        let i = 1;
+        i <= totalPages;
+        i++
+    ) {
+
+        if (i === currentPage) {
+
+            html += `
+                <button
+                    type="button"
+                    class="brand-pagination-button is-current"
+                >
+                    ${i}
+                </button>
+            `;
+
+        } else {
+
+            html += `
+                <button
+                    type="button"
+                    onclick="changePage(${i})"
+                    class="brand-pagination-button"
+                >
+                    ${i}
+                </button>
+            `;
+        }
+    }
+
+
+    if (currentPage < totalPages) {
+
+        html += `
+            <button
+                type="button"
+                onclick="changePage(${currentPage + 1})"
+                class="brand-pagination-button brand-pagination-arrow"
+            >
+                »
+            </button>
+        `;
+    }
+
+    container.innerHTML = html;
+}
+
+
+// ========================================================
+// CHANGE PAGE
+// ========================================================
+
+window.changePage = function(page) {
+
+    currentPage = page;
+
+    renderFilteredBrands();
+
+    const list =
+        document.getElementById(
+            'brandsContainer'
+        );
+
+    if (!list) return;
+
+    const listTop =
+        list.offsetTop;
+
+    window.scrollTo({
+        top: listTop - 150,
+        behavior: 'smooth'
+    });
+};
+
+
+// ========================================================
+// RESET FILTER
+// ========================================================
+
+window.resetFilters = function() {
+
+    filterByLetter('ALL');
+};
+
+
+// ========================================================
+// GENERATE BRAND CARD
+// ========================================================
+
+function generateBrandCard(
+    brand,
+    isFeatured
+) {
+
+    const link =
+        `products.html?brand_id=${brand.id}`;
+
+    const featureClass =
+        isFeatured
+            ? 'brand-card-featured'
+            : '';
+
+    return `
+        <a
+            href="${link}"
+            class="brand-card ${featureClass}"
+            title="${brand.name}"
+        >
+
+            <div class="brand-card-main">
+
+                <h3 class="brand-card-title">
+                    ${brand.name}
+                </h3>
+
+            </div>
+
+
+            <div class="brand-card-hover">
+
+                <span class="brand-card-hover-name">
+                    ${brand.name}
+                </span>
+
+                <span class="brand-card-hover-count">
+                    ${brand.productCount} Sản phẩm →
+                </span>
+
+            </div>
+
+        </a>
+    `;
+}
+
+
+// ========================================================
+// INIT
+// ========================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    async () => {
+
+        await initBrandsPage();
+
+        if (
+            typeof checkCustomerAuth ===
+            "function"
+        ) {
+
             try {
-                // Phóng lên bảng brands, lấy về đúng 12 hãng
-                const { data, error } = await supabaseClient
-                    .from('brands')
-                    .select('*')
-                    .limit(12);
 
-                if (error) throw error;
-                
-                grid.innerHTML = ''; // Xóa icon loading
+                const user =
+                    await checkCustomerAuth();
 
-                if (data.length === 0) {
-                    grid.innerHTML = '<p class="col-span-full text-center text-gray-500 font-bold py-10">Chưa có thương hiệu nào.</p>';
-                    return;
+                if (user) {
+
+                    document
+                        .getElementById(
+                            "btnGuestLogin"
+                        )
+                        ?.classList.add(
+                            "hidden"
+                        );
+
+                    const userProfileBtn =
+                        document.getElementById(
+                            "btnUserProfile"
+                        );
+
+                    if (userProfileBtn) {
+
+                        userProfileBtn.classList.remove(
+                            "hidden"
+                        );
+
+                        userProfileBtn.classList.add(
+                            "flex"
+                        );
+                    }
                 }
 
-                // Vòng lặp đẻ ra Card thương hiệu theo y xì đúc thiết kế của ông
-                data.forEach(brand => {
-                    grid.innerHTML += `
-                        <a href="products.html?brand_id=${brand.id}" class="bg-white border border-gray-200 rounded-lg p-6 flex flex-col items-center justify-center hover:shadow-lg hover:border-kn-orange transition-all group h-40 relative">
-                            
-                            <h3 class="text-xl md:text-2xl font-black text-gray-400 group-hover:text-kn-blue transition-colors uppercase tracking-widest text-center w-full line-clamp-1" title="${brand.name}">
-                                ${brand.name}
-                            </h3>
-                            
-                            <span class="text-xs text-gray-400 mt-3 group-hover:text-kn-orange">Thương hiệu Chính hãng</span>
-                            
-                            <div class="absolute inset-0 bg-kn-blue bg-opacity-90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
-                                <span class="text-white text-sm font-bold border border-white px-4 py-1.5 rounded">Xem Tất Cả SP</span>
-                            </div>
-                        </a>
-                    `;
-                });
-
             } catch (err) {
-                console.error("Lỗi tải thương hiệu:", err);
-                grid.innerHTML = `<p class="col-span-full text-center text-red-500 py-10">Lỗi kết nối: ${err.message}</p>`;
+
+                console.error(
+                    "Lỗi check auth:",
+                    err
+                );
             }
         }
-        // Gom các lệnh khởi chạy lúc mở trang vào chung 1 hàm window.onload
-        window.onload = function() {
-            checkCustomerAuth(); // Kiểm tra đăng nhập (Lấy từ common.js)
-            loadFeaturedBrands();         // Tải danh sách 
-        };
+    }
+);

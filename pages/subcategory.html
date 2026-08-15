@@ -1,59 +1,331 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh Mục Con - MRO Khang Nam</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00', 'kn-light': '#f5f6f8' } } } }
-    </script>
+
+    <title>Danh mục nhóm hàng | MRO Khang Nam</title>
+
+    <meta
+        name="description"
+        content="Khám phá các nhóm sản phẩm vật tư công nghiệp chính hãng tại MRO Khang Nam."
+    >
+
+    <meta
+        name="robots"
+        content="index,follow"
+    >
+
+    <!-- Canonical -->
+    <link
+        rel="canonical"
+        id="canonicalUrl"
+        href=""
+    >
+
+    <!-- Open Graph -->
+    <meta
+        property="og:url"
+        id="ogUrl"
+        content=""
+    >
+
+    <meta
+        property="og:title"
+        id="ogTitle"
+        content="Danh mục nhóm hàng | MRO Khang Nam"
+    >
+
+    <meta
+        property="og:description"
+        id="ogDesc"
+        content="Khám phá các nhóm sản phẩm vật tư công nghiệp chính hãng tại MRO Khang Nam."
+    >
+
+    <meta
+        property="og:image"
+        content="../assets/banner-brands.webp"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="../assets/images/world mark.png"
+    >
+
+    <!-- JSON-LD -->
+    <script
+        type="application/ld+json"
+        id="breadcrumbSchema"
+    ></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- CSS DÙNG CHUNG -->
+     
+    <link
+        rel="stylesheet"
+        href="../assets/css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/header.css"
+    >
+ 
+    <link
+        rel="stylesheet"
+        href="../assets/css/footer.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/catalog.css"
+    >
 </head>
-<body class="bg-kn-light flex flex-col min-h-screen">
 
-    <!-- CHỖ NÀY ĐỂ RÁP HEADER BẰNG JAVASCRIPT -->
-    <div id="app-header"></div>
 
-    <!-- 3. MAIN CONTENT: LƯỚI DANH MỤC CON -->
-    <main class="flex-grow container mx-auto px-4 py-10">
-        <!-- BREADCRUMB -->
-        <div class="text-sm font-medium mb-6 text-gray-500 flex items-center space-x-2">
-            <a href="../index.html" class="hover:text-kn-orange">Home</a> 
-            <span>/</span>
-            <span id="bcCategory" class="text-kn-blue font-bold uppercase">Đang tải...</span>
-        </div>
+<body class="subcategory-page">
 
-        <div class="flex justify-between items-end mb-6 border-b border-gray-200 pb-4">
-            <div>
-                <h1 id="pageTitle" class="text-3xl font-bold text-kn-blue uppercase">Danh Mục Phân Loại</h1>
-                <p class="text-gray-500 mt-1">Chọn một phân loại để xem các dòng sản phẩm chi tiết</p>
+    <!-- HEADER -->
+    <div
+        id="app-header"
+        class="site-header-placeholder"
+    ></div>
+
+
+    <!-- ====================================================
+         BANNER
+    ===================================================== -->
+
+    <section class="subcategory-hero">
+
+        <div class="subcategory-hero-overlay"></div>
+
+        <div class="subcategory-hero-container">
+
+            <nav
+                aria-label="Breadcrumb"
+                class="subcategory-breadcrumb"
+            >
+
+                <a
+                    href="../index.html"
+                    class="subcategory-breadcrumb-link"
+                >
+                    Trang chủ
+                </a>
+
+                <span
+                    class="subcategory-breadcrumb-separator"
+                    aria-hidden="true"
+                >
+                    /
+                </span>
+
+                <a
+                    href="category.html"
+                    class="subcategory-breadcrumb-link"
+                >
+                    Danh Mục
+                </a>
+
+                <span
+                    class="subcategory-breadcrumb-separator"
+                    aria-hidden="true"
+                >
+                    /
+                </span>
+
+                <span
+                    id="bcCategory"
+                    class="subcategory-breadcrumb-current"
+                >
+                    Đang tải...
+                </span>
+
+            </nav>
+
+
+            <div class="subcategory-hero-content">
+
+                <h1
+                    id="pageTitle"
+                    class="subcategory-page-title"
+                >
+                    Đang tải dữ liệu...
+                </h1>
+
+                <p class="subcategory-page-description">
+                    Chọn một phân loại để xem các dòng sản phẩm chi tiết
+                </p>
+
             </div>
+
         </div>
 
-        <!-- BÃI ĐÁP SUBCATEGORY -->
-        <div id="subCategoryContainer" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <div class="col-span-full flex justify-center py-10">
-                <svg class="animate-spin h-8 w-8 text-kn-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="4" class="opacity-25"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+    </section>
+
+
+    <!-- ====================================================
+         MAIN CONTENT
+    ===================================================== -->
+
+    <main class="subcategory-main">
+
+        <!-- SEARCH -->
+
+        <div class="subcategory-search-wrapper">
+
+            <div class="subcategory-search-box">
+
+                <input
+                    type="text"
+                    id="searchSubcat"
+                    class="subcategory-search-input"
+                    placeholder="Tìm nhóm hàng..."
+                    autocomplete="off"
+                    aria-label="Tìm nhóm hàng"
+                >
+
+                <svg
+                    class="subcategory-search-icon"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    ></path>
+                </svg>
+
             </div>
+
         </div>
+
+
+        <!-- ==================================================
+             LOADING SKELETON
+        =================================================== -->
+
+        <div
+            id="skeletonLoading"
+            class="subcategory-grid subcategory-loading-grid"
+        >
+
+            <div class="subcategory-skeleton-card">
+                <div class="subcategory-skeleton-icon"></div>
+                <div class="subcategory-skeleton-title"></div>
+                <div class="subcategory-skeleton-text"></div>
+            </div>
+
+            <div class="subcategory-skeleton-card">
+                <div class="subcategory-skeleton-icon"></div>
+                <div class="subcategory-skeleton-title"></div>
+                <div class="subcategory-skeleton-text"></div>
+            </div>
+
+            <div class="subcategory-skeleton-card">
+                <div class="subcategory-skeleton-icon"></div>
+                <div class="subcategory-skeleton-title"></div>
+                <div class="subcategory-skeleton-text"></div>
+            </div>
+
+            <div class="subcategory-skeleton-card">
+                <div class="subcategory-skeleton-icon"></div>
+                <div class="subcategory-skeleton-title"></div>
+                <div class="subcategory-skeleton-text"></div>
+            </div>
+
+        </div>
+
+
+        <!-- ==================================================
+             SUBCATEGORY GRID
+        =================================================== -->
+
+        <div
+            id="subCategoryContainer"
+            class="subcategory-grid is-hidden"
+        ></div>
+
+
+        <!-- ==================================================
+             EMPTY STATE
+        =================================================== -->
+
+        <div
+            id="emptyState"
+            class="subcategory-empty-state is-hidden"
+        >
+
+            <span class="subcategory-empty-icon">
+                📂
+            </span>
+
+            <h2 class="subcategory-empty-title">
+                Chưa có nhóm hàng
+            </h2>
+
+            <p class="subcategory-empty-description">
+                Hệ thống đang cập nhật dữ liệu cho danh mục này.
+            </p>
+
+        </div>
+
+
+        <!-- ==================================================
+             RELATED CATEGORIES
+        =================================================== -->
+
+        <div class="subcategory-related">
+
+            <h2 class="subcategory-related-title">
+                Danh mục liên quan
+            </h2>
+
+            <div
+                id="relatedCategoriesContainer"
+                class="subcategory-related-list"
+            >
+
+                <span class="subcategory-related-loading">
+                    Đang tải danh mục...
+                </span>
+
+            </div>
+
+        </div>
+
     </main>
 
-    <!-- CHỖ NÀY ĐỂ RÁP FOOTER BẰNG JAVASCRIPT -->
-    <div id="app-footer"></div>
-    
-    <!-- ========================================== -->
-    <!-- PHẦN GỌI SCRIPT ĐƯỢC QUY HOẠCH GỌN GÀNG LẠI -->
-    <!-- ========================================== -->
 
-    <!-- 1. GỌI SCRIPT COMPONENT HEADER/FOOTER -->
+    <!-- FOOTER -->
+    <div id="app-footer"></div>
+
+
+    <!-- ====================================================
+         JAVASCRIPT
+    ===================================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/common/utils.js"></script>
+
     <script src="../assets/components/header.js"></script>
     <script src="../assets/components/footer.js"></script>
 
-    <!-- 2. GỌI THƯ VIỆN & SCRIPT DÙNG CHUNG -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../assets/js/common.js"></script>
+    <script src="../assets/js/common/auth.js"></script>
+    <script src="../assets/js/users/auth-ui.js"></script>
 
-    <!-- 3. SCRIPT LOGIC RIÊNG CỦA TRANG NÀY (CỰC SẠCH) -->
-    <script src="../assets/js/subcategory.js"></script>
+    <script src="../assets/js/users/subcategory.js"></script>
+
 </body>
+
 </html>

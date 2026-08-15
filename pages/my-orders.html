@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn hàng của tôi | MRO Khang Nam</title>
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="icon" type="image/png" href="../assets/images/world mark.png">
+    
+    <!-- FONT INTER -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- GOOGLE FONT -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- CSS CHUNG -->
+    <link
+        rel="stylesheet"
+        href="../assets/css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/header.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/footer.css"
+    >
+
+    <!-- CSS RIÊNG -->
+    <link
+        rel="stylesheet"
+        href="../assets/css/my-orders.css"
+    >
+</head>
+<body class="profile-page-wrapper">
+
+    <!-- HEADER -->
+    <div id="app-header"></div>
+
+    <!-- BANNER HERO -->
+    <section class="profile-hero">
+        <div class="profile-hero-overlay"></div>
+        <div class="profile-container relative-z">
+            <nav aria-label="Breadcrumb" class="profile-breadcrumb">
+                <a href="../index.html" class="breadcrumb-link">Trang chủ</a> 
+                <span class="breadcrumb-separator">/</span>
+                <a href="profile.html" class="breadcrumb-link">Tài khoản</a>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-current">Đơn hàng mua trực tiếp</span>
+            </nav>
+            <h1 class="profile-hero-title">Quản lý Đơn hàng</h1>
+            <p class="my-rfq-hero-description">Theo dõi toàn bộ yêu đơn hàng đã mua, kiểm tra trạng thái xử lý và xem lại chi tiết từng đơn hàng.</p>
+        </div>
+    </section>
+
+    <!-- MAIN CONTENT -->
+    <main class="profile-main-content">
+        <div class="profile-layout-grid">
+            
+            <!-- CỘT TRÁI: SIDEBAR MENU -->
+            <aside class="profile-sidebar">
+
+                <div class="profile-sidebar-profile">
+                    <div id="userAvatarInitials" class="profile-avatar">KN</div>
+                    <p id="sidebarUserName" class="profile-sidebar-name">Đang tải...</p>
+                    <p id="sidebarUserEmail" class="profile-sidebar-email">-</p>
+                </div>
+
+                <nav class="profile-sidebar-nav">
+                    <a href="profile.html" class="profile-sidebar-link">
+                        <svg class="profile-sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        <span>Thông tin Công ty</span>
+                    </a>
+                    <a href="my-orders.html" class="profile-sidebar-link is-active">
+                        <svg class="profile-sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                        <span>Lịch sử mua hàng</span>
+                    </a>
+                    <a href="my-rfq.html" class="profile-sidebar-link">
+                        <svg class="profile-sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2-2z"></path></svg>
+                        <span>Lịch sử Báo giá (RFQ)</span>
+                    </a>
+                    <a href="purchased-products.html" class="profile-sidebar-link">
+                        <svg class="profile-sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                        <span>Sản phẩm thường mua</span>
+                    </a>
+                    <div class="profile-sidebar-divider"></div>
+                    <button type="button" onclick="handleCustomerLogout()" class="profile-sidebar-link profile-sidebar-logout">
+                        <svg class="profile-sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        <span>Đăng xuất</span>
+                    </button>
+                </nav>
+
+            </aside>
+
+            <!-- CỘT PHẢI: BẢNG DANH SÁCH ĐƠN HÀNG -->
+            <div class="profile-content-area">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h2 class="content-title">Danh sách Đơn hàng</h2>
+                        <span id="totalOrdersCount" class="content-badge">0 đơn hàng</span>
+                    </div>
+                    
+                    <div class="content-card-body">
+                        <!-- Khung chờ Load -->
+                        <div id="ordersLoading" class="state-container">
+                            <div class="loading-spinner"></div>
+                            <p class="state-text">Đang tải danh sách đơn hàng...</p>
+                        </div>
+
+                        <!-- Khung trống -->
+                        <div id="emptyOrdersState" class="state-container d-none">
+                            <svg class="state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                            <h3 class="state-heading">Chưa có đơn hàng nào</h3>
+                            <p class="state-desc">Bạn chưa thực hiện đơn mua hàng trực tiếp nào trên hệ thống.</p>
+                            <a href="products.html" class="btn-primary mt-3">Đi đến Cửa hàng</a>
+                        </div>
+
+                        <!-- Bảng dữ liệu -->
+                        <div class="table-responsive d-none" id="ordersTableWrapper">
+                            <table class="mro-data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Mã Đơn</th>
+                                        <th>Ngày Đặt</th>
+                                        <th class="text-right">Tổng Tiền</th>
+                                        <th class="text-center">Trạng Thái</th>
+                                        <th class="text-center">Thao Tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ordersTableBody">
+                                    <!-- Dữ liệu được JS bơm vào đây -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <div id="app-footer"></div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/common/auth.js"></script>
+    <script src="../assets/js/common/utils.js"></script>
+    <script src="../assets/components/header.js"></script>
+    <script src="../assets/components/footer.js"></script>
+    <script src="../assets/js/users/auth-ui.js"></script>
+    <script src="../assets/js/users/my-orders.js"></script>
+</body>
+</html>

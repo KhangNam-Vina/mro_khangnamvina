@@ -3,111 +3,391 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tin Tức MRO - Khang Nam Vina</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00', 'kn-light': '#f5f6f8' } } } }
-    </script>
+
+    <!-- SEO -->
+    <title>Thương hiệu vật tư công nghiệp | MRO Khang Nam</title>
+
+    <meta
+        name="description"
+        content="MRO Khang Nam phân phối hơn 100 thương hiệu vật tư công nghiệp chính hãng như SKF, Bosch, Makita..."
+    >
+
+    <meta name="robots" content="index,follow">
+
+    <!-- Open Graph -->
+    <meta
+        property="og:title"
+        content="Thương hiệu vật tư công nghiệp | MRO Khang Nam"
+    >
+
+    <meta
+        property="og:description"
+        content="MRO Khang Nam phân phối hơn 100 thương hiệu vật tư công nghiệp chính hãng như SKF, Bosch, Makita..."
+    >
+
+    <meta
+        property="og:image"
+        content="../assets/banner-brands.webp"
+    >
+
+    <!-- Favicon -->
+    <link
+        rel="icon"
+        type="image/png"
+        href="../assets/images/world mark.png"
+    >
+
+    <!-- Google Font: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- CSS dùng chung -->
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/header.css">
+    <link rel="stylesheet" href="../assets/css/footer.css">
+    <link rel="stylesheet" href="../assets/css/blog.css">
 </head>
-<body class="bg-kn-light flex flex-col min-h-screen">
 
-    <!-- CHỖ NÀY ĐỂ RÁP HEADER BẰNG JAVASCRIPT -->
-    <div id="app-header"></div> 
+<body class="blog-page">
 
-    <!-- 3. PAGE HEADER / BANNER -->
-    <div class="bg-gray-900 text-white py-12 relative overflow-hidden">
-        <img src="../assets/world mark.png" alt="Brands Banner" class="absolute inset-0 w-full h-full object-cover opacity-20">
-        <div class="container mx-auto px-4 relative z-10">
-            <h1 class="text-3xl md:text-4xl font-bold mb-4">Tin Tức & Kiến Thức MRO</h1>
-            <p class="text-gray-300 max-w-2xl text-sm leading-relaxed">
-                Cập nhật những xu hướng công nghệ mới nhất và bí quyết tối ưu hóa dây chuyền sản xuất công nghiệp.
-            </p> <!-- ĐÃ FIX LỖI THIẾU THẺ ĐÓNG Ở ĐÂY -->
+    <!-- HEADER -->
+    <div id="app-header"></div>
+
+
+    <!-- HERO -->
+    <section class="blog-hero">
+
+        <div class="blog-hero-overlay"></div>
+
+        <div class="blog-hero-container">
+
+            <nav
+                class="blog-breadcrumb"
+                aria-label="Breadcrumb"
+            >
+                <a
+                    href="../index.html"
+                    class="blog-breadcrumb-link"
+                >
+                    Trang chủ
+                </a>
+
+                <span class="blog-breadcrumb-separator">
+                    /
+                </span>
+
+                <span class="blog-breadcrumb-current">
+                    Bài viết
+                </span>
+            </nav>
+
+            <h1 class="blog-hero-title">
+                Trung Tâm Kiến Thức MRO
+            </h1>
+
+            <p class="blog-hero-description">
+                Nghiên cứu xu hướng sản xuất, cẩm nang bảo trì dự đoán
+                và hướng dẫn lựa chọn vật tư công nghiệp tối ưu nhất
+                cho nhà máy của bạn.
+            </p>
+
         </div>
-    </div>
+
+    </section>
 
 
-    <!-- MAIN CONTENT: DANH SÁCH BLOG -->
-    <main class="flex-grow bg-kn-light py-12">
-        <div class="container mx-auto px-4">
-            <!-- LƯỚI BÀI VIẾT -->
-            <div id="blogGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Icon Loading -->
-                <div class="col-span-full flex justify-center py-20">
-                    <svg class="animate-spin h-10 w-10 text-kn-orange" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+    <!-- MAIN -->
+    <main class="blog-main">
+
+        <div class="blog-layout">
+
+            <!-- ==========================================
+                 BLOG CONTENT
+                 ========================================== -->
+            <section class="blog-content">
+
+                <!-- CATEGORY FILTER -->
+                <div class="blog-filter-bar">
+
+                    <div
+                        id="categoryFilters"
+                        class="blog-category-filters"
+                    >
+
+                        <button
+                            type="button"
+                            onclick="filterBlog('ALL', this)"
+                            data-cat="ALL"
+                            class="cat-btn blog-category-btn is-active"
+                        >
+                            Tất cả
+                        </button>
+
+                        <button
+                            type="button"
+                            onclick="filterBlog('bảo trì', this)"
+                            data-cat="bảo trì"
+                            class="cat-btn blog-category-btn"
+                        >
+                            Bảo trì
+                        </button>
+
+                        <button
+                            type="button"
+                            onclick="filterBlog('vật tư', this)"
+                            data-cat="vật tư"
+                            class="cat-btn blog-category-btn"
+                        >
+                            Vật tư
+                        </button>
+
+                        <button
+                            type="button"
+                            onclick="filterBlog('an toàn', this)"
+                            data-cat="an toàn"
+                            class="cat-btn blog-category-btn"
+                        >
+                            An toàn (Safety)
+                        </button>
+
+                    </div>
+
+                    <span
+                        id="blogCount"
+                        class="blog-count"
+                    >
+                        ... bài viết
+                    </span>
+
                 </div>
-            </div>
+
+
+                <!-- BLOG DATA AREA -->
+                <div id="blogContainer">
+
+                    <!-- SKELETON -->
+                    <div
+                        id="skeletonLoading"
+                        class="blog-skeleton-container"
+                    >
+
+                        <div class="blog-skeleton-featured"></div>
+
+                        <div class="blog-skeleton-grid">
+
+                            <div class="blog-skeleton-card"></div>
+                            <div class="blog-skeleton-card"></div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- FEATURED POST -->
+                    <div
+                        id="featuredPostArea"
+                        class="blog-featured-area"
+                    ></div>
+
+
+                    <!-- BLOG GRID -->
+                    <div
+                        id="blogGrid"
+                        class="blog-grid"
+                    ></div>
+
+
+                    <!-- PAGINATION -->
+                    <div
+                        id="paginationContainer"
+                        class="blog-pagination"
+                    ></div>
+
+
+                    <!-- EMPTY STATE -->
+                    <div
+                        id="emptyState"
+                        class="blog-empty"
+                    >
+
+                        <svg
+                            class="blog-empty-icon"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                            ></path>
+                        </svg>
+
+                        <h3 class="blog-empty-title">
+                            Không tìm thấy bài viết!
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ==========================================
+                 SIDEBAR
+                 ========================================== -->
+            <aside class="blog-sidebar">
+
+                <!-- SEARCH -->
+                <div class="blog-sidebar-card">
+
+                    <h3 class="blog-sidebar-title">
+
+                        <svg
+                            class="blog-sidebar-title-icon"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            ></path>
+                        </svg>
+
+                        Tìm Bài Viết
+
+                    </h3>
+
+
+                    <div class="blog-search-box">
+
+                        <input
+                            type="text"
+                            id="blogSearchInput"
+                            placeholder="Nhập từ khóa..."
+                            class="blog-search-input"
+                        >
+
+                        <button
+                            type="button"
+                            onclick="handleSearch()"
+                            class="blog-search-button"
+                            aria-label="Tìm kiếm"
+                        >
+
+                            <svg
+                                class="blog-search-button-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                ></path>
+                            </svg>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- LATEST BLOG -->
+                <div class="blog-sidebar-card">
+
+                    <h3 class="blog-sidebar-title">
+
+                        <svg
+                            class="blog-sidebar-title-icon"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                            ></path>
+                        </svg>
+
+                        Bài Viết Mới Nhất
+
+                    </h3>
+
+
+                    <div
+                        id="sidebarBlogList"
+                        class="blog-sidebar-list"
+                    >
+
+                        <div class="blog-sidebar-skeleton">
+
+                            <div class="blog-sidebar-skeleton-image"></div>
+
+                            <div class="blog-sidebar-skeleton-content">
+
+                                <div class="blog-sidebar-skeleton-line"></div>
+
+                                <div class="blog-sidebar-skeleton-line short"></div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </aside>
 
         </div>
+
     </main>
 
-    <!-- CHỖ NÀY ĐỂ RÁP FOOTER BẰNG JAVASCRIPT -->
+
+    <!-- FOOTER -->
     <div id="app-footer"></div>
 
-    <!-- ========================================== -->
-    <!-- PHẦN GỌI SCRIPT ĐƯỢC QUY HOẠCH GỌN GÀNG LẠI -->
-    <!-- ========================================== -->
 
-    <!-- 1. GỌI SCRIPT COMPONENT HEADER/FOOTER -->
+    <!-- SUPABASE -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- COMMON JS -->
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/common/utils.js"></script>
+    <script src="../assets/js/common/auth.js"></script>
+
+    <!-- COMPONENTS -->
     <script src="../assets/components/header.js"></script>
     <script src="../assets/components/footer.js"></script>
 
-    <!-- 2. GỌI THƯ VIỆN & SCRIPT DÙNG CHUNG -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../assets/js/common.js"></script>
+    <!-- USER -->
+    <script src="../assets/js/users/auth-ui.js"></script>
 
-    <!-- 3. SCRIPT LOGIC RIÊNG CỦA TRANG NÀY -->
-    <script>
-        async function loadBlogs() {
-            const grid = document.getElementById('blogGrid');
-            if(!grid) return;
- 
-            try {
-                const { data, error } = await supabaseClient
-                    .from('blogs')
-                    .select('id, title, slug, thumbnail, summary, created_at')
-                    .order('created_at', { ascending: false });
+    <!-- PAGE -->
+    <script src="../assets/js/users/blog.js"></script>
 
-                if (error) throw error;
-
-                if (!data || data.length === 0) {
-                    grid.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">Chưa có bài viết nào.</div>`;
-                    return;
-                }
-
-                grid.innerHTML = '';
-                data.forEach(post => {
-                    const date = new Date(post.created_at).toLocaleDateString('vi-VN');
-                    
-                    grid.innerHTML += `
-                        <div class="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200 hover:shadow-lg transition flex flex-col h-full group">
-                            <a href="blog-detail.html?slug=${post.slug}" class="block h-56 overflow-hidden relative">
-                                <img src="${post.thumbnail || 'https://via.placeholder.com/600x400?text=Blog+Image'}" alt="${post.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                <div class="absolute top-4 left-4 bg-kn-orange text-white text-xs font-bold px-3 py-1 rounded shadow">${date}</div>
-                            </a>
-                            <div class="p-6 flex-grow flex flex-col">
-                                <a href="blog-detail.html?slug=${post.slug}">
-                                    <h3 class="text-lg font-bold text-gray-800 mb-3 group-hover:text-kn-blue transition-colors line-clamp-2">${post.title}</h3>
-                                </a>
-                                <p class="text-gray-500 text-sm mb-4 line-clamp-3">${post.summary || ''}</p>
-                                <a href="blog-detail.html?slug=${post.slug}" class="mt-auto inline-flex items-center text-kn-blue font-bold text-sm hover:text-kn-orange transition-colors">
-                                    Đọc tiếp
-                                    <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                                </a>
-                            </div>
-                        </div>
-                    `;
-                });
-            } catch (error) {
-                console.error("Lỗi tải blog:", error);
-                grid.innerHTML = `<div class="col-span-full text-center text-red-500">Lỗi: ${error.message}</div>`;
-            }
-        }
-
-        // Gom các lệnh khởi chạy lúc mở trang vào chung 1 hàm window.onload
-        window.onload = function() {
-            checkCustomerAuth(); // Kiểm tra đăng nhập (Lấy từ common.js)
-            loadBlogs();         // Tải danh sách bài viết
-        };
-    </script>
 </body>
 </html>

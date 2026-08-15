@@ -1,45 +1,480 @@
+// ========================================================
+// FILE: assets/js/users/contact.js
+// TRANG LIÊN HỆ KHANG NAM
+// - Load cấu hình contact_page
+// - Submit form
+// - Hiển thị trạng thái thành công
+// - Không chứa Tailwind class
+// ========================================================
+
+"use strict";
 
 
-async function submitContact() {
-            // 1. Lấy dữ liệu từ các ô nhập
-            const name = document.getElementById('inContactName').value.trim();
-            const company = document.getElementById('inContactCompany').value.trim();
-            const phone = document.getElementById('inContactPhone').value.trim();
-            const email = document.getElementById('inContactEmail').value.trim();
-            const subject = document.getElementById('inContactSubject').value;
-            const message = document.getElementById('inContactMessage').value.trim();
+// ========================================================
+// 1. LOAD CONFIG
+// ========================================================
 
-            // 2. Rào lỗi bỏ trống
-            if (!name || !company || !phone || !email || !message) {
-                alert("Bro vui lòng điền đầy đủ các thông tin bắt buộc (*) nhé!");
-                return;
+async function loadContactConfig() {
+    try {
+        if (!window.supabaseClient) {
+            throw new Error("Chưa kết nối được hệ thống.");
+        }
+
+        const { data, error } =
+            await window.supabaseClient
+                .from("contact_page")
+                .select("*")
+                .eq("id", 1)
+                .maybeSingle();
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data) {
+            return;
+        }
+
+
+        // ------------------------------------------------
+        // HOTLINE
+        // ------------------------------------------------
+
+        if (data.hotline) {
+            const hotline =
+                document.getElementById("txtHotline");
+
+            const hotlineCTA =
+                document.getElementById("txtHotlineCTA");
+
+            const hotlineLink =
+                document.getElementById("linkHotlineCTA");
+
+            if (hotline) {
+                hotline.textContent =
+                    data.hotline;
             }
 
-            try {
-                // 3. Bắn dữ liệu lên bảng 'contacts' của Supabase
-                const { error } = await supabaseClient
-                    .from('contacts')
-                    .insert([{ 
-                        name: name, 
-                        company: company, 
-                        phone: phone, 
-                        email: email, 
-                        subject: subject, 
-                        message: message 
-                    }]);
+            if (hotlineCTA) {
+                hotlineCTA.textContent =
+                    data.hotline;
+            }
 
-                if (error) throw error;
-
-                // 4. Báo thành công và dọn sạch form
-                alert("Gửi yêu cầu thành công! Khang Nam sẽ liên hệ với bro sớm nhất.");
-                document.getElementById('contactForm').reset();
-
-            } catch (error) {
-                console.error("Lỗi gửi liên hệ:", error);
-                alert("Có lỗi xảy ra: " + error.message);
+            if (hotlineLink) {
+                hotlineLink.href =
+                    `tel:${data.hotline.replace(/\s+/g, "")}`;
             }
         }
-    
-        window.onload = function() {
-            checkCustomerAuth(); // Kiểm tra đăng nhập (Lấy từ common.js)
+
+
+        // ------------------------------------------------
+        // EMAIL
+        // ------------------------------------------------
+
+        if (data.email_sales) {
+            const email =
+                document.getElementById("txtEmail");
+
+            if (email) {
+                email.textContent =
+                    data.email_sales;
+            }
+        }
+
+
+        // ------------------------------------------------
+        // ADDRESS
+        // ------------------------------------------------
+
+        if (data.address) {
+            const address =
+                document.getElementById("txtAddress");
+
+            if (address) {
+                address.textContent =
+                    data.address;
+            }
+        }
+
+
+        // ------------------------------------------------
+        // SUPPORT TIME
+        // ------------------------------------------------
+
+        if (data.support_time) {
+            const supportTime =
+                document.getElementById("txtSupportTime");
+
+            if (supportTime) {
+                supportTime.textContent =
+                    data.support_time;
+            }
+        }
+
+
+        // ------------------------------------------------
+        // MAP
+        // ------------------------------------------------
+
+        if (data.map_iframe_url) {
+            const map =
+                document.getElementById("mapIframe");
+
+            if (map) {
+                map.src =
+                    data.map_iframe_url;
+            }
+        }
+
+
+        // ------------------------------------------------
+        // SOCIAL PROOF
+        // ------------------------------------------------
+
+        const proofMap = {
+            proof_1: "txtProof1",
+            proof_2: "txtProof2",
+            proof_3: "txtProof3",
+            proof_4: "txtProof4"
         };
+
+        Object.entries(proofMap).forEach(
+            ([field, elementId]) => {
+
+                if (!data[field]) {
+                    return;
+                }
+
+                const element =
+                    document.getElementById(elementId);
+
+                if (element) {
+                    element.textContent =
+                        data[field];
+                }
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Lỗi tải cấu hình trang liên hệ:",
+            error
+        );
+    }
+}
+
+
+// ========================================================
+// 2. SUBMIT CONTACT
+// ========================================================
+
+window.submitContact = async function () {
+
+    const btnSubmit =
+        document.getElementById(
+            "btnSubmitContact"
+        );
+
+    const nameInput =
+        document.getElementById(
+            "inContactName"
+        );
+
+    const companyInput =
+        document.getElementById(
+            "inContactCompany"
+        );
+
+    const phoneInput =
+        document.getElementById(
+            "inContactPhone"
+        );
+
+    const emailInput =
+        document.getElementById(
+            "inContactEmail"
+        );
+
+    const subjectInput =
+        document.getElementById(
+            "inContactSubject"
+        );
+
+    const messageInput =
+        document.getElementById(
+            "inContactMessage"
+        );
+
+
+    if (
+        !btnSubmit ||
+        !nameInput ||
+        !companyInput ||
+        !phoneInput ||
+        !emailInput ||
+        !subjectInput ||
+        !messageInput
+    ) {
+        console.error(
+            "Không tìm thấy đầy đủ thành phần form liên hệ."
+        );
+
+        return;
+    }
+
+
+    // ------------------------------------------------
+    // GET FORM DATA
+    // ------------------------------------------------
+
+    const name =
+        nameInput.value.trim();
+
+    const company =
+        companyInput.value.trim();
+
+    const phone =
+        phoneInput.value.trim();
+
+    const email =
+        emailInput.value.trim();
+
+    const subject =
+        subjectInput.value;
+
+    const message =
+        messageInput.value.trim();
+
+
+    // ------------------------------------------------
+    // VALIDATE
+    // ------------------------------------------------
+
+    if (
+        !name ||
+        !company ||
+        !phone ||
+        !email ||
+        !message
+    ) {
+        alert(
+            "Vui lòng điền đầy đủ các thông tin bắt buộc (*) trước khi gửi!"
+        );
+
+        return;
+    }
+
+
+    // ------------------------------------------------
+    // SAVE ORIGINAL BUTTON
+    // ------------------------------------------------
+
+    const originalHTML =
+        btnSubmit.innerHTML;
+
+
+    // ------------------------------------------------
+    // LOADING STATE
+    // ------------------------------------------------
+
+    btnSubmit.disabled = true;
+
+    btnSubmit.innerHTML = `
+        <span
+            class="contact-spinner"
+            aria-hidden="true"
+        ></span>
+
+        <span>Đang xử lý...</span>
+    `;
+
+
+    try {
+
+        if (!window.supabaseClient) {
+            throw new Error(
+                "Chưa kết nối được hệ thống máy chủ."
+            );
+        }
+
+
+        // ------------------------------------------------
+        // INSERT CONTACT
+        // ------------------------------------------------
+
+        const { error } =
+            await window.supabaseClient
+                .from("contacts")
+                .insert([
+                    {
+                        name,
+                        company,
+                        phone,
+                        email,
+                        subject,
+                        message
+                    }
+                ]);
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        // ------------------------------------------------
+        // GENERATE TICKET
+        // ------------------------------------------------
+
+        const dateObj =
+            new Date();
+
+        const year =
+            dateObj.getFullYear();
+
+        const month =
+            String(
+                dateObj.getMonth() + 1
+            ).padStart(2, "0");
+
+        const day =
+            String(
+                dateObj.getDate()
+            ).padStart(2, "0");
+
+        const randomNum =
+            Math.floor(
+                100 +
+                Math.random() * 900
+            );
+
+        const ticketId =
+            `#CN-${year}${month}${day}-${randomNum}`;
+
+
+        // ------------------------------------------------
+        // SHOW SUCCESS
+        // ------------------------------------------------
+
+        const formContainer =
+            document.getElementById(
+                "formContainer"
+            );
+
+        const successMessage =
+            document.getElementById(
+                "successMessage"
+            );
+
+        const ticketDisplay =
+            document.getElementById(
+                "ticketIdDisplay"
+            );
+
+
+        if (formContainer) {
+            formContainer.classList.add(
+                "is-hidden"
+            );
+        }
+
+        if (successMessage) {
+            successMessage.classList.remove(
+                "is-hidden"
+            );
+        }
+
+        if (ticketDisplay) {
+            ticketDisplay.textContent =
+                ticketId;
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Lỗi gửi liên hệ:",
+            error
+        );
+
+        alert(
+            "Có lỗi xảy ra trong quá trình gửi: " +
+            error.message
+        );
+
+    } finally {
+
+        // ------------------------------------------------
+        // RESTORE BUTTON
+        // ------------------------------------------------
+
+        btnSubmit.disabled = false;
+
+        btnSubmit.innerHTML =
+            originalHTML;
+    }
+};
+
+
+// ========================================================
+// 3. RESET CONTACT FORM
+// ========================================================
+
+window.resetContactForm = function () {
+
+    const form =
+        document.getElementById(
+            "contactForm"
+        );
+
+    const successMessage =
+        document.getElementById(
+            "successMessage"
+        );
+
+    const formContainer =
+        document.getElementById(
+            "formContainer"
+        );
+
+    const companyInput =
+        document.getElementById(
+            "inContactCompany"
+        );
+
+
+    if (form) {
+        form.reset();
+    }
+
+    if (successMessage) {
+        successMessage.classList.add(
+            "is-hidden"
+        );
+    }
+
+    if (formContainer) {
+        formContainer.classList.remove(
+            "is-hidden"
+        );
+    }
+
+    if (companyInput) {
+        companyInput.focus();
+    }
+};
+
+
+// ========================================================
+// 4. INIT
+// ========================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    async () => {
+
+        await loadContactConfig();
+
+    }
+);

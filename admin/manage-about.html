@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Trang Giới Thiệu (About) - KN Admin</title>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    
+    <!-- CKEditor 5 Superbuild - Cấu hình rút gọn cho trang About -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/super-build/ckeditor.js"></script>
+    
+    <script>
+        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00' } } } }
+    </script>
+    
+    <style type="text/tailwindcss">
+        .ck-editor__editable_inline {
+            min-height: 520px;
+            font-family: inherit;
+        }
+        .ck-toolbar {
+            flex-wrap: wrap !important;
+        }
+        .ck-content {
+            @apply prose prose-blue max-w-none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 flex h-screen overflow-hidden relative">
+
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none gap-2"></div>
+
+    <!-- MÀN SƯƠNG ĐEN KHI MỞ MENU MOBILE -->
+    <div id="sidebarBackdrop" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="adminSidebar" class="w-64 bg-gray-900 text-white flex flex-col fixed md:relative z-50 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 shrink-0">
+        <div class="h-16 flex items-center justify-between px-6 bg-gray-950 border-b border-gray-800">
+            <span class="text-xl font-black tracking-wider text-white">Khangnam <span class="text-kn-orange">ADMIN</span></span>
+            <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white font-bold text-xl">&times;</button>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4">
+            <nav class="space-y-1 px-3" id="adminSidebarNav">
+                <a href="dashboard.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Tổng quan & Đơn hàng</a>
+                <a href="manage-categories.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Danh mục</a>
+                <a href="manage-subcategories.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Nhóm hàng</a>
+                <a href="manage-families.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Dòng sản phẩm</a>
+                <a href="manage-products.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Sản phẩm</a>
+                <a href="manage-industries.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Ngành hàng</a>
+                <a href="manage-blog.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Bài viết</a>
+                <a href="manage-about.html"class="nav-link flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md transition font-bold">Quản lý Giới thiệu</a>
+                <a href="manage-contacts.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Liên hệ</a>
+                <a href="manage-users.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Người dùng</a>
+                <a href="manage-settings.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Cấu hình</a>
+            </nav> 
+        </div> 
+        <div class="p-4 border-t border-gray-800">
+            <button onclick="handleAdminLogout()" class="flex items-center text-sm text-gray-400 hover:text-white transition-colors w-full">Đăng xuất</button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden">
+        
+        <!-- ĐÃ FIX: STICKY HEADER & NÚT MENU MOBILE -->
+        <header class="sticky top-0 z-30 bg-white shadow-sm px-6 py-4 flex justify-between items-center border-b border-gray-200">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSidebar()" class="md:hidden text-gray-600 hover:bg-gray-100 p-2 rounded-lg transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+                <h2 class="text-xl font-bold text-gray-900 hidden sm:block">Quản lý nội dung "Về Chúng Tôi"</h2>
+                <h2 class="text-lg font-bold text-gray-900 sm:hidden">Về Chúng Tôi</h2>
+            </div>
+            <button id="btnSave" onclick="saveContent()" class="px-5 py-2 sm:px-6 bg-kn-blue text-white font-bold text-sm sm:text-base rounded-lg hover:bg-blue-800 transition shadow-sm">
+                Lưu Thay Đổi
+            </button>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-6 bg-gray-50 custom-scrollbar relative z-0">
+            <div id="loadingIndicator" class="text-center py-10 hidden">
+                <div class="animate-spin inline-block w-8 h-8 border-4 border-kn-blue border-t-transparent rounded-full mb-2"></div>
+                <p class="text-gray-500 font-bold">Đang tải dữ liệu...</p>
+            </div>
+
+            <div id="editorWrapper" class="max-w-5xl mx-auto space-y-6 pb-10">
+                
+                <!-- SECTION 1: SEO META (ĐÃ FIX: BỘ ĐẾM KÝ TỰ) -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-lg font-black text-gray-900 mb-4 border-b pb-2">1. Cấu hình SEO Meta</h3>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <div class="flex justify-between items-end mb-1">
+                                <label class="block text-sm font-bold text-gray-700">Meta Title (Tiêu đề trang)</label>
+                                <span id="metaTitleCount" class="text-xs font-mono text-gray-500">0 / 60</span>
+                            </div>
+                            <input type="text" id="metaTitle" maxlength="60" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none" placeholder="VD: Giới thiệu MRO Khang Nam...">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-end mb-1">
+                                <label class="block text-sm font-bold text-gray-700">Meta Description (Mô tả ngắn)</label>
+                                <span id="metaDescCount" class="text-xs font-mono text-gray-500">0 / 160</span>
+                            </div>
+                            <textarea id="metaDesc" rows="2" maxlength="160" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none" placeholder="Nhập mô tả SEO..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: HERO BANNER -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-lg font-black text-gray-900 mb-4 border-b pb-2">2. Khu vực Hero (Đầu trang)</h3>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Heading (Tiêu đề chính)</label>
+                            <input type="text" id="heroHeading" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Description (Đoạn giới thiệu ngắn)</label>
+                            <textarea id="heroDesc" rows="3" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: KPI THỐNG KÊ -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-lg font-black text-gray-900 mb-4 border-b pb-2">3. Các chỉ số thống kê (KPI)</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Năm kinh nghiệm</label>
+                            <input type="number" id="kpiYears" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Thương hiệu</label>
+                            <input type="number" id="kpiBrands" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Mã sản phẩm (SKU)</label>
+                            <input type="number" id="kpiSkus" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Khách hàng</label>
+                            <input type="number" id="kpiCustomers" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: NỘI DUNG CHI TIẾT (CKEDITOR) -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                    <h3 class="text-lg font-black text-gray-900 mb-4 border-b pb-2">4. Nội dung bài viết (Lịch sử, Thành tựu...)</h3>
+                    <p class="text-sm text-gray-500 mb-4 italic">Lưu ý: Chỉ sử dụng các thẻ Heading (H2, H3), Paragraph và List để đảm bảo đồng bộ giao diện hiển thị.</p>
+                    <textarea id="ckEditorContainer"></textarea>
+                </div>
+                
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/admin/admin-about.js"></script>
+</body>
+</html>

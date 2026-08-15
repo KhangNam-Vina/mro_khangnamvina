@@ -1,0 +1,2258 @@
+/* =========================================================
+   QUICK ORDER
+   MRO KHANG NAM
+   CSS TĨNH - KHÔNG DÙNG TAILWIND
+========================================================= */
+
+/* =========================================================
+   1. BASE
+========================================================= */
+
+.quick-order-page {
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+
+    margin: 0;
+
+    background: #f5f6f8;
+
+    color: #1f2937;
+
+    font-family:
+        "Inter",
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+.quick-order-page *,
+.quick-order-page *::before,
+.quick-order-page *::after {
+    box-sizing: border-box;
+}
+
+.quick-order-page button,
+.quick-order-page input,
+.quick-order-page textarea,
+.quick-order-page select {
+    font-family: inherit;
+}
+
+.quick-order-page img {
+    max-width: 100%;
+    display: block;
+}
+
+.is-hidden {
+    display: none !important;
+}
+
+.is-disabled {
+    opacity: .5 !important;
+    cursor: not-allowed !important;
+}
+
+
+/* =========================================================
+   2. CONTAINER
+========================================================= */
+
+.quick-order-container {
+    width: min(
+        1280px,
+        calc(100% - 32px)
+    );
+
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   3. HERO
+========================================================= */
+
+.quick-order-hero {
+    position: relative;
+
+    overflow: hidden;
+
+    padding: 48px 0;
+    margin-bottom: 32px;
+    color: #ffffff;
+    background: linear-gradient(110deg, #003370 0%, #00479b 100%);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.quick-order-hero-pattern {
+    position: absolute;
+
+    inset: 0;
+
+    background-image:
+        url("https://www.transparenttextures.com/patterns/cubes.png");
+
+    opacity: .1;
+
+    pointer-events: none;
+}
+
+.quick-order-hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: rgba(0, 71, 155, 0.6);
+    pointer-events: none;
+}
+
+.quick-order-hero .quick-order-container {
+    position: relative;
+    z-index: 2;
+}
+
+
+/* =========================================================
+   4. BREADCRUMB
+========================================================= */
+
+.quick-order-breadcrumb {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-bottom: 24px;
+
+    color:
+        #d1d5db;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.5;
+
+    font-weight:
+        500;
+}
+
+.quick-order-breadcrumb-link {
+    color:
+        #d1d5db;
+
+    text-decoration:
+        none;
+
+    transition:
+        color .2s ease;
+}
+
+.quick-order-breadcrumb-link:hover {
+    color: #ff5e00;
+}
+
+.quick-order-breadcrumb-separator {
+    color: #6b7280;
+}
+
+.quick-order-breadcrumb-current {
+    color: #fff;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   5. HERO CONTENT
+========================================================= */
+
+.quick-order-hero-content {
+    display: flex;
+
+    align-items: flex-end;
+
+    justify-content: space-between;
+
+    gap: 32px;
+}
+
+.quick-order-hero-main {
+    max-width: 850px;
+}
+
+.quick-order-hero-title {
+    margin:
+        0 0 8px;
+
+    color:
+        #fff;
+
+    font-size:
+        clamp(
+            30px,
+            4vw,
+            40px
+        );
+
+    line-height:
+        1.2;
+
+    font-weight:
+        900;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        .01em;
+}
+
+.quick-order-hero-icon {
+    width: 32px;
+    height: 32px;
+
+    margin-right: 12px;
+
+    flex-shrink: 0;
+
+    color: #ff5e00;
+}
+
+.quick-order-hero-description {
+    max-width:
+        760px;
+
+    margin:
+        0;
+
+    color:
+        #e5e7eb;
+
+    font-size:
+        14px;
+
+    line-height:
+        1.7;
+}
+
+
+/* =========================================================
+   6. FEATURE LIST
+========================================================= */
+
+.quick-order-feature-list {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin: 0;
+
+    padding: 0;
+
+    list-style: none;
+}
+
+.quick-order-feature-item {
+    display: inline-flex;
+
+    align-items: center;
+
+    min-height: 32px;
+
+    padding:
+        6px 12px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .1
+        );
+
+    border-radius: 5px;
+
+    color: #f3f4f6;
+
+    font-size: 12px;
+
+    line-height: 1.4;
+
+    font-weight: 700;
+}
+
+.quick-order-feature-icon {
+    width: 16px;
+    height: 16px;
+
+    margin-right: 8px;
+
+    flex-shrink: 0;
+
+    color:
+        #ff5e00;
+}
+
+
+/* =========================================================
+   7. MAIN
+========================================================= */
+
+.quick-order-main {
+    flex: 1;
+
+    width: 100%;
+
+    padding:
+        0 0 64px;
+
+    background:
+        #f9fafb;
+}
+
+.quick-order-main >
+.quick-order-container {
+    position: relative;
+}
+
+
+/* =========================================================
+   8. WORKFLOW
+========================================================= */
+
+.quick-order-workflow {
+    position: relative;
+
+    min-height: 74px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-top: -24px;
+
+    margin-bottom: 32px;
+
+    padding:
+        14px 22px;
+
+    background: #fff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 6px 18px rgba(
+            15,
+            23,
+            42,
+            .08
+        );
+
+    z-index: 20;
+}
+
+.quick-order-workflow-line {
+    position: absolute;
+
+    left: 64px;
+    right: 64px;
+
+    top: 50%;
+
+    height: 2px;
+
+    background:
+        #f3f4f6;
+
+    transform:
+        translateY(-50%);
+
+    z-index: 0;
+}
+
+.quick-order-workflow-step {
+    position: relative;
+
+    z-index: 1;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding:
+        0 14px;
+
+    background: #fff;
+
+    color: #6b7280;
+
+    font-size: 11px;
+
+    line-height: 1.4;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+
+    letter-spacing:
+        .03em;
+}
+
+.quick-order-workflow-number {
+    width: 32px;
+    height: 32px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background:
+        #e5e7eb;
+
+    color:
+        #6b7280;
+
+    font-size:
+        13px;
+
+    font-weight:
+        900;
+}
+
+.quick-order-workflow-step.is-active {
+    color:
+        #374151;
+}
+
+.quick-order-workflow-step.is-active
+.quick-order-workflow-number {
+    background:
+        #00479b;
+
+    color:
+        #fff;
+
+    box-shadow:
+        0 2px 6px rgba(
+            0,
+            71,
+            155,
+            .2
+        );
+}
+
+
+/* =========================================================
+   9. INPUT CARD
+========================================================= */
+
+.quick-order-input-card {
+    padding:
+        32px;
+
+    background:
+        #fff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius:
+        16px;
+
+    box-shadow:
+        0 2px 8px rgba(
+            15,
+            23,
+            42,
+            .05
+        );
+}
+
+.quick-order-input-layout {
+    display:
+        flex;
+
+    align-items:
+        stretch;
+
+    gap:
+        32px;
+}
+
+
+/* =========================================================
+   10. INPUT OPTIONS
+========================================================= */
+
+.quick-order-input-option {
+    flex:
+        1 1 0;
+
+    min-width:
+        0;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+}
+
+.quick-order-field-heading {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    margin-bottom:
+        8px;
+
+    color:
+        #00479b;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.4;
+
+    font-weight:
+        900;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        .06em;
+}
+
+.quick-order-field-heading-icon {
+    width:
+        20px;
+
+    height:
+        20px;
+
+    margin-right:
+        8px;
+
+    flex-shrink:
+        0;
+}
+
+.quick-order-field-description {
+    margin:
+        0 0 12px;
+
+    color:
+        #6b7280;
+
+    font-size:
+        12px;
+
+    line-height:
+        1.5;
+}
+
+
+/* =========================================================
+   11. DROPZONE
+========================================================= */
+
+.quick-order-dropzone {
+    position:
+        relative;
+
+    min-height:
+        220px;
+
+    flex:
+        1;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        32px 24px;
+
+    background:
+        #f9fafb;
+
+    border:
+        2px dashed #d1d5db;
+
+    border-radius:
+        12px;
+
+    text-align:
+        center;
+
+    cursor:
+        pointer;
+
+    transition:
+        border-color .2s ease,
+        background-color .2s ease,
+        box-shadow .2s ease;
+}
+
+.quick-order-dropzone:hover,
+.quick-order-dropzone.is-dragover {
+    border-color:
+        #00479b;
+
+    background:
+        #eff6ff;
+}
+
+.quick-order-dropzone input[type="file"] {
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    opacity:
+        0;
+
+    cursor:
+        pointer;
+}
+
+.quick-order-dropzone-icon {
+    width:
+        64px;
+
+    height:
+        64px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+    justify-content:
+        center;
+
+    margin-bottom:
+        16px;
+
+    background:
+        #fff;
+
+    border-radius:
+        50%;
+
+    color:
+        #00479b;
+
+    box-shadow:
+        0 2px 8px rgba(
+            15,
+            23,
+            42,
+            .08
+        );
+
+    transition:
+        transform .2s ease;
+}
+
+.quick-order-dropzone:hover
+.quick-order-dropzone-icon {
+    transform:
+        scale(1.08);
+}
+
+.quick-order-dropzone-icon svg {
+    width:
+        32px;
+
+    height:
+        32px;
+}
+
+.quick-order-dropzone-title {
+    margin:
+        0 0 4px;
+
+    color:
+        #1f2937;
+
+    font-size:
+        15px;
+
+    line-height:
+        1.4;
+
+    font-weight:
+        800;
+}
+
+.quick-order-dropzone-description {
+    margin:
+        0 0 16px;
+
+    color:
+        #6b7280;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.5;
+}
+
+.quick-order-file-button {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    min-height:
+        36px;
+
+    padding:
+        0 16px;
+
+    background:
+        #fff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius:
+        5px;
+
+    color:
+        #4b5563;
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+
+    box-shadow:
+        0 2px 4px rgba(
+            0,
+            0,
+            0,
+            .04
+        );
+}
+
+
+/* =========================================================
+   12. TEXTAREA
+========================================================= */
+
+.quick-order-textarea {
+    width:
+        100%;
+
+    min-height:
+        220px;
+
+    flex:
+        1;
+
+    padding:
+        16px;
+
+    resize:
+        vertical;
+
+    background:
+        #f9fafb;
+
+    border:
+        1px solid #d1d5db;
+
+    border-radius:
+        12px;
+
+    color:
+        #1f2937;
+
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        monospace;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.6;
+
+    outline:
+        none;
+
+    transition:
+        border-color .2s ease,
+        background-color .2s ease,
+        box-shadow .2s ease;
+}
+
+.quick-order-textarea::placeholder {
+    color:
+        #9ca3af;
+}
+
+.quick-order-textarea:focus {
+    border-color:
+        #00479b;
+
+    background:
+        #fff;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(
+            0,
+            71,
+            155,
+            .08
+        );
+}
+
+
+/* =========================================================
+   13. DIVIDERS
+========================================================= */
+
+.quick-order-divider-desktop {
+    position:
+        relative;
+
+    width:
+        48px;
+
+    flex:
+        0 0 48px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+}
+
+.quick-order-divider-desktop::before {
+    content:
+        "";
+
+    position:
+        absolute;
+
+    top:
+        0;
+
+    bottom:
+        0;
+
+    width:
+        1px;
+
+    background:
+        #e5e7eb;
+}
+
+.quick-order-divider-desktop span {
+    position:
+        relative;
+
+    z-index:
+        1;
+
+    padding:
+        4px 8px;
+
+    background:
+        #fff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius:
+        999px;
+
+    color:
+        #9ca3af;
+
+    font-size:
+        9px;
+
+    line-height:
+        1;
+
+    font-weight:
+        900;
+}
+
+.quick-order-divider-mobile {
+    display:
+        none;
+}
+
+
+/* =========================================================
+   14. PROCESS BUTTON
+========================================================= */
+
+.quick-order-process {
+    margin-top:
+        32px;
+
+    padding-top:
+        32px;
+
+    border-top:
+        1px solid #f3f4f6;
+
+    text-align:
+        center;
+}
+
+.quick-order-process-button {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+    justify-content:
+        center;
+
+    gap:
+        10px;
+
+    min-height:
+        52px;
+
+    padding:
+        0 48px;
+
+    background:
+        #ff5e00;
+
+    border:
+        1px solid #ff5e00;
+
+    border-radius:
+        10px;
+
+    color:
+        #fff;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.2;
+
+    font-weight:
+        900;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        .08em;
+
+    cursor:
+        pointer;
+
+    box-shadow:
+        0 8px 20px rgba(
+            255,
+            94,
+            0,
+            .18
+        );
+
+    transition:
+        background-color .2s ease,
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+.quick-order-process-button:hover:not(:disabled) {
+    background:
+        #ea580c;
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 10px 24px rgba(
+            255,
+            94,
+            0,
+            .24
+        );
+}
+
+.quick-order-process-button:disabled {
+    opacity:
+        .6;
+
+    cursor:
+        not-allowed;
+
+    transform:
+        none;
+}
+
+.quick-order-process-icon {
+    width:
+        20px;
+
+    height:
+        20px;
+
+    flex-shrink:
+        0;
+}
+
+.quick-order-process-note {
+    margin:
+        12px 0 0;
+
+    color:
+        #9ca3af;
+
+    font-size:
+        11px;
+
+    line-height:
+        1.5;
+}
+
+
+/* =========================================================
+   15. DASHBOARD
+========================================================= */
+
+.quick-order-dashboard {
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap:
+        16px;
+
+    margin-top:
+        24px;
+}
+
+.quick-order-stat-card {
+    padding:
+        20px;
+
+    background:
+        #fff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius:
+        10px;
+
+    text-align:
+        center;
+
+    box-shadow:
+        0 2px 6px rgba(
+            15,
+            23,
+            42,
+            .04
+        );
+}
+
+.quick-order-stat-label {
+    margin:
+        0 0 4px;
+
+    color:
+        #6b7280;
+
+    font-size:
+        10px;
+
+    line-height:
+        1.5;
+
+    font-weight:
+        800;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        .1em;
+}
+
+.quick-order-stat-label-green {
+    color:
+        #16a34a;
+}
+
+.quick-order-stat-label-orange {
+    color:
+        #ea580c;
+}
+
+.quick-order-stat-label-blue {
+    color:
+        #00479b;
+}
+
+.quick-order-stat-value {
+    margin:
+        0;
+
+    font-size:
+        32px;
+
+    line-height:
+        1.15;
+
+    font-weight:
+        900;
+}
+
+.quick-order-stat-neutral {
+    color:
+        #1f2937;
+}
+
+.quick-order-stat-green {
+    color:
+        #22c55e;
+}
+
+.quick-order-stat-orange {
+    color:
+        #ff5e00;
+}
+
+.quick-order-stat-blue {
+    color:
+        #00479b;
+}
+
+
+/* =========================================================
+   16. LOG / RESULT
+========================================================= */
+
+.quick-order-log {
+    position:
+        relative;
+
+    min-height:
+        300px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    margin-top:
+        24px;
+
+    overflow:
+        hidden;
+
+    background:
+        #fff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius:
+        16px;
+
+    box-shadow:
+        0 2px 8px rgba(
+            15,
+            23,
+            42,
+            .05
+        );
+}
+
+.quick-order-empty-state {
+    min-height:
+        300px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        center;
+    justify-content:
+        center;
+
+    padding:
+        32px 24px;
+
+    text-align:
+        center;
+}
+
+.quick-order-empty-icon {
+    width:
+        80px;
+
+    height:
+        80px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    margin-bottom:
+        16px;
+
+    background:
+        #f9fafb;
+
+    border:
+        4px solid #fff;
+
+    border-radius:
+        50%;
+
+    font-size:
+        38px;
+
+    box-shadow:
+        0 2px 8px rgba(
+            15,
+            23,
+            42,
+            .06
+        );
+}
+
+.quick-order-empty-title {
+    margin:
+        0 0 4px;
+
+    color:
+        #1f2937;
+
+    font-size:
+        17px;
+
+    line-height:
+        1.4;
+
+    font-weight:
+        900;
+}
+
+.quick-order-empty-description {
+    max-width:
+        520px;
+
+    margin:
+        0;
+
+    color:
+        #6b7280;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.7;
+}
+
+
+/* =========================================================
+   17. RESULT TABLE
+========================================================= */
+
+.quick-order-result {
+    width:
+        100%;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    height:
+        100%;
+}
+
+.quick-order-result-header {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        16px;
+
+    padding:
+        16px 24px;
+
+    background:
+        #f9fafb;
+
+    border-bottom:
+        1px solid #e5e7eb;
+}
+
+.quick-order-result-title {
+    margin:
+        0;
+
+    color:
+        #1f2937;
+
+    font-size:
+        14px;
+
+    font-weight:
+        800;
+}
+
+.quick-order-result-count {
+    color:
+        #6b7280;
+
+    font-size:
+        11px;
+
+    font-weight:
+        600;
+}
+
+.quick-order-table-wrapper {
+    width:
+        100%;
+
+    overflow-x:
+        auto;
+
+    flex:
+        1;
+}
+
+.quick-order-table {
+    width:
+        100%;
+
+    border-collapse:
+        collapse;
+
+    text-align:
+        left;
+
+    white-space:
+        nowrap;
+
+    font-size:
+        13px;
+}
+
+.quick-order-table th {
+    padding:
+        14px 16px;
+
+    background:
+        #f9fafb;
+
+    border-bottom:
+        1px solid #e5e7eb;
+
+    color:
+        #4b5563;
+
+    font-size:
+        10px;
+
+    line-height:
+        1.4;
+
+    font-weight:
+        800;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        .06em;
+}
+
+.quick-order-table td {
+    padding:
+        14px 16px;
+
+    border-bottom:
+        1px solid #f3f4f6;
+
+    color:
+        #374151;
+
+    vertical-align:
+        middle;
+}
+
+.quick-order-table tbody tr {
+    transition:
+        background-color .2s ease;
+}
+
+.quick-order-table tbody tr:hover {
+    background:
+        #eff6ff;
+}
+
+.quick-order-table tbody tr.is-not-found {
+    background:
+        rgba(
+            249,
+            250,
+            251,
+            .7
+        );
+}
+
+.quick-order-table tbody tr.is-not-found:hover {
+    background:
+        #fef2f2;
+}
+
+.quick-order-table .cell-sku {
+    color:
+        #00479b;
+
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        monospace;
+
+    font-weight:
+        800;
+}
+
+.quick-order-table .cell-name {
+    min-width:
+        220px;
+
+    color:
+        #374151;
+
+    font-weight:
+        600;
+
+    white-space:
+        normal;
+}
+
+.quick-order-table .cell-not-found {
+    color:
+        #9ca3af;
+
+    font-size:
+        11px;
+
+    font-style:
+        italic;
+
+    white-space:
+        normal;
+}
+
+.quick-order-table .cell-status {
+    text-align:
+        center;
+}
+
+.quick-order-table .cell-quantity {
+    text-align:
+        center;
+
+    font-weight:
+        800;
+}
+
+.quick-order-status {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    min-height:
+        28px;
+
+    padding:
+        0 10px;
+
+    border-radius:
+        5px;
+
+    font-size:
+        10px;
+
+    line-height:
+        1.2;
+
+    font-weight:
+        800;
+
+    white-space:
+        nowrap;
+}
+
+.quick-order-status-success {
+    background:
+        #dcfce7;
+
+    color:
+        #15803d;
+}
+
+.quick-order-status-warning {
+    background:
+        #ffedd5;
+
+    color:
+        #c2410c;
+}
+
+.quick-order-result-footer {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        flex-end;
+
+    padding:
+        16px 24px;
+
+    background:
+        #f9fafb;
+
+    border-top:
+        1px solid #e5e7eb;
+}
+
+.quick-order-rfq-button {
+    min-height:
+        42px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        0 24px;
+
+    background:
+        #ff5e00;
+
+    border:
+        1px solid #ff5e00;
+
+    border-radius:
+        8px;
+
+    color:
+        #fff;
+
+    font-size:
+        12px;
+
+    line-height:
+        1.2;
+
+    font-weight:
+        800;
+
+    cursor:
+        pointer;
+
+    box-shadow:
+        0 4px 10px rgba(
+            255,
+            94,
+            0,
+            .15
+        );
+
+    transition:
+        background-color .2s ease,
+        transform .2s ease;
+}
+
+.quick-order-rfq-button:hover {
+    background:
+        #ea580c;
+
+    transform:
+        translateY(-1px);
+}
+
+
+/* =========================================================
+   18. BOTTOM GRID
+========================================================= */
+
+.quick-order-bottom-grid {
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap:
+        24px;
+
+    margin-top:
+        32px;
+}
+
+
+/* =========================================================
+   19. TIPS
+========================================================= */
+
+.quick-order-tips-card {
+    padding:
+        24px;
+
+    background:
+        rgba(
+            239,
+            246,
+            255,
+            .5
+        );
+
+    border:
+        1px solid #dbeafe;
+
+    border-radius:
+        12px;
+}
+
+.quick-order-card-heading {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    margin:
+        0 0 16px;
+
+    color:
+        #00479b;
+
+    font-size:
+        12px;
+
+    line-height:
+        1.4;
+
+    font-weight:
+        900;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        .08em;
+}
+
+.quick-order-card-heading span {
+    margin-right:
+        8px;
+
+    font-size:
+        18px;
+}
+
+.quick-order-tips-list {
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        12px;
+
+    margin:
+        0;
+
+    padding:
+        0;
+
+    list-style:
+        none;
+
+    color:
+        #4b5563;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.6;
+
+    font-weight:
+        500;
+}
+
+.quick-order-tips-list li {
+    display:
+        flex;
+
+    align-items:
+        flex-start;
+}
+
+.quick-order-check-icon {
+    width:
+        16px;
+
+    height:
+        16px;
+
+    margin:
+        2px 8px 0 0;
+
+    flex-shrink:
+        0;
+
+    color:
+        #22c55e;
+}
+
+.quick-order-tips-list strong {
+    color:
+        #1f2937;
+
+    font-weight:
+        800;
+}
+
+
+/* =========================================================
+   20. SUPPORT CTA
+========================================================= */
+
+.quick-order-support-card {
+    position:
+        relative;
+
+    overflow:
+        hidden;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    justify-content:
+        center;
+
+    min-height:
+        220px;
+
+    padding:
+        24px;
+
+    background:
+        #111827;
+
+    border-radius:
+        12px;
+
+    color:
+        #fff;
+}
+
+.quick-order-support-glow {
+    position:
+        absolute;
+
+    width:
+        96px;
+
+    height:
+        96px;
+
+    top:
+        -16px;
+
+    right:
+        -16px;
+
+    background:
+        rgba(
+            255,
+            94,
+            0,
+            .2
+        );
+
+    border-radius:
+        50%;
+
+    filter:
+        blur(32px);
+
+    pointer-events:
+        none;
+}
+
+.quick-order-support-title {
+    position:
+        relative;
+
+    z-index:
+        1;
+
+    margin:
+        0 0 8px;
+
+    color:
+        #fff;
+
+    font-size:
+        18px;
+
+    line-height:
+        1.4;
+
+    font-weight:
+        900;
+}
+
+.quick-order-support-description {
+    position:
+        relative;
+
+    z-index:
+        1;
+
+    max-width:
+        560px;
+
+    margin:
+        0 0 20px;
+
+    color:
+        #d1d5db;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.7;
+}
+
+.quick-order-support-button {
+    position:
+        relative;
+
+    z-index:
+        1;
+
+    align-self:
+        flex-start;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    min-height:
+        40px;
+
+    padding:
+        0 20px;
+
+    background:
+        #ff5e00;
+
+    border:
+        1px solid #ff5e00;
+
+    border-radius:
+        7px;
+
+    color:
+        #fff;
+
+    font-size:
+        12px;
+
+    line-height:
+        1.2;
+
+    font-weight:
+        800;
+
+    text-decoration:
+        none;
+
+    transition:
+        background-color .2s ease,
+        transform .2s ease;
+}
+
+.quick-order-support-button:hover {
+    background:
+        #ea580c;
+
+    transform:
+        translateY(-1px);
+}
+
+.quick-order-support-icon {
+    width:
+        16px;
+
+    height:
+        16px;
+
+    margin-left:
+        8px;
+}
+
+
+/* =========================================================
+   21. RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .quick-order-workflow {
+        display:
+            none;
+    }
+
+    .quick-order-main {
+        padding-top:
+            24px;
+    }
+
+    .quick-order-input-layout {
+        flex-direction:
+            column;
+
+        gap:
+            24px;
+    }
+
+    .quick-order-divider-desktop {
+        display:
+            none;
+    }
+
+    .quick-order-divider-mobile {
+        position:
+            relative;
+
+        display:
+            flex;
+
+        align-items:
+            center;
+
+        justify-content:
+            center;
+
+        height:
+            24px;
+    }
+
+    .quick-order-divider-mobile::before {
+        content:
+            "";
+
+        position:
+            absolute;
+
+        left:
+            0;
+
+        right:
+            0;
+
+        top:
+            50%;
+
+        height:
+            1px;
+
+        background:
+            #e5e7eb;
+    }
+
+    .quick-order-divider-mobile span {
+        position:
+            relative;
+
+        z-index:
+            1;
+
+        padding:
+            0 12px;
+
+        background:
+            #fff;
+
+        color:
+            #9ca3af;
+
+        font-size:
+            10px;
+
+        font-weight:
+            900;
+    }
+
+    .quick-order-bottom-grid {
+        grid-template-columns:
+            1fr;
+    }
+}
+
+
+@media (max-width: 767px) {
+
+    .quick-order-container {
+        width:
+            calc(100% - 24px);
+    }
+
+    .quick-order-hero {
+        padding:
+            36px 0 48px;
+    }
+
+    .quick-order-hero-title {
+        font-size:
+            28px;
+
+        align-items:
+            flex-start;
+    }
+
+    .quick-order-hero-icon {
+        margin-top:
+            2px;
+    }
+
+    .quick-order-feature-list {
+        gap:
+            8px;
+    }
+
+    .quick-order-feature-item {
+        font-size:
+            11px;
+    }
+
+    .quick-order-input-card {
+        padding:
+            20px;
+    }
+
+    .quick-order-dashboard {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+    }
+
+    .quick-order-process-button {
+        width:
+            100%;
+
+        padding:
+            0 20px;
+    }
+
+    .quick-order-result-header,
+    .quick-order-result-footer {
+        padding:
+            14px 16px;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .quick-order-container {
+        width:
+            calc(100% - 20px);
+    }
+
+    .quick-order-hero-title {
+        font-size:
+            25px;
+    }
+
+    .quick-order-hero-description {
+        font-size:
+            13px;
+    }
+
+    .quick-order-input-card {
+        padding:
+            16px;
+    }
+
+    .quick-order-dashboard {
+        grid-template-columns:
+            1fr;
+    }
+
+    .quick-order-stat-card {
+        padding:
+            16px;
+    }
+
+    .quick-order-stat-value {
+        font-size:
+            28px;
+    }
+
+    .quick-order-dropzone {
+        min-height:
+            200px;
+
+        padding:
+            24px 16px;
+    }
+
+    .quick-order-table th,
+    .quick-order-table td {
+        padding:
+            12px;
+    }
+
+    .quick-order-rfq-button {
+        width:
+            100%;
+    }
+
+    .quick-order-result-footer {
+        padding:
+            14px;
+    }
+}
+

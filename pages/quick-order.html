@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Đặt Hàng Nhanh (Quick Order) | MRO Khang Nam
+    </title>
+
+    <meta
+        name="description"
+        content="Tải lên file Excel hoặc nhập danh sách SKU để kiểm tra tồn kho và gửi yêu cầu báo giá nhanh đến MRO Khang Nam."
+    >
+
+    <meta
+        name="robots"
+        content="index,follow"
+    >
+
+    <meta
+        property="og:type"
+        content="website"
+    >
+
+    <meta
+        property="og:title"
+        content="Đặt Hàng Nhanh (Quick Order) | MRO Khang Nam"
+    >
+
+    <meta
+        property="og:description"
+        content="Tải lên file Excel hoặc nhập danh sách SKU để kiểm tra tồn kho và gửi yêu cầu báo giá nhanh đến MRO Khang Nam."
+    >
+
+    <meta
+        property="og:image"
+        content="../assets/banner-brands.webp"
+    >
+
+    <meta
+        property="og:url"
+        content="https://khangnamvina.com/pages/quick-order.html"
+    >
+
+    <meta
+        property="og:site_name"
+        content="MRO Khang Nam"
+    >
+
+    <link
+        rel="icon"
+        type="image/x-icon"
+        href="../assets/favicon.ico"
+    >
+
+
+    <!-- GOOGLE FONT -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- CSS CHUNG -->
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/header.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/footer.css"
+    >
+
+    <!-- CSS RIÊNG QUICK ORDER -->
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/quick-order.css"
+    >
+
+</head>
+
+
+<body class="quick-order-page">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div
+        id="app-header"
+        class="site-header-placeholder"
+    ></div>
+
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="quick-order-hero">
+
+        <div class="quick-order-hero-pattern"></div>
+
+        <div class="quick-order-hero-overlay"></div>
+
+        <div class="quick-order-container">
+
+
+            <nav
+                aria-label="Breadcrumb"
+                class="quick-order-breadcrumb"
+            >
+
+                <a
+                    href="../index.html"
+                    class="quick-order-breadcrumb-link"
+                >
+                    Trang chủ
+                </a>
+
+                <span
+                    class="quick-order-breadcrumb-separator"
+                    aria-hidden="true"
+                >
+                    /
+                </span>
+
+                <span class="quick-order-breadcrumb-current">
+                    Đặt hàng nhanh
+                </span>
+
+            </nav>
+
+
+            <div class="quick-order-hero-content">
+
+                <div class="quick-order-hero-main">
+
+                    <h1 class="quick-order-hero-title">
+
+                        <svg
+                            class="quick-order-hero-icon"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"
+                            ></path>
+                        </svg>
+
+                        Đặt hàng nhanh
+
+                    </h1>
+
+
+                    <p class="quick-order-hero-description">
+                        Công cụ tra cứu và đặt hàng hàng loạt dành riêng cho
+                        doanh nghiệp. Tiết kiệm thời gian xử lý RFQ chỉ trong
+                        vài giây.
+                    </p>
+
+
+                    <ul class="quick-order-feature-list">
+
+                        <li class="quick-order-feature-item">
+
+                            <svg
+                                class="quick-order-feature-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="3"
+                                    d="M5 13l4 4L19 7"
+                                ></path>
+                            </svg>
+
+                            Upload Excel/CSV
+
+                        </li>
+
+
+                        <li class="quick-order-feature-item">
+
+                            <svg
+                                class="quick-order-feature-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="3"
+                                    d="M5 13l4 4L19 7"
+                                ></path>
+                            </svg>
+
+                            Paste SKU đa dòng
+
+                        </li>
+
+
+                        <li class="quick-order-feature-item">
+
+                            <svg
+                                class="quick-order-feature-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="3"
+                                    d="M5 13l4 4L19 7"
+                                ></path>
+                            </svg>
+
+                            Check tồn kho Real-time
+
+                        </li>
+
+
+                        <li class="quick-order-feature-item">
+
+                            <svg
+                                class="quick-order-feature-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="3"
+                                    d="M5 13l4 4L19 7"
+                                ></path>
+                            </svg>
+
+                            Tạo RFQ 1-Click
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="quick-order-main">
+
+
+        <!-- =================================================
+             WORKFLOW
+        ================================================== -->
+
+        <div class="quick-order-container">
+
+            <div
+                class="quick-order-workflow"
+                id="quickOrderWorkflow"
+            >
+
+                <div class="quick-order-workflow-line"></div>
+
+
+                <div class="quick-order-workflow-step is-active">
+
+                    <div class="quick-order-workflow-number">
+                        1
+                    </div>
+
+                    <span>
+                        Tải File / Nhập Mã
+                    </span>
+
+                </div>
+
+
+                <div class="quick-order-workflow-step">
+
+                    <div class="quick-order-workflow-number">
+                        2
+                    </div>
+
+                    <span>
+                        Hệ Thống Xử Lý
+                    </span>
+
+                </div>
+
+
+                <div class="quick-order-workflow-step">
+
+                    <div class="quick-order-workflow-number">
+                        3
+                    </div>
+
+                    <span>
+                        Hiển Thị Tồn Kho
+                    </span>
+
+                </div>
+
+
+                <div class="quick-order-workflow-step">
+
+                    <div class="quick-order-workflow-number">
+                        4
+                    </div>
+
+                    <span>
+                        Tạo Báo Giá (RFQ)
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="quick-order-container">
+
+
+            <!-- =================================================
+                 INPUT CARD
+            ================================================== -->
+
+            <section class="quick-order-input-card">
+
+
+                <div class="quick-order-input-layout">
+
+
+                    <!-- FILE UPLOAD -->
+
+                    <div class="quick-order-input-option">
+
+                        <label class="quick-order-field-heading">
+
+                            <svg
+                                class="quick-order-field-heading-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2-2z"
+                                ></path>
+                            </svg>
+
+                            Upload File Excel
+
+                        </label>
+
+
+                        <p class="quick-order-field-description">
+                            File bao gồm: Mã SKU và Số lượng
+                            (1 sản phẩm 1 dòng)
+                        </p>
+
+
+                        <label class="quick-order-dropzone">
+
+                            <input
+                                type="file"
+                                id="quickOrderFile"
+                                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                            >
+
+
+                            <div class="quick-order-dropzone-icon">
+
+                                <svg
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                                    ></path>
+                                </svg>
+
+                            </div>
+
+
+                            <h4
+                                id="dropzoneText"
+                                class="quick-order-dropzone-title"
+                            >
+                                Kéo thả file vào đây
+                            </h4>
+
+
+                            <p class="quick-order-dropzone-description">
+                                hoặc click để chọn file từ máy tính
+                            </p>
+
+
+                            <span class="quick-order-file-button">
+                                Chọn File .XLSX / .CSV
+                            </span>
+
+                        </label>
+
+                    </div>
+
+
+                    <!-- DESKTOP DIVIDER -->
+
+                    <div class="quick-order-divider-desktop">
+
+                        <span>
+                            HOẶC
+                        </span>
+
+                    </div>
+
+
+                    <!-- MOBILE DIVIDER -->
+
+                    <div class="quick-order-divider-mobile">
+
+                        <span>
+                            HOẶC
+                        </span>
+
+                    </div>
+
+
+                    <!-- TEXT INPUT -->
+
+                    <div class="quick-order-input-option">
+
+                        <label class="quick-order-field-heading">
+
+                            <svg
+                                class="quick-order-field-heading-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                                ></path>
+                            </svg>
+
+                            Dán Mã SKU Trực Tiếp
+
+                        </label>
+
+
+                        <p class="quick-order-field-description">
+                            Ví dụ: SKF-6205ZZ (Mỗi dòng 1 mã)
+                        </p>
+
+
+                        <textarea
+                            id="quickOrderText"
+                            class="quick-order-textarea"
+                            placeholder="SKF6205&#10;3M6200&#10;Bosch GSB13RE"
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PROCESS BUTTON -->
+
+                <div class="quick-order-process">
+
+                    <button
+                        type="button"
+                        id="btnProcessQuickOrder"
+                        class="quick-order-process-button"
+                    >
+
+                        <svg
+                            class="quick-order-process-icon"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                            ></path>
+                        </svg>
+
+                        <span>
+                            Hệ Thống Bắt Đầu Xử Lý
+                        </span>
+
+                    </button>
+
+
+                    <p class="quick-order-process-note">
+                        Cam kết kiểm tra & đối chiếu kho trong chưa tới 3 giây.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 DASHBOARD
+            ================================================== -->
+
+            <section
+                id="quickOrderDashboard"
+                class="quick-order-dashboard"
+            >
+
+
+                <article class="quick-order-stat-card">
+
+                    <p class="quick-order-stat-label">
+                        Tổng SKU
+                    </p>
+
+                    <h3
+                        id="dashTotal"
+                        class="quick-order-stat-value quick-order-stat-neutral"
+                    >
+                        0
+                    </h3>
+
+                </article>
+
+
+                <article class="quick-order-stat-card">
+
+                    <p class="quick-order-stat-label quick-order-stat-label-green">
+                        Có Sẵn Hàng
+                    </p>
+
+                    <h3
+                        id="dashInStock"
+                        class="quick-order-stat-value quick-order-stat-green"
+                    >
+                        0
+                    </h3>
+
+                </article>
+
+
+                <article class="quick-order-stat-card">
+
+                    <p class="quick-order-stat-label quick-order-stat-label-orange">
+                        Cần Báo Giá
+                    </p>
+
+                    <h3
+                        id="dashQuotation"
+                        class="quick-order-stat-value quick-order-stat-orange"
+                    >
+                        0
+                    </h3>
+
+                </article>
+
+
+                <article class="quick-order-stat-card">
+
+                    <p class="quick-order-stat-label quick-order-stat-label-blue">
+                        Đã Tạo RFQ
+                    </p>
+
+                    <h3
+                        id="dashRfqCount"
+                        class="quick-order-stat-value quick-order-stat-blue"
+                    >
+                        0
+                    </h3>
+
+                </article>
+
+            </section>
+
+
+            <!-- =================================================
+                 RESULT LOG
+            ================================================== -->
+
+            <section
+                id="quickOrderLog"
+                class="quick-order-log"
+            >
+
+                <div
+                    id="emptyLogState"
+                    class="quick-order-empty-state"
+                >
+
+                    <div class="quick-order-empty-icon">
+                        📦
+                    </div>
+
+
+                    <h3 class="quick-order-empty-title">
+                        Danh Sách Vật Tư Sẽ Hiển Thị Tại Đây
+                    </h3>
+
+
+                    <p class="quick-order-empty-description">
+                        Vui lòng tải file Excel hoặc dán mã SKU ở phía trên
+                        để hệ thống kiểm tra tình trạng tồn kho.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 TIPS / CTA
+            ================================================== -->
+
+            <section class="quick-order-bottom-grid">
+
+
+                <!-- TIPS -->
+
+                <article class="quick-order-tips-card">
+
+                    <h4 class="quick-order-card-heading">
+
+                        <span>
+                            💡
+                        </span>
+
+                        Mẹo sử dụng hệ thống
+
+                    </h4>
+
+
+                    <ul class="quick-order-tips-list">
+
+                        <li>
+
+                            <svg
+                                class="quick-order-check-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="3"
+                                    d="M5 13l4 4L19 7"
+                                ></path>
+                            </svg>
+
+                            <span>
+                                Xử lý mượt mà tối đa
+                                <strong>1000 SKU</strong>
+                                trong một lần quét.
+                            </span>
+
+                        </li>
+
+
+                        <li>
+
+                            <svg
+                                class="quick-order-check-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="3"
+                                    d="M5 13l4 4L19 7"
+                                ></path>
+                            </svg>
+
+                            <span>
+                                Chấp nhận cả
+                                <strong>Mã SKU</strong>
+                                và
+                                <strong>Tên sản phẩm</strong>.
+                                Thuật toán AI sẽ tự nhận diện mã gần đúng.
+                            </span>
+
+                        </li>
+
+
+                        <li>
+
+                            <svg
+                                class="quick-order-check-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="3"
+                                    d="M5 13l4 4L19 7"
+                                ></path>
+                            </svg>
+
+                            <span>
+                                Bỏ trống số lượng?
+                                Hệ thống tự mặc định bằng
+                                <strong>1</strong>.
+                            </span>
+
+                        </li>
+
+                    </ul>
+
+                </article>
+
+
+                <!-- CTA -->
+
+                <article class="quick-order-support-card">
+
+                    <div class="quick-order-support-glow"></div>
+
+
+                    <h4 class="quick-order-support-title">
+                        Không tìm thấy vật tư cần thiết?
+                    </h4>
+
+
+                    <p class="quick-order-support-description">
+                        Đừng lo lắng! Hãy gửi danh mục trực tiếp cho chúng tôi.
+                        Đội ngũ kỹ sư MRO Khang Nam sẽ phản hồi báo giá đặc biệt
+                        trong vòng 30 phút.
+                    </p>
+
+
+                    <a
+                        href="contact.html"
+                        class="quick-order-support-button"
+                    >
+
+                        Gửi RFQ Cho Kỹ Sư
+
+                        <svg
+                            class="quick-order-support-icon"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M14 5l7 7m0 0l-7 7m7-7H3"
+                            ></path>
+                        </svg>
+
+                    </a>
+
+                </article>
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <div id="app-footer"></div>
+
+
+    <!-- =====================================================
+         SCRIPTS
+    ====================================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/common/utils.js"></script>
+    <script src="../assets/js/common/auth.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+    <script src="../assets/components/header.js"></script>
+    <script src="../assets/components/footer.js"></script>
+
+    <script src="../assets/js/users/auth-ui.js"></script>
+    <script src="../assets/js/users/quick-order.js"></script>
+
+</body>
+</html>

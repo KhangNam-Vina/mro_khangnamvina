@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cấu hình Website - KN Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00' } } } }
+    </script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-gray-900 text-white flex flex-col hidden md:flex shrink-0">
+        <div class="h-16 flex items-center px-6 bg-gray-950 border-b border-gray-800">
+            <span class="text-xl font-black tracking-wider text-white">Khangnam <span class="text-kn-orange">ADMIN</span></span>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4">
+            <nav class="space-y-1 px-3" id="adminSidebarNav">
+                <a href="dashboard.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Tổng quan & Đơn hàng</a>
+                <a href="manage-categories.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Danh mục</a>
+                <a href="manage-subcategories.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Nhóm hàng</a>
+                <a href="manage-families.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Dòng sản phẩm</a>
+                <a href="manage-products.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Sản phẩm</a>
+                <a href="manage-industries.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Ngành hàng</a>
+                <a href="manage-blog.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Bài viết</a>
+                <a href="manage-about.html"class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Giới thiệu</a>
+                <a href="manage-contacts.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Liên hệ</a>
+                <a href="manage-users.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Người dùng</a>
+                <a href="manage-settings.html" class="nav-link flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md transition font-bold">Cấu hình Cấu hình</a>
+            </nav> 
+        </div>
+        <div class="p-4 border-t border-gray-800">
+            <button onclick="handleAdminLogout()" class="flex items-center text-sm text-gray-400 hover:text-white transition-colors w-full">Đăng xuất</button>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col h-screen overflow-hidden">
+        <header class="bg-white shadow-sm px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200">
+            <div>
+                <h2 class="text-xl font-bold text-gray-900">Cấu hình Website</h2>
+                <p class="text-xs text-gray-500 mt-1">Cập nhật thông tin công ty, liên hệ và SEO cho toàn hệ thống</p>
+            </div>
+            <div class="mt-3 md:mt-0">
+                <button onclick="saveSettings()" id="btnSaveSettings" class="bg-gray-900 hover:bg-black text-white px-6 py-2 rounded-lg text-sm font-bold shadow transition flex items-center">
+                    Lưu cấu hình
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
+            <form id="settingsForm" class="max-w-5xl mx-auto space-y-6 pb-10">
+                
+                <!-- KHỐI 1: THÔNG TIN CHUNG -->
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <h3 class="font-bold text-gray-900 border-b border-gray-100 pb-3 mb-5 uppercase text-sm tracking-wider">Thông tin chung</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1 uppercase">Tên Công Ty / Thương Hiệu</label>
+                            <input type="text" id="inCompanyName" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1 uppercase">Link Logo (URL)</label>
+                            <input type="text" id="inLogoUrl" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue" placeholder="https://...">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KHỐI 2: LIÊN HỆ & BẢN ĐỒ -->
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <h3 class="font-bold text-gray-900 border-b border-gray-100 pb-3 mb-5 uppercase text-sm tracking-wider">Thông tin liên lạc</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1 uppercase">Hotline</label>
+                            <input type="text" id="inHotline" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue" placeholder="VD: 0909.xxx.xxx">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1 uppercase">Email hỗ trợ</label>
+                            <input type="email" id="inEmail" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1 uppercase">Zalo / Viber</label>
+                            <input type="text" id="inZalo" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1 uppercase">Thời gian làm việc</label>
+                            <input type="text" id="inWorkingHours" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue" placeholder="VD: Thứ 2 - Thứ 7 | 8:00 - 17:00">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-gray-700 mb-1 uppercase">Địa chỉ văn phòng / Kho bãi</label>
+                            <textarea id="inAddress" rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue resize-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KHỐI 3: SOCIAL & SEO -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- SOCIAL -->
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                        <h3 class="font-bold text-gray-900 border-b border-gray-100 pb-3 mb-5 uppercase text-sm tracking-wider">Mạng Xã Hội</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1 uppercase">Facebook Page (URL)</label>
+                                <input type="url" id="inFacebook" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue" placeholder="https://facebook.com/...">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1 uppercase">YouTube Channel (URL)</label>
+                                <input type="url" id="inYoutube" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue" placeholder="https://youtube.com/...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SEO -->
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                        <h3 class="font-bold text-gray-900 border-b border-gray-100 pb-3 mb-5 uppercase text-sm tracking-wider">SEO Mặc định trang chủ</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1 uppercase">Meta Title</label>
+                                <input type="text" id="inMetaTitle" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1 uppercase">Meta Description</label>
+                                <textarea id="inMetaDesc" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue resize-none" placeholder="Mô tả tóm tắt doanh nghiệp để Google hiển thị..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </main>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/common/utils.js"></script>
+    <script src="../assets/js/admin/admin-core.js"></script> 
+    <script src="../assets/js/admin/admin-settings.js"></script>
+</body>
+</html>

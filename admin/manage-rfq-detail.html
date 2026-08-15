@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết Yêu cầu Báo giá - KN Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00' } } } }
+    </script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-gray-900 text-white flex flex-col hidden md:flex shrink-0">
+        <div class="h-16 flex items-center px-6 bg-gray-950 border-b border-gray-800">
+            <span class="text-xl font-black tracking-wider text-white">Khangnam <span class="text-kn-orange">ADMIN</span></span>
+        </div>
+        <div class="flex-1 overflow-y-auto py-4">
+            <nav class="space-y-1 px-3" id="adminSidebarNav">
+                <a href="dashboard.html" class="nav-link flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md transition font-bold">Tổng quan & Đơn hàng</a>
+                <a href="manage-categories.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Danh mục</a>
+                <a href="manage-subcategories.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Nhóm hàng</a>
+                <a href="manage-families.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Dòng sản phẩm</a>
+                <a href="manage-products.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Sản phẩm</a>
+                <a href="manage-industries.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Ngành hàng</a>
+                <a href="manage-blog.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Bài viết</a>
+                <a href="manage-about.html"class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Giới thiệu</a>
+                <a href="manage-contacts.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Liên hệ</a>
+                <a href="manage-users.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Người dùng</a>
+                <a href="manage-settings.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Cấu hình</a>
+            </nav> 
+        </div>
+        <div class="p-4 border-t border-gray-800">
+            <button onclick="handleAdminLogout()" class="flex items-center text-sm text-gray-400 hover:text-white transition-colors w-full">Đăng xuất</button>
+        </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col h-screen overflow-hidden">
+
+        <header class="bg-white shadow-sm px-6 py-4 flex justify-between items-center border-b border-gray-200">
+            <h2 class="text-xl font-bold text-gray-900">Chi tiết Yêu cầu Báo giá</h2>
+            
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-2 bg-gray-50 border border-gray-300 rounded-lg px-3 py-1.5 focus-within:border-kn-blue transition">
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" id="searchInput" placeholder="Tìm theo mã đơn..." class="bg-transparent border-none outline-none text-sm text-gray-700 w-40" onkeypress="handleSearchEnter(event)">
+                    <button id="btnSearchRfq" onclick="searchRFQ()" class="text-kn-blue font-bold text-xs hover:text-blue-800 border-l border-gray-300 pl-2">Tìm</button>
+                </div>
+
+                <a href="dashboard.html" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3.5 py-2 rounded-lg font-bold transition flex items-center">
+                    &larr; Về Dashboard
+                </a>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
+            <div class="max-w-4xl mx-auto space-y-6">  
+                
+                <div id="emptyState" class="hidden flex flex-col items-center justify-center bg-white rounded-xl border border-gray-200 py-20 px-4 text-center shadow-sm">
+                    <svg class="w-20 h-20 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <h3 class="text-lg font-bold text-gray-800 mb-1">Không tìm thấy đơn hàng</h3>
+                    <p class="text-gray-500 text-xs mb-6">Mã RFQ không tồn tại hoặc đã bị xóa khỏi hệ thống.</p>
+                    <a href="dashboard.html" class="bg-gray-900 text-white px-5 py-2 rounded-lg font-bold text-xs shadow hover:bg-black transition">
+                        Về danh sách đơn
+                    </a>
+                </div>
+
+                <div id="rfqDetailContent" class="space-y-6">
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                        <div class="flex justify-between items-start border-b pb-4 mb-4 border-gray-100">
+                            <div>
+                                <h2 class="text-2xl font-black text-kn-blue" id="lblRfqCode">---</h2>
+                                <p class="text-xs text-gray-500 mt-1">Ngày gửi: <span id="lblDate" class="font-bold text-gray-700">---</span></p>
+                            </div>
+                            <span id="lblStatus" class="px-3 py-1 rounded-full text-xs font-bold border">---</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <p class="text-xs text-gray-400 font-bold uppercase mb-0.5">Công ty / Nhà máy:</p>
+                                <p class="font-bold text-gray-800 text-base" id="lblCompany">---</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 font-bold uppercase mb-0.5">Người đại diện (Purchasing):</p>
+                                <p class="font-bold text-gray-800 text-base" id="lblName">---</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 font-bold uppercase mb-0.5">Số điện thoại / Zalo:</p>
+                                <p class="font-bold text-gray-800" id="lblPhone">---</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 font-bold uppercase mb-0.5">Email liên hệ:</p>
+                                <p class="font-bold text-gray-800" id="lblEmail">---</p>
+                            </div>
+                            <div class="col-span-1 md:col-span-2 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <p class="text-gray-400 text-xs font-bold uppercase mb-1">Ghi chú từ khách hàng:</p>
+                                <p class="text-gray-700 italic text-sm" id="lblNotes">---</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-3.5 border-b border-gray-100 bg-gray-50">
+                            <h3 class="font-bold text-gray-900 uppercase text-xs tracking-wider">Danh mục vật tư yêu cầu báo giá</h3>
+                        </div>
+                        <table class="w-full text-left text-sm text-gray-600">
+                            <thead class="bg-gray-50 text-gray-700 font-bold border-b border-gray-200 text-xs uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-6 py-3 text-center w-12">#</th>
+                                    <th class="px-6 py-3 w-36">Mã SKU</th>
+                                    <th class="px-6 py-3">Tên sản phẩm</th>
+                                    <th class="px-6 py-3 text-center w-24">Số lượng</th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemList" class="divide-y divide-gray-100 bg-white">
+                                <tr><td colspan="4" class="text-center py-6 text-gray-400">Đang tải vật tư...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="actionButtons" class="flex flex-wrap gap-3 justify-end pt-2">
+                        <button id="btnRejectRfq" onclick="updateRfqStatus('Từ chối')" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-5 rounded-lg text-sm shadow transition">Từ chối Đơn</button>
+                        <button id="btnApproveRfq" onclick="updateRfqStatus('Đã báo giá')" class="bg-kn-blue hover:bg-blue-800 text-white font-bold py-2 px-5 rounded-lg text-sm shadow transition">Xác nhận Đã báo giá</button>
+                        <button id="btnExportPdf" onclick="exportPDF()" class="bg-gray-900 hover:bg-black text-white font-bold py-2 px-5 rounded-lg text-sm shadow transition flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                            Xuất file PDF
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/common/utils.js"></script>
+    <script src="../assets/js/admin/admin-core.js"></script> 
+    <script src="../assets/js/services/rfqService.js"></script>
+    <script src="../assets/js/admin/admin-rfq-detail.js"></script>
+</body>
+</html>

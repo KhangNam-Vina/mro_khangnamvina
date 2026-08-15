@@ -1,0 +1,3471 @@
+/* =========================================================
+   MY RFQ DETAIL
+   MRO KHANG NAM
+   CSS TĨNH - KHÔNG DÙNG TAILWIND
+========================================================= */
+
+
+/* =========================================================
+   1. BASE
+========================================================= */
+
+.my-rfq-detail-page {
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+
+    margin: 0;
+
+    background: #f5f6f8;
+
+    color: #1f2937;
+
+    font-family:
+        "Inter",
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+.my-rfq-detail-page *,
+.my-rfq-detail-page *::before,
+.my-rfq-detail-page *::after {
+    box-sizing: border-box;
+}
+
+.my-rfq-detail-page button,
+.my-rfq-detail-page input,
+.my-rfq-detail-page textarea,
+.my-rfq-detail-page select {
+    font-family: inherit;
+}
+
+.is-hidden {
+    display: none !important;
+}
+
+
+/* =========================================================
+   2. CONTAINER
+========================================================= */
+
+.rfq-detail-container {
+    width: min(
+        1152px,
+        calc(100% - 32px)
+    );
+
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   3. HERO
+========================================================= */
+
+.rfq-detail-hero {
+    position: relative;
+
+    overflow: hidden;
+
+    padding:
+        48px 0;
+
+    color:
+        #fff;
+
+    background:
+        linear-gradient(
+            110deg,
+            #003370 0%,
+            #00479b 100%
+        );
+}
+
+.rfq-detail-hero-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            110deg,
+            rgba(0, 51, 112, .92),
+            rgba(0, 71, 155, .82)
+        );
+
+    pointer-events:
+        none;
+}
+
+.rfq-detail-hero .rfq-detail-container {
+    position: relative;
+
+    z-index: 2;
+}
+
+
+/* =========================================================
+   4. BREADCRUMB
+========================================================= */
+
+.rfq-detail-breadcrumb {
+    display:
+        flex;
+
+    flex-wrap:
+        wrap;
+
+    align-items:
+        center;
+
+    gap:
+        8px;
+
+    margin:
+        0 0 20px;
+
+    color:
+        #d1d5db;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.5;
+
+    font-weight:
+        500;
+}
+
+.rfq-detail-breadcrumb-link {
+    color:
+        #d1d5db;
+
+    text-decoration:
+        none;
+
+    transition:
+        color .2s ease;
+}
+
+.rfq-detail-breadcrumb-link:hover {
+    color:
+        #ff5e00;
+}
+
+.rfq-detail-breadcrumb-separator {
+    color:
+        #6b7280;
+}
+
+.rfq-detail-breadcrumb-current {
+    color:
+        #fff;
+
+    font-weight:
+        800;
+
+    text-transform:
+        uppercase;
+}
+
+
+/* =========================================================
+   5. HERO TITLE
+========================================================= */
+
+.rfq-detail-hero-title {
+    margin:
+        0 0 12px;
+
+    color:
+        #fff;
+
+    font-size:
+        clamp(
+            30px,
+            4vw,
+            42px
+        );
+
+    line-height:
+        1.2;
+
+    font-weight:
+        900;
+}
+
+.rfq-detail-hero-description {
+    max-width:
+        760px;
+
+    margin:
+        0;
+
+    color:
+        #e5e7eb;
+
+    font-size:
+        14px;
+
+    line-height:
+        1.7;
+}
+
+
+/* =========================================================
+   6. MAIN
+========================================================= */
+
+.rfq-detail-main {
+    flex:
+        1;
+
+    width:
+        100%;
+
+    padding:
+        40px 0 64px;
+
+    background:
+        #f9fafb;
+}
+
+
+/* =========================================================
+   7. BACK BAR
+========================================================= */
+
+.rfq-detail-backbar {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        16px;
+
+    margin:
+        0 0 24px;
+
+    padding:
+        0 0 16px;
+
+    border-bottom:
+        1px solid #e5e7eb;
+}
+
+.rfq-detail-back-button {
+    min-height:
+        40px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    padding:
+        0 16px;
+
+    background:
+        #fff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius:
+        6px;
+
+    color:
+        #6b7280;
+
+    font-size:
+        13px;
+
+    font-weight:
+        700;
+
+    text-decoration:
+        none;
+
+    box-shadow:
+        0 2px 5px rgba(
+            15,
+            23,
+            42,
+            .04
+        );
+
+    transition:
+        color .2s ease,
+        background-color .2s ease,
+        border-color .2s ease;
+}
+
+.rfq-detail-back-button:hover {
+    color:
+        #ff5e00;
+
+    border-color:
+        #fed7aa;
+
+    background:
+        #fffaf5;
+}
+
+.rfq-detail-back-icon {
+    width:
+        16px;
+
+    height:
+        16px;
+
+    margin-right:
+        8px;
+}
+
+
+/* =========================================================
+   8. STATUS BADGE
+========================================================= */
+
+.rfq-detail-badge {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    min-height:
+        32px;
+
+    padding:
+        0 14px;
+
+    border-radius:
+        6px;
+
+    font-size:
+        11px;
+
+    line-height:
+        1.2;
+
+    font-weight:
+        900;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        .06em;
+}
+
+.status-loading {
+    background:
+        #e5e7eb;
+
+    color:
+        #9ca3af;
+
+    animation:
+        rfq-detail-pulse 1.4s ease-in-out infinite;
+}
+
+.status-new {
+    background:
+        #dbeafe;
+
+    color:
+        #1d4ed8;
+}
+
+.status-pending {
+    background:
+        #fef3c7;
+
+    color:
+        #b45309;
+}
+
+.status-quoted {
+    background:
+        #dcfce7;
+
+    color:
+        #15803d;
+}
+
+.status-canceled {
+    background:
+        #fee2e2;
+
+    color:
+        #b91c1c;
+}
+
+.status-default {
+    background:
+        #e5e7eb;
+
+    color:
+        #4b5563;
+}
+
+@keyframes rfq-detail-pulse {
+    0%,
+    100% {
+        opacity:
+            1;
+    }
+
+    50% {
+        opacity:
+            .5;
+    }
+}
+
+
+/* =========================================================
+   9. ORDER HEADER
+========================================================= */
+
+.rfq-detail-order-header {
+    display:
+        flex;
+
+    align-items:
+        flex-end;
+
+    justify-content:
+        space-between;
+
+    gap:
+        24px;
+
+    margin:
+        0 0 24px;
+
+    padding:
+        24px;
+
+    background:
+        #fff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius:
+        12px;
+
+    box-shadow:
+        0 2px 8px rgba(
+            15,
+            23,
+            42,
+            .04
+        );
+}
+
+.rfq-detail-order-title {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        6px;
+
+    margin:
+        0 0 8px;
+
+    color:
+        #00479b;
+
+    font-size:
+        clamp(
+            22px,
+            3vw,
+            30px
+        );
+
+    line-height:
+        1.25;
+
+    font-weight:
+        900;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        -.01em;
+}
+
+.rfq-detail-order-icon {
+    width:
+        28px;
+
+    height:
+        28px;
+
+    margin-right:
+        2px;
+
+    color:
+        #ff5e00;
+}
+
+.rfq-detail-order-code {
+    color:
+        #1f2937;
+
+    word-break:
+        break-word;
+}
+
+.rfq-detail-order-date {
+    margin:
+        0;
+
+    color:
+        #6b7280;
+
+    font-size:
+        13px;
+
+    font-weight:
+        500;
+}
+
+.rfq-detail-order-date span {
+    margin-left:
+        4px;
+
+    color:
+        #1f2937;
+
+    font-weight:
+        800;
+}
+
+.rfq-detail-order-tools {
+    display:
+        flex;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        8px;
+
+    width:
+        auto;
+}
+
+.rfq-detail-tool-button {
+    min-height:
+        40px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        0 16px;
+
+    border-radius:
+        6px;
+
+    font-size:
+        12px;
+
+    line-height:
+        1.2;
+
+    font-weight:
+        800;
+
+    cursor:
+        pointer;
+
+    transition:
+        background-color .2s ease,
+        border-color .2s ease,
+        color .2s ease;
+}
+
+.rfq-detail-tool-icon {
+    width:
+        16px;
+
+    height:
+        16px;
+
+    margin-right:
+        8px;
+}
+
+.rfq-detail-tool-print {
+    background:
+        #f3f4f6;
+
+    border:
+        1px solid #e5e7eb;
+
+    color:
+        #374151;
+}
+
+.rfq-detail-tool-print:hover {
+    background:
+        #e5e7eb;
+}
+
+.rfq-detail-tool-excel {
+    background:
+        #f0fdf4;
+
+    border:
+        1px solid #bbf7d0;
+
+    color:
+        #15803d;
+}
+
+.rfq-detail-tool-excel:hover {
+    background:
+        #dcfce7;
+}
+
+
+/* =========================================================
+   10. TOP GRID
+========================================================= */
+
+.rfq-detail-top-grid {
+    display:
+        grid;
+
+    grid-template-columns:
+        minmax(
+            0,
+            2fr
+        )
+        minmax(
+            300px,
+            1fr
+        );
+
+    gap:
+        24px;
+
+    margin:
+        0 0 24px;
+
+    align-items:
+        stretch;
+}
+
+
+/* =========================================================
+   11. COMPANY CARD
+========================================================= */
+
+.rfq-detail-company-card,
+.rfq-detail-timeline-card,
+.rfq-detail-sales-card {
+    background:
+        #fff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius:
+        12px;
+
+    box-shadow:
+        0 2px 8px rgba(
+            15,
+            23,
+            42,
+            .04
+        );
+}
+
+.rfq-detail-company-card {
+    padding:
+        24px;
+}
+
+.rfq-detail-card-title {
+    margin:
+        0 0 20px;
+
+    padding:
+        0 0 12px;
+
+    border-bottom:
+        1px solid #f3f4f6;
+
+    color:
+        #00479b;
+
+    font-size:
+        18px;
+
+    line-height:
+        1.4;
+
+    font-weight:
+        900;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        .03em;
+}
+
+.rfq-detail-company-grid {
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap:
+        24px;
+}
+
+.rfq-detail-info-full {
+    grid-column:
+        1 / -1;
+}
+
+.rfq-detail-info-label {
+    margin:
+        0 0 5px;
+
+    color:
+        #9ca3af;
+
+    font-size:
+        10px;
+
+    line-height:
+        1.5;
+
+    font-weight:
+        800;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        .09em;
+}
+
+.rfq-detail-info-value {
+    margin:
+        0;
+
+    color:
+        #1f2937;
+
+    font-size:
+        15px;
+
+    line-height:
+        1.5;
+
+    font-weight:
+        800;
+
+    word-break:
+        break-word;
+}
+
+.rfq-detail-note {
+    min-height:
+        60px;
+
+    margin:
+        0;
+
+    padding:
+        12px;
+
+    background:
+        #f9fafb;
+
+    border:
+        1px solid #f3f4f6;
+
+    border-radius:
+        6px;
+
+    color:
+        #4b5563;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.7;
+
+    font-style:
+        italic;
+
+    white-space:
+        pre-wrap;
+
+    word-break:
+        break-word;
+}
+
+
+/* =========================================================
+   12. SIDE COLUMN
+========================================================= */
+
+.rfq-detail-side-column {
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        20px;
+
+    min-width:
+        0;
+}
+
+.rfq-detail-timeline-card {
+    flex:
+        1;
+
+    padding:
+        24px;
+}
+
+.rfq-detail-small-title {
+    margin:
+        0 0 18px;
+
+    padding:
+        0 0 12px;
+
+    border-bottom:
+        1px solid #f3f4f6;
+
+    color:
+        #1f2937;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.4;
+
+    font-weight:
+        900;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        .05em;
+}
+
+
+/* =========================================================
+   13. TIMELINE
+========================================================= */
+
+.rfq-detail-timeline {
+    position:
+        relative;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        18px;
+
+    padding:
+        4px 0;
+}
+
+.rfq-detail-timeline::before {
+    content:
+        "";
+
+    position:
+        absolute;
+
+    left:
+        10px;
+
+    top:
+        10px;
+
+    bottom:
+        10px;
+
+    width:
+        2px;
+
+    background:
+        linear-gradient(
+            to bottom,
+            transparent,
+            #e5e7eb 15%,
+            #e5e7eb 85%,
+            transparent
+        );
+}
+
+.timeline-step {
+    position:
+        relative;
+
+    display:
+        flex;
+
+    align-items:
+        flex-start;
+
+    gap:
+        12px;
+
+    min-height:
+        48px;
+}
+
+.timeline-dot {
+    position:
+        relative;
+
+    z-index:
+        1;
+
+    width:
+        20px;
+
+    height:
+        20px;
+
+    flex:
+        0 0 20px;
+
+    margin-top:
+        2px;
+
+    border:
+        4px solid #fff;
+
+    border-radius:
+        50%;
+
+    background:
+        #d1d5db;
+
+    box-shadow:
+        0 0 0 1px #e5e7eb;
+}
+
+.timeline-content {
+    min-width:
+        0;
+}
+
+.timeline-title {
+    margin:
+        0 0 3px;
+
+    color:
+        #374151;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.4;
+
+    font-weight:
+        800;
+}
+
+.timeline-desc {
+    margin:
+        0;
+
+    color:
+        #9ca3af;
+
+    font-size:
+        11px;
+
+    line-height:
+        1.5;
+}
+
+.timeline-step.step-completed
+.timeline-dot {
+    background:
+        #22c55e;
+
+    box-shadow:
+        0 0 0 1px #86efac;
+}
+
+.timeline-step.step-active
+.timeline-dot {
+    background:
+        #ff5e00;
+
+    box-shadow:
+        0 0 0 1px #fdba74;
+}
+
+.timeline-step.step-quoted
+.timeline-dot {
+    background:
+        #00479b;
+
+    box-shadow:
+        0 0 0 1px #93c5fd;
+}
+
+.timeline-step.step-canceled
+.timeline-dot {
+    background:
+        #ef4444;
+
+    box-shadow:
+        0 0 0 1px #fca5a5;
+}
+
+.timeline-step.step-active
+.timeline-title {
+    color:
+        #c2410c;
+}
+
+.timeline-step.step-quoted
+.timeline-title {
+    color:
+        #1d4ed8;
+}
+
+.timeline-step.step-canceled
+.timeline-title {
+    color:
+        #b91c1c;
+}
+
+
+/* =========================================================
+   14. SALES CARD
+========================================================= */
+
+.rfq-detail-sales-card {
+    padding:
+        20px;
+
+    background:
+        #eff6ff;
+
+    border-color:
+        #dbeafe;
+}
+
+.rfq-detail-sales-title {
+    margin:
+        0 0 16px;
+
+    padding:
+        0 0 10px;
+
+    border-bottom:
+        1px solid #bfdbfe;
+
+    color:
+        #00479b;
+
+    font-size:
+        11px;
+
+    line-height:
+        1.4;
+
+    font-weight:
+        900;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        .08em;
+}
+
+.rfq-detail-sales-profile {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        12px;
+}
+
+.rfq-detail-sales-avatar {
+    width:
+        48px;
+
+    height:
+        48px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    flex-shrink:
+        0;
+
+    border-radius:
+        50%;
+
+    background:
+        #00479b;
+
+    color:
+        #fff;
+
+    font-size:
+        16px;
+
+    font-weight:
+        900;
+}
+
+.rfq-detail-sales-name {
+    margin:
+        0;
+
+    color:
+        #111827;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.4;
+
+    font-weight:
+        800;
+}
+
+.rfq-detail-sales-phone {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    margin:
+        5px 0 0;
+
+    color:
+        #4b5563;
+
+    font-size:
+        11px;
+
+    line-height:
+        1.4;
+}
+
+.rfq-detail-sales-icon {
+    width:
+        12px;
+
+    height:
+        12px;
+
+    margin-right:
+        5px;
+
+    color:
+        #ff5e00;
+}
+
+
+/* =========================================================
+   15. PRODUCTS CARD
+========================================================= */
+
+.rfq-detail-products-card {
+    overflow:
+        hidden;
+
+    background:
+        #fff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius:
+        12px;
+
+    box-shadow:
+        0 2px 8px rgba(
+            15,
+            23,
+            42,
+            .04
+        );
+}
+
+.rfq-detail-products-header {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        20px;
+
+    padding:
+        20px;
+
+    background:
+        #f9fafb;
+
+    border-bottom:
+        1px solid #e5e7eb;
+}
+
+.rfq-detail-products-header
+.rfq-detail-card-title {
+    margin:
+        0;
+
+    padding:
+        0;
+
+    border:
+        0;
+}
+
+.rfq-detail-summary {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        0;
+
+    margin-top:
+        8px;
+
+    color:
+        #6b7280;
+
+    font-size:
+        11px;
+
+    font-weight:
+        700;
+}
+
+.rfq-detail-summary-divider {
+    margin-left:
+        14px;
+
+    padding-left:
+        14px;
+
+    border-left:
+        1px solid #d1d5db;
+}
+
+.rfq-detail-search {
+    position:
+        relative;
+
+    width:
+        256px;
+
+    flex:
+        0 0 256px;
+}
+
+.rfq-detail-search-input {
+    width:
+        100%;
+
+    height:
+        38px;
+
+    padding:
+        0 12px 0 36px;
+
+    background:
+        #fff;
+
+    border:
+        1px solid #d1d5db;
+
+    border-radius:
+        6px;
+
+    color:
+        #374151;
+
+    font-size:
+        13px;
+
+    outline:
+        none;
+
+    box-shadow:
+        0 2px 5px rgba(
+            15,
+            23,
+            42,
+            .04
+        );
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease;
+}
+
+.rfq-detail-search-input:focus {
+    border-color:
+        #ff5e00;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(
+            255,
+            94,
+            0,
+            .08
+        );
+}
+
+.rfq-detail-search-icon {
+    position:
+        absolute;
+
+    left:
+        11px;
+
+    top:
+        50%;
+
+    width:
+        16px;
+
+    height:
+        16px;
+
+    color:
+        #9ca3af;
+
+    transform:
+        translateY(-50%);
+
+    pointer-events:
+        none;
+}
+
+
+/* =========================================================
+   16. TABLE
+========================================================= */
+
+.rfq-detail-table-wrapper {
+    width:
+        100%;
+
+    overflow-x:
+        auto;
+}
+
+.rfq-detail-table {
+    width:
+        100%;
+
+    min-width:
+        760px;
+
+    border-collapse:
+        collapse;
+
+    text-align:
+        left;
+}
+
+.rfq-detail-table thead tr {
+    background:
+        #f3f4f6;
+
+    border-bottom:
+        1px solid #e5e7eb;
+}
+
+.rfq-detail-table th {
+    padding:
+        14px 20px;
+
+    color:
+        #6b7280;
+
+    font-size:
+        10px;
+
+    line-height:
+        1.4;
+
+    font-weight:
+        800;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        .08em;
+
+    white-space:
+        nowrap;
+}
+
+.rfq-detail-table td {
+    padding:
+        14px 20px;
+
+    border-bottom:
+        1px solid #f3f4f6;
+
+    color:
+        #374151;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.5;
+
+    vertical-align:
+        middle;
+}
+
+.rfq-item-row {
+    transition:
+        background-color .2s ease;
+}
+
+.rfq-item-row:hover {
+    background:
+        #eff6ff;
+}
+
+.rfq-item-stt {
+    width:
+        60px;
+
+    color:
+        #9ca3af;
+
+    font-weight:
+        600;
+
+    text-align:
+        center;
+}
+
+.rfq-item-sku {
+    color:
+        #00479b;
+
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        monospace;
+
+    font-weight:
+        800;
+
+    white-space:
+        nowrap;
+}
+
+.rfq-item-name {
+    min-width:
+        240px;
+
+    max-width:
+        420px;
+
+    color:
+        #1f2937;
+
+    font-weight:
+        700;
+
+    white-space:
+        normal;
+
+    word-break:
+        break-word;
+}
+
+.rfq-item-brand,
+.rfq-item-unit,
+.rfq-item-qty {
+    text-align:
+        center;
+}
+
+.rfq-item-brand {
+    color:
+        #6b7280;
+
+    font-size:
+        11px;
+
+    font-weight:
+        700;
+
+    text-transform:
+        uppercase;
+}
+
+.rfq-item-unit {
+    color:
+        #6b7280;
+
+    font-size:
+        12px;
+}
+
+.rfq-item-qty {
+    color:
+        #ff5e00;
+
+    font-size:
+        14px;
+
+    font-weight:
+        900;
+}
+
+.rfq-table-empty {
+    padding:
+        40px 20px !important;
+
+    color:
+        #9ca3af !important;
+
+    text-align:
+        center;
+
+    font-style:
+        italic;
+}
+
+
+/* =========================================================
+   17. STATE SCREEN
+========================================================= */
+
+.rfq-detail-state-screen {
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    min-height:
+        360px;
+
+    padding:
+        40px 24px;
+
+    background:
+        #fff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius:
+        12px;
+
+    box-shadow:
+        0 2px 8px rgba(
+            15,
+            23,
+            42,
+            .04
+        );
+
+    text-align:
+        center;
+}
+
+.rfq-detail-spinner {
+    width:
+        40px;
+
+    height:
+        40px;
+
+    margin-bottom:
+        16px;
+
+    color:
+        #ff5e00;
+
+    animation:
+        rfq-detail-spin 1s linear infinite;
+}
+
+.rfq-spinner-track {
+    opacity:
+        .25;
+}
+
+.rfq-spinner-head {
+    opacity:
+        .95;
+}
+
+@keyframes rfq-detail-spin {
+    from {
+        transform:
+            rotate(0deg);
+    }
+
+    to {
+        transform:
+            rotate(360deg);
+    }
+}
+
+.rfq-detail-state-text {
+    margin:
+        0;
+
+    color:
+        #6b7280;
+
+    font-size:
+        13px;
+
+    font-weight:
+        700;
+}
+
+
+/* =========================================================
+   18. ERROR
+========================================================= */
+
+.rfq-detail-error-icon {
+    width:
+        64px;
+
+    height:
+        64px;
+
+    margin-bottom:
+        16px;
+
+    color:
+        #ef4444;
+}
+
+.rfq-detail-error-icon svg {
+    width:
+        100%;
+
+    height:
+        100%;
+}
+
+.rfq-detail-error-title {
+    margin:
+        0 0 8px;
+
+    color:
+        #1f2937;
+
+    font-size:
+        24px;
+
+    line-height:
+        1.3;
+
+    font-weight:
+        900;
+}
+
+.rfq-detail-error-description {
+    max-width:
+        520px;
+
+    margin:
+        0 0 24px;
+
+    color:
+        #6b7280;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.6;
+
+    font-weight:
+        500;
+}
+
+.rfq-detail-error-button {
+    min-height:
+        42px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        0 24px;
+
+    border-radius:
+        6px;
+
+    background:
+        #00479b;
+
+    color:
+        #fff;
+
+    font-size:
+        13px;
+
+    font-weight:
+        800;
+
+    text-decoration:
+        none;
+
+    transition:
+        background-color .2s ease;
+}
+
+.rfq-detail-error-button:hover {
+    background:
+        #1e40af;
+}
+
+
+/* =========================================================
+   19. TEXT HELPERS
+========================================================= */
+
+.text-center {
+    text-align:
+        center;
+}
+
+.quantity-column {
+    color:
+        #ff5e00 !important;
+}
+
+
+/* =========================================================
+   20. PRINT
+========================================================= */
+
+@media print {
+
+    .no-print,
+    #app-header,
+    #app-footer,
+    .rfq-detail-hero,
+    .rfq-detail-backbar {
+        display:
+            none !important;
+    }
+
+    .rfq-detail-page {
+        background:
+            #fff;
+    }
+
+    .rfq-detail-main {
+        padding:
+            0;
+
+        background:
+            #fff;
+    }
+
+    .rfq-detail-container {
+        width:
+            100%;
+
+        max-width:
+            none;
+    }
+
+    .rfq-detail-content {
+        display:
+            block !important;
+    }
+
+    .rfq-detail-order-header,
+    .rfq-detail-company-card,
+    .rfq-detail-timeline-card,
+    .rfq-detail-sales-card,
+    .rfq-detail-products-card {
+        box-shadow:
+            none;
+
+        border-color:
+            #d1d5db;
+    }
+
+    .rfq-detail-order-header {
+        margin-bottom:
+            20px;
+    }
+
+    .rfq-detail-products-card {
+        break-inside:
+            avoid;
+    }
+
+    .rfq-detail-table {
+        min-width:
+            0;
+    }
+}
+
+
+/* =========================================================
+   21. RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .rfq-detail-top-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .rfq-detail-side-column {
+        display:
+            grid;
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+    }
+
+    .rfq-detail-order-header {
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+    }
+
+    .rfq-detail-order-tools {
+        width:
+            100%;
+    }
+
+    .rfq-detail-tool-button {
+        flex:
+            1;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .rfq-detail-container {
+        width:
+            calc(100% - 24px);
+    }
+
+    .rfq-detail-hero {
+        padding:
+            36px 0 42px;
+    }
+
+    .rfq-detail-hero-title {
+        font-size:
+            28px;
+    }
+
+    .rfq-detail-hero-description {
+        font-size:
+            13px;
+    }
+
+    .rfq-detail-main {
+        padding:
+            28px 0 48px;
+    }
+
+    .rfq-detail-backbar {
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+    }
+
+    .rfq-detail-order-header {
+        padding:
+            18px;
+    }
+
+    .rfq-detail-order-title {
+        font-size:
+            21px;
+    }
+
+    .rfq-detail-company-card,
+    .rfq-detail-timeline-card,
+    .rfq-detail-sales-card {
+        padding:
+            18px;
+    }
+
+    .rfq-detail-company-grid {
+        grid-template-columns:
+            1fr;
+
+        gap:
+            18px;
+    }
+
+    .rfq-detail-info-full {
+        grid-column:
+            auto;
+    }
+
+    .rfq-detail-side-column {
+        grid-template-columns:
+            1fr;
+    }
+
+    .rfq-detail-products-header {
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+    }
+
+    .rfq-detail-search {
+        width:
+            100%;
+
+        flex:
+            none;
+    }
+}
+
+
+@media (max-width: 520px) {
+
+    .rfq-detail-container {
+        width:
+            calc(100% - 20px);
+    }
+
+    .rfq-detail-order-tools {
+        flex-direction:
+            column;
+    }
+
+    .rfq-detail-tool-button {
+        width:
+            100%;
+    }
+
+    .rfq-detail-company-card,
+    .rfq-detail-timeline-card,
+    .rfq-detail-sales-card {
+        padding:
+            16px;
+    }
+
+    .rfq-detail-products-header {
+        padding:
+            16px;
+    }
+
+    .rfq-detail-table th,
+    .rfq-detail-table td {
+        padding:
+            12px 14px;
+    }
+}
+/* =========================================================
+   MY RFQ - TABLE FIX
+========================================================= */
+
+.my-rfq-page {
+    font-family: "Inter", Arial, Helvetica, sans-serif;
+    background: #f5f6f8;
+    color: #1f2937;
+}
+
+/* Card chứa filter + table */
+.my-rfq-table-card {
+    width: 100%;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .05);
+}
+
+/* Thanh filter */
+.my-rfq-filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.my-rfq-filter-tabs {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.my-rfq-filter-btn {
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+    border: 0;
+    border-radius: 999px;
+    background: #f3f4f6;
+    color: #4b5563;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+        background-color .2s ease,
+        color .2s ease,
+        transform .2s ease;
+}
+
+.my-rfq-filter-btn:hover {
+    background: #e5e7eb;
+}
+
+.my-rfq-filter-btn.active {
+    background: #00479b;
+    color: #fff;
+}
+
+.my-rfq-filter-btn.active:hover {
+    background: #003b82;
+}
+
+/* Search */
+.my-rfq-search {
+    position: relative;
+    width: 290px;
+    flex-shrink: 0;
+}
+
+.my-rfq-search-input {
+    width: 100%;
+    height: 38px;
+    box-sizing: border-box;
+    padding: 0 14px 0 38px;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    color: #374151;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease;
+}
+
+.my-rfq-search-input:focus {
+    border-color: #00479b;
+    box-shadow: 0 0 0 3px rgba(0, 71, 155, .08);
+}
+
+.my-rfq-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    width: 16px;
+    height: 16px;
+    color: #9ca3af;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+/* Table wrapper */
+.my-rfq-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* Table */
+.my-rfq-table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+/* Header */
+.my-rfq-table thead {
+    background: #f9fafb;
+}
+
+.my-rfq-table thead tr {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.my-rfq-table th {
+    padding: 15px 18px;
+    color: #6b7280;
+    font-size: 11px;
+    line-height: 1.4;
+    font-weight: 800;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    white-space: nowrap;
+}
+
+/* Chiều rộng từng cột */
+.my-rfq-table th:nth-child(1),
+.my-rfq-table td:nth-child(1) {
+    width: 17%;
+}
+
+.my-rfq-table th:nth-child(2),
+.my-rfq-table td:nth-child(2) {
+    width: 21%;
+}
+
+.my-rfq-table th:nth-child(3),
+.my-rfq-table td:nth-child(3) {
+    width: 30%;
+}
+
+.my-rfq-table th:nth-child(4),
+.my-rfq-table td:nth-child(4) {
+    width: 17%;
+}
+
+.my-rfq-table th:nth-child(5),
+.my-rfq-table td:nth-child(5) {
+    width: 15%;
+}
+
+/* Body */
+.my-rfq-table tbody tr {
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color .2s ease;
+}
+
+.my-rfq-table tbody tr:last-child {
+    border-bottom: 0;
+}
+
+.my-rfq-table tbody tr:hover {
+    background: #f8fbff;
+}
+
+.my-rfq-table td {
+    padding: 14px 18px;
+    color: #374151;
+    font-size: 13px;
+    line-height: 1.5;
+    vertical-align: middle;
+}
+
+/* RFQ code */
+.my-rfq-code {
+    color: #00479b;
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+/* Date */
+.my-rfq-date {
+    color: #4b5563;
+    white-space: nowrap;
+}
+
+/* Company */
+.my-rfq-company {
+    color: #1f2937;
+    font-weight: 600;
+    word-break: break-word;
+}
+
+/* Status */
+.my-rfq-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 0 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.my-rfq-status.status-new {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.my-rfq-status.status-pending {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.my-rfq-status.status-quoted {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.my-rfq-status.status-canceled {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.my-rfq-status.status-default {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+/* Action */
+.my-rfq-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 58px;
+    min-height: 32px;
+    padding: 0 12px;
+    border-radius: 6px;
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    color: #00479b;
+    font-size: 12px;
+    font-weight: 800;
+    text-decoration: none;
+    transition:
+        background-color .2s ease,
+        border-color .2s ease,
+        color .2s ease;
+}
+
+.my-rfq-action:hover {
+    background: #00479b;
+    border-color: #00479b;
+    color: #fff;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .my-rfq-filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .my-rfq-search {
+        width: 100%;
+    }
+
+    .my-rfq-filter-tabs {
+        width: 100%;
+    }
+
+    .my-rfq-filter-btn {
+        flex: 1;
+    }
+}
+
+
+@media (max-width: 520px) {
+
+    .my-rfq-filter-bar {
+        padding: 12px;
+    }
+
+    .my-rfq-filter-tabs {
+        gap: 6px;
+    }
+
+    .my-rfq-filter-btn {
+        padding: 0 11px;
+        font-size: 11px;
+    }
+
+    .my-rfq-table th,
+    .my-rfq-table td {
+        padding: 12px 14px;
+    }
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@media print {
+
+    .my-rfq-filter-bar {
+        display: none;
+    }
+
+    .my-rfq-table-card {
+        border: 0;
+        box-shadow: none;
+    }
+
+    .my-rfq-table {
+        min-width: 0;
+    }
+}
+
+
+/* =========================================================
+   MRO KHANG NAM - PROFILE SYSTEM NORMALIZATION
+   Đồng bộ theo profile.css chuẩn.
+   Chỉ override visual/layout chung, giữ nguyên RFQ Detail logic.
+========================================================= */
+
+.my-rfq-detail-page {
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    background: #f5f6f8;
+    color: #1f2937;
+    font-family: "Inter", Arial, sans-serif;
+}
+
+.my-rfq-detail-page *,
+.my-rfq-detail-page *::before,
+.my-rfq-detail-page *::after {
+    box-sizing: border-box;
+}
+
+.my-rfq-detail-page button,
+.my-rfq-detail-page input,
+.my-rfq-detail-page textarea,
+.my-rfq-detail-page select {
+    font-family: inherit;
+}
+
+.my-rfq-detail-page a,
+.my-rfq-detail-page button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.my-rfq-detail-page .is-hidden {
+    display: none !important;
+}
+
+/* CONTAINER */
+.my-rfq-detail-page .rfq-detail-container {
+    width: min(1536px, calc(100% - 32px));
+    margin: 0 auto;
+}
+
+/* HERO */
+.my-rfq-detail-page .rfq-detail-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 48px 0;
+    background: linear-gradient(110deg, #003370 0%, #00479b 100%);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .08);
+}
+
+.my-rfq-detail-page .rfq-detail-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 71, 155, .6);
+    pointer-events: none;
+}
+
+.my-rfq-detail-page .rfq-detail-hero .rfq-detail-container {
+    position: relative;
+    z-index: 2;
+}
+
+/* BREADCRUMB */
+.my-rfq-detail-page .rfq-detail-breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 20px;
+    color: #d1d5db;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.my-rfq-detail-page .rfq-detail-breadcrumb-link {
+    color: #d1d5db;
+    text-decoration: none;
+    transition: color .2s;
+}
+
+.my-rfq-detail-page .rfq-detail-breadcrumb-link:hover {
+    color: #ff5e00;
+}
+
+.my-rfq-detail-page .rfq-detail-breadcrumb-separator {
+    color: #6b7280;
+}
+
+.my-rfq-detail-page .rfq-detail-breadcrumb-current {
+    color: #fff;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+/* HERO TEXT */
+.my-rfq-detail-page .rfq-detail-hero-title {
+    margin: 0 0 10px;
+    color: #fff;
+    font-size: clamp(30px, 4vw, 42px);
+    line-height: 1.2;
+    font-weight: 900;
+    letter-spacing: -.02em;
+    text-transform: none;
+}
+
+.my-rfq-detail-page .rfq-detail-hero-description {
+    max-width: 760px;
+    margin: 0;
+    color: #e5e7eb;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+/* MAIN */
+.my-rfq-detail-page .rfq-detail-main {
+    flex: 1;
+    width: 100%;
+    padding: 40px 0 64px;
+    background: #f9fafb;
+}
+
+/* BACK BAR */
+.my-rfq-detail-page .rfq-detail-backbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 0 0 24px;
+    padding: 0 0 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.my-rfq-detail-page .rfq-detail-back-button {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    background: #fff;
+    color: #4b5563;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: none;
+    transition: background-color .2s, border-color .2s, color .2s, transform .2s;
+}
+
+.my-rfq-detail-page .rfq-detail-back-button:hover {
+    background: #f9fafb;
+    border-color: #00479b;
+    color: #00479b;
+    transform: translateY(-1px);
+}
+
+.my-rfq-detail-page .rfq-detail-back-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+}
+
+/* STATUS */
+.my-rfq-detail-page .rfq-detail-badge {
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 11px;
+    line-height: 1.2;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+
+/* HEADER CARD */
+.my-rfq-detail-page .rfq-detail-order-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin: 0 0 24px;
+    padding: 24px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .05);
+}
+
+.my-rfq-detail-page .rfq-detail-order-title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0 0 8px;
+    color: #00479b;
+    font-size: clamp(21px, 3vw, 28px);
+    line-height: 1.25;
+    font-weight: 900;
+    letter-spacing: -.01em;
+    text-transform: uppercase;
+}
+
+.my-rfq-detail-page .rfq-detail-order-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 2px;
+    color: #ff5e00;
+}
+
+.my-rfq-detail-page .rfq-detail-order-code {
+    color: #1f2937;
+    word-break: break-word;
+}
+
+.my-rfq-detail-page .rfq-detail-order-date {
+    margin: 0;
+    color: #6b7280;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.my-rfq-detail-page .rfq-detail-order-date span {
+    color: #1f2937;
+    font-weight: 800;
+}
+
+/* TOOL BUTTONS */
+.my-rfq-detail-page .rfq-detail-order-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.my-rfq-detail-page .rfq-detail-tool-button {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background-color .2s, border-color .2s, color .2s, transform .2s;
+}
+
+.my-rfq-detail-page .rfq-detail-tool-button:hover {
+    transform: translateY(-1px);
+}
+
+.my-rfq-detail-page .rfq-detail-tool-icon {
+    width: 17px;
+    height: 17px;
+    margin-right: 8px;
+}
+
+.my-rfq-detail-page .rfq-detail-tool-print {
+    background: #fff;
+    border: 1px solid #d1d5db;
+    color: #4b5563;
+}
+
+.my-rfq-detail-page .rfq-detail-tool-print:hover {
+    background: #f9fafb;
+    border-color: #00479b;
+    color: #00479b;
+}
+
+.my-rfq-detail-page .rfq-detail-tool-excel {
+    background: #ff5e00;
+    border: 1px solid #ff5e00;
+    color: #fff;
+    box-shadow: 0 3px 8px rgba(255, 94, 0, .12);
+}
+
+.my-rfq-detail-page .rfq-detail-tool-excel:hover {
+    background: #e95100;
+    border-color: #e95100;
+}
+
+/* TOP GRID */
+.my-rfq-detail-page .rfq-detail-top-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+    gap: 24px;
+    margin: 0 0 24px;
+    align-items: stretch;
+}
+
+/* SHARED CARD SYSTEM */
+.my-rfq-detail-page .rfq-detail-company-card,
+.my-rfq-detail-page .rfq-detail-timeline-card,
+.my-rfq-detail-page .rfq-detail-sales-card,
+.my-rfq-detail-page .rfq-detail-products-card,
+.my-rfq-detail-page .rfq-detail-state-screen {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .05);
+}
+
+.my-rfq-detail-page .rfq-detail-company-card {
+    padding: 24px;
+}
+
+.my-rfq-detail-page .rfq-detail-timeline-card {
+    padding: 24px;
+}
+
+.my-rfq-detail-page .rfq-detail-sales-card {
+    padding: 20px;
+}
+
+/* SECTION TITLES */
+.my-rfq-detail-page .rfq-detail-card-title {
+    margin: 0 0 20px;
+    padding: 0 0 12px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #00479b;
+    font-size: 18px;
+    line-height: 1.4;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -.01em;
+}
+
+.my-rfq-detail-page .rfq-detail-small-title {
+    margin: 0 0 18px;
+    padding: 0 0 12px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #00479b;
+    font-size: 13px;
+    line-height: 1.4;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+
+/* COMPANY INFO */
+.my-rfq-detail-page .rfq-detail-company-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.my-rfq-detail-page .rfq-detail-info-label {
+    margin: 0 0 8px;
+    color: #374151;
+    font-size: 11px;
+    line-height: 1.5;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .02em;
+}
+
+.my-rfq-detail-page .rfq-detail-info-value {
+    margin: 0;
+    color: #1f2937;
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 800;
+    word-break: break-word;
+}
+
+.my-rfq-detail-page .rfq-detail-note {
+    min-height: 96px;
+    margin: 0;
+    padding: 11px 13px;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    color: #4b5563;
+    font-size: 13px;
+    line-height: 1.7;
+    font-style: normal;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* TIMELINE */
+.my-rfq-detail-page .rfq-detail-side-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+}
+
+.my-rfq-detail-page .rfq-detail-timeline {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 4px 0;
+}
+
+.my-rfq-detail-page .rfq-detail-timeline::before {
+    left: 9px;
+    width: 2px;
+    background: #e5e7eb;
+}
+
+.my-rfq-detail-page .timeline-dot {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    margin-top: 2px;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    background: #d1d5db;
+    box-shadow: 0 0 0 1px #e5e7eb;
+}
+
+.my-rfq-detail-page .timeline-title {
+    margin: 0 0 3px;
+    color: #374151;
+    font-size: 13px;
+    line-height: 1.4;
+    font-weight: 800;
+}
+
+.my-rfq-detail-page .timeline-desc {
+    margin: 0;
+    color: #9ca3af;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.my-rfq-detail-page .timeline-step.step-active .timeline-title {
+    color: #c2410c;
+}
+
+/* SALES CARD */
+.my-rfq-detail-page .rfq-detail-sales-card {
+    background: #eff6ff;
+    border-color: #dbeafe;
+}
+
+.my-rfq-detail-page .rfq-detail-sales-title {
+    margin: 0 0 16px;
+    padding: 0 0 10px;
+    border-bottom: 1px solid #bfdbfe;
+    color: #00479b;
+    font-size: 11px;
+    line-height: 1.4;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+.my-rfq-detail-page .rfq-detail-sales-avatar {
+    width: 48px;
+    height: 48px;
+    background: #00479b;
+}
+
+/* PRODUCTS */
+.my-rfq-detail-page .rfq-detail-products-card {
+    overflow: hidden;
+}
+
+.my-rfq-detail-page .rfq-detail-products-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px 24px;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.my-rfq-detail-page .rfq-detail-products-header .rfq-detail-card-title {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.my-rfq-detail-page .rfq-detail-summary {
+    margin-top: 8px;
+    color: #6b7280;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.my-rfq-detail-page .rfq-detail-search {
+    position: relative;
+    width: 288px;
+    flex: 0 0 288px;
+}
+
+.my-rfq-detail-page .rfq-detail-search-input {
+    width: 100%;
+    min-height: 42px;
+    height: 42px;
+    padding: 0 13px 0 38px;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    color: #1f2937;
+    font-size: 13px;
+    outline: none;
+    box-shadow: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.my-rfq-detail-page .rfq-detail-search-input::placeholder {
+    color: #9ca3af;
+}
+
+.my-rfq-detail-page .rfq-detail-search-input:focus {
+    border-color: #00479b;
+    box-shadow: 0 0 0 3px rgba(0, 71, 155, .08);
+}
+
+.my-rfq-detail-page .rfq-detail-search-icon {
+    left: 12px;
+    width: 17px;
+    height: 17px;
+}
+
+/* TABLE */
+.my-rfq-detail-page .rfq-detail-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.my-rfq-detail-page .rfq-detail-table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 13px;
+}
+
+.my-rfq-detail-page .rfq-detail-table thead tr {
+    background: #f3f4f6;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.my-rfq-detail-page .rfq-detail-table th {
+    padding: 14px 18px;
+    background: #f3f4f6;
+    color: #4b5563;
+    font-size: 11px;
+    line-height: 1.4;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.my-rfq-detail-page .rfq-detail-table td {
+    padding: 15px 18px;
+    color: #374151;
+    font-size: 13px;
+    line-height: 1.5;
+    vertical-align: middle;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.my-rfq-detail-page .rfq-detail-table tbody tr:hover td {
+    background: #f9fafb;
+}
+
+.my-rfq-detail-page .rfq-item-stt {
+    color: #6b7280;
+    font-weight: 700;
+}
+
+.my-rfq-detail-page .rfq-item-sku {
+    color: #00479b;
+    font-family: monospace;
+    font-weight: 800;
+}
+
+.my-rfq-detail-page .rfq-item-name {
+    color: #1f2937;
+    font-weight: 700;
+}
+
+.my-rfq-detail-page .rfq-item-brand,
+.my-rfq-detail-page .rfq-item-unit {
+    color: #4b5563;
+}
+
+.my-rfq-detail-page .rfq-item-qty {
+    color: #ff5e00;
+    font-weight: 900;
+}
+
+.my-rfq-detail-page .rfq-table-empty {
+    padding: 40px 20px !important;
+    color: #6b7280 !important;
+    text-align: center;
+    font-style: normal;
+}
+
+/* STATE */
+.my-rfq-detail-page .rfq-detail-state-screen {
+    min-height: 300px;
+    padding: 48px 24px;
+    text-align: center;
+}
+
+.my-rfq-detail-page .rfq-detail-spinner {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 16px;
+    color: #ff5e00;
+}
+
+.my-rfq-detail-page .rfq-detail-state-text {
+    margin: 0;
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.my-rfq-detail-page .rfq-detail-error-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+    color: #dc2626;
+}
+
+.my-rfq-detail-page .rfq-detail-error-title {
+    margin: 0 0 8px;
+    color: #1f2937;
+    font-size: 21px;
+    line-height: 1.3;
+    font-weight: 900;
+}
+
+.my-rfq-detail-page .rfq-detail-error-description {
+    max-width: 520px;
+    margin: 0 0 24px;
+    color: #6b7280;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.my-rfq-detail-page .rfq-detail-error-button {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 24px;
+    border: 1px solid #ff5e00;
+    border-radius: 7px;
+    background: #ff5e00;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-decoration: none;
+    box-shadow: 0 3px 8px rgba(255, 94, 0, .12);
+    transition: background-color .2s, transform .2s;
+}
+
+.my-rfq-detail-page .rfq-detail-error-button:hover {
+    background: #e95100;
+    transform: translateY(-1px);
+}
+
+/* GENERIC */
+.my-rfq-detail-page .text-center { text-align: center; }
+
+/* RESPONSIVE - theo profile.css */
+@media (max-width: 1000px) {
+    .my-rfq-detail-page .rfq-detail-container {
+        width: min(100%, calc(100% - 24px));
+    }
+}
+
+@media (max-width: 850px) {
+    .my-rfq-detail-page .rfq-detail-top-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .my-rfq-detail-page .rfq-detail-side-column {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .my-rfq-detail-page .rfq-detail-order-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .my-rfq-detail-page .rfq-detail-order-tools {
+        width: 100%;
+    }
+
+    .my-rfq-detail-page .rfq-detail-tool-button {
+        flex: 1 1 0;
+    }
+}
+
+@media (max-width: 700px) {
+    .my-rfq-detail-page .rfq-detail-hero {
+        padding: 38px 0 42px;
+    }
+
+    .my-rfq-detail-page .rfq-detail-hero-title {
+        font-size: 29px;
+    }
+
+    .my-rfq-detail-page .rfq-detail-main {
+        padding: 28px 0 48px;
+    }
+
+    .my-rfq-detail-page .rfq-detail-backbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .my-rfq-detail-page .rfq-detail-back-button {
+        width: 100%;
+    }
+
+    .my-rfq-detail-page .rfq-detail-order-header {
+        padding: 20px;
+    }
+
+    .my-rfq-detail-page .rfq-detail-company-card,
+    .my-rfq-detail-page .rfq-detail-timeline-card,
+    .my-rfq-detail-page .rfq-detail-sales-card {
+        padding: 20px;
+    }
+
+    .my-rfq-detail-page .rfq-detail-company-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .my-rfq-detail-page .rfq-detail-info-full {
+        grid-column: auto;
+    }
+
+    .my-rfq-detail-page .rfq-detail-side-column {
+        grid-template-columns: 1fr;
+    }
+
+    .my-rfq-detail-page .rfq-detail-products-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .my-rfq-detail-page .rfq-detail-search {
+        width: 100%;
+        flex: none;
+    }
+}
+
+@media (max-width: 560px) {
+    .my-rfq-detail-page .rfq-detail-container {
+        width: calc(100% - 20px);
+    }
+
+    .my-rfq-detail-page .rfq-detail-order-tools {
+        flex-direction: column;
+    }
+
+    .my-rfq-detail-page .rfq-detail-tool-button {
+        width: 100%;
+        flex: none;
+    }
+
+    .my-rfq-detail-page .rfq-detail-order-header {
+        padding: 18px;
+    }
+
+    .my-rfq-detail-page .rfq-detail-company-card,
+    .my-rfq-detail-page .rfq-detail-timeline-card,
+    .my-rfq-detail-page .rfq-detail-sales-card {
+        padding: 16px;
+    }
+
+    .my-rfq-detail-page .rfq-detail-products-header {
+        padding: 16px;
+    }
+
+    .my-rfq-detail-page .rfq-detail-table th,
+    .my-rfq-detail-page .rfq-detail-table td {
+        padding: 12px 14px;
+    }
+
+    .my-rfq-detail-page .rfq-detail-order-title {
+        font-size: 20px;
+    }
+}
+
+/* PRINT */
+@media print {
+    #app-header,
+    #app-footer,
+    .my-rfq-detail-page .no-print,
+    .my-rfq-detail-page .rfq-detail-backbar,
+    .my-rfq-detail-page .rfq-detail-order-tools,
+    .my-rfq-detail-page .rfq-detail-search {
+        display: none !important;
+    }
+
+    .my-rfq-detail-page,
+    .my-rfq-detail-page .rfq-detail-main {
+        background: #fff;
+        padding: 0;
+    }
+
+    .my-rfq-detail-page .rfq-detail-container {
+        width: 100%;
+        max-width: none;
+    }
+
+    .my-rfq-detail-page .rfq-detail-order-header,
+    .my-rfq-detail-page .rfq-detail-company-card,
+    .my-rfq-detail-page .rfq-detail-timeline-card,
+    .my-rfq-detail-page .rfq-detail-sales-card,
+    .my-rfq-detail-page .rfq-detail-products-card,
+    .my-rfq-detail-page .rfq-detail-state-screen {
+        box-shadow: none;
+    }
+
+    .my-rfq-detail-page .rfq-detail-table {
+        min-width: 0;
+    }
+}
+
+/* =========================================================
+   ACCOUNT LAYOUT — ĐỒNG BỘ VỚI TRANG LỊCH SỬ YÊU CẦU BÁO GIÁ
+========================================================= */
+.my-rfq-detail-page 
+.rfq-detail-page-layout {
+    display: grid;
+    grid-template-columns: 256px minmax(0, 1fr);
+    gap: 32px;
+    align-items: start;
+}
+
+.my-rfq-detail-page .rfq-detail-content-column {
+    min-width: 0;
+}
+
+/* SIDEBAR  */
+.my-rfq-detail-page 
+.profile-sidebar {
+    position: static;
+    align-self: start;
+    width: 100%;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .05);
+}
+
+.my-rfq-detail-page 
+.profile-sidebar-profile {
+    padding: 20px;
+    text-align: center;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.my-rfq-detail-page 
+.profile-avatar {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+    background: #00479b;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.my-rfq-detail-page 
+.profile-sidebar-name {
+    margin: 0 0 4px;
+    overflow: hidden;
+    color: #1f2937;
+    font-size: 14px;
+    font-weight: 800;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.my-rfq-detail-page 
+.profile-sidebar-email {
+    margin: 0;
+    overflow: hidden;
+    color: #6b7280;
+    font-size: 11px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.my-rfq-detail-page 
+.profile-sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+}
+
+.my-rfq-detail-page .profile-sidebar-link,
+.my-rfq-detail-page .profile-sidebar-logout {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #4b5563;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background-color .2s, color .2s;
+}
+
+.my-rfq-detail-page .profile-sidebar-link:hover {
+    background: #f9fafb;
+    color: #00479b;
+}
+
+.my-rfq-detail-page .profile-sidebar-link.is-active {
+    background: #eff6ff;
+    color: #00479b;
+    font-weight: 800;
+}
+
+.my-rfq-detail-page 
+.profile-sidebar-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    flex-shrink: 0;
+    color: #9ca3af;
+}
+
+.my-rfq-detail-page 
+.profile-sidebar-link.is-active 
+.profile-sidebar-icon { color: #00479b; }
+
+.my-rfq-detail-page .profile-sidebar-divider {
+    height: 1px;
+    margin: 8px 4px;
+    background: #f3f4f6;
+}
+
+.my-rfq-detail-page 
+.profile-sidebar-logout {
+    color: #dc2626;
+}
+
+.my-rfq-detail-page 
+.profile-sidebar-logout:hover {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.my-rfq-detail-page 
+.profile-sidebar-logout
+.profile-sidebar-icon {
+    color: inherit;
+}
+
+/* BREADCRUMB — ĐỒNG BỘ CÁCH HIỂN THỊ VỚI MY RFQ */
+.my-rfq-detail-page .rfq-detail-breadcrumb-link,
+.my-rfq-detail-page .rfq-detail-breadcrumb-current {
+    line-height: 1.5;
+}
+
+.my-rfq-detail-page .rfq-detail-breadcrumb-current {
+    text-transform: uppercase;
+}
+
+/* RESPONSIVE ACCOUNT LAYOUT */
+@media (max-width: 1000px) {
+    .my-rfq-detail-page .rfq-detail-page-layout {
+        grid-template-columns: 220px minmax(0, 1fr);
+        gap: 24px;
+    }
+}
+
+@media (max-width: 850px) {
+    .my-rfq-detail-page .rfq-detail-page-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .my-rfq-detail-page .profile-sidebar {
+        position: static;
+    }
+
+    .my-rfq-detail-page .profile-sidebar-nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .my-rfq-detail-page .profile-sidebar-divider,
+    .my-rfq-detail-page .profile-sidebar-logout {
+        grid-column: 1 / -1;
+    }
+} 
+
+@media (max-width: 560px) {
+    .my-rfq-detail-page .profile-sidebar-nav {
+        grid-template-columns: 1fr;
+    }
+
+    .my-rfq-detail-page .profile-sidebar-divider,
+    .my-rfq-detail-page .profile-sidebar-logout {
+        grid-column: auto;
+    }
+}
+
+@media print {
+    .my-rfq-detail-page .profile-sidebar {
+        display: none !important;
+    }
+
+    .my-rfq-detail-page .rfq-detail-page-layout {
+        display: block;
+    }
+}

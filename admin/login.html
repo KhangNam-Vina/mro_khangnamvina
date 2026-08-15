@@ -50,55 +50,68 @@
         </div> -->
     </div>
 
+    <!-- 1. CÓ LÕI CỦA SUPABASE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- 2. GỌI FILE CẤU HÌNH DÙNG CHUNG ĐỂ ĐỒNG BỘ NGĂN KÉO 'kn-admin-session' -->
+    <script src="../assets/js/common/supabase.js"></script>
+
+    <!-- 3. LOGIC ĐĂNG NHẬP -->
     <script>
-        const SUPABASE_URL = 'https://wnhrkziiujbswnrfnlly.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_mCpQQA5h6TQHP7ueyYv1qg_vxnTQIRk'; 
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginForm = document.getElementById('adminLoginForm');
+            if (!loginForm) return;
 
-        document.getElementById('adminLoginForm').addEventListener('submit', async function(event) {
-            event.preventDefault(); // Chặn tải lại trang
+            loginForm.addEventListener('submit', async function(event) {
+                event.preventDefault(); 
 
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const btn = document.getElementById('loginBtn');
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const btn = document.getElementById('loginBtn');
 
-            btn.innerHTML = 'Đang kiểm tra hệ thống...';
-            btn.disabled = true;
+                btn.innerHTML = 'Đang kiểm tra hệ thống...';
+                btn.disabled = true;
 
-            try {
-                // 1. Gọi lệnh đăng nhập lên Supabase
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email: email,
-                    password: password,
-                });
+                try {
+                    // Dùng đúng window.supabaseClient từ file chung
+                    const { data: authData, error: authError } = await window.supabaseClient.auth.signInWithPassword({
+                        email: email,
+                        password: password,
+                    });
 
-                if (error) throw error;
+                    if (authError) throw authError;
 
-                // 2. Lấy ngay thông tin role trong metadata của user vừa đăng nhập
-                const userRole = data.session.user.user_metadata?.role;
+                    const userId = authData.session.user.id;
 
-                // 3. KIỂM TRA QUYỀN SẮC BÉN
-                if (userRole === 'admin') {
-                    // alert("Chào mừng Sếp quay trở lại kho hàng!");
-                    // Vì file login này nằm trong thư mục admin/ luôn nên gọi thẳng dashboard.html
-                    window.location.href = "dashboard.html"; 
-                } else {
-                    // BẪY BẢO MẬT: Nếu là tài khoản khách hàng lọt vào đây
-                    alert("Cảnh báo nguy hiểm: Tài khoản này không có quyền Admin! Từ chối truy cập.");
+                    const { data: adminData, error: adminError } = await window.supabaseClient
+                        .from('admins')
+                        .select('*')
+                        .eq('id', userId)
+                        .maybeSingle(); // ĐỔI TỪ single() SANG maybeSingle() Ở ĐÂY
+
+                    console.log("=== BẮT ĐẦU DEBUG LOGIN ===");
+                    console.log("1. Lỗi nếu có từ bảng admins:", adminError);
+                    console.log("2. Dữ liệu bốc được từ DB:", adminData);
+                    console.log("3. Role thực tế đang là:", adminData?.role);
+                    console.log("=== KẾT THÚC DEBUG ===");
+
+                    // Code if/else bên dưới giữ nguyên
+                    if (adminData && adminData.role === 'admin') {
+                        // VÀO THẲNG DASHBOARD VÀ KHÔNG BAO GIỜ BỊ SÚT RA NỮA
+                        window.location.replace("dashboard.html"); 
+                    } else {
+                        alert("Cảnh báo nguy hiểm: Tài khoản này không có quyền Admin! Từ chối truy cập.");
+                        await window.supabaseClient.auth.signOut();
+                        window.location.reload();
+                    }
                     
-                    // Ép buộc đăng xuất ngay lập tức để xóa sạch Token trên trình duyệt
-                    await supabaseClient.auth.signOut();
-                    
-                    // Tải lại trang đăng nhập để reset
-                    window.location.reload();
+                } catch (error) {
+                    console.error("Lỗi quá trình đăng nhập:", error);
+                    alert("Đăng nhập thất bại: Tài khoản hoặc mật khẩu không chính xác!");
+                    btn.innerHTML = 'Xác Thực Đăng Nhập';
+                    btn.disabled = false;
                 }
-                
-            } catch (error) {
-                alert("Đăng nhập thất bại: " + error.message);
-                btn.innerHTML = 'Xác Thực Đăng Nhập';
-                btn.disabled = false;
-            }
+            });
         });
     </script>
 </body>

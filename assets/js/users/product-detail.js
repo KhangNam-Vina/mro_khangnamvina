@@ -1,509 +1,1826 @@
 // ========================================================
-// FILE: assets/js/product-detail.js
-// XỬ LÝ LOGIC RIÊNG CHO TRANG KHUYẾN MÃI (PROMOTIONS)
+// FILE: assets/js/users/product-detail.js
+// XỬ LÝ LOGIC TRANG CHI TIẾT SẢN PHẨM & RFQ
+// ĐÃ FIX LỖI XUNG ĐỘT BIẾN (SYNTAX ERROR)
 // ========================================================
 
-// KÉO DỮ LIỆU TỪ DB LÊN GIAO DIỆN
-        async function loadProductDetail() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const productId = urlParams.get('id');
+let currentMOQ = 1;
+let currentStock = 0;
 
-            const mainContent = document.getElementById('mainContent');
-            const loadingScreen = document.getElementById('loadingScreen');
-            const errorScreen = document.getElementById('errorScreen');
-            const errorText = document.getElementById('errorText');
 
-            if (!productId) {
-                loadingScreen.classList.add('hidden');
-                errorScreen.classList.remove('hidden');
-                errorText.innerText = "Đường dẫn không hợp lệ. Thiếu mã ID sản phẩm.";
-                return;
-            }
+/* ========================================================
+   HELPER (ĐÃ ĐỔI TÊN ĐỂ TRÁNH TRÙNG LẶP VỚI CART.JS)
+======================================================== */
 
-            try {
-                const { data: item, error } = await supabaseClient
-                    .from('products')
-                    .select(`
-                        *,
-                        categories(id, name),
-                        sub_categories(id, name),
-                        brands(id, name)
-                    `)
-                    .eq('id', productId)
-                    .single();
+const pdEscapeHTML = (value) => {
+    if (typeof utils !== "undefined" && typeof utils.escapeHTML === "function") {
+        return utils.escapeHTML(value ?? "");
+    }
 
-                if (error) throw error;
-                if (!item) throw new Error("Sản phẩm không tồn tại");
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+};
 
-                // Đổ thông tin text
-                const brandName = item.brands ? item.brands.name : 'OEM';
-                const catName = item.categories ? item.categories.name : 'Chưa phân loại';
-                const subCatName = item.sub_categories ? item.sub_categories.name : 'Chưa phân loại';
-                const priceFormat = item.price ? new Intl.NumberFormat('vi-VN').format(item.price) + ' đ' : 'Liên hệ để có giá sỉ';
 
-                document.title = item.name + " - MRO Khang Nam";
-                document.getElementById('bcCat').innerText = catName;
-                if(item.category_id) document.getElementById('bcCat').href = `category.html?category_id=${item.category_id}`;
-                document.getElementById('bcSub').innerText = subCatName;
-                if(item.sub_category_id) document.getElementById('bcSub').href = `products.html?sub_category_id=${item.sub_category_id}`;
-                document.getElementById('bcSku').innerText = item.sku;
-                document.getElementById('brandLabel').innerText = brandName;
-                document.getElementById('productName').innerText = item.name;
-                document.getElementById('detailSku').innerText = item.sku;
-                document.getElementById('detailBrand').innerText = brandName;
-                document.getElementById('detailUnit').innerText = item.unit;
-                document.getElementById('detailPrice').innerText = priceFormat;
+const pdCleanUrl = (url) => {
+    if (!url) return "";
 
-                const descText = item.description ? item.description.replace(/\n/g, '<br>') : 'Sản phẩm đang được cập nhật mô tả chi tiết.';
-                document.getElementById('tabDescContent').innerHTML = descText;
+    return url
+        .replace(/['"\[\]\n\r]/g, "")
+        .trim();
+};
 
-                // XỬ LÝ DÀN ẢNH PHỤ (Đã nâng cấp chống lỗi kiểu dữ liệu)
-                const mainImg = document.getElementById('mainImage');
-                const thumbList = document.getElementById('thumbnailList');
-                
-                mainImg.src = item.image_url || 'https://via.placeholder.com/600x600?text=No+Image';
-                thumbList.innerHTML = ''; 
-                
-                const allImages = [item.image_url]; 
-                
-                // Bắt đầu "xay" dữ liệu ảnh phụ
-                if (item.images) {
-                    let extraImgs = [];
-                    if (Array.isArray(item.images)) {
-                        extraImgs = item.images; // Nếu đúng là mảng
-                    } else if (typeof item.images === 'string') {
-                        try {
-                            extraImgs = JSON.parse(item.images); // Nếu nó là chuỗi JSON
-                        } catch(e) {
-                            extraImgs = item.images.split(','); // Nếu nó là chuỗi thường cách nhau dấu phẩy
-                        }
-                    }
-                    
-                    // Gom chung vào allImages
-                    extraImgs.forEach(link => {
-                        const cleanLink = link.trim();
-                        // Tránh việc ảnh phụ bị trùng với ảnh chính
-                        if(cleanLink && cleanLink !== item.image_url) {
-                            allImages.push(cleanLink);
-                        }
-                    });
-                }
 
-                // Đổ tất cả ảnh ra giao diện
-                allImages.forEach((imgSrc) => {
-                    if(!imgSrc) return;
-                    thumbList.innerHTML += `
-                        <div onclick="changeMainImage('${imgSrc}', this)" class="thumbnail-item w-20 h-20 shrink-0 border-2 rounded cursor-pointer overflow-hidden opacity-70 hover:opacity-100 transition border-gray-200">
-                            <img src="${imgSrc}" class="w-full h-full object-cover bg-white">
-                        </div>
-                    `;
-                });
-                
-                // Cài viền cam cho ảnh đầu tiên
-                const firstThumb = thumbList.querySelector('.thumbnail-item');
-                if(firstThumb) {
-                    firstThumb.classList.remove('opacity-70', 'border-gray-200');
-                    firstThumb.classList.add('border-kn-orange');
-                }
-                
+const pdFormatCurrency = (value) => {
+    if (!value || Number(value) <= 0) {
+        return "Liên hệ";
+    }
 
-                // XỬ LÝ DATASHEET
-                const btnDatasheet = document.getElementById('btnDatasheet');
-                const techDetails = document.getElementById('techDetails');
-                
-                if (item.datasheet_url) {
-                    btnDatasheet.href = item.datasheet_url;
-                    btnDatasheet.classList.remove('hidden'); 
-                    techDetails.innerHTML = `
-                        <p class="font-bold text-gray-800 mb-2">Tài liệu kỹ thuật khả dụng:</p>
-                        <a href="${item.datasheet_url}" target="_blank" class="text-kn-blue font-bold hover:underline inline-flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            Tải file PDF Datasheet (Catalog)
-                        </a>
-                    `;
-                } else {
-                    techDetails.innerHTML = "Nhà sản xuất chưa cung cấp tài liệu kỹ thuật cho mã sản phẩm này.";
-                }
+    return new Intl.NumberFormat("vi-VN").format(value) + " đ";
+};
 
-                loadingScreen.classList.add('hidden');
-                mainContent.classList.remove('hidden');
-                await loadRelatedProducts(item);
 
-            } catch (err) {
-                console.error("Lỗi tải chi tiết:", err);
-                loadingScreen.classList.add('hidden');
-                errorScreen.classList.remove('hidden');
-                errorText.innerText = err.message;
-                 
+/* ========================================================
+   1. LOAD PRODUCT DETAIL
+======================================================== */
+
+async function loadProductDetail() {
+
+    const urlParams = new URLSearchParams(
+        window.location.search
+    );
+
+    const productId = urlParams.get("id");
+
+    const mainContent =
+        document.getElementById("mainContent");
+
+    const loadingScreen =
+        document.getElementById("loadingScreen");
+
+    const errorScreen =
+        document.getElementById("errorScreen");
+
+    const errorText =
+        document.getElementById("errorText");
+
+    const previousPage =
+        document.referrer.toLowerCase();
+
+    const bcParentPage =
+        document.getElementById("bcParentPage");
+
+    const bcCurrentProduct =
+        document.getElementById("bcCurrentProduct");
+
+
+    /* -----------------------------------------------------
+       INVALID URL
+    ----------------------------------------------------- */
+
+    if (!productId) {
+
+        loadingScreen?.classList.add("is-hidden");
+        errorScreen?.classList.remove("is-hidden");
+
+        if (errorText) {
+            errorText.innerText =
+                "Đường dẫn không hợp lệ. Thiếu mã ID sản phẩm.";
+        }
+
+        return;
+    }
+
+
+    try {
+
+        /* -------------------------------------------------
+           FETCH PRODUCT
+        ------------------------------------------------- */
+
+        const {
+            data: item,
+            error
+        } = await window.supabaseClient
+            .from("products")
+            .select(`
+                *,
+                categories(id, name),
+                sub_categories(id, name),
+                brands(id, name)
+            `)
+            .eq("id", productId)
+            .single();
+
+
+        if (error) {
+            throw error;
+        }
+
+        if (!item) {
+            throw new Error("Sản phẩm không tồn tại");
+        }
+
+
+        /* -------------------------------------------------
+           SAVE CURRENT PRODUCT
+        ------------------------------------------------- */
+
+        window.currentProductData = item;
+
+        currentMOQ =
+            Number(item.min_order_quantity) || 1;
+
+        currentStock =
+            Number(item.stock_quantity) || 0;
+
+
+        /* -------------------------------------------------
+           BASIC DATA
+        ------------------------------------------------- */
+
+        const brandName =
+            item.brands?.name || "OEM";
+
+        const priceFormat =
+            pdFormatCurrency(item.price);
+
+
+        document.title =
+            `${item.name} - MRO Khang Nam`;
+
+
+        /* -------------------------------------------------
+           BREADCRUMB
+        ------------------------------------------------- */
+
+        if (bcParentPage) {
+
+            if (
+                previousPage.includes(
+                    "promotions.html"
+                )
+            ) {
+
+                bcParentPage.href =
+                    "promotions.html";
+
+                bcParentPage.innerText =
+                    "Giảm giá";
+
+            } else {
+
+                bcParentPage.href =
+                    "products.html";
+
+                bcParentPage.innerText =
+                    "Sản phẩm";
             }
         }
 
-                async function loadRelatedProducts(currentItem) {
 
-            const grid = document.getElementById("relatedProductsGrid");
+        if (bcCurrentProduct) {
+
+            bcCurrentProduct.innerText =
+                item.name;
+
+            bcCurrentProduct.classList.remove(
+                "is-loading"
+            );
+        }
+
+
+        /* -------------------------------------------------
+           PRODUCT BASIC INFO
+        ------------------------------------------------- */
+
+        const brandLabel =
+            document.getElementById("brandLabel");
+
+        if (brandLabel) {
+            brandLabel.innerText =
+                brandName;
+        }
+
+
+        const productName =
+            document.getElementById("productName");
+
+        if (productName) {
+            productName.innerText =
+                item.name;
+        }
+
+
+        const shortDescription =
+            document.getElementById("shortDescription");
+
+        if (shortDescription) {
+
+            shortDescription.innerText =
+                item.short_description ||
+                "Sản phẩm vật tư chuyên dụng chính hãng. Vui lòng xem thông số chi tiết bên dưới.";
+        }
+
+
+        const detailSku =
+            document.getElementById("detailSku");
+
+        if (detailSku) {
+            detailSku.innerText =
+                item.sku || "";
+        }
+
+
+        const detailBrand =
+            document.getElementById("detailBrand");
+
+        if (detailBrand) {
+            detailBrand.innerText =
+                brandName;
+        }
+
+
+        const detailUnit =
+            document.getElementById("detailUnit");
+
+        if (detailUnit) {
+            detailUnit.innerText =
+                item.unit || "Cái";
+        }
+
+
+        const detailOrigin =
+            document.getElementById("detailOrigin");
+
+        if (detailOrigin) {
+            detailOrigin.innerText =
+                item.origin || "Đang cập nhật";
+        }
+
+
+        const detailPrice =
+            document.getElementById("detailPrice");
+
+        if (detailPrice) {
+            detailPrice.innerText =
+                priceFormat;
+        }
+
+
+        /* -------------------------------------------------
+           ORIGIN BADGE
+        ------------------------------------------------- */
+
+        const badgeOrigin =
+            document.getElementById("badgeOrigin");
+
+        if (
+            badgeOrigin &&
+            item.origin &&
+            item.origin.toUpperCase() === "JAPAN"
+        ) {
+
+            badgeOrigin.classList.remove(
+                "is-hidden"
+            );
+        }
+
+
+        /* -------------------------------------------------
+           STATUS BADGE
+        ------------------------------------------------- */
+
+        if (
+            item.badge &&
+            item.badge.trim() !== ""
+        ) {
+
+            const badgeEl =
+                document.getElementById("badgeStatus");
+
+            if (badgeEl) {
+
+                const badgeVal =
+                    item.badge
+                        .trim()
+                        .toUpperCase();
+
+                let badgeClass =
+                    "badge-default";
+
+
+                if (badgeVal === "NEW") {
+                    badgeClass = "badge-new";
+                } else if (badgeVal === "HOT") {
+                    badgeClass = "badge-hot";
+                } else if (badgeVal === "SALE") {
+                    badgeClass = "badge-sale";
+                } else if (
+                    badgeVal === "BEST SELLER"
+                ) {
+                    badgeClass = "badge-best";
+                } else if (
+                    badgeVal === "CLEARANCE"
+                ) {
+                    badgeClass = "badge-clearance";
+                }
+
+
+                badgeEl.className =
+                    `product-badge ${badgeClass}`;
+
+                badgeEl.innerText =
+                    badgeVal;
+
+                badgeEl.classList.remove(
+                    "is-hidden"
+                );
+            }
+        }
+
+
+        /* -------------------------------------------------
+           STOCK
+        ------------------------------------------------- */
+
+        const stockEl =
+            document.getElementById(
+                "detailStock"
+            );
+
+
+        if (stockEl) {
+
+            if (currentStock > 0) {
+
+                stockEl.className =
+                    "product-stock-value stock-ready";
+
+                stockEl.innerHTML = `
+                    <svg
+                        width="16"
+                        height="16"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M5 13l4 4L19 7"
+                        ></path>
+                    </svg>
+                    Tình trạng: Sẵn sàng giao hàng
+                `;
+
+            } else {
+
+                stockEl.className =
+                    "product-stock-value stock-preorder";
+
+                stockEl.innerHTML = `
+                    <svg
+                        width="16"
+                        height="16"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        ></path>
+                    </svg>
+                    Tình trạng: Pre-order (Liên hệ)
+                `;
+            }
+        }
+
+
+        /* -------------------------------------------------
+           MOQ
+        ------------------------------------------------- */
+
+        const qtyInput =
+            document.getElementById("buyQty");
+
+        if (qtyInput) {
+
+            qtyInput.min =
+                currentMOQ;
+
+            qtyInput.value =
+                currentMOQ;
+        }
+
+
+        if (currentMOQ > 1) {
+
+            const moqNote =
+                document.getElementById("moqNote");
+
+            const moqVal =
+                document.getElementById("moqVal");
+
+
+            if (moqVal) {
+
+                moqVal.innerText =
+                    `${currentMOQ} ${item.unit || "Cái"}`;
+            }
+
+
+            if (moqNote) {
+
+                moqNote.classList.remove(
+                    "is-hidden"
+                );
+            }
+        }
+
+
+        /* -------------------------------------------------
+           IMAGE GALLERY
+        ------------------------------------------------- */
+
+        let allValidImages = [];
+
+        const safeMainImg =
+            pdCleanUrl(item.image_url);
+
+
+        if (safeMainImg) {
+            allValidImages.push(
+                safeMainImg
+            );
+        }
+
+
+        if (item.images) {
+
+            let rawExtraImgs = [];
+
+
+            if (Array.isArray(item.images)) {
+
+                rawExtraImgs =
+                    item.images;
+
+            } else if (
+                typeof item.images === "string"
+            ) {
+
+                rawExtraImgs =
+                    item.images.split(
+                        /[\n,]+/
+                    );
+            }
+
+
+            rawExtraImgs.forEach(
+                (rawUrl) => {
+
+                    const safeUrl =
+                        pdCleanUrl(rawUrl);
+
+
+                    if (
+                        safeUrl &&
+                        safeUrl !== safeMainImg &&
+                        !allValidImages.includes(
+                            safeUrl
+                        )
+                    ) {
+
+                        allValidImages.push(
+                            safeUrl
+                        );
+                    }
+                }
+            );
+        }
+
+
+        const domMainImg =
+            document.getElementById(
+                "mainImage"
+            );
+
+        const domThumbList =
+            document.getElementById(
+                "thumbnailList"
+            );
+
+
+        if (
+            allValidImages.length > 0
+        ) {
+
+            if (domMainImg) {
+
+                domMainImg.src =
+                    allValidImages[0];
+
+                domMainImg.onerror =
+                    function () {
+
+                        this.onerror = null;
+
+                        this.src =
+                            "../assets/images/world mark.png";
+                    };
+            }
+
+
+            if (domThumbList) {
+
+                domThumbList.innerHTML =
+                    "";
+
+
+                allValidImages.forEach(
+                    (url, index) => {
+
+                        const activeClass =
+                            index === 0
+                                ? "is-active"
+                                : "";
+
+
+                        domThumbList.innerHTML += `
+                            <div
+                                class="thumbnail-item ${activeClass}"
+                                onclick="changeMainImage('${pdEscapeHTML(url)}', this)"
+                            >
+                                <img
+                                    src="${pdEscapeHTML(url)}"
+                                    alt="Ảnh sản phẩm"
+                                >
+                            </div>
+                        `;
+                    }
+                );
+            }
+
+        } else {
+
+            if (domMainImg) {
+
+                domMainImg.src =
+                    "../assets/images/world mark.png";
+            }
+
+            if (domThumbList) {
+
+                domThumbList.innerHTML =
+                    "";
+            }
+        }
+
+
+        /* -------------------------------------------------
+           DESCRIPTION
+        ------------------------------------------------- */
+
+        const descText =
+            item.description ||
+            "Đang cập nhật mô tả chi tiết.";
+
+
+        const tabDescContent =
+            document.getElementById(
+                "tabDescContent"
+            );
+
+
+        if (tabDescContent) {
+
+            tabDescContent.innerHTML =
+                descText;
+        }
+
+
+        /* -------------------------------------------------
+           TECHNICAL DETAILS
+        ------------------------------------------------- */
+
+        const techDetails =
+            document.getElementById(
+                "techDetails"
+            );
+
+
+        if (techDetails) {
+
+            techDetails.innerHTML =
+                item.specifications ||
+                "Chưa có dữ liệu.";
+        }
+
+
+        /* -------------------------------------------------
+           DATASHEET
+        ------------------------------------------------- */
+
+        const tabDocsContent =
+            document.getElementById(
+                "tabDocsContent"
+            );
+
+
+        if (tabDocsContent) {
+
+            if (item.datasheet_url) {
+
+                tabDocsContent.innerHTML = `
+                    <div class="product-document-card">
+
+                        <div class="product-document-info">
+
+                            <div class="product-document-icon">
+                                <svg
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                                    ></path>
+                                </svg>
+                            </div>
+
+                            <div class="product-document-text">
+
+                                <div class="product-document-title">
+                                    Tài liệu kỹ thuật
+                                </div>
+
+                                <div class="product-document-type">
+                                    PDF Document
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <a
+                            href="${pdEscapeHTML(item.datasheet_url)}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="product-document-button"
+                        >
+                            Tải về
+                        </a>
+
+                    </div>
+                `;
+
+            } else {
+
+                tabDocsContent.innerHTML = `
+                    <p class="product-docs-empty">
+                        Chưa có tài liệu tải về bổ sung cho sản phẩm này.
+                    </p>
+                `;
+            }
+        }
+
+
+        /* -------------------------------------------------
+           SALES MODE + BUTTONS
+        ------------------------------------------------- */
+
+        const salesMode =
+            item.sales_mode || "BOTH";
+
+        const actionContainer =
+            document.getElementById(
+                "productActionButtons"
+            );
+
+
+        let actionHtml = "";
+
+
+        if (
+            salesMode === "BOTH" ||
+            salesMode === "RFQ"
+        ) {
+
+            actionHtml += `
+                <button
+                    type="button"
+                    onclick="addToRFQCart()"
+                    class="product-action-button action-rfq"
+                >
+                    <svg
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        ></path>
+                    </svg>
+
+                    Thêm Yêu Cầu Báo Giá
+                </button>
+            `;
+        }
+
+
+        if (
+            (
+                salesMode === "BOTH" ||
+                salesMode === "BUY"
+            ) &&
+            Number(item.price) > 0
+        ) {
+
+            actionHtml += `
+                <button
+                    type="button"
+                    onclick="addToShoppingCart()"
+                    class="product-action-button action-buy"
+                >
+                    <span aria-hidden="true">🛒</span>
+                    Mua Ngay
+                </button>
+            `;
+        }
+
+
+        if (actionContainer) {
+
+            actionContainer.innerHTML =
+                actionHtml;
+        }
+
+
+        /* -------------------------------------------------
+           SHOW MAIN
+        ------------------------------------------------- */
+
+        loadingScreen?.classList.add(
+            "is-hidden"
+        );
+
+        mainContent?.classList.remove(
+            "is-hidden"
+        );
+
+
+        /* -------------------------------------------------
+           LOAD RELATED + SALE
+        ------------------------------------------------- */
+
+        await Promise.all([
+            loadRelatedProducts(item),
+            loadSaleProductsSidebar(item.id)
+        ]);
+
+    } catch (err) {
+
+        console.error(
+            "Lỗi tải chi tiết:",
+            err
+        );
+
+        loadingScreen?.classList.add(
+            "is-hidden"
+        );
+
+        errorScreen?.classList.remove(
+            "is-hidden"
+        );
+
+        if (errorText) {
+            errorText.innerText =
+                err.message ||
+                "Không thể tải dữ liệu sản phẩm.";
+        }
+    }
+}
+
+
+/* ========================================================
+   2. CHANGE MAIN IMAGE
+======================================================== */
+
+function changeMainImage(
+    src,
+    element
+) {
+
+    const mainImage =
+        document.getElementById(
+            "mainImage"
+        );
+
+
+    if (mainImage) {
+
+        mainImage.src =
+            src;
+    }
+
+
+    document
+        .querySelectorAll(
+            ".thumbnail-item"
+        )
+        .forEach(
+            (el) => {
+
+                el.classList.remove(
+                    "is-active"
+                );
+            }
+        );
+
+
+    if (element) {
+
+        element.classList.add(
+            "is-active"
+        );
+    }
+}
+
+
+/* ========================================================
+   3. SWITCH TAB
+======================================================== */
+
+function switchTab(
+    tabName
+) {
+
+    const tabs = [
+        "desc",
+        "tech",
+        "docs"
+    ];
+
+
+    tabs.forEach(
+        (tab) => {
+
+            const suffix =
+                tab.charAt(0)
+                    .toUpperCase() +
+                tab.slice(1);
+
+
+            const btn =
+                document.getElementById(
+                    `tab${suffix}Btn`
+                );
+
+            const content =
+                document.getElementById(
+                    `tab${suffix}Content`
+                );
+
+
+            if (!btn || !content) {
+                return;
+            }
+
+
+            if (tab === tabName) {
+
+                btn.classList.add(
+                    "is-active"
+                );
+
+                content.classList.remove(
+                    "is-hidden"
+                );
+
+            } else {
+
+                btn.classList.remove(
+                    "is-active"
+                );
+
+                content.classList.add(
+                    "is-hidden"
+                );
+            }
+        }
+    );
+}
+
+
+/* ========================================================
+   4. CHANGE QUANTITY
+======================================================== */
+
+function changeQty(step) {
+
+    const qtyInput =
+        document.getElementById(
+            "buyQty"
+        );
+
+
+    if (!qtyInput) {
+        return;
+    }
+
+
+    const currentVal =
+        parseInt(
+            qtyInput.value
+        ) || currentMOQ;
+
+
+    let newVal =
+        currentVal + step;
+
+
+    if (
+        newVal <
+        currentMOQ
+    ) {
+
+        newVal =
+            currentMOQ;
+    }
+
+
+    qtyInput.value =
+        newVal;
+}
+
+
+/* ========================================================
+   5. ADD TO RFQ CART
+======================================================== */
+
+function addToRFQCart() {
+
+    const qtyInput =
+        document.getElementById(
+            "buyQty"
+        );
+
+
+    if (!qtyInput) {
+        return;
+    }
+
+
+    const qtyToAdd =
+        parseInt(
+            qtyInput.value
+        ) || 0;
+
+
+    if (
+        qtyToAdd <
+        currentMOQ
+    ) {
+
+        alert(
+            `❌ Sản phẩm này yêu cầu số lượng đặt mua tối thiểu (MOQ) là: ${currentMOQ}.\n\nVui lòng nhập số lượng hợp lệ để tiếp tục!`
+        );
+
+        qtyInput.value =
+            currentMOQ;
+
+        return;
+    }
+
+
+    let cart =
+        JSON.parse(
+            localStorage.getItem(
+                "mro_rfq_cart"
+            )
+        ) || [];
+
+
+    const currentItem = {
+
+        sku:
+            document.getElementById(
+                "detailSku"
+            )?.innerText || "",
+
+        name:
+            document.getElementById(
+                "productName"
+            )?.innerText || "",
+
+        brand:
+            document.getElementById(
+                "detailBrand"
+            )?.innerText || "",
+
+        unit:
+            document.getElementById(
+                "detailUnit"
+            )?.innerText || "",
+
+        qty:
+            qtyToAdd
+    };
+
+
+    const existingItem =
+        cart.find(
+            item =>
+                item.sku ===
+                currentItem.sku
+        );
+
+
+    if (existingItem) {
+
+        existingItem.qty +=
+            qtyToAdd;
+
+    } else {
+
+        cart.push(
+            currentItem
+        );
+    }
+
+
+    localStorage.setItem(
+        "mro_rfq_cart",
+        JSON.stringify(cart)
+    );
+
+
+    window.location.href =
+        "rfq.html";
+}
+
+
+/* ========================================================
+   6. RELATED PRODUCTS
+======================================================== */
+
+async function loadRelatedProducts(
+    currentItem
+) {
+
+    const grid =
+        document.getElementById(
+            "relatedProductsGrid"
+        );
+
+    const introText =
+        document.getElementById(
+            "relatedIntro"
+        );
+
+    const viewAllBtn =
+        document.getElementById(
+            "viewAllRelated"
+        );
+
+
+    if (!grid) {
+        return;
+    }
+
+
+    if (
+        currentItem.sub_category_id &&
+        viewAllBtn
+    ) {
+
+        viewAllBtn.href =
+            `products.html?sub_category_id=${currentItem.sub_category_id}`;
+    }
+
+
+    let queryColumn =
+        null;
+
+    let queryValue =
+        null;
+
+
+    if (currentItem.family_id) {
+
+        queryColumn =
+            "family_id";
+
+        queryValue =
+            currentItem.family_id;
+
+
+        if (
+            currentItem.brands &&
+            introText
+        ) {
+
+            introText.innerText =
+                `Các sản phẩm cùng thương hiệu ${currentItem.brands.name} bạn có thể quan tâm.`;
+        }
+
+    } else if (
+        currentItem.sub_category_id
+    ) {
+
+        queryColumn =
+            "sub_category_id";
+
+        queryValue =
+            currentItem.sub_category_id;
+
+
+        if (
+            currentItem.sub_categories &&
+            introText
+        ) {
+
+            introText.innerText =
+                `Các thiết bị thuộc nhóm ${currentItem.sub_categories.name} bạn có thể quan tâm.`;
+        }
+    }
+
+
+    if (!queryValue) {
+
+        grid.innerHTML = `
+            <p class="related-product-message">
+                Không có sản phẩm cùng dòng.
+            </p>
+        `;
+
+        introText?.classList.add(
+            "is-hidden"
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const {
+            data,
+            error
+        } = await window.supabaseClient
+            .from("products")
+            .select(`
+                *,
+                brands(name)
+            `)
+            .eq(
+                queryColumn,
+                queryValue
+            )
+            .neq(
+                "id",
+                currentItem.id
+            )
+            .limit(4);
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        if (
+            !data ||
+            data.length === 0
+        ) {
 
             grid.innerHTML = `
-                <div class="col-span-full flex justify-center py-10">
-                    <svg class="animate-spin h-8 w-8 text-kn-orange" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10" stroke-width="4"
-                            class="opacity-25"
-                            fill="none"
-                            stroke="currentColor">
-                        </circle>
-                        <path class="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0
-                            C5.373 0 0 5.373 0 12h4
-                            zm2 5.291A7.962 7.962 0 014 12H0
-                            c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                        </path>
-                    </svg>
-                </div>
+                <p class="related-product-message">
+                    Chưa có sản phẩm liên quan.
+                </p>
             `;
 
-            let queryColumn = null;
-            let queryValue = null;
+            introText?.classList.add(
+                "is-hidden"
+            );
 
-            if (currentItem.family_id) {
-                queryColumn = "family_id";
-                queryValue = currentItem.family_id;
-            }
-            else if (currentItem.sub_category_id) {
-                queryColumn = "sub_category_id";
-                queryValue = currentItem.sub_category_id;
-            }
+            return;
+        }
 
-            if (!queryValue) {
-                grid.innerHTML =
-                    '<p class="col-span-full text-center text-gray-500 italic">Không có sản phẩm cùng dòng.</p>';
-                return;
-            }
 
-            try {
+        grid.innerHTML =
+            "";
 
-                const { data, error } = await supabaseClient
-                    .from("products")
-                    .select(`
-                        *,
-                        brands(name)
-                    `)
-                    .eq(queryColumn, queryValue)
-                    .neq("id", currentItem.id)
-                    .limit(4);
 
-                if (error) throw error;
+        data.forEach(
+            (item) => {
 
-                if (!data || data.length === 0) {
-                    grid.innerHTML =
-                        '<p class="col-span-full text-center text-gray-500 italic">Chưa có sản phẩm cùng dòng.</p>';
-                    return;
-                }
+                const brandName =
+                    item.brands?.name ||
+                    "OEM";
 
-                grid.innerHTML = "";
 
-                data.forEach(item => {
+                const img =
+                    item.image_url ||
+                    "../assets/images/world mark.png";
 
-                    const brandName = item.brands?.name || "OEM";
 
-                    const img =
-                        item.image_url ||
-                        "https://via.placeholder.com/300x300?text=No+Image";
+                grid.innerHTML += `
 
-                    grid.innerHTML += `
-                        <div class="bg-white border rounded-lg hover:shadow-lg transition overflow-hidden">
+                    <div class="related-product-card">
 
-                            <a href="product-detail.html?id=${item.id}">
-                                <div class="h-48 flex items-center justify-center p-4">
-                                    <img src="${img}"
-                                        class="max-h-full object-contain hover:scale-105 transition">
-                                </div>
+                        <a
+                            href="product-detail.html?id=${item.id}"
+                            class="related-product-image-link"
+                        >
+                            <img
+                                src="${pdEscapeHTML(img)}"
+                                alt="${pdEscapeHTML(item.name || "")}"
+                                class="related-product-image"
+                            >
+                        </a>
+
+
+                        <div class="related-product-body">
+
+                            <div class="related-product-brand">
+                                ${pdEscapeHTML(brandName)}
+                            </div>
+
+
+                            <a
+                                href="product-detail.html?id=${item.id}"
+                            >
+                                <h4 class="related-product-name">
+                                    ${pdEscapeHTML(item.name || "")}
+                                </h4>
                             </a>
 
-                            <div class="p-4">
 
-                                <div class="text-xs text-gray-500 uppercase mb-2">
-                                    ${brandName}
+                            <div class="related-product-footer">
+
+                                <div class="related-product-sku">
+                                    SKU: ${pdEscapeHTML(item.sku || "")}
                                 </div>
 
-                                <a href="product-detail.html?id=${item.id}">
-                                    <h4 class="font-bold text-kn-blue hover:text-kn-orange line-clamp-2 min-h-[48px]">
-                                        ${item.name}
-                                    </h4>
-                                </a>
-
-                                <div class="mt-3 text-xs text-gray-500">
-                                    SKU: ${item.sku}
+                                <div class="related-product-stock">
+                                    IN STOCK
                                 </div>
 
                             </div>
 
                         </div>
-                    `;
 
-                });
+                    </div>
 
-            } catch (err) {
-
-                console.error("Related Products:", err);
-
-                grid.innerHTML =
-                    `<p class="col-span-full text-center text-red-500">
-                        Không thể tải sản phẩm cùng dòng.
-                    </p>`;
-            }
-
-        }
-
-        // HÀM CHUYỂN ẢNH KHI BẤM VÀO THUMBNAIL
-        function changeMainImage(src, element) {
-            document.getElementById('mainImage').src = src;
-            document.querySelectorAll('.thumbnail-item').forEach(el => {
-                el.classList.remove('border-kn-orange');
-                el.classList.add('opacity-70', 'border-gray-200');
-            });
-            element.classList.remove('opacity-70', 'border-gray-200');
-            element.classList.add('border-kn-orange');
-        }
-
-        // HÀM CHUYỂN TAB MÔ TẢ VÀ KỸ THUẬT
-        function switchTab(tabName) {
-            const btnDesc = document.getElementById('tabDescBtn');
-            const btnTech = document.getElementById('tabTechBtn');
-            const contentDesc = document.getElementById('tabDescContent');
-            const contentTech = document.getElementById('tabTechContent');
-
-            if(tabName === 'desc') {
-                btnDesc.classList.replace('text-gray-500', 'text-kn-blue');
-                btnDesc.classList.replace('border-transparent', 'border-kn-orange');
-                btnDesc.classList.add('bg-gray-50');
-                
-                btnTech.classList.replace('text-kn-blue', 'text-gray-500');
-                btnTech.classList.replace('border-kn-orange', 'border-transparent');
-                btnTech.classList.remove('bg-gray-50');
-
-                contentDesc.classList.remove('hidden');
-                contentTech.classList.add('hidden');
-            } else {
-                btnTech.classList.replace('text-gray-500', 'text-kn-blue');
-                btnTech.classList.replace('border-transparent', 'border-kn-orange');
-                btnTech.classList.add('bg-gray-50');
-                
-                btnDesc.classList.replace('text-kn-blue', 'text-gray-500');
-                btnDesc.classList.replace('border-kn-orange', 'border-transparent');
-                btnDesc.classList.remove('bg-gray-50');
-
-                contentTech.classList.remove('hidden');
-                contentDesc.classList.add('hidden');
-            }
-        }
-    
-        // HÀM TĂNG GIẢM SỐ LƯỢNG MỚI
-        function changeQty(step) {
-            const qtyInput = document.getElementById('buyQty');
-            let currentVal = parseInt(qtyInput.value) || 1;
-            let newVal = currentVal + step;
-            if (newVal < 1) newVal = 1; // Không cho tụt xuống số âm hoặc 0
-            qtyInput.value = newVal;
-        }
-
-        // HÀM THÊM VÀO GIỎ HÀNG (ĐÃ UPDATE ĐỂ LẤY SỐ LƯỢNG TỪ Ô NHẬP)
-        function addToRFQCart() {
-            let cart = JSON.parse(localStorage.getItem('mro_rfq_cart')) || [];
-            
-            // Lấy số lượng từ ô input do khách gõ
-            let qtyToAdd = parseInt(document.getElementById('buyQty').value) || 1; 
-
-            let currentItem = {
-                sku: document.getElementById('detailSku').innerText,
-                name: document.getElementById('productName').innerText,
-                brand: document.getElementById('detailBrand').innerText,
-                unit: document.getElementById('detailUnit').innerText,
-                qty: qtyToAdd // Nhét đúng số lượng khách chọn vào giỏ
-            };
-            
-            let existingItem = cart.find(item => item.sku === currentItem.sku);
-            
-            if (existingItem) {
-                existingItem.qty += qtyToAdd; // Cộng dồn nếu đã có trong giỏ
-            } else {
-                cart.push(currentItem); 
-            }
-            
-            localStorage.setItem('mro_rfq_cart', JSON.stringify(cart));
-            window.location.href = 'rfq.html'; 
-        }
-    
-        function executeSearch() {
-            const keyword = document.getElementById('searchInput').value.trim();
-            if (keyword) {
-                const currentPath = window.location.pathname;
-                const isRoot = currentPath.endsWith('index.html') || currentPath === '/' || currentPath.includes('index');
-                const targetUrl = isRoot ? `pages/products.html?search=${encodeURIComponent(keyword)}` : `products.html?search=${encodeURIComponent(keyword)}`;
-                window.location.href = targetUrl;
-            }
-        }
-
-        function handleEnterKey(event) {
-            if (event.key === 'Enter') {
-                executeSearch();
-            }
-        }
-    
-    // 1. TẢI GIỎ HÀNG TỪ LOCALSTORAGE (Mục 2.1 & 2.2)
-        function loadCartFromStorage() {
-            const cartList = document.getElementById('cartList');
-            let cartItems = JSON.parse(localStorage.getItem('mro_rfq_cart')) || [];
-            
-            if (cartItems.length === 0) {
-                cartList.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-gray-500">Giỏ yêu cầu của bạn đang trống.</td></tr>`;
-                return;
-            }
-
-            cartList.innerHTML = '';
-            cartItems.forEach((item, index) => {
-                // Hiển thị bảng đẹp hơn với đầy đủ thông tin
-                cartList.innerHTML += `
-                    <tr class="border-b">
-                        <td class="py-3 px-4">
-                            <img src="${item.image || 'https://via.placeholder.com/50'}" class="w-12 h-12 object-cover rounded border">
-                        </td>
-                        <td class="py-3 px-4 font-bold text-kn-blue">${item.sku}</td>
-                        <td class="py-3 px-4 font-medium">${item.name}</td>
-                        <td class="py-3 px-4 text-xs text-gray-500 uppercase">${item.brand}</td>
-                        <td class="py-3 px-4">
-                            <div class="flex items-center border rounded w-24">
-                                <button onclick="updateQty('${item.sku}', -1)" class="px-2 py-1 bg-gray-100 hover:bg-gray-200">-</button>
-                                <input type="number" value="${item.qty}" readonly class="w-full text-center text-sm outline-none bg-transparent">
-                                <button onclick="updateQty('${item.sku}', 1)" class="px-2 py-1 bg-gray-100 hover:bg-gray-200">+</button>
-                            </div>
-                        </td>
-                        <td class="py-3 px-4 text-center">
-                            <button onclick="removeItem('${item.sku}')" class="text-red-500 hover:text-red-700 font-bold">Xóa</button>
-                        </td>
-                    </tr>
                 `;
-            });
-        }
-
-        // Cập nhật số lượng (Không cho tụt dưới 1)
-        function updateQty(sku, change) {
-            let cartItems = JSON.parse(localSrage.getItem('mro_rfq_cart')) || [];
-            let item = cartItems.find(i => i.sku === sku);
-            if (item) {
-                item.qty += change;
-                if (item.qty < 1) item.qty = 1;
-                localStorage.setItem('mro_rfq_cart', JSON.stringify(cartItems));
-                loadCartFromStorage();
             }
+        );
+
+    } catch (err) {
+
+        console.error(
+            "Related Products:",
+            err
+        );
+
+        grid.innerHTML = `
+            <p class="related-product-error">
+                Lỗi tải dữ liệu sản phẩm cùng dòng.
+            </p>
+        `;
+    }
+}
+
+
+/* ========================================================
+   7. SALE PRODUCTS SIDEBAR
+======================================================== */
+
+async function loadSaleProductsSidebar(
+    currentProductId
+) {
+
+    const container =
+        document.getElementById(
+            "saleProductsSidebar"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    try {
+
+        const {
+            data,
+            error
+        } = await window.supabaseClient
+            .from("products")
+            .select(`
+                *,
+                brands(name)
+            `)
+            .gt(
+                "discount_price",
+                0
+            )
+            .neq(
+                "id",
+                currentProductId
+            )
+            .limit(20);
+
+
+        if (error) {
+            throw error;
         }
 
-        // Xóa một sản phẩm
-        function removeItem(sku) {
-            let cartItems = JSON.parse(localStorage.getItem('mro_rfq_cart')) || [];
-            cartItems = cartItems.filter(i => i.sku !== sku);
-            localStorage.setItem('mro_rfq_cart', JSON.stringify(cartItems));
+
+        if (
+            !data ||
+            data.length === 0
+        ) {
+
+            container.innerHTML = `
+                <p class="product-sale-empty">
+                    Hiện tại đang không có chương trình khuyến mãi.
+                </p>
+            `;
+
+            return;
+        }
+
+
+        const shuffledData =
+            data.sort(
+                () =>
+                    0.5 -
+                    Math.random()
+            );
+
+
+        const randomPicks =
+            shuffledData.slice(
+                0,
+                4
+            );
+
+
+        let html =
+            "";
+
+
+        randomPicks.forEach(
+            (item) => {
+
+                const brandName =
+                    item.brands?.name ||
+                    "OEM";
+
+
+                const img =
+                    item.image_url ||
+                    "../assets/images/world mark.png";
+
+
+                const originalPrice =
+                    item.price
+                        ? pdFormatCurrency(
+                            item.price
+                        )
+                        : "";
+
+
+                const discountPrice =
+                    item.discount_price
+                        ? pdFormatCurrency(
+                            item.discount_price
+                        )
+                        : "Liên hệ";
+
+
+                html += `
+
+                    <a
+                        href="product-detail.html?id=${item.id}"
+                        class="product-sale-item"
+                    >
+
+                        <div class="product-sale-image">
+
+                            <img
+                                src="${pdEscapeHTML(img)}"
+                                alt="${pdEscapeHTML(item.name || "")}"
+                            >
+
+                        </div>
+
+
+                        <div class="product-sale-info">
+
+                            <div class="product-sale-brand">
+                                ${pdEscapeHTML(brandName)}
+                            </div>
+
+
+                            <h4 class="product-sale-name">
+                                ${pdEscapeHTML(item.name || "")}
+                            </h4>
+
+
+                            <div class="product-sale-prices">
+
+                                <span class="product-sale-old-price">
+                                    ${originalPrice}
+                                </span>
+
+                                <span class="product-sale-new-price">
+                                    ${discountPrice}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </a>
+
+                `;
+            }
+        );
+
+
+        container.innerHTML =
+            html;
+
+    } catch (err) {
+
+        console.error(
+            "Sale Sidebar Products:",
+            err
+        );
+
+        container.innerHTML = `
+            <p class="product-sale-empty">
+                Lỗi tải dữ liệu.
+            </p>
+        `;
+    }
+}
+
+
+/* ========================================================
+   8. RFQ LOCAL STORAGE
+======================================================== */
+
+function loadCartFromStorage() {
+
+    const cartList =
+        document.getElementById(
+            "cartList"
+        );
+
+
+    if (!cartList) {
+        return;
+    }
+
+
+    const cartItems =
+        JSON.parse(
+            localStorage.getItem(
+                "mro_rfq_cart"
+            )
+        ) || [];
+
+
+    if (
+        cartItems.length === 0
+    ) {
+
+        cartList.innerHTML = `
+            <tr>
+                <td
+                    colspan="6"
+                    class="rfq-cart-empty"
+                >
+                    Giỏ yêu cầu của bạn đang trống.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+
+    cartList.innerHTML =
+        "";
+
+
+    cartItems.forEach(
+        (item) => {
+
+            cartList.innerHTML += `
+
+                <tr class="rfq-cart-row">
+
+                    <td class="rfq-cart-sku">
+                        ${pdEscapeHTML(item.sku)}
+                    </td>
+
+                    <td class="rfq-cart-name">
+                        ${pdEscapeHTML(item.name)}
+                    </td>
+
+                    <td class="rfq-cart-brand">
+                        ${pdEscapeHTML(item.brand)}
+                    </td>
+
+                    <td class="rfq-cart-qty-cell">
+
+                        <div class="rfq-cart-qty">
+
+                            <button
+                                type="button"
+                                onclick="updateQty('${pdEscapeHTML(item.sku)}', -1)"
+                            >
+                                -
+                            </button>
+
+                            <input
+                                type="number"
+                                value="${item.qty}"
+                                readonly
+                            >
+
+                            <button
+                                type="button"
+                                onclick="updateQty('${pdEscapeHTML(item.sku)}', 1)"
+                            >
+                                +
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                    <td class="rfq-cart-remove-cell">
+
+                        <button
+                            type="button"
+                            onclick="removeItem('${pdEscapeHTML(item.sku)}')"
+                            class="rfq-cart-remove"
+                        >
+                            Xóa
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            `;
+        }
+    );
+}
+
+
+/* ========================================================
+   9. UPDATE RFQ QUANTITY
+======================================================== */
+
+function updateQty(
+    sku,
+    change
+) {
+
+    let cartItems =
+        JSON.parse(
+            localStorage.getItem(
+                "mro_rfq_cart"
+            )
+        ) || [];
+
+
+    const item =
+        cartItems.find(
+            i =>
+                i.sku === sku
+        );
+
+
+    if (item) {
+
+        item.qty +=
+            change;
+
+
+        if (item.qty < 1) {
+            item.qty = 1;
+        }
+
+
+        localStorage.setItem(
+            "mro_rfq_cart",
+            JSON.stringify(
+                cartItems
+            )
+        );
+
+
+        loadCartFromStorage();
+    }
+}
+
+
+/* ========================================================
+   10. REMOVE RFQ ITEM
+======================================================== */
+
+function removeItem(
+    sku
+) {
+
+    let cartItems =
+        JSON.parse(
+            localStorage.getItem(
+                "mro_rfq_cart"
+            )
+        ) || [];
+
+
+    cartItems =
+        cartItems.filter(
+            i =>
+                i.sku !== sku
+        );
+
+
+    localStorage.setItem(
+        "mro_rfq_cart",
+        JSON.stringify(
+            cartItems
+        )
+    );
+
+
+    loadCartFromStorage();
+}
+
+
+/* ========================================================
+   11. SHARE
+======================================================== */
+
+function shareProduct() {
+
+    const productUrl =
+        window.location.href;
+
+    const productTitle =
+        document.getElementById(
+            "productName"
+        )?.innerText ||
+        document.title;
+
+
+    if (
+        navigator.share
+    ) {
+
+        navigator.share({
+
+            title:
+                productTitle,
+
+            text:
+                "Tham khảo vật tư này trên MRO Khang Nam:",
+
+            url:
+                productUrl
+
+        })
+        .catch(
+            (err) =>
+                console.error(
+                    "Lỗi chia sẻ:",
+                    err
+                )
+        );
+
+    } else {
+
+        navigator.clipboard
+            .writeText(
+                productUrl
+            )
+            .then(
+                () => {
+
+                    alert(
+                        "✅ Đã copy link sản phẩm! Bạn có thể dán (Ctrl+V) để chia sẻ."
+                    );
+                }
+            )
+            .catch(
+                (err) => {
+
+                    console.error(
+                        "Không thể copy link:",
+                        err
+                    );
+                }
+            );
+    }
+}
+
+
+/* ========================================================
+   12. PRINT
+======================================================== */
+
+function printProduct() {
+    window.print();
+}
+
+
+/* ========================================================
+   13. INIT
+======================================================== */
+
+window.addEventListener(
+    "load",
+    async () => {
+
+        const urlParams =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        if (
+            urlParams.get("id")
+        ) {
+
+            await loadProductDetail();
+        }
+
+
+        if (
+            document.getElementById(
+                "cartList"
+            )
+        ) {
+
             loadCartFromStorage();
         }
 
-        // Xóa toàn bộ
-        function clearAllCart() {
-            if(confirm("Bạn có chắc muốn xóa sạch giỏ yêu cầu báo giá?")) {
-                localStorage.removeItem('mro_rfq_cart');
-                loadCartFromStorage();
+
+        /* -----------------------------------------------
+           XÁC THỰC "TRÙM CUỐI" ĐỒNG BỘ CSS TĨNH
+        ------------------------------------------------ */
+        try {
+            let isUserLoggedIn = false;
+            if (typeof checkCustomerAuth === 'function') {
+                isUserLoggedIn = !!(await checkCustomerAuth());
+            } else if (typeof window.checkCustomerAuth === 'function') {
+                isUserLoggedIn = !!(await window.checkCustomerAuth());
+            } else if (typeof Auth !== 'undefined' && typeof Auth.getCurrentUser === 'function') {
+                isUserLoggedIn = !!(await Auth.getCurrentUser());
+            } else if (window.supabaseClient) {
+                const { data } = await window.supabaseClient.auth.getSession();
+                isUserLoggedIn = !!data?.session;
             }
-        }
-    
-        // 2. GỬI YÊU CẦU BÁO GIÁ (Mục 2.3 & 2.4)
-        async function submitRFQ(event) {
-            event.preventDefault(); // Chặn tải lại trang
 
-            let cartItems = JSON.parse(localStorage.getItem('mro_rfq_cart')) || [];
-            if (cartItems.length === 0) {
-                alert("Giỏ hàng đang trống, vui lòng thêm sản phẩm trước khi gửi!");
-                return;
-            }
-
-            // Lấy thông tin khách hàng từ Form (2.3)
-            const company = document.getElementById('inCompany').value;
-            const name = document.getElementById('inFullName').value;
-            const phone = document.getElementById('inPhone').value;
-            const email = document.getElementById('inEmail').value;
-            const address = document.getElementById('inAddress').value;
-            const note = document.getElementById('inNote').value;
-
-            // Tạo mã RFQ tự động (VD: RFQ-2026-12345)
-            const date = new Date();
-            const year = date.getFullYear();
-            const randomCode = `RFQ-${year}-${Math.floor(10000 + Math.random() * 90000)}`;
-
-            try {
-                // Đổi text nút Submit để báo hiệu đang chạy
-                const btnSubmit = document.getElementById('btnSubmitRFQ');
-                btnSubmit.innerText = "Đang gửi yêu cầu...";
-                btnSubmit.disabled = true;
-
-                // Tùy theo cấu trúc Database của ông:
-                // Nếu dùng 2 bảng rfq_orders và rfq_items như ông viết ở 2.4
+            if (isUserLoggedIn) {
+                const guestBtn = document.getElementById("btnGuestLogin");
+                if (guestBtn) guestBtn.classList.add("d-none");
                 
-                // BƯỚC 1: Insert vào bảng rfq_orders
-                const { data: orderData, error: orderError } = await supabaseClient
-                    .from('rfq_orders')
-                    .insert([{
-                        rfq_code: randomCode,
-                        company_name: company,
-                        full_name: name,
-                        phone: phone,
-                        email: email,
-                        address: address,
-                        note: note,
-                        status: 'Chờ xử lý'
-                    }])
-                    .select('id')
-                    .single();
-
-                if (orderError) throw orderError;
-
-                // BƯỚC 2: Insert chi tiết vào bảng rfq_items (có link với id của rfq_orders)
-                const itemsToInsert = cartItems.map(item => ({
-                    order_id: orderData.id,
-                    sku: item.sku,
-                    name: item.name,
-                    brand: item.brand,
-                    qty: item.qty
-                }));
-
-                const { error: itemsError } = await supabaseClient
-                    .from('rfq_items')
-                    .insert(itemsToInsert);
-
-                if (itemsError) throw itemsError;
-
-                // THÀNH CÔNG (Mục 2.5) -> Xóa giỏ và bật trang Success
-                localStorage.removeItem('mro_rfq_cart');
-                showSuccessPage(randomCode);
-
-            } catch (error) {
-                console.error("Lỗi gửi RFQ:", error);
-                alert("Có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại!");
-                document.getElementById('btnSubmitRFQ').innerText = "Gửi Yêu Cầu Báo Giá";
-                document.getElementById('btnSubmitRFQ').disabled = false;
+                const userProfileBtn = document.getElementById("btnUserProfile");
+                if (userProfileBtn) {
+                    userProfileBtn.classList.remove("d-none", "hidden", "is-hidden");
+                }
             }
+        } catch (err) {
+            console.error("Lỗi xác thực:", err);
         }
-
-        // Bật màn hình Success (2.5)
-        function showSuccessPage(rfqCode) {
-            // Giấu phần form và giỏ hàng đi
-            document.getElementById('rfqMainSection').classList.add('hidden');
-            
-            // Hiện phần thông báo thành công lên
-            const successDiv = document.getElementById('rfqSuccessSection');
-            successDiv.classList.remove('hidden');
-            
-            // In mã RFQ ra
-            document.getElementById('displayRfqCode').innerText = rfqCode;
-        }
-
-        window.onload = function() {
-            checkCustomerAuth();
-            loadProductDetail();
-        };
+    }
+);

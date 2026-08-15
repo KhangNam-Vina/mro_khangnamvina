@@ -3,69 +3,312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thương hiệu đối tác - MRO Khang Nam B2B</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { 
-            theme: { 
-                extend: { 
-                    colors: { 
-                        'kn-blue': '#00479b', 
-                        'kn-orange': '#ff5e00', 
-                        'kn-light': '#f5f6f8',
-                        'kn-dark': '#003370'
-                    } 
-                } 
-            } 
-        }
-    </script>
+
+    <title>Thương hiệu vật tư công nghiệp | MRO Khang Nam</title>
+
+    <meta
+        name="description"
+        content="MRO Khang Nam phân phối hơn 100 thương hiệu vật tư công nghiệp chính hãng như SKF, Bosch, Makita..."
+    >
+
+    <meta name="robots" content="index,follow">
+
+    <meta
+        property="og:title"
+        content="Thương hiệu vật tư công nghiệp | MRO Khang Nam"
+    >
+
+    <meta
+        property="og:description"
+        content="MRO Khang Nam phân phối hơn 100 thương hiệu vật tư công nghiệp chính hãng như SKF, Bosch, Makita..."
+    >
+
+    <meta
+        property="og:image"
+        content="../assets/banner-brands.webp"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="../assets/images/world mark.png"
+    >
+
+    <!-- CSS DÙNG CHUNG -->
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/header.css">
+    <link rel="stylesheet" href="../assets/css/footer.css">
+    <link rel="stylesheet" href="../assets/css/brand.css">
 </head>
-<body class="bg-kn-light font-sans text-gray-800">
 
-    <!-- CHỖ NÀY ĐỂ RÁP HEADER BẰNG JAVASCRIPT -->
-    <div id="app-header"></div>
+<body class="brands-page">
 
-    <!-- 3. PAGE HEADER / BANNER -->
-    <div class="bg-gray-900 text-white py-12 relative overflow-hidden">
-        <img src="../assets/world mark.png" alt="Brands Banner" class="absolute inset-0 w-full h-full object-cover opacity-20">
-        <div class="container mx-auto px-4 relative z-10">
-            <h1 class="text-3xl md:text-4xl font-bold mb-4">Thương Hiệu Phân Phối</h1>
-            <p class="text-gray-300 max-w-2xl text-sm leading-relaxed">
-                MRO Khang Nam tự hào là đối tác phân phối chính thức của hơn 100+ thương hiệu vật tư công nghiệp hàng đầu thế giới. Cam kết 100% hàng chính hãng, đầy đủ chứng từ CO/CQ.
+    <!-- HEADER -->
+    <div id="app-header" class="site-header-placeholder"></div>
+
+
+    <!-- HERO -->
+    <section class="brands-hero">
+
+        <div class="brands-hero-overlay"></div>
+
+        <div class="brands-container">
+
+            <nav
+                aria-label="Breadcrumb"
+                class="brands-breadcrumb"
+            >
+                <a
+                    href="../index.html"
+                    class="brands-breadcrumb-link"
+                >
+                    Trang chủ
+                </a>
+
+                <span class="brands-breadcrumb-separator">
+                    /
+                </span>
+
+                <span class="brands-breadcrumb-current">
+                    Thương Hiệu
+                </span>
+            </nav>
+
+
+            <h1 class="brands-hero-title">
+                Đối Tác & Thương Hiệu Phân Phối
+            </h1>
+
+            <p class="brands-hero-description">
+                Công ty TNHH Thương mại – Dịch vụ Khang Nam Vina tự hào là
+                đơn vị hàng đầu hợp tác với các thương hiệu đi đầu trong
+                lĩnh vực công nghiệp, trang thiết bị văn phòng và nhà xưởng.
             </p>
-        </div>
-    </div>
 
-    <!-- 4. MAIN CONTENT -->
-    <main class="container mx-auto px-4 py-10">
-        <div class="mb-6 flex justify-between items-end border-b-2 border-kn-blue pb-2">
-            <h2 class="text-2xl font-bold text-gray-800 uppercase tracking-wide">Thương hiệu Nổi bật</h2>
-            <span class="text-sm text-gray-500 font-medium">Hiển thị 12 thương hiệu hàng đầu</span>
         </div>
 
-        <div id="brandGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-            <div class="col-span-full flex justify-center py-10">
-                <svg class="animate-spin h-8 w-8 text-kn-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="4" class="opacity-25"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+    </section>
+
+
+    <!-- MAIN -->
+    <main class="brands-main">
+
+        <div class="brands-container">
+
+
+            <!-- SEARCH + A-Z -->
+            <div class="brands-toolbar">
+
+                <div class="brands-search-box">
+
+                    <input
+                        type="text"
+                        id="searchBrand"
+                        placeholder="Tìm thương hiệu (VD: SKF, Bosch...)"
+                        class="brands-search-input"
+                    >
+
+                    <svg
+                        class="brands-search-icon"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        ></path>
+                    </svg>
+
+                </div>
+
+
+                <div
+                    id="azFilter"
+                    class="brands-az-filter"
+                ></div>
+
             </div>
+
+
+            <!-- FEATURED BRANDS -->
+            <section
+                id="featuredSection"
+                class="brands-featured-section"
+            >
+
+                <h2 class="brands-section-title">
+
+                    <svg
+                        class="brands-section-title-icon"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                        ></path>
+                    </svg>
+
+                    Thương Hiệu Nổi Bật
+
+                </h2>
+
+
+                <div
+                    id="featuredBrands"
+                    class="brands-featured-grid"
+                ></div>
+
+            </section>
+
+
+            <!-- ALL BRANDS -->
+            <section class="brands-all-section">
+
+                <div class="brands-list-header">
+
+                    <h2 class="brands-list-title">
+
+                        Tất Cả Thương Hiệu
+
+                        <span
+                            id="currentFilterText"
+                            class="brands-current-filter"
+                        ></span>
+
+                    </h2>
+
+
+                    <span
+                        id="brandCountText"
+                        class="brands-count"
+                    >
+                        ...
+                    </span>
+
+                </div>
+
+
+                <!-- BRAND GRID -->
+                <div
+                    id="brandsContainer"
+                    class="brands-grid"
+                >
+
+                    <!-- Skeleton -->
+                    <div class="brand-skeleton-card">
+                        <div class="brand-skeleton-logo"></div>
+                        <div class="brand-skeleton-line"></div>
+                    </div>
+
+                    <div class="brand-skeleton-card brand-skeleton-sm">
+                        <div class="brand-skeleton-logo"></div>
+                        <div class="brand-skeleton-line"></div>
+                    </div>
+
+                    <div class="brand-skeleton-card brand-skeleton-lg">
+                        <div class="brand-skeleton-logo"></div>
+                        <div class="brand-skeleton-line"></div>
+                    </div>
+
+                    <div class="brand-skeleton-card brand-skeleton-xl">
+                        <div class="brand-skeleton-logo"></div>
+                        <div class="brand-skeleton-line"></div>
+                    </div>
+
+                    <div class="brand-skeleton-card brand-skeleton-xl">
+                        <div class="brand-skeleton-logo"></div>
+                        <div class="brand-skeleton-line"></div>
+                    </div>
+
+                    <div class="brand-skeleton-card brand-skeleton-xl">
+                        <div class="brand-skeleton-logo"></div>
+                        <div class="brand-skeleton-line"></div>
+                    </div>
+
+                </div>
+
+
+                <!-- EMPTY -->
+                <div
+                    id="emptyState"
+                    class="brands-empty is-hidden"
+                >
+
+                    <svg
+                        class="brands-empty-icon"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        ></path>
+                    </svg>
+
+
+                    <h3 class="brands-empty-title">
+                        Không tìm thấy thương hiệu nào!
+                    </h3>
+
+
+                    <p class="brands-empty-description">
+                        Thử tìm kiếm với từ khóa khác hoặc xóa bộ lọc
+                        để xem toàn bộ.
+                    </p>
+
+
+                    <button
+                        type="button"
+                        onclick="resetFilters()"
+                        class="brands-reset-button"
+                    >
+                        Hiển Thị Tất Cả
+                    </button>
+
+                </div>
+
+
+                <!-- PAGINATION -->
+                <div
+                    id="paginationContainer"
+                    class="brands-pagination"
+                ></div>
+
+            </section>
+
         </div>
+
     </main>
 
-    <!-- CHỖ NÀY ĐỂ RÁP FOOTER BẰNG JAVASCRIPT -->
+
+    <!-- FOOTER -->
     <div id="app-footer"></div>
 
-    <!-- ========================================== -->
-    <!-- PHẦN GỌI SCRIPT ĐƯỢC QUY HOẠCH GỌN GÀNG LẠI -->
-    <!-- ========================================== -->
 
-    <!-- 1. GỌI SCRIPT COMPONENT HEADER/FOOTER -->
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/common/utils.js"></script>
+    <script src="../assets/js/common/auth.js"></script>
+
     <script src="../assets/components/header.js"></script>
     <script src="../assets/components/footer.js"></script>
 
-    <!-- 2. GỌI THƯ VIỆN & SCRIPT DÙNG CHUNG -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../assets/js/common.js"></script>
+    <script src="../assets/js/users/auth-ui.js"></script>
+    <script src="../assets/js/users/brands.js"></script>
 
-    <!-- 3. SCRIPT LOGIC RIÊNG CỦA TRANG NÀY (CỰC SẠCH) -->
-    <script src="../assets/js/brands.js"></script>
 </body>
 </html>

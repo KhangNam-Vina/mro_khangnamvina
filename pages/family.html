@@ -1,53 +1,297 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dòng Sản Phẩm - MRO Khang Nam</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00', 'kn-light': '#f5f6f8' } } } }
-    </script>
+
+    <title>Dòng sản phẩm | MRO Khang Nam</title>
+
+    <meta
+        name="description"
+        content="Danh sách dòng sản phẩm vật tư công nghiệp tại MRO Khang Nam."
+    >
+
+    <meta name="robots" content="index,follow">
+
+    <link
+        rel="canonical"
+        id="canonicalUrl"
+        href=""
+    >
+
+    <meta
+        property="og:title"
+        id="ogTitle"
+        content="Dòng sản phẩm | MRO Khang Nam"
+    >
+
+    <meta
+        property="og:description"
+        id="ogDesc"
+        content="Danh sách dòng sản phẩm vật tư công nghiệp tại MRO Khang Nam."
+    >
+
+    <meta
+        property="og:url"
+        id="ogUrl"
+        content=""
+    >
+
+    <meta
+        property="og:image"
+        content="../assets/banner-brands.webp"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="../assets/images/world mark.png"
+    >
+
+    <!-- JSON-LD -->
+    <script
+        type="application/ld+json"
+        id="schemaJSON"
+    ></script>
+
+    <!-- CSS DÙNG CHUNG -->
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link
+        rel="stylesheet"
+        href="../assets/css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/header.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/footer.css"
+    >
+
+    <!-- CATALOG CSS -->
+    <link
+        rel="stylesheet"
+        href="../assets/css/catalog.css"
+    >
 </head>
-<body class="bg-kn-light flex flex-col min-h-screen">
 
-    <!-- CHỖ NÀY ĐỂ RÁP HEADER BẰNG JAVASCRIPT -->
-    <div id="app-header"></div>
 
-    <!-- MAIN: LƯỚI FAMILY -->
-    <main class="flex-grow container mx-auto px-4 py-10">
-        <div class="flex justify-between items-end mb-6 border-b border-gray-200 pb-4">
-            <div>
-                <h1 id="pageTitle" class="text-3xl font-bold text-kn-blue uppercase">Đang tải Dòng Sản Phẩm...</h1>
-                <p class="text-gray-500 mt-1">Chọn một dòng sản phẩm để xem chi tiết các mã hàng</p>
+<body class="catalog-page">
+
+    <!-- HEADER -->
+    <div
+        id="app-header"
+        class="site-header-placeholder"
+    ></div>
+
+
+    <!-- ====================================================
+         HERO
+    ===================================================== -->
+
+    <section class="catalog-hero family-hero">
+
+        <div class="catalog-hero-overlay"></div>
+
+        <div class="catalog-hero-container">
+
+            <!-- BREADCRUMB -->
+
+            <nav
+                id="dynamicBreadcrumb"
+                class="catalog-breadcrumb"
+                aria-label="Breadcrumb"
+            >
+
+                <a
+                    href="../index.html"
+                    class="catalog-breadcrumb-link"
+                >
+                    Trang chủ
+                </a>
+
+                <span
+                    class="catalog-breadcrumb-separator"
+                    aria-hidden="true"
+                >
+                    /
+                </span>
+
+                <a
+                    href="category.html"
+                    class="catalog-breadcrumb-link"
+                >
+                    Danh Mục
+                </a>
+
+                <span
+                    class="catalog-breadcrumb-separator"
+                    aria-hidden="true"
+                >
+                    /
+                </span>
+
+                <a
+                    id="bcParentCategory"
+                    href="#"
+                    class="catalog-breadcrumb-link is-hidden"
+                >
+                    Parent Category
+                </a>
+
+                <span
+                    id="bcSeparator"
+                    class="catalog-breadcrumb-separator is-hidden"
+                    aria-hidden="true"
+                >
+                    /
+                </span>
+
+                <span
+                    id="bcCurrent"
+                    class="catalog-breadcrumb-current catalog-breadcrumb-loading"
+                >
+                    Đang tải...
+                </span>
+
+            </nav>
+
+
+            <!-- TITLE -->
+
+            <div class="catalog-hero-content">
+
+                <h1
+                    id="pageTitle"
+                    class="catalog-hero-title"
+                >
+                    Đang tải dữ liệu...
+                </h1>
+
+                <p class="catalog-hero-description">
+                    Chọn một dòng sản phẩm để xem chi tiết các mã hàng
+                </p>
+
             </div>
+
         </div>
-        
-        <!-- BÃI ĐÁP FAMILY -->
-        <div id="familyContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="col-span-full flex justify-center py-10">
-                <!-- Icon Loading -->
-                <svg class="animate-spin h-8 w-8 text-kn-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="4" class="opacity-25"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+
+    </section>
+
+
+    <!-- ====================================================
+         MAIN
+    ===================================================== -->
+
+    <main class="catalog-main family-main">
+
+        <div class="catalog-container">
+
+
+            <!-- SEARCH -->
+
+            <div class="catalog-search-wrapper family-search-wrapper">
+
+                <div class="catalog-search-box">
+
+                    <input
+                        type="text"
+                        id="searchFamily"
+                        class="catalog-search-input"
+                        placeholder="Tìm dòng sản phẩm (VD: MY Series)..."
+                        autocomplete="off"
+                        aria-label="Tìm dòng sản phẩm"
+                    >
+
+                    <svg
+                        class="catalog-search-icon"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        ></path>
+                    </svg>
+
+                </div>
+
             </div>
+
+
+            <!-- FAMILY GRID -->
+
+            <div
+                id="familyContainer"
+                class="catalog-grid family-grid"
+            >
+                <!-- JS render -->
+            </div>
+
+
+            <!-- EMPTY STATE -->
+
+            <div
+                id="emptyState"
+                class="catalog-empty-state is-hidden"
+            >
+
+                <span class="catalog-empty-emoji">
+                    📭
+                </span>
+
+                <h2 class="catalog-empty-title">
+                    Chưa có dòng sản phẩm
+                </h2>
+
+                <p class="catalog-empty-description">
+                    Chúng tôi đang cập nhật thêm dữ liệu cho phân nhóm này.
+                </p>
+
+                <a
+                    href="category.html"
+                    class="catalog-empty-button"
+                >
+                    Quay lại danh mục
+                </a>
+
+            </div>
+
         </div>
+
     </main>
 
-    <!-- CHỖ NÀY ĐỂ RÁP FOOTER BẰNG JAVASCRIPT -->
+
+    <!-- FOOTER -->
     <div id="app-footer"></div>
 
-    <!-- ========================================== -->
-    <!-- PHẦN GỌI SCRIPT ĐƯỢC QUY HOẠCH GỌN GÀNG LẠI -->
-    <!-- ========================================== -->
+ 
+    <!-- ====================================================
+         JAVASCRIPT
+    ===================================================== -->
 
-    <!-- 1. GỌI SCRIPT COMPONENT HEADER/FOOTER -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/common/utils.js"></script>
+    <script src="../assets/js/common/auth.js"></script>
+
     <script src="../assets/components/header.js"></script>
     <script src="../assets/components/footer.js"></script>
 
-    <!-- 2. GỌI THƯ VIỆN & SCRIPT DÙNG CHUNG -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../assets/js/common.js"></script>
+    <script src="../assets/js/users/auth-ui.js"></script>
+    <script src="../assets/js/users/family.js"></script>
 
-    <!-- 3. SCRIPT LOGIC RIÊNG CỦA TRANG NÀY (CỰC SẠCH) -->
-    <script src="../assets/js/family.js"></script>
 </body>
+
 </html>

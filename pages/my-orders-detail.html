@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chi tiết đơn hàng | MRO Khang Nam</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/png" href="../assets/images/world mark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/header.css">
+<link rel="stylesheet" href="../assets/css/footer.css">
+<link rel="stylesheet" href="../assets/css/my-orders-detail.css">
+</head>
+<body class="profile-page-wrapper">
+
+<div id="app-header"></div>
+
+<section class="profile-hero">
+    <div class="profile-hero-overlay"></div>
+    <div class="profile-container relative-z">
+        <nav aria-label="Breadcrumb" class="profile-breadcrumb">
+            <a href="../index.html" class="breadcrumb-link">Trang chủ</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="profile.html" class="breadcrumb-link">Tài khoản</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="my-orders.html" class="breadcrumb-link">Lịch sử mua hàng</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-current">Chi tiết đơn hàng</span>
+        </nav>
+        <h1 class="profile-hero-title">Chi tiết đơn hàng</h1>
+        <p class="profile-hero-description">Xem thông tin, sản phẩm và trạng thái xử lý của đơn hàng.</p>
+    </div>
+</section>
+
+<main class="profile-main-content">
+<div class="profile-layout-grid">
+
+<aside class="profile-sidebar">
+    <div class="profile-sidebar-profile">
+        <div id="userAvatarInitials" class="profile-avatar">KN</div>
+        <p id="sidebarUserName" class="profile-sidebar-name">Đang tải...</p>
+        <p id="sidebarUserEmail" class="profile-sidebar-email">-</p>
+    </div>
+    <nav class="profile-sidebar-nav">
+        <a href="profile.html" class="profile-sidebar-link">
+            <svg class="profile-sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            <span>Thông tin Công ty</span>
+        </a>
+        <a href="my-orders.html" class="profile-sidebar-link is-active">
+            <svg class="profile-sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            <span>Lịch sử mua hàng</span>
+        </a>
+        <a href="my-rfq.html" class="profile-sidebar-link">
+            <svg class="profile-sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>Lịch sử Báo giá (RFQ)</span>
+        </a>
+        <a href="purchased-products.html" class="profile-sidebar-link">
+            <svg class="profile-sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+            <span>Sản phẩm thường mua</span>
+        </a>
+        <div class="profile-sidebar-divider"></div>
+        <button type="button" onclick="handleCustomerLogout()" class="profile-sidebar-link profile-sidebar-logout">
+            <svg class="profile-sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            <span>Đăng xuất</span>
+        </button>
+    </nav>
+</aside>
+
+<div class="profile-content-area">
+    <div id="orderLoading" class="order-detail-card order-detail-state">
+        <div class="loading-spinner"></div>
+        <p class="state-text">Đang tải chi tiết đơn hàng...</p>
+    </div>
+
+    <div id="orderError" class="order-detail-card order-detail-state d-none">
+        <svg class="state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v4m0 4h.01M10.29 3.86l-8.1 14a2 2 0 001.73 3h16.16a2 2 0 001.73-3l-8.1-14a2 2 0 00-3.46 0z"/>
+        </svg>
+        <h2 class="state-heading">Không thể tải đơn hàng</h2>
+        <p id="orderErrorMessage" class="state-desc">Đơn hàng không tồn tại hoặc bạn không có quyền xem đơn hàng này.</p>
+        <a href="my-orders.html" class="btn-primary">Quay lại lịch sử mua hàng</a>
+    </div>
+
+    <div id="orderDetailContent" class="order-detail-content d-none">
+        <section class="order-detail-card">
+            <div class="order-detail-card-header">
+                <div>
+                    <p class="order-detail-eyebrow">Đơn hàng</p>
+                    <h2 id="orderCode" class="order-detail-code">-</h2>
+                </div>
+                <span id="orderStatus" class="status-badge status-pending">Đang tải</span>
+            </div>
+            <div class="order-summary-grid">
+                <div class="order-summary-item"><span class="order-summary-label">Ngày đặt hàng</span><strong id="orderDate" class="order-summary-value">-</strong></div>
+                <div class="order-summary-item"><span class="order-summary-label">Trạng thái</span><strong id="orderStatusText" class="order-summary-value">-</strong></div>
+                <div class="order-summary-item"><span class="order-summary-label">Tổng sản phẩm</span><strong id="orderItemCount" class="order-summary-value">0</strong></div>
+                <div class="order-summary-item"><span class="order-summary-label">Tổng tiền</span><strong id="orderTotal" class="order-summary-value order-summary-total">0 đ</strong></div>
+            </div>
+        </section>
+
+        <section class="order-detail-card">
+            <div class="order-detail-section-header">
+                <h2 class="order-detail-section-title">Sản phẩm trong đơn hàng</h2>
+                <p class="order-detail-section-desc">Danh sách sản phẩm đã được ghi nhận tại thời điểm đặt hàng.</p>
+            </div>
+            <div class="order-items-table-wrapper">
+                <table class="order-items-table">
+                    <thead><tr><th>Sản phẩm</th><th>SKU</th><th class="text-center">Số lượng</th><th class="text-right">Đơn giá</th><th class="text-right">Thành tiền</th></tr></thead>
+                    <tbody id="orderItemsBody"></tbody>
+                </table>
+            </div>
+            <div class="order-total-box"><span>Tổng tiền đơn hàng</span><strong id="orderTotalBottom">0 đ</strong></div>
+        </section>
+
+        <div class="order-detail-actions">
+            <a href="my-orders.html" class="btn-outline-blue">← Quay lại lịch sử mua hàng</a>
+        </div>
+    </div>
+</div>
+
+</div>
+</main>
+
+<div id="app-footer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/common/supabase.js"></script>
+<script src="../assets/js/common/auth.js"></script>
+<script src="../assets/js/common/utils.js"></script>
+<script src="../assets/components/header.js"></script>
+<script src="../assets/components/footer.js"></script>
+<script src="../assets/js/users/auth-ui.js"></script>
+<script src="../assets/js/users/my-orders-detail.js"></script>
+</body>
+</html>

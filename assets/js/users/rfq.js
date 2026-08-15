@@ -1,150 +1,1145 @@
 // ========================================================
-// FILE: assets/js/rfq.js
-// XỬ LÝ LOGIC 
+// FILE: assets/js/users/rfq.js
+// RFQ CENTER - MRO KHANG NAM
+// CSS ĐÃ TÁCH KHỎI HTML / JS
 // ========================================================
 
-let cartItems = []; // Biến giữ đồ trong giỏ
+let cartItems = [];
+let filteredCart = [];
 
-        // 1. ĐỌC GIỎ HÀNG TỪ LOCALSTORAGE
-        function loadCartFromStorage() {
-            const grid = document.getElementById('productGrid');
-            const loading = document.getElementById('productLoading');
-            const submitBtn = document.getElementById('submitRfqBtn');
 
-            loading.classList.add('hidden');
-            grid.classList.remove('hidden');
+/* ========================================================
+   1. LOAD CART
+======================================================== */
 
-            // Mở kho lấy giỏ ra
-            cartItems = JSON.parse(localStorage.getItem('mro_rfq_cart')) || [];
+function loadCartFromStorage() {
 
-            if (cartItems.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-2 text-center py-10 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                        <p class="text-gray-500 font-bold mb-3">Danh sách yêu cầu đang trống!</p>
-                        <a href="products.html" class="bg-kn-blue text-white px-6 py-2 rounded shadow hover:bg-kn-orange transition">Đến Kho Hàng để chọn vật tư</a>
-                    </div>`;
-                submitBtn.disabled = true;
-                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                return;
-            }
+    try {
 
-            grid.innerHTML = '';
-            // Vẽ các món có trong giỏ ra lưới
-            cartItems.forEach((item, index) => {
-                grid.innerHTML += `
-                    <div class="border border-gray-200 rounded-lg p-4 hover:border-kn-orange transition shadow-sm bg-white flex flex-col justify-between relative">
-                        <button onclick="removeItem(${index})" class="absolute top-2 right-2 text-red-400 hover:text-red-600 font-bold text-xs bg-red-50 px-2 py-1 rounded">XÓA</button>
-                        
-                        <div class="pr-10">
-                            <div class="text-xs font-bold text-kn-orange uppercase tracking-wider mb-1">${item.brand}</div>
-                            <h3 class="font-bold text-kn-blue text-sm line-clamp-2 h-10 mb-1">${item.name}</h3>
-                            <div class="text-xs text-gray-500 mb-2">Mã SKU: <span class="font-bold text-gray-700 uppercase">${item.sku}</span></div>
+        cartItems =
+            JSON.parse(
+                localStorage.getItem(
+                    "mro_rfq_cart"
+                )
+            ) || [];
+
+    } catch (error) {
+
+        console.error(
+            "Lỗi đọc RFQ cart:",
+            error
+        );
+
+        cartItems = [];
+    }
+
+
+    filteredCart = [
+        ...cartItems
+    ];
+
+
+    updateCartCounters();
+    renderCartUI();
+
+
+    const searchInput =
+        document.getElementById(
+            "searchCart"
+        );
+
+
+    if (
+        searchInput &&
+        !searchInput.dataset.bound
+    ) {
+
+        searchInput.addEventListener(
+            "input",
+            handleCartSearch
+        );
+
+        searchInput.dataset.bound =
+            "true";
+    }
+}
+
+
+/* ========================================================
+   2. SEARCH
+======================================================== */
+
+function handleCartSearch(event) {
+
+    const keyword =
+        String(
+            event.target.value || ""
+        )
+            .toLowerCase()
+            .trim();
+
+
+    if (!keyword) {
+
+        filteredCart =
+            [
+                ...cartItems
+            ];
+
+    } else {
+
+        filteredCart =
+            cartItems.filter(
+                (item) => {
+
+                    const sku =
+                        String(
+                            item.sku || ""
+                        ).toLowerCase();
+
+                    const name =
+                        String(
+                            item.name || ""
+                        ).toLowerCase();
+
+                    const brand =
+                        String(
+                            item.brand || ""
+                        ).toLowerCase();
+
+                    return (
+                        sku.includes(keyword) ||
+                        name.includes(keyword) ||
+                        brand.includes(keyword)
+                    );
+                }
+            );
+    }
+
+
+    renderCartUI();
+}
+
+
+/* ========================================================
+   3. COUNTERS
+======================================================== */
+
+function updateCartCounters() {
+
+    const totalItems =
+        cartItems.length;
+
+
+    const headerCount =
+        document.getElementById(
+            "cartCountHeader"
+        );
+
+    const formCount =
+        document.getElementById(
+            "cartCountForm"
+        );
+
+    const submitBtn =
+        document.getElementById(
+            "submitRfqBtn"
+        );
+
+
+    if (headerCount) {
+
+        headerCount.innerText =
+            `${totalItems} SP`;
+    }
+
+
+    if (formCount) {
+
+        formCount.innerText =
+            `${totalItems} Sản phẩm`;
+    }
+
+
+    if (submitBtn) {
+
+        if (totalItems === 0) {
+
+            submitBtn.disabled =
+                true;
+
+            submitBtn.classList.add(
+                "is-disabled"
+            );
+
+        } else {
+
+            submitBtn.disabled =
+                false;
+
+            submitBtn.classList.remove(
+                "is-disabled"
+            );
+        }
+    }
+}
+
+
+/* ========================================================
+   4. RENDER CART
+======================================================== */
+
+function renderCartUI() {
+
+    const grid =
+        document.getElementById(
+            "productGrid"
+        );
+
+
+    if (!grid) {
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       EMPTY CART
+    ----------------------------------------------------- */
+
+    if (
+        cartItems.length === 0
+    ) {
+
+        grid.innerHTML = `
+
+            <div class="rfq-empty-state">
+
+                <svg
+                    class="rfq-empty-icon"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                    ></path>
+                </svg>
+
+
+                <p class="rfq-empty-title">
+                    Danh sách yêu cầu đang trống!
+                </p>
+
+
+                <a
+                    href="products.html"
+                    class="rfq-empty-button"
+                >
+                    → Đến Kho Hàng chọn vật tư
+                </a>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       SEARCH NO RESULT
+    ----------------------------------------------------- */
+
+    if (
+        filteredCart.length === 0
+    ) {
+
+        grid.innerHTML = `
+
+            <div class="rfq-filter-empty">
+                Không tìm thấy mã nào phù hợp với từ khóa.
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    let html =
+        "";
+
+
+    filteredCart.forEach(
+        (item) => {
+
+            const originalIndex =
+                cartItems.findIndex(
+                    (originalItem) =>
+                        originalItem.sku ===
+                        item.sku
+                );
+
+
+            html += `
+
+                <article class="rfq-product-card">
+
+                    <button
+                        type="button"
+                        onclick="removeItem(${originalIndex})"
+                        title="Xóa mã này"
+                        class="rfq-product-remove"
+                    >
+                        XÓA
+                    </button>
+
+
+                    <div class="rfq-product-card-top">
+
+                        <div class="rfq-product-brand">
+                            ${escapeRFQValue(
+                                item.brand || "OEM"
+                            )}
                         </div>
-                        
-                        <div class="flex items-center justify-between border-t pt-3 mt-2">
-                            <span class="text-xs text-gray-500">ĐVT: ${item.unit}</span>
-                            <div class="flex items-center space-x-2">
-                                <label class="text-xs font-bold text-gray-700">Số lượng:</label>
-                                <input type="number" id="rfq-qty-${index}" min="1" value="${item.qty}" class="w-16 text-center border border-gray-300 rounded py-1 text-xs font-bold text-kn-blue focus:outline-none focus:border-kn-orange bg-gray-50" onchange="updateQty(${index}, this.value)">
-                            </div>
-                        </div>
+
+
+                        <h3
+                            class="rfq-product-name"
+                            title="${escapeRFQValue(
+                                item.name || ""
+                            )}"
+                        >
+                            ${escapeRFQValue(
+                                item.name || "Sản phẩm"
+                            )}
+                        </h3>
+
+
+                        <p class="rfq-product-sku">
+                            Mã SKU:
+                            <strong>
+                                ${escapeRFQValue(
+                                    item.sku || ""
+                                )}
+                            </strong>
+                        </p>
+
                     </div>
-                `;
-            });
+
+
+                    <div class="rfq-product-footer">
+
+                        <span class="rfq-product-unit">
+                            ĐVT:
+                            ${escapeRFQValue(
+                                item.unit || "Cái"
+                            )}
+                        </span>
+
+
+                        <div class="rfq-product-qty-wrap">
+
+                            <label
+                                class="rfq-product-qty-label"
+                                for="rfqQty-${originalIndex}"
+                            >
+                                SL:
+                            </label>
+
+
+                            <input
+                                type="number"
+                                id="rfqQty-${originalIndex}"
+                                min="1"
+                                value="${Number(item.qty) || 1}"
+                                class="rfq-product-qty-input"
+                                onchange="updateQty(${originalIndex}, this.value)"
+                            >
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            `;
+        }
+    );
+
+
+    grid.innerHTML =
+        html;
+}
+
+
+/* ========================================================
+   5. ESCAPE HTML
+======================================================== */
+
+function escapeRFQValue(value) {
+
+    if (
+        typeof utils !== "undefined" &&
+        typeof utils.escapeHTML === "function"
+    ) {
+
+        return utils.escapeHTML(
+            value ?? ""
+        );
+    }
+
+
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+}
+
+
+/* ========================================================
+   6. UPDATE QUANTITY
+======================================================== */
+
+window.updateQty =
+function (
+    originalIndex,
+    newQty
+) {
+
+    if (
+        !cartItems[originalIndex]
+    ) {
+
+        return;
+    }
+
+
+    const qtyInt =
+        parseInt(
+            newQty,
+            10
+        );
+
+
+    cartItems[
+        originalIndex
+    ].qty =
+        Number.isFinite(qtyInt) &&
+        qtyInt >= 1
+            ? qtyInt
+            : 1;
+
+
+    localStorage.setItem(
+        "mro_rfq_cart",
+        JSON.stringify(
+            cartItems
+        )
+    );
+
+
+    const searchValue =
+        document.getElementById(
+            "searchCart"
+        )?.value
+            .toLowerCase()
+            .trim() || "";
+
+
+    if (!searchValue) {
+
+        filteredCart = [
+            ...cartItems
+        ];
+
+    } else {
+
+        filteredCart =
+            cartItems.filter(
+                (item) => {
+
+                    const sku =
+                        String(
+                            item.sku || ""
+                        ).toLowerCase();
+
+                    const name =
+                        String(
+                            item.name || ""
+                        ).toLowerCase();
+
+                    const brand =
+                        String(
+                            item.brand || ""
+                        ).toLowerCase();
+
+                    return (
+                        sku.includes(
+                            searchValue
+                        ) ||
+                        name.includes(
+                            searchValue
+                        ) ||
+                        brand.includes(
+                            searchValue
+                        )
+                    );
+                }
+            );
+    }
+
+
+    updateCartCounters();
+    renderCartUI();
+};
+
+
+/* ========================================================
+   7. REMOVE ITEM
+======================================================== */
+
+window.removeItem =
+function (
+    originalIndex
+) {
+
+    if (
+        originalIndex < 0 ||
+        originalIndex >= cartItems.length
+    ) {
+
+        return;
+    }
+
+
+    cartItems.splice(
+        originalIndex,
+        1
+    );
+
+
+    localStorage.setItem(
+        "mro_rfq_cart",
+        JSON.stringify(
+            cartItems
+        )
+    );
+
+
+    loadCartFromStorage();
+};
+
+
+/* ========================================================
+   8. CLEAR ALL
+======================================================== */
+
+window.clearAllCart =
+function () {
+
+    if (
+        cartItems.length === 0
+    ) {
+
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            "Bạn có chắc chắn muốn xóa TOÀN BỘ danh sách yêu cầu không?"
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    localStorage.removeItem(
+        "mro_rfq_cart"
+    );
+
+
+    const searchInput =
+        document.getElementById(
+            "searchCart"
+        );
+
+
+    if (searchInput) {
+        searchInput.value =
+            "";
+    }
+
+
+    loadCartFromStorage();
+};
+
+
+/* ========================================================
+   9. EXPORT CSV
+======================================================== */
+
+window.exportCartToCSV =
+function () {
+
+    if (
+        cartItems.length === 0
+    ) {
+
+        alert(
+            "Giỏ hàng đang trống, không có dữ liệu để xuất!"
+        );
+
+        return;
+    }
+
+
+    let csvContent =
+        "data:text/csv;charset=utf-8,\uFEFF";
+
+
+    csvContent +=
+        "STT,Mã SKU,Tên Sản Phẩm,Thương Hiệu,ĐVT,Số Lượng\n";
+
+
+    cartItems.forEach(
+        (
+            item,
+            index
+        ) => {
+
+            const safeName =
+                item.name
+                    ? String(
+                        item.name
+                    ).replace(
+                        /"/g,
+                        '""'
+                    )
+                    : "";
+
+
+            const safeSku =
+                item.sku
+                    ? String(
+                        item.sku
+                    ).replace(
+                        /"/g,
+                        '""'
+                    )
+                    : "";
+
+
+            const safeBrand =
+                item.brand
+                    ? String(
+                        item.brand
+                    ).replace(
+                        /"/g,
+                        '""'
+                    )
+                    : "OEM";
+
+
+            const safeUnit =
+                item.unit
+                    ? String(
+                        item.unit
+                    ).replace(
+                        /"/g,
+                        '""'
+                    )
+                    : "Cái";
+
+
+            const qty =
+                Number(
+                    item.qty
+                ) || 1;
+
+
+            csvContent +=
+                `${index + 1},"${safeSku}","${safeName}","${safeBrand}","${safeUnit}",${qty}\n`;
+        }
+    );
+
+
+    const encodedUri =
+        encodeURI(
+            csvContent
+        );
+
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.href =
+        encodedUri;
+
+
+    link.download =
+        `Yeu_Cau_Bao_Gia_MRO_${Date.now()}.csv`;
+
+
+    document.body.appendChild(
+        link
+    );
+
+
+    link.click();
+
+
+    document.body.removeChild(
+        link
+    );
+};
+
+
+/* ========================================================
+   10. SUBMIT RFQ
+======================================================== */
+
+window.submitRFQ =
+async function () {
+
+    if (
+        !window.supabaseClient
+    ) {
+
+        alert(
+            "Lỗi hệ thống: Kết nối máy chủ Supabase chưa sẵn sàng!"
+        );
+
+        return;
+    }
+
+
+    const {
+        data: {
+            session
+        }
+    } =
+        await window.supabaseClient
+            .auth
+            .getSession();
+
+
+    if (!session) {
+
+        alert(
+            "Kho hàng B2B chỉ dành cho đối tác. Vui lòng đăng nhập để gửi đơn báo giá!"
+        );
+
+
+        window.location.href =
+            "login.html";
+
+
+        return;
+    }
+
+
+    const currentUserId =
+        session.user.id;
+
+
+    const company =
+        document.getElementById(
+            "company"
+        )?.value
+            .trim();
+
+
+    const name =
+        document.getElementById(
+            "name"
+        )?.value
+            .trim();
+
+
+    const phone =
+        document.getElementById(
+            "phone"
+        )?.value
+            .trim();
+
+
+    const email =
+        document.getElementById(
+            "email"
+        )?.value
+            .trim();
+
+
+    const notes =
+        document.getElementById(
+            "notes"
+        )?.value
+            .trim();
+
+
+    if (
+        !company ||
+        !name ||
+        !phone ||
+        !email
+    ) {
+
+        alert(
+            "Vui lòng điền đầy đủ các thông tin có dấu (*) trước khi gửi!"
+        );
+
+        return;
+    }
+
+
+    const selectedItems =
+        cartItems.filter(
+            (item) =>
+                Number(item.qty) > 0
+        );
+
+
+    if (
+        selectedItems.length === 0
+    ) {
+
+        alert(
+            "Danh sách vật tư yêu cầu đang trống hoặc số lượng không hợp lệ!"
+        );
+
+        return;
+    }
+
+
+    const btn =
+        document.getElementById(
+            "submitRfqBtn"
+        );
+
+
+    const originalBtnText =
+        btn?.innerHTML || "";
+
+
+    if (btn) {
+
+        btn.disabled =
+            true;
+
+        btn.classList.add(
+            "is-disabled"
+        );
+
+
+        btn.innerHTML = `
+
+            <span class="rfq-submit-loading">
+
+                <svg
+                    class="rfq-submit-spinner"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                >
+
+                    <circle
+                        class="rfq-spinner-circle"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                    ></circle>
+
+                    <path
+                        class="rfq-spinner-path"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    ></path>
+
+                </svg>
+
+                Đang gửi đơn báo giá...
+
+            </span>
+
+        `;
+    }
+
+
+    const randomCode =
+        "RFQ-" +
+        Math.floor(
+            1000 +
+            Math.random() * 9000
+        );
+
+
+    try {
+
+        const {
+            error
+        } =
+            await window.supabaseClient
+                .from("rfqs")
+                .insert([
+                    {
+                        rfq_code:
+                            randomCode,
+
+                        company_name:
+                            company,
+
+                        contact_person:
+                            name,
+
+                        phone:
+                            phone,
+
+                        email:
+                            email,
+
+                        notes:
+                            notes,
+
+                        status:
+                            "Chờ xử lý",
+
+                        items:
+                            selectedItems,
+
+                        user_id:
+                            currentUserId
+                    }
+                ]);
+
+
+        if (error) {
+            throw error;
         }
 
-        // Cập nhật số lượng khi khách bấm tăng giảm
-        function updateQty(index, newQty) {
-            cartItems[index].qty = parseInt(newQty) || 1;
-            localStorage.setItem('mro_rfq_cart', JSON.stringify(cartItems));
+
+        alert(
+            `Gửi Yêu Cầu Báo Giá Thành Công!\nMã đơn của bạn là: ${randomCode}`
+        );
+
+
+        localStorage.removeItem(
+            "mro_rfq_cart"
+        );
+
+
+        const form =
+            document.getElementById(
+                "rfqForm"
+            );
+
+
+        if (form) {
+            form.reset();
         }
 
-        // Bỏ món hàng ra khỏi danh sách
-        function removeItem(index) {
-            cartItems.splice(index, 1);
-            localStorage.setItem('mro_rfq_cart', JSON.stringify(cartItems));
-            loadCartFromStorage(); // Tải lại lưới
+
+        const searchInput =
+            document.getElementById(
+                "searchCart"
+            );
+
+
+        if (searchInput) {
+            searchInput.value =
+                "";
         }
 
-        // 2. GỬI ĐƠN LÊN SUPABASE
-        async function submitRFQ() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            const currentUserId = session ? session.user.id : null;
+
+        loadCartFromStorage();
+
+
+    } catch (error) {
+
+        console.error(
+            "Lỗi gửi RFQ:",
+            error
+        );
+
+
+        alert(
+            "Lỗi khi gửi yêu cầu báo giá: " +
+            error.message
+        );
+
+
+    } finally {
+
+        if (btn) {
+
+            btn.disabled =
+                false;
+
+            btn.classList.remove(
+                "is-disabled"
+            );
+
+
+            btn.innerHTML =
+                originalBtnText ||
+                "Gửi Yêu Cầu Báo Giá";
+        }
+    }
+};
+
+
+/* ========================================================
+   11. INIT
+======================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    async () => {
+
+        try {
+
+            if (
+                !window.supabaseClient
+            ) {
+
+                console.error(
+                    "Cảnh báo: Supabase Client chưa sẵn sàng!"
+                );
+
+                loadCartFromStorage();
+
+                return;
+            }
+
+
+            const {
+                data: {
+                    session
+                }
+            } =
+                await window.supabaseClient
+                    .auth
+                    .getSession();
+
 
             if (!session) {
-                alert("Ní phải đăng nhập tài khoản Khách hàng thì mới gửi được nha!");
-                window.location.href = "login.html"; 
-                return; 
-            }
 
-            // Validate form
-            const company = document.getElementById('company').value.trim();
-            const name = document.getElementById('name').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const notes = document.getElementById('notes').value.trim();
+                alert(
+                    "Kho hàng B2B chỉ dành cho đối tác. Vui lòng đăng nhập để tạo đơn RFQ!"
+                );
 
-            if(!company || !name || !phone || !email) {
-                alert("Vui lòng điền đầy đủ các ô có dấu * ở phần Thông tin gửi đơn nhé!");
+
+                window.location.href =
+                    "login.html";
+
+
                 return;
             }
 
-            // Gom đồ trong giỏ
-            const selectedItems = cartItems.filter(item => item.qty > 0);
-            if (selectedItems.length === 0) {
-                alert("Chưa có sản phẩm nào hợp lệ để gửi!");
-                return;
+
+            loadCartFromStorage();
+
+
+            /* ---------------------------------------------
+               AUTH UI
+            --------------------------------------------- */
+
+            if (
+                typeof window.checkCustomerAuth ===
+                "function"
+            ) {
+
+                try {
+
+                    const user =
+                        await window.checkCustomerAuth();
+
+
+                    if (user) {
+
+                        const guestBtn =
+                            document.getElementById(
+                                "btnGuestLogin"
+                            );
+
+
+                        if (guestBtn) {
+
+                            guestBtn.classList.add(
+                                "is-hidden"
+                            );
+                        }
+
+
+                        const userProfileBtn =
+                            document.getElementById(
+                                "btnUserProfile"
+                            );
+
+
+                        if (
+                            userProfileBtn
+                        ) {
+
+                            userProfileBtn.classList.remove(
+                                "is-hidden"
+                            );
+
+                            userProfileBtn.classList.add(
+                                "is-visible-flex"
+                            );
+                        }
+                    }
+
+                } catch (err) {
+
+                    console.error(
+                        "Lỗi xác thực:",
+                        err
+                    );
+                }
             }
 
-            const btn = document.getElementById('submitRfqBtn');
-            btn.innerHTML = 'Hệ thống đang đẩy đơn...';
-            btn.disabled = true;
 
-            const randomCode = 'RFQ-' + Math.floor(1000 + Math.random() * 9000);
+        } catch (error) {
 
-            try {
-                // Đẩy lên mây
-                const { error } = await supabaseClient
-                    .from('rfqs')
-                    .insert([{
-                        rfq_code: randomCode,
-                        company_name: company,
-                        contact_person: name,
-                        phone: phone,
-                        email: email,
-                        notes: notes,
-                        status: 'Chờ xử lý',
-                        items: selectedItems,
-                        user_id: currentUserId
-                    }]);
+            console.error(
+                "Lỗi khởi tạo trang RFQ:",
+                error
+            );
 
-                if (error) throw error;
-                
-                alert(`Gửi yêu cầu thành công! Mã đơn: ${randomCode}`);
-                
-                // QUAN TRỌNG: Gửi xong thì dọn sạch giỏ hàng
-                localStorage.removeItem('mro_rfq_cart');
-                document.getElementById('rfqForm').reset();
-                loadCartFromStorage(); // Load lại thì giỏ sẽ trống
-                
-            } catch (error) {
-                alert("Lỗi nghẽn mạng: " + error.message);
-            } finally {
-                btn.innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>Gửi Yêu Cầu Báo Giá Real-time';
-                btn.disabled = false;
-            }
+            loadCartFromStorage();
         }
-
-        // Khởi chạy
-        window.onload = async function() {
-            // Tui đã chuyển logic bảo vệ (LÍNH GÁC) vào đây để gọn code
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) {
-                alert("Kho hàng B2B chỉ dành cho đối tác. Ní vui lòng đăng nhập để tạo đơn RFQ nha!");
-                window.location.href = "login.html";
-                return;
-            }
-
-            checkCustomerAuth(); // Cập nhật Header từ common.js
-            loadCartFromStorage(); // Đọc giỏ hàng thay vì load cả kho
-        };
+    }
+);

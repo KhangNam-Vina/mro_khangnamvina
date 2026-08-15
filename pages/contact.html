@@ -3,138 +3,817 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liên hệ - MRO Khang Nam B2B</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { 
-            theme: { 
-                extend: { 
-                    colors: { 
-                        'kn-blue': '#00479b', 
-                        'kn-orange': '#ff5e00', 
-                        'kn-light': '#f5f6f8',
-                        'kn-dark': '#003370'
-                    } 
-                } 
-            } 
-        }
-    </script>
+
+    <title>Thương hiệu vật tư công nghiệp | MRO Khang Nam</title>
+
+    <meta
+        name="description"
+        content="MRO Khang Nam phân phối hơn 100 thương hiệu vật tư công nghiệp chính hãng như SKF, Bosch, Makita..."
+    >
+
+    <meta name="robots" content="index,follow">
+
+    <meta
+        property="og:title"
+        content="Thương hiệu vật tư công nghiệp | MRO Khang Nam"
+    >
+
+    <meta
+        property="og:description"
+        content="MRO Khang Nam phân phối hơn 100 thương hiệu vật tư công nghiệp chính hãng như SKF, Bosch, Makita..."
+    >
+
+    <meta
+        property="og:image"
+        content="../assets/banner-brands.webp"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="../assets/images/world mark.png"
+    >
+
+    <!-- INTER -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- CSS CHUNG -->
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/header.css">
+    <link rel="stylesheet" href="../assets/css/footer.css">
+
+    <!-- CSS RIÊNG TRANG CONTACT -->
+    <link rel="stylesheet" href="../assets/css/contact.css">
 </head>
-<body class="bg-kn-light font-sans text-gray-800">
 
-    <!-- CHỖ NÀY ĐỂ RÁP HEADER BẰNG JAVASCRIPT -->
-    <div id="app-header"></div>
+<body class="contact-page">
 
-    <div class="bg-gray-900 text-white py-12 relative overflow-hidden">
-        <img src="../assets/world mark.png" alt="Brands Banner" class="absolute inset-0 w-full h-full object-cover opacity-20">
-        <div class="container mx-auto px-4 relative z-10">
-            <h1 class="text-3xl md:text-4xl font-bold mb-4">Liên Hệ Khang Nam</h1>
-            <p class="text-gray-300 max-w-2xl text-sm leading-relaxed">
-                Đội ngũ kỹ sư và chuyên viên tư vấn MRO của chúng tôi luôn sẵn sàng hỗ trợ nhà máy của bạn 24/7.
+    <!-- HEADER -->
+    <div
+        id="app-header"
+        class="site-header-placeholder"
+    ></div>
+
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="contact-hero">
+
+        <div class="contact-hero-overlay"></div>
+
+        <div class="contact-container">
+
+            <nav
+                class="contact-breadcrumb"
+                aria-label="Breadcrumb"
+            >
+                <a
+                    href="../index.html"
+                    class="contact-breadcrumb-link"
+                >
+                    Trang chủ
+                </a>
+
+                <span
+                    class="contact-breadcrumb-separator"
+                    aria-hidden="true"
+                >
+                    /
+                </span>
+
+                <span class="contact-breadcrumb-current">
+                    Liên Hệ Khang Nam
+                </span>
+            </nav>
+
+
+            <h1 class="contact-hero-title">
+                Kết Nối Với Chúng Tôi
+            </h1>
+
+            <p class="contact-hero-description">
+                Đội ngũ kỹ sư và chuyên viên tư vấn MRO của chúng tôi
+                luôn sẵn sàng hỗ trợ nhà máy của bạn giải quyết các bài toán
+                kỹ thuật phức tạp nhất.
             </p>
+
         </div>
-    </div>
 
-    <main class="container mx-auto px-4 py-12">
-        <div class="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto">
-            
-            <div class="w-full lg:w-1/3 space-y-6">
-                <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
-                    <h3 class="text-xl font-bold text-kn-blue mb-6 border-b pb-3">Thông tin Trụ sở</h3>
-                    
-                    <ul class="space-y-5 text-sm text-gray-600">
-                        <li class="flex items-start">
-                            <svg class="w-5 h-5 mr-3 text-kn-orange shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                            <span><strong class="text-gray-800">Trụ sở chính & Kho vận:</strong><br>Khu Công Nghệ Cao, TP. Thủ Đức, TP. Hồ Chí Minh</span>
-                        </li>
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 mr-3 text-kn-orange shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                            <span><strong class="text-gray-800">Hotline B2B:</strong> <br>0919 699 942</span>
-                        </li>
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 mr-3 text-kn-orange shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                            <span><strong class="text-gray-800">Email Báo giá:</strong> <br>sales@khangnam.com</span>
-                        </li>
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 mr-3 text-kn-orange shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span><strong class="text-gray-800">Giờ làm việc:</strong> <br>Thứ 2 - Thứ 7 (8:00 - 17:00)</span>
-                        </li>
-                    </ul>
+    </section>
+
+
+    <!-- =====================================================
+         QUICK CONTACT
+    ====================================================== -->
+
+    <section class="contact-quick-section">
+
+        <div class="contact-container">
+
+            <div class="contact-quick-grid">
+
+                <!-- HOTLINE -->
+
+                <div class="contact-quick-card">
+
+                    <div class="contact-quick-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                            ></path>
+                        </svg>
+
+                    </div>
+
+                    <div class="contact-quick-content">
+                        <div class="contact-quick-label">
+                            Hotline B2B
+                        </div>
+
+                        <div
+                            id="txtHotline"
+                            class="contact-quick-value"
+                        >
+                            0919 699 942
+                        </div>
+                    </div>
+
                 </div>
 
-                <div class="bg-white p-2 rounded-xl shadow-sm border border-gray-200 overflow-hidden h-64 relative">
-                    <iframe src="https://maps.google.com/maps?q=Khu%20Công%20Nghệ%20Cao,%20Thủ%20Đức,%20Hồ%20Chí%20Minh&t=&z=14&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+                <!-- EMAIL -->
+
+                <div class="contact-quick-card">
+
+                    <div class="contact-quick-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                            ></path>
+                        </svg>
+
+                    </div>
+
+                    <div class="contact-quick-content">
+                        <div class="contact-quick-label">
+                            Email Báo Giá
+                        </div>
+
+                        <div
+                            id="txtEmail"
+                            class="contact-quick-value"
+                        >
+                            sales@khangnam.com
+                        </div>
+                    </div>
+
                 </div>
+
+
+                <!-- ADDRESS -->
+
+                <div class="contact-quick-card">
+
+                    <div class="contact-quick-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                            ></path>
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                            ></path>
+                        </svg>
+
+                    </div>
+
+                    <div class="contact-quick-content">
+                        <div class="contact-quick-label">
+                            Địa Chỉ Kho
+                        </div>
+
+                        <div
+                            id="txtAddress"
+                            class="contact-quick-value contact-quick-value-small contact-line-clamp"
+                        >
+                            Khu CNC, TP.Thủ Đức
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- SUPPORT TIME -->
+
+                <div class="contact-quick-card">
+
+                    <div class="contact-quick-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                            ></path>
+                        </svg>
+
+                    </div>
+
+                    <div class="contact-quick-content">
+                        <div class="contact-quick-label">
+                            Hỗ trợ kỹ thuật
+                        </div>
+
+                        <div
+                            id="txtSupportTime"
+                            class="contact-quick-value contact-quick-value-small"
+                        >
+                            8:00 - 17:00 (T2-T7)
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
 
-            <div class="w-full lg:w-2/3 bg-white p-8 md:p-10 rounded-xl shadow-sm border border-gray-200">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Gửi Yêu Cầu Hỗ Trợ</h2>
-                    <p class="text-sm text-gray-500">Mọi yêu cầu sẽ được bộ phận Chăm sóc Khách hàng Doanh nghiệp phản hồi trong vòng <span class="font-bold text-kn-orange">2 giờ làm việc</span>.</p>
-                </div>
-
-                <!-- ĐÃ BỔ SUNG KHUNG BAO QUANH FORM: border-2, bg-gray-50, p-6 -->
-                <form id="contactForm" class="space-y-6 bg-gray-50 p-6 md:p-8 rounded-xl border-2 border-gray-300 shadow-sm mt-6">
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Họ và tên <span class="text-red-500">*</span></label>
-                            <input id="inContactName" type="text" placeholder="Nhập họ và tên..." class="w-full border-2 border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-kn-blue focus:ring-1 focus:ring-kn-blue transition-colors bg-white" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Tên Công ty / Nhà máy <span class="text-red-500">*</span></label>
-                            <input id="inContactCompany" type="text" placeholder="Công ty TNHH..." class="w-full border-2 border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-kn-blue focus:ring-1 focus:ring-kn-blue transition-colors bg-white" required>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Số điện thoại liên hệ <span class="text-red-500">*</span></label>
-                            <input id="inContactPhone" type="tel" placeholder="0909 xxx xxx" class="w-full border-2 border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-kn-blue focus:ring-1 focus:ring-kn-blue transition-colors bg-white" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Email công ty <span class="text-red-500">*</span></label>
-                            <input id="inContactEmail" type="email" placeholder="email@company.com" class="w-full border-2 border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-kn-blue focus:ring-1 focus:ring-kn-blue transition-colors bg-white" required>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Chủ đề cần hỗ trợ</label>
-                        <select id="inContactSubject" class="w-full border-2 border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:border-kn-blue focus:ring-1 focus:ring-kn-blue transition-colors bg-white">
-                            <option>Yêu cầu tư vấn giải pháp</option>
-                            <option>Yêu cầu báo giá</option>
-                            <option>Hỗ trợ kỹ thuật / Bảo hành</option>
-                            <option>Vấn đề khác</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Nội dung chi tiết <span class="text-red-500">*</span></label>
-                        <textarea id="inContactMessage" rows="5" placeholder="Vui lòng cung cấp chi tiết yêu cầu, mã sản phẩm hoặc vấn đề bạn đang gặp phải..." class="w-full border-2 border-gray-300 rounded-md px-4 py-3 text-sm focus:outline-none focus:border-kn-blue focus:ring-1 focus:ring-kn-blue transition-colors resize-none bg-white" required></textarea>
-                    </div>
-
-                    <button type="button" onclick="submitContact()" class="w-full bg-kn-blue text-white font-bold text-sm py-3.5 px-10 rounded-md hover:bg-blue-800 transition-colors shadow-md flex items-center justify-center uppercase tracking-wider">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                        Gửi Yêu Cầu Cho Khang Nam
-                    </button>
-                </form>
-            </div>
         </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="contact-main">
+
+        <div class="contact-container">
+
+            <div class="contact-layout">
+
+
+                <!-- =================================================
+                     LEFT COLUMN
+                ================================================= -->
+
+                <aside class="contact-sidebar">
+
+
+                    <!-- MAP -->
+
+                    <div class="contact-map-card">
+
+                        <iframe
+                            id="mapIframe"
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d979.613113304017!2d106.79587709616469!3d10.853150591292822!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3175278028f44c09%3A0x20ed5669a03b4b58!2sKhangNam%20Vina!5e0!3m2!1svi!2s!4v1785123525560!5m2!1svi!2s"
+                            class="contact-map"
+                            title="Bản đồ Khang Nam Vina"
+                            allowfullscreen
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                        ></iframe>
+
+                    </div>
+
+
+                    <!-- SOCIAL PROOF -->
+
+                    <div class="contact-proof-card">
+
+                        <h3 class="contact-proof-title">
+                            Uy Tín Của Khang Nam
+                        </h3>
+
+                        <ul class="contact-proof-list">
+
+                            <li class="contact-proof-item">
+
+                                <svg
+                                    class="contact-proof-icon"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    ></path>
+                                </svg>
+
+                                <span id="txtProof1">
+                                    20+ năm kinh nghiệm cung ứng
+                                </span>
+
+                            </li>
+
+
+                            <li class="contact-proof-item">
+
+                                <svg
+                                    class="contact-proof-icon"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    ></path>
+                                </svg>
+
+                                <span id="txtProof2">
+                                    Hợp tác 1000+ nhà máy FDI
+                                </span>
+
+                            </li>
+
+
+                            <li class="contact-proof-item">
+
+                                <svg
+                                    class="contact-proof-icon"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    ></path>
+                                </svg>
+
+                                <span id="txtProof3">
+                                    Phân phối 100+ thương hiệu quốc tế
+                                </span>
+
+                            </li>
+
+
+                            <li class="contact-proof-item">
+
+                                <svg
+                                    class="contact-proof-icon"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    ></path>
+                                </svg>
+
+                                <span id="txtProof4">
+                                    Đầy đủ chứng nhận xuất xứ CO/CQ
+                                </span>
+
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </aside>
+
+
+                <!-- =================================================
+                     RIGHT COLUMN
+                ================================================= -->
+
+                <section class="contact-form-column">
+
+                    <div class="contact-form-card">
+
+
+                        <!-- SUCCESS -->
+
+                        <div
+                            id="successMessage"
+                            class="contact-success is-hidden"
+                        >
+
+                            <div class="contact-success-icon">
+
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="3"
+                                        d="M5 13l4 4L19 7"
+                                    ></path>
+                                </svg>
+
+                            </div>
+
+
+                            <h2 class="contact-success-title">
+                                Đã Gửi Yêu Cầu Thành Công!
+                            </h2>
+
+
+                            <p class="contact-success-text">
+                                Cảm ơn bạn đã liên hệ.
+                                Mã số yêu cầu của bạn là:
+                            </p>
+
+
+                            <div
+                                id="ticketIdDisplay"
+                                class="contact-ticket"
+                            >
+                                #CN-XXXXXXXX
+                            </div>
+
+
+                            <p class="contact-success-description">
+                                Đội ngũ kỹ sư của chúng tôi sẽ xem xét yêu cầu
+                                và phản hồi lại cho bạn qua email hoặc điện thoại
+                                <strong>
+                                    trong vòng 2 giờ làm việc
+                                </strong>.
+                            </p>
+
+
+                            <button
+                                type="button"
+                                onclick="resetContactForm()"
+                                class="contact-reset-button"
+                            >
+                                Gửi yêu cầu khác
+                            </button>
+
+                        </div>
+
+
+                        <!-- FORM -->
+
+                        <div id="formContainer">
+
+                            <div class="contact-form-header">
+
+                                <h2 class="contact-form-title">
+                                    Gửi Yêu Cầu Tư Vấn MRO
+                                </h2>
+
+
+                                <div class="contact-benefits">
+
+                                    <span class="contact-benefit">
+                                        <svg
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            aria-hidden="true"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M5 13l4 4L19 7"
+                                            ></path>
+                                        </svg>
+
+                                        Phản hồi trong 2 giờ
+                                    </span>
+
+
+                                    <span class="contact-benefit">
+                                        <svg
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            aria-hidden="true"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M5 13l4 4L19 7"
+                                            ></path>
+                                        </svg>
+
+                                        Báo giá trong ngày
+                                    </span>
+
+
+                                    <span class="contact-benefit">
+                                        <svg
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            aria-hidden="true"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M5 13l4 4L19 7"
+                                            ></path>
+                                        </svg>
+
+                                        Tư vấn kỹ thuật miễn phí
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <form
+                                id="contactForm"
+                                class="contact-form"
+                            >
+
+
+                                <!-- COMPANY / NAME -->
+
+                                <div class="contact-form-grid">
+
+                                    <div class="contact-field">
+
+                                        <label for="inContactCompany">
+                                            Tên Công ty / Nhà máy
+                                            <span class="contact-required">
+                                                *
+                                            </span>
+                                        </label>
+
+                                        <input
+                                            id="inContactCompany"
+                                            type="text"
+                                            placeholder="Ví dụ: Công ty TNHH ABC Việt Nam"
+                                            required
+                                        >
+
+                                    </div>
+
+
+                                    <div class="contact-field">
+
+                                        <label for="inContactName">
+                                            Họ và tên người liên hệ
+                                            <span class="contact-required">
+                                                *
+                                            </span>
+                                        </label>
+
+                                        <input
+                                            id="inContactName"
+                                            type="text"
+                                            placeholder="Ví dụ: Nguyễn Văn A (Purchasing)"
+                                            required
+                                        >
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- PHONE / EMAIL -->
+
+                                <div class="contact-form-grid">
+
+                                    <div class="contact-field">
+
+                                        <label for="inContactPhone">
+                                            Số điện thoại / Zalo
+                                            <span class="contact-required">
+                                                *
+                                            </span>
+                                        </label>
+
+                                        <input
+                                            id="inContactPhone"
+                                            type="tel"
+                                            placeholder="0912 345 678"
+                                            required
+                                        >
+
+                                    </div>
+
+
+                                    <div class="contact-field">
+
+                                        <label for="inContactEmail">
+                                            Email nhận báo giá
+                                            <span class="contact-required">
+                                                *
+                                            </span>
+                                        </label>
+
+                                        <input
+                                            id="inContactEmail"
+                                            type="email"
+                                            placeholder="purchasing@abc.com"
+                                            required
+                                        >
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- SUBJECT -->
+
+                                <div class="contact-field">
+
+                                    <label for="inContactSubject">
+                                        Chủ đề hỗ trợ
+                                    </label>
+
+                                    <select id="inContactSubject">
+
+                                        <option value="Yêu cầu báo giá">
+                                            Yêu cầu báo giá vật tư
+                                        </option>
+
+                                        <option value="Tư vấn giải pháp">
+                                            Yêu cầu tư vấn giải pháp
+                                        </option>
+
+                                        <option value="Hỗ trợ kỹ thuật">
+                                            Hỗ trợ kỹ thuật / Đọc bản vẽ
+                                        </option>
+
+                                        <option value="Khác">
+                                            Vấn đề khác
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+
+                                <!-- MESSAGE -->
+
+                                <div class="contact-field">
+
+                                    <label for="inContactMessage">
+                                        Nội dung chi tiết
+                                        <span class="contact-required">
+                                            *
+                                        </span>
+                                    </label>
+
+                                    <textarea
+                                        id="inContactMessage"
+                                        rows="5"
+                                        placeholder="Cung cấp chi tiết mã hàng (SKU), số lượng, yêu cầu CO/CQ hoặc vấn đề kỹ thuật nhà máy đang gặp phải..."
+                                        required
+                                    ></textarea>
+
+                                </div>
+
+
+                                <!-- SUBMIT -->
+
+                                <button
+                                    type="button"
+                                    id="btnSubmitContact"
+                                    onclick="submitContact()"
+                                    class="contact-submit-button"
+                                >
+
+                                    <svg
+                                        class="contact-submit-icon"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                                        ></path>
+                                    </svg>
+
+                                    Gửi Yêu Cầu Báo Giá
+
+                                </button>
+
+
+                                <!-- CTA PHONE -->
+
+                                <div class="contact-cta">
+
+                                    <p class="contact-cta-label">
+                                        Hoặc gọi ngay
+                                    </p>
+
+
+                                    <a
+                                        id="linkHotlineCTA"
+                                        href="tel:0919699942"
+                                        class="contact-cta-phone"
+                                    >
+
+                                        <span id="txtHotlineCTA">
+                                            0919 699 942
+                                        </span>
+
+                                    </a>
+
+
+                                    <p class="contact-cta-note">
+                                        Tư vấn trực tiếp trong giờ hành chính
+                                    </p>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </div>
+
     </main>
 
-    <!-- ========================================== -->
-    <!-- PHẦN GỌI SCRIPT ĐƯỢC QUY HOẠCH GỌN GÀNG LẠI -->
-    <!-- ========================================== -->
 
-    <!-- 1. GỌI SCRIPT COMPONENT HEADER/FOOTER -->
+    <!-- FOOTER -->
+    <div id="app-footer"></div>
+
+
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/common/utils.js"></script>
+    <script src="../assets/js/common/auth.js"></script>
+
     <script src="../assets/components/header.js"></script>
     <script src="../assets/components/footer.js"></script>
 
-    <!-- 2. GỌI THƯ VIỆN & SCRIPT DÙNG CHUNG -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../assets/js/common.js"></script>
+    <script src="../assets/js/users/auth-ui.js"></script>
+    <script src="../assets/js/users/contact.js"></script>
 
-    <!-- 3. SCRIPT LOGIC RIÊNG CỦA TRANG NÀY (CỰC SẠCH) -->
-    <script src="../assets/js/contact.js"></script>
 </body>
 </html>

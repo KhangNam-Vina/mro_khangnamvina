@@ -1,6 +1,6 @@
 // ========================================================
-// FILE: assets/js/admin-families.js
-// SẠCH 100% - CHỈ CÒN LOGIC GIAO DIỆN
+// FILE: assets/js/admin/admin-families.js
+// Nâng cấp: Bỏ Service Layer, Tích hợp Slug + Thumbnail, Pagination chuẩn
 // ========================================================
 
 const state = {
@@ -16,6 +16,8 @@ const state = {
 const DOM = {
     form: document.getElementById('familyForm'),
     inName: document.getElementById('inName'),
+    inSlug: document.getElementById('inSlug'),
+    inThumbnail: document.getElementById('inThumbnail'),
     selSubCategory: document.getElementById('selSubCategory'),
     btnSave: document.getElementById('btnSaveFamily'),
     btnCancel: document.getElementById('btnCancelEdit'),
@@ -26,16 +28,21 @@ const DOM = {
 
 document.addEventListener('DOMContentLoaded', async () => {
     await loadDropdownSubCategories();
-    
+
     if (DOM.searchInput) {
-        DOM.searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                state.searchQuery = e.target.value.trim();
-                state.currentPage = 1;
-                fetchFamilies();
-            }
+        DOM.searchInput.addEventListener('input', (e) => {
+            state.searchQuery = e.target.value.trim().toLowerCase();
+            state.currentPage = 1;
+            fetchFamilies();
         });
     }
+
+    // Auto generate Slug
+    DOM.inName?.addEventListener('input', (e) => {
+        if (!state.editingId) {
+            DOM.inSlug.value = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-");
+        }
+    });
 
     if (DOM.form) DOM.form.addEventListener('submit', saveFamily);
     if (DOM.btnCancel) DOM.btnCancel.addEventListener('click', cancelEdit);
@@ -43,32 +50,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     fetchFamilies();
 });
 
-// Tạm gọi Supabase trực tiếp ở đây (Nếu rảnh ông có thể bóc ra thành CategoryService)
 async function loadDropdownSubCategories() {
     try {
-        const { data, error } = await supabaseClient.from('sub_categories').select('id, name').order('name');
+        const { data, error } = await window.supabaseClient.from('sub_categories').select('id, name').order('name');
         if (error) throw error;
         state.subCategories = data || []; 
-        DOM.selSubCategory.innerHTML = '<option value="">-- Chọn Phân loại --</option>' + 
-            state.subCategories.map(sub => `<option value="${sub.id}">${window.utils.escapeHTML(sub.name)}</option>`).join('');
+        DOM.selSubCategory.innerHTML = '<option value="">-- Chọn nhóm hàng --</option>' + 
+            state.subCategories.map(sub => `<option value="${sub.id}">${sub.name}</option>`).join('');
     } catch (error) {
-        window.utils.showToast("Lỗi tải danh mục: " + error.message, "error");
+        console.error("Lỗi tải danh mục:", error);
     }
 }
 
 // --------------------------------------------------------
-// GỌI API QUA TẦNG SERVICE LAYER
+// SUPABASE DIRECT CALLS
 // --------------------------------------------------------
 async function fetchFamilies() {
-    if (DOM.tbody) DOM.tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10"><div class="animate-spin inline-block w-8 h-8 border-4 border-kn-blue border-t-transparent rounded-full mb-2"></div><br><span class="text-gray-500 font-bold">Đang tải...</span></td></tr>`;
+    if (DOM.tbody) DOM.tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10"><div class="animate-spin inline-block w-6 h-6 border-2 border-kn-blue border-t-transparent rounded-full"></div></td></tr>`;
 
     try {
-        const { data, count, error } = await FamilyService.getList({
-            page: state.currentPage,
-            limit: state.itemsPerPage,
-            search: state.searchQuery
-        });
-        
+        const from = (state.currentPage - 1) * state.itemsPerPage;
+        const to = from + state.itemsPerPage - 1;
+
+        let query = window.supabaseClient
+            .from('families')
+            .select('*, sub_categories(name)', { count: 'exact' });
+
+        if (state.searchQuery) {
+            query = query.or(`name.ilike.%${state.searchQuery}%,slug.ilike.%${state.searchQuery}%`);
+        }
+
+        const { data, count, error } = await query.order('id', { ascending: false }).range(from, to);
+
         if (error) throw error;
 
         state.families = data || [];
@@ -83,70 +96,69 @@ async function fetchFamilies() {
 
 async function saveFamily(event) {
     event.preventDefault();
-    const name = DOM.inName.value.trim();
-    const subCatId = DOM.selSubCategory.value;
+    const payload = {
+        name: DOM.inName.value.trim(),
+        slug: DOM.inSlug.value.trim(),
+        thumbnail_url: DOM.inThumbnail.value.trim() || null,
+        sub_category_id: DOM.selSubCategory.value
+    };
 
-    if (!name || !subCatId) return window.utils.showToast("Vui lòng nhập tên và chọn phân loại!", "error");
+    if (!payload.name || !payload.sub_category_id || !payload.slug) {
+        return alert("Vui lòng nhập đủ các trường bắt buộc!");
+    }
 
-    window.utils.toggleBtn(DOM.btnSave, true, "Đang lưu...");
+    DOM.btnSave.disabled = true;
+    DOM.btnSave.innerText = "Đang lưu...";
 
     try {
-        // Gọi Service kiểm tra trùng lặp
-        const { data: existing, error: checkErr } = await FamilyService.checkExist(name, subCatId, state.editingId);
-        if (checkErr) throw checkErr;
+        // Kiểm tra trùng tên trong cùng 1 danh mục
+        let checkQuery = window.supabaseClient.from('families').select('id').eq('name', payload.name).eq('sub_category_id', payload.sub_category_id);
+        if (state.editingId) checkQuery = checkQuery.neq('id', state.editingId);
         
+        const { data: existing } = await checkQuery.maybeSingle();
         if (existing) {
-            window.utils.showToast(`Dòng sản phẩm "${name}" đã tồn tại trong danh mục này!`, "warning");
+            alert(`Dòng sản phẩm "${payload.name}" đã tồn tại trong nhóm này!`);
             DOM.inName.focus();
             return;
         }
 
-        const payload = { name: name, sub_category_id: subCatId };
-
-        // Gọi Service Lưu
         if (state.editingId) {
-            const { error } = await FamilyService.update(state.editingId, payload);
+            const { error } = await window.supabaseClient.from('families').update(payload).eq('id', state.editingId);
             if (error) throw error;
-            window.utils.showToast("Cập nhật thành công!", "success");
         } else {
-            const { error } = await FamilyService.create(payload);
+            const { error } = await window.supabaseClient.from('families').insert([payload]);
             if (error) throw error;
-            window.utils.showToast("Thêm mới thành công!", "success");
         }
 
         cancelEdit();
         fetchFamilies();
     } catch (error) {
-        window.utils.showToast(`Lỗi: ${error.message}`, "error");
+        alert(`Lỗi: ${error.message}`);
     } finally {
-        window.utils.toggleBtn(DOM.btnSave, false, state.editingId ? 'Cập Nhật' : 'Thêm Mới');
+        DOM.btnSave.disabled = false;
+        DOM.btnSave.innerText = state.editingId ? "Cập Nhật" : "Lưu Dữ Liệu";
     }
 }
 
 window.deleteFamily = async function(id) {
-    const item = state.families.find(f => f.id == id);
-    if (!item) return;
-
-    if (!confirm(`Xóa dòng sản phẩm: "${item.name}"?`)) return;
+    if (!confirm(`Bạn có chắc chắn muốn xóa dòng sản phẩm này?`)) return;
 
     try {
-        // Gọi Service Xóa
-        const { error } = await FamilyService.delete(id);
+        const { error } = await window.supabaseClient.from('families').delete().eq('id', id);
         if (error) {
-            if (error.code === '23503') return window.utils.showToast(`Không thể xóa! "${item.name}" đang chứa sản phẩm.`, "error");
+            if (error.code === '23503') return alert(`Không thể xóa! Dòng sản phẩm này đang chứa sản phẩm con.`);
             throw error;
         }
 
-        window.utils.showToast("Đã xóa thành công!", "success");
         if (state.families.length === 1 && state.currentPage > 1) state.currentPage--;
         fetchFamilies();
     } catch (error) {
-        window.utils.showToast("Lỗi xóa: " + error.message, "error");
+        alert("Lỗi xóa: " + error.message);
     }
 }
 
 // --------------------------------------------------------
-// GIAO DIỆN (UI)
+// RENDER GIAO DIỆN
 // --------------------------------------------------------
 window.editFamily = function(id) {
     const item = state.families.find(f => f.id == id);
@@ -154,52 +166,60 @@ window.editFamily = function(id) {
 
     state.editingId = item.id;
     DOM.inName.value = item.name;
+    DOM.inSlug.value = item.slug || '';
+    DOM.inThumbnail.value = item.thumbnail_url || '';
     DOM.selSubCategory.value = item.sub_category_id;
 
     DOM.btnSave.innerHTML = "Cập Nhật";
-    DOM.btnSave.classList.replace('bg-kn-blue', 'bg-green-600');
     DOM.btnCancel.classList.remove('hidden');
-    DOM.inName.focus();
+    document.getElementById('formTitle').innerText = "Chỉnh sửa Dòng sản phẩm";
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function cancelEdit() {
     state.editingId = null;
     DOM.form.reset();
-    DOM.btnSave.innerHTML = "Thêm Mới";
-    DOM.btnSave.classList.replace('bg-green-600', 'bg-kn-blue');
+    DOM.btnSave.innerHTML = "Lưu Dữ Liệu";
     DOM.btnCancel.classList.add('hidden');
+    document.getElementById('formTitle').innerText = "Thêm Dòng sản phẩm Mới";
 }
 
 function renderFamilies() {
     if (!DOM.tbody) return;
     if (state.families.length === 0) {
-        DOM.tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-gray-500 font-bold">Chưa có dữ liệu!</td></tr>`;
+        DOM.tbody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-gray-400 font-medium">Chưa có dữ liệu!</td></tr>`;
         return;
     }
 
     const from = (state.currentPage - 1) * state.itemsPerPage;
-    
+
     DOM.tbody.innerHTML = state.families.map((item, index) => {
-        const safeName = window.utils.escapeHTML(item.name);
-        const parentCat = state.subCategories.find(sub => sub.id == item.sub_category_id);
-        const parentCatName = parentCat ? window.utils.escapeHTML(parentCat.name) : '-';
-        const dateStr = item.created_at ? new Date(item.created_at).toLocaleDateString('vi-VN') : '-';
+        const safeName = item.name;
+        const parentCatName = item.sub_categories ? item.sub_categories.name : '<span class="text-red-500">Mất link</span>';
+        const imgObj = item.thumbnail_url 
+            ? `<img src="${item.thumbnail_url}" class="w-10 h-10 object-contain bg-white border rounded">`
+            : `<div class="w-10 h-10 bg-gray-100 border rounded flex items-center justify-center text-xs text-gray-400">No Img</div>`;
 
         return `
-            <tr class="border-b border-gray-100 hover:bg-gray-50">
-                <td class="p-4 text-center font-bold text-gray-500">${from + index + 1}</td>
-                <td class="p-4 font-bold text-gray-800">${safeName}</td>
-                <td class="p-4 text-sm text-gray-600 bg-gray-50"><span class="font-medium bg-gray-200 px-2 py-1 rounded text-xs">${parentCatName}</span></td>
-                <td class="p-4 text-xs text-gray-500">${dateStr}</td>
-                <td class="p-4 text-right space-x-2">
-                    <button onclick="editFamily(${item.id})" class="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded font-bold hover:bg-blue-200">Sửa</button>
-                    <button onclick="deleteFamily(${item.id})" class="text-xs bg-red-100 text-red-700 px-3 py-1.5 rounded font-bold hover:bg-red-200">Xóa</button>
+            <tr class="border-b border-gray-100 hover:bg-blue-50/30 transition group">
+                <td class="p-4 text-center font-bold text-gray-400 text-xs">${from + index + 1}</td>
+                <td class="p-4 text-center">${imgObj}</td>
+                <td class="p-4">
+                    <div class="font-bold text-gray-900 text-sm">${safeName}</div>
+                    <div class="text-xs text-gray-400 mt-1">Slug: ${item.slug || '--'}</div>
+                </td>
+                <td class="p-4 text-xs text-gray-600">
+                    <!-- ĐÃ THÊM 'inline-block' VÀ 'whitespace-nowrap' ĐỂ TRÁNH RỚT DÒNG BỂ BACKGROUND -->
+                    <span class="inline-block font-bold border border-gray-200 bg-gray-100 px-2.5 py-1.5 rounded-md text-xs">${parentCatName}</span>
+                </td>
+                <td class="p-4 text-center space-x-1">
+                    <button onclick="editFamily(${item.id})" class="p-1.5 text-blue-600 hover:bg-blue-100 rounded-lg transition font-bold text-xs uppercase" title="Sửa">Sửa</button>
+                    <button onclick="deleteFamily(${item.id})" class="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition font-bold text-xs uppercase" title="Xóa">Xóa</button>
                 </td>
             </tr>
         `;
     }).join('');
-}
+} 
 
 function renderPagination() {
     if (!DOM.pagination) return;
@@ -207,12 +227,10 @@ function renderPagination() {
     const totalPages = Math.ceil(state.totalItems / state.itemsPerPage);
     if (totalPages <= 1) return;
 
-    let html = '';
-    if (state.currentPage > 1) html += `<button onclick="state.currentPage--; fetchFamilies()" class="px-3 py-1 bg-white border rounded text-sm hover:bg-gray-50">&laquo;</button>`;
+    let html = `<button onclick="state.currentPage--; fetchFamilies()" ${state.currentPage === 1 ? 'disabled class="px-3 py-1.5 rounded-lg text-gray-400 bg-transparent"' : 'class="px-3 py-1.5 rounded-lg text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 shadow-sm font-bold"'}>&laquo; Prev</button><div class="flex space-x-1">`;
     for (let i = 1; i <= totalPages; i++) {
-        if (i === state.currentPage) html += `<button class="px-3 py-1 bg-kn-orange text-white rounded text-sm font-bold">${i}</button>`;
-        else html += `<button onclick="state.currentPage = ${i}; fetchFamilies()" class="px-3 py-1 bg-white border rounded text-sm hover:bg-blue-50">${i}</button>`;
+        html += `<button onclick="state.currentPage = ${i}; fetchFamilies()" class="px-3 py-1.5 rounded-lg font-bold shadow-sm transition ${i === state.currentPage ? 'bg-kn-blue text-white border border-kn-blue' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}">${i}</button>`;
     }
-    if (state.currentPage < totalPages) html += `<button onclick="state.currentPage++; fetchFamilies()" class="px-3 py-1 bg-white border rounded text-sm hover:bg-gray-50">&raquo;</button>`;
+    html += `</div><button onclick="state.currentPage++; fetchFamilies()" ${state.currentPage === totalPages ? 'disabled class="px-3 py-1.5 rounded-lg text-gray-400 bg-transparent"' : 'class="px-3 py-1.5 rounded-lg text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 shadow-sm font-bold"'}>Next &raquo;</button>`;
     DOM.pagination.innerHTML = html;
 }

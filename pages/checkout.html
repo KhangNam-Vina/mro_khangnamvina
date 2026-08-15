@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Thanh toán đơn hàng | MRO Khang Nam
+    </title>
+
+    <meta
+        name="description"
+        content="Xác nhận thông tin giao hàng và đặt đơn mua sắm vật tư công nghiệp tại MRO Khang Nam."
+    >
+
+    <meta
+        name="robots"
+        content="noindex,nofollow"
+    >
+
+    <meta
+        property="og:title"
+        content="Thanh toán đơn hàng | MRO Khang Nam"
+    >
+
+    <meta
+        property="og:description"
+        content="Xác nhận thông tin giao hàng và đặt đơn mua sắm vật tư công nghiệp tại MRO Khang Nam."
+    >
+
+    <meta
+        property="og:image"
+        content="../assets/banner-brands.webp"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="../assets/images/world mark.png"
+    >
+
+
+    <!-- =====================================================
+         GOOGLE FONT
+    ====================================================== -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         CSS CHUNG
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/header.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/footer.css"
+    >
+
+
+    <!-- =====================================================
+         CSS RIÊNG
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/checkout.css"
+    >
+
+</head>
+
+
+<body class="checkout-page">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div
+        id="app-header"
+        class="site-header-placeholder"
+    ></div>
+
+
+    <!-- =====================================================
+         HERO / BREADCRUMB
+    ====================================================== -->
+
+    <section class="checkout-hero">
+
+        <div class="checkout-hero-overlay"></div>
+
+        <div class="checkout-container">
+
+            <nav
+                class="checkout-breadcrumb"
+                aria-label="Breadcrumb"
+            >
+
+                <a
+                    href="../index.html"
+                    class="checkout-breadcrumb-link"
+                >
+                    Trang chủ
+                </a>
+
+                <span
+                    class="checkout-breadcrumb-separator"
+                    aria-hidden="true"
+                >
+                    /
+                </span>
+
+                <a
+                    href="cart.html"
+                    class="checkout-breadcrumb-link"
+                >
+                    Giỏ hàng
+                </a>
+
+                <span
+                    class="checkout-breadcrumb-separator"
+                    aria-hidden="true"
+                >
+                    /
+                </span>
+
+                <span class="checkout-breadcrumb-current">
+                    Thanh toán
+                </span>
+
+            </nav>
+
+
+            <h1 class="checkout-hero-title">
+                Xác Nhận Đơn Hàng
+            </h1>
+
+
+            <p class="checkout-hero-description">
+                Kiểm tra lại thông tin giao hàng và xác nhận
+                đơn mua sắm trước khi gửi đến hệ thống.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="checkout-main">
+
+        <div class="checkout-container">
+
+
+            <!-- =================================================
+                 LOADING
+            ================================================== -->
+
+            <section
+                id="checkoutLoading"
+                class="checkout-loading is-hidden"
+            >
+
+                <svg
+                    class="checkout-loading-spinner"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                >
+
+                    <circle
+                        class="checkout-spinner-track"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                    ></circle>
+
+                    <path
+                        class="checkout-spinner-head"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    ></path>
+
+                </svg>
+
+
+                <p>
+                    Đang xử lý đơn hàng...
+                </p>
+
+            </section>
+
+
+            <!-- =================================================
+                 CHECKOUT FORM
+            ================================================== -->
+
+            <form
+                id="checkoutForm"
+                class="checkout-layout"
+            >
+
+
+                <!-- =================================================
+                     LEFT
+                ================================================== -->
+
+                <section class="checkout-form-section">
+
+                    <div class="checkout-form-card">
+
+
+                        <!-- HEADER -->
+                        <div class="checkout-card-header">
+
+                            <h2 class="checkout-card-title">
+
+                                <svg
+                                    class="checkout-title-icon"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                    ></path>
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                    ></path>
+                                </svg>
+
+                                Thông tin Giao hàng
+
+                            </h2>
+
+                        </div>
+
+
+                        <!-- FORM BODY -->
+                        <div class="checkout-form-body">
+
+
+                            <!-- HỌ TÊN + PHONE -->
+
+                            <div class="checkout-field-grid">
+
+
+                                <div class="checkout-form-group">
+
+                                    <label
+                                        for="shippingName"
+                                        class="checkout-form-label"
+                                    >
+                                        Họ và tên người nhận
+                                        <span>*</span>
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="shippingName"
+                                        class="checkout-form-input"
+                                        required
+                                        placeholder="Nhập họ tên đầy đủ"
+                                    >
+
+                                </div>
+
+
+                                <div class="checkout-form-group">
+
+                                    <label
+                                        for="shippingPhone"
+                                        class="checkout-form-label"
+                                    >
+                                        Số điện thoại
+                                        <span>*</span>
+                                    </label>
+
+                                    <input
+                                        type="tel"
+                                        id="shippingPhone"
+                                        class="checkout-form-input"
+                                        required
+                                        placeholder="Nhập số điện thoại liên hệ"
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ĐỊA CHỈ -->
+
+                            <div class="checkout-form-group">
+
+                                <label
+                                    for="shippingAddress"
+                                    class="checkout-form-label"
+                                >
+                                    Địa chỉ giao hàng chi tiết
+                                    <span>*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="shippingAddress"
+                                    class="checkout-form-input"
+                                    required
+                                    placeholder="Số nhà, Tên đường, Phường/Xã, Quận/Huyện, Tỉnh/Thành phố..."
+                                >
+
+                            </div>
+
+
+                            <!-- NOTE -->
+
+                            <div class="checkout-form-group">
+
+                                <label
+                                    for="orderNotes"
+                                    class="checkout-form-label"
+                                >
+                                    Ghi chú đơn hàng
+                                    <small>
+                                        (Tùy chọn)
+                                    </small>
+                                </label>
+
+                                <textarea
+                                    id="orderNotes"
+                                    class="checkout-form-textarea"
+                                    rows="4"
+                                    placeholder="Ghi chú về thời gian giao hàng, yêu cầu xuất hóa đơn VAT, mã số thuế doanh nghiệp..."
+                                ></textarea>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================================
+                     RIGHT - BILL
+                ================================================== -->
+
+                <aside class="checkout-summary-section">
+
+                    <div class="checkout-summary-card">
+
+
+                        <!-- HEADER -->
+
+                        <div class="checkout-summary-header">
+
+                            <h3 class="checkout-summary-title">
+                                Đơn hàng của bạn
+                            </h3>
+
+                        </div>
+
+
+                        <!-- BODY -->
+
+                        <div class="checkout-summary-body">
+
+
+                            <!-- MINI PRODUCTS -->
+
+                            <div
+                                id="checkoutItemsContainer"
+                                class="checkout-items-container"
+                            >
+
+                                <p class="checkout-items-loading">
+                                    Đang tải giỏ hàng...
+                                </p>
+
+                            </div>
+
+
+                            <!-- TOTAL -->
+
+                            <div class="checkout-bill">
+
+
+                                <div class="checkout-bill-row">
+
+                                    <span>
+                                        Tạm tính:
+                                    </span>
+
+                                    <strong id="checkoutSubtotal">
+                                        0 đ
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="checkout-bill-row">
+
+                                    <span>
+                                        Phí vận chuyển:
+                                    </span>
+
+                                    <strong>
+                                        Liên hệ sau
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="checkout-bill-row">
+
+                                    <span>
+                                        Thuế VAT (8-10%):
+                                    </span>
+
+                                    <strong>
+                                        Chưa bao gồm
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="checkout-bill-total">
+
+                                    <span>
+                                        Tổng thanh toán:
+                                    </span>
+
+                                    <strong id="checkoutTotal">
+                                        0 đ
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- PAYMENT METHOD -->
+
+                            <div class="checkout-payment-method">
+
+                                <div class="checkout-payment-row">
+
+                                    <input
+                                        type="radio"
+                                        checked
+                                        class="checkout-radio"
+                                        aria-label="Thanh toán chuyển khoản hoặc công nợ"
+                                    >
+
+
+                                    <div>
+
+                                        <h4 class="checkout-payment-title">
+                                            Thanh toán chuyển khoản / Công nợ
+                                        </h4>
+
+                                        <p class="checkout-payment-description">
+                                            Kế toán sẽ liên hệ xác nhận chi phí
+                                            vận chuyển, thuế VAT và công nợ
+                                            nếu có trước khi giao hàng.
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- SUBMIT -->
+
+                            <button
+                                type="submit"
+                                id="btnSubmitOrder"
+                                class="checkout-submit-button"
+                            >
+
+                                <span>
+                                    Xác Nhận Đặt Hàng
+                                </span>
+
+                                <svg
+                                    class="checkout-submit-icon"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M5 13l4 4L19 7"
+                                    ></path>
+                                </svg>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </aside>
+
+            </form>
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <div id="app-footer"></div>
+
+
+    <!-- =====================================================
+         SCRIPT
+    ====================================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/common/auth.js"></script>
+    <script src="../assets/js/common/utils.js"></script>
+
+    <script src="../assets/components/header.js"></script>
+    <script src="../assets/components/footer.js"></script>
+
+    <script src="../assets/js/users/auth-ui.js"></script>
+    <script src="../assets/js/users/checkout.js"></script>
+
+</body>
+
+</html>
