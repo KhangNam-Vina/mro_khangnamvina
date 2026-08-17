@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chi tiết đơn hàng | MRO Khang Nam</title>
-<meta name="robots" content="noindex,nofollow">
-<link rel="icon" type="image/png" href="../assets/images/world mark.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/style.css">
-<link rel="stylesheet" href="../assets/css/header.css">
-<link rel="stylesheet" href="../assets/css/footer.css">
-<link rel="stylesheet" href="../assets/css/my-orders-detail.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết đơn hàng | MRO Khang Nam</title>
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="icon" type="image/png" href="../assets/images/world mark.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/header.css">
+    <link rel="stylesheet" href="../assets/css/footer.css">
+    <link rel="stylesheet" href="../assets/css/my-orders-detail.css">
 </head>
 <body class="profile-page-wrapper">
 
@@ -85,6 +85,8 @@
     </div>
 
     <div id="orderDetailContent" class="order-detail-content d-none">
+        
+        <!-- HEADER ĐƠN HÀNG -->
         <section class="order-detail-card">
             <div class="order-detail-card-header">
                 <div>
@@ -101,7 +103,33 @@
             </div>
         </section>
 
-        <section class="order-detail-card">
+        <!-- THÔNG TIN GIAO HÀNG -->
+        <section class="order-detail-card mt-6">
+            <div class="order-detail-section-header">
+                <h2 class="order-detail-section-title">Thông tin Giao hàng</h2>
+            </div>
+            <div class="shipping-info-grid">
+                <div class="shipping-info-item">
+                    <span class="shipping-info-label">Người nhận</span>
+                    <strong id="shippingName" class="shipping-info-value">-</strong>
+                </div>
+                <div class="shipping-info-item">
+                    <span class="shipping-info-label">Số điện thoại</span>
+                    <strong id="shippingPhone" class="shipping-info-value">-</strong>
+                </div>
+                <div class="shipping-info-item">
+                    <span class="shipping-info-label">Địa chỉ giao hàng</span>
+                    <strong id="shippingAddress" class="shipping-info-value">-</strong>
+                </div>
+                <div class="shipping-info-item">
+                    <span class="shipping-info-label">Ghi chú đơn hàng</span>
+                    <strong id="shippingNote" class="shipping-info-value">-</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- BẢNG SẢN PHẨM -->
+        <section class="order-detail-card mt-6">
             <div class="order-detail-section-header">
                 <h2 class="order-detail-section-title">Sản phẩm trong đơn hàng</h2>
                 <p class="order-detail-section-desc">Danh sách sản phẩm đã được ghi nhận tại thời điểm đặt hàng.</p>
@@ -115,9 +143,18 @@
             <div class="order-total-box"><span>Tổng tiền đơn hàng</span><strong id="orderTotalBottom">0 đ</strong></div>
         </section>
 
-        <div class="order-detail-actions">
+        <!-- NÚT HÀNH ĐỘNG -->
+        <div class="order-detail-actions mt-6">
             <a href="my-orders.html" class="btn-outline-blue">← Quay lại lịch sử mua hàng</a>
+            
+            <button type="button" onclick="reorderCurrentItems()" class="btn-primary reorder-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                Mua lại đơn này
+            </button>
         </div>
+        
     </div>
 </div>
 

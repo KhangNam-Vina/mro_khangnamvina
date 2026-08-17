@@ -246,36 +246,95 @@
 
 .profile-sidebar-logout .profile-sidebar-icon { color: inherit; }
 
-/* =========================================================
-   5. CONTENT BASE
-========================================================= */
+/* --- Content Area --- */
 .profile-content-area {
     min-width: 0;
 }
 
 .content-card {
-    overflow: hidden;
-    background: #fff;
+    background: #ffffff;
     border: 1px solid #e5e7eb;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(15, 23, 42, .05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    overflow: hidden;
 }
 
 .content-card-header {
-    padding: 24px;
+    padding: 20px 24px;
+    background: #f9fafb;
     border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Cho phép rớt dòng trên Mobile */
+    gap: 16px;
+}
+
+.orders-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .content-title {
-    margin: 0 0 6px;
-    color: #00479b;
-    font-size: 21px;
+    margin: 0;
+    font-size: 18px;
     font-weight: 900;
+    color: #00479b;
     text-transform: uppercase;
-    letter-spacing: -.01em;
 }
 
-.content-card-body { padding: 24px; }
+.content-badge {
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #4b5563;
+}
+
+/* --- Search Mini --- */
+.my-orders-search {
+    position: relative;
+    width: 256px;
+    flex-shrink: 0;
+}
+
+.my-orders-search-input {
+    width: 100%;
+    height: 38px;
+    padding: 0 12px 0 36px;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    color: #374151;
+    font-size: 13px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.my-orders-search-input:focus {
+    border-color: #00479b;
+    box-shadow: 0 0 0 3px rgba(0, 71, 155, .08);
+}
+
+.my-orders-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    width: 16px;
+    height: 16px;
+    color: #9ca3af;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+/* Fix responsibe cho Search rớt dòng Mobile */
+@media (max-width: 560px) {
+    .content-card-header { flex-direction: column; align-items: stretch; }
+    .my-orders-search { width: 100%; }
+}
 
 /* =========================================================
    6. TABLE

@@ -429,7 +429,6 @@
 }
 
 .btn-outline-blue:hover { background: #00479b; color: #fff; }
-.order-detail-actions { display: flex; justify-content: flex-start; }
 
 .loading-spinner {
     width: 40px;
@@ -448,7 +447,64 @@
 .state-heading { margin: 0 0 8px; color: #1f2937; font-size: 20px; font-weight: 800; }
 .state-desc { margin: 0; color: #6b7280; font-size: 14px; line-height: 1.6; max-width: 560px; }
 
+/* =======================================================
+   SHIPPING INFO & ACTIONS (BỔ SUNG)
+======================================================= */
+.mt-6 { margin-top: 24px; }
 
+.shipping-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    padding: 24px;
+}
+
+.shipping-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.shipping-info-label {
+    color: #6b7280;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.shipping-info-value {
+    color: #1f2937;
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 700;
+    word-break: break-word;
+}
+
+.order-detail-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-primary.reorder-btn {
+    margin-top: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #ff5e00;
+    border: 1px solid #ff5e00;
+    box-shadow: 0 3px 8px rgba(255, 94, 0, .12);
+}
+
+.btn-primary.reorder-btn:hover {
+    background: #e95100;
+    transform: translateY(-1px);
+}
+
+/* =======================================================
+   RESPONSIVE
+======================================================= */
 @media (max-width: 1000px) {
     .profile-container { width: min(100%, calc(100% - 24px)); }
     .profile-layout-grid { grid-template-columns: 220px minmax(0, 1fr); gap: 24px; }
@@ -468,6 +524,14 @@
     .order-detail-card-header { align-items:flex-start; flex-direction:column; }
 }
 
+@media (max-width: 768px) {
+    .shipping-info-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 20px;
+    }
+}
+
 @media (max-width: 700px) {
     .profile-hero { padding: 38px 0 42px; }
     .profile-hero-title { font-size: 29px; }
@@ -482,6 +546,16 @@
     .order-summary-item:last-child { border-bottom:0; }
     .order-detail-code { font-size:20px; }
     .order-total-box { align-items:flex-end; flex-direction:column; gap:8px; }
+    
+    .order-detail-actions {
+        flex-direction: column-reverse;
+        gap: 12px;
+    }
+    .order-detail-actions a,
+    .order-detail-actions button {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 @media print {

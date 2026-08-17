@@ -4,6 +4,7 @@
 // ========================================================
 
 let currentUser = null;
+let currentOrderItems = []; // Biến toàn cục lưu danh sách sp để dùng cho tính năng Mua lại
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
@@ -159,7 +160,7 @@ async function loadOrderDetail() {
     const { data: items, error: itemsError } =
         await window.supabaseClient
             .from('order_items')
-            .select('*')
+            .select('*, products(image_url)')
             .eq('order_id', order.id);
 
     if (itemsError) {
@@ -280,11 +281,27 @@ function renderOrder(order, items) {
             formatCurrency(total);
     }
 
+    // -----------------------------------------------
+    // HIỂN THỊ THÔNG TIN GIAO HÀNG
+    // -----------------------------------------------
+    const shipNameEl = document.getElementById('shippingName');
+    const shipPhoneEl = document.getElementById('shippingPhone');
+    const shipAddressEl = document.getElementById('shippingAddress');
+    const shipNoteEl = document.getElementById('shippingNote');
+
+    if (shipNameEl) shipNameEl.textContent = order.shipping_name || '-';
+    if (shipPhoneEl) shipPhoneEl.textContent = order.shipping_phone || '-';
+    if (shipAddressEl) shipAddressEl.textContent = order.shipping_address || '-';
+    if (shipNoteEl) shipNoteEl.textContent = order.notes || order.note || 'Không có ghi chú';
+
+    // Lưu danh sách items vào biến toàn cục để dùng cho nút Mua Lại
+    window.currentOrderItems = items;
+
     renderOrderItems(items);
 }
 
 // ----------------------------------------------------
-// 5. RENDER ORDER ITEMS
+// 5. RENDER ORDER ITEMS (ĐÃ FIX LỖI HIỂN THỊ ẢNH)
 // ----------------------------------------------------
 function renderOrderItems(items) {
     const body =
@@ -346,27 +363,30 @@ function renderOrderItems(items) {
                     )
                 );
 
+            // XỬ LÝ LẤY LINK ẢNH TỪ DATABASE
+            const imageUrl = 
+               item.products?.image_url || // Ưu tiên 1: Lấy ảnh gốc tươi rói từ bảng Products
+                item.image_url ||           // Ưu tiên 2: Lấy từ Order Items (nếu có lưu)
+                item.image ||
+                '../assets/images/no-image.png';
+
             return `
                 <tr>
                     <td>
                         <div class="order-item-product">
 
+                            <!-- ĐÃ FIX VÒNG LẶP ONERROR VÀ ĐỔI ẢNH DỰ PHÒNG CHUẨN -->
                             <div
                                 class="order-item-icon"
                                 aria-hidden="true"
+                                style="overflow: hidden; background: #fff;"
                             >
-                                <svg
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
+                                <img 
+                                    src="${escapeHtml(imageUrl)}" 
+                                    alt="${escapeHtml(productName)}"
+                                    style="width: 100%; height: 100%; object-fit: contain;"
+                                    onerror="this.onerror=null; this.src='../assets/images/world mark.png';"
                                 >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="1.7"
-                                        d="M20 7l-8-4-8 4m16 0v10l-8 4-8-4V7m16 0l-8 4m-8-4l8 4m0 0v10"
-                                    />
-                                </svg>
                             </div>
 
                             <div class="order-item-product-info">
@@ -605,5 +625,46 @@ function showOrderError(message) {
     if (messageEl) {
         messageEl.textContent =
             message;
+    }
+}
+
+// ----------------------------------------------------
+// 14. CHỨC NĂNG MUA LẠI ĐƠN HÀNG (REORDER)
+// ----------------------------------------------------
+window.reorderCurrentItems = function() {
+    if (!window.currentOrderItems || window.currentOrderItems.length === 0) return;
+    
+    // Mở giỏ hàng Shopping Cart hiện tại
+    let shoppingCart = JSON.parse(localStorage.getItem('mro_shopping_cart')) || [];
+    
+    window.currentOrderItems.forEach(item => {
+        const sku = item.sku;
+        const existingIndex = shoppingCart.findIndex(cartItem => cartItem.sku === sku);
+        const qty = Number(item.quantity ?? item.qty ?? 1);
+        
+        if (existingIndex > -1) {
+            shoppingCart[existingIndex].qty += qty;
+        } else {
+            shoppingCart.push({
+                id: item.product_id, 
+                sku: item.sku,
+                name: item.product_name || item.name,
+                price: item.unit_price || item.price,
+                image: item.image_url || '../assets/images/no-image.png',
+                unit: item.unit || 'Cái',
+                qty: qty
+            });
+        }
+    });
+    
+    // Lưu lại và quăng qua trang Cart
+    localStorage.setItem('mro_shopping_cart', JSON.stringify(shoppingCart));
+    
+    if (window.utils && window.utils.showToast) {
+        window.utils.showToast('Đã thêm sản phẩm vào giỏ hàng!', 'success');
+        setTimeout(() => { window.location.href = 'cart.html'; }, 1000);
+    } else {
+        alert('Đã thêm tất cả sản phẩm vào giỏ mua hàng trực tiếp!');
+        window.location.href = 'cart.html';
     }
 }
