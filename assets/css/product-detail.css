@@ -1154,9 +1154,8 @@
 .product-sale-sidebar {
     min-width: 0;
 
-    position: sticky;
-
-    top: 96px;
+    position: relative;
+    overflow: hidden;
 
     align-self: start;
 }

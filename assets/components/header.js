@@ -39,12 +39,12 @@ const renderHeader = () => {
                     <!-- ACCOUNT & LOGIN -->
                     <div class="header-account-wrapper">
                         <!-- Nút Đăng nhập -->
-                        <a id="btnGuestLogin" href="${pagesPath}login.html" class="btn-guest-login">Đăng nhập</a>
+                        <a id="btnGuestLogin" href="${pagesPath}login.html" class="btn-guest-login d-none">Đăng nhập</a>
                         
-                        <!-- Nút Tài khoản (Mặc định ẩn bằng class tĩnh d-none) -->
+                        <!-- Nút Tài khoản (Fix cứng chữ TK) -->
                         <a id="btnUserProfile" href="${pagesPath}profile.html" class="btn-user-profile d-none">
-                            <div id="headerAvatarInitials" class="user-avatar">KN</div>
-                            <span id="headerUserName" class="user-text">Tài khoản</span>
+                            <div class="user-avatar">TK</div>
+                            <span class="user-text">Tài khoản</span>
                         </a>
                     </div>
 
@@ -246,5 +246,81 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     } catch (err) {
         console.error("Lỗi đồng bộ Header:", err);
+    }
+});
+
+// ========================================================
+// TỰ ĐỘNG CẬP NHẬT TRẠNG THÁI HEADER (CSS TĨNH) TRÊN MỌI TRANG
+// Giấu cả 2 nút lúc đầu, check xong mới bật 1 trong 2 để chống giật UI
+// ========================================================
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        let isUserLoggedIn = false;
+
+        // Quét các lớp để tìm trạng thái đăng nhập
+        if (typeof window.checkCustomerAuth === 'function') {
+            isUserLoggedIn = !!(await window.checkCustomerAuth());
+        } else if (typeof Auth !== 'undefined' && typeof Auth.getCurrentUser === 'function') {
+            isUserLoggedIn = !!(await Auth.getCurrentUser());
+        } else if (window.supabaseClient) {
+            const { data } = await window.supabaseClient.auth.getSession();
+            isUserLoggedIn = !!data?.session;
+        }
+
+        const guestBtn = document.getElementById("btnGuestLogin");
+        const userProfileBtn = document.getElementById("btnUserProfile");
+
+        // Logic hiển thị sau khi đã có kết quả
+        if (isUserLoggedIn) {
+            // ĐÃ đăng nhập: Hiện Tài khoản, Giữ ẩn Khách
+            if (userProfileBtn) userProfileBtn.classList.remove("d-none");
+            if (guestBtn) guestBtn.classList.add("d-none");
+        } else {
+            // CHƯA đăng nhập: Hiện Khách, Giữ ẩn Tài khoản
+            if (guestBtn) guestBtn.classList.remove("d-none");
+            if (userProfileBtn) userProfileBtn.classList.add("d-none");
+        }
+    } catch (err) {
+        console.error("Lỗi đồng bộ Header:", err);
+        // Fallback: Nếu lỗi, mặc định bật lại nút Đăng nhập khách
+        const guestBtn = document.getElementById("btnGuestLogin");
+        if (guestBtn) guestBtn.classList.remove("d-none");
+    }
+});
+
+// ========================================================
+// TỰ ĐỘNG CẬP NHẬT TRẠNG THÁI HEADER (CSS TĨNH)
+// Fix cứng chữ "TK" - Không cần chờ tải dữ liệu Tên
+// ========================================================
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        let isUserLoggedIn = false;
+
+        // Quét các lớp để tìm trạng thái đăng nhập
+        if (typeof window.checkCustomerAuth === 'function') {
+            isUserLoggedIn = !!(await window.checkCustomerAuth());
+        } else if (typeof Auth !== 'undefined' && typeof Auth.getCurrentUser === 'function') {
+            isUserLoggedIn = !!(await Auth.getCurrentUser());
+        } else if (window.supabaseClient) {
+            const { data } = await window.supabaseClient.auth.getSession();
+            isUserLoggedIn = !!data?.session;
+        }
+
+        const guestBtn = document.getElementById("btnGuestLogin");
+        const userProfileBtn = document.getElementById("btnUserProfile");
+
+        // Xử lý bật/tắt hiển thị
+        if (isUserLoggedIn) {
+            if (userProfileBtn) userProfileBtn.classList.remove("d-none");
+            if (guestBtn) guestBtn.classList.add("d-none");
+        } else {
+            if (guestBtn) guestBtn.classList.remove("d-none");
+            if (userProfileBtn) userProfileBtn.classList.add("d-none");
+        }
+    } catch (err) {
+        console.error("Lỗi đồng bộ Header:", err);
+        // Fallback: Lỗi thì bật nút Đăng nhập
+        const guestBtn = document.getElementById("btnGuestLogin");
+        if (guestBtn) guestBtn.classList.remove("d-none");
     }
 });

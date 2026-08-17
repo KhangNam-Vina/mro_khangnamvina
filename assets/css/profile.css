@@ -19,7 +19,7 @@
 /* CONTAINER */
 .profile-container {
     width: min(1536px, calc(100% - 32px));
-    margin: 0 auto;
+    margin: 0 auto; 
 }
 
 /* HERO */
