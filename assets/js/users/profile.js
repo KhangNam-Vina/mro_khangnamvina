@@ -51,6 +51,7 @@ async function loadUserProfile(user) {
         if (data) {
             setValue("profFullName", data.full_name);
             setValue("profPhone", data.phone);
+            setValue("profEmail", user.email);
             setValue("profCompany", data.company_name);
             setValue("profTaxId", data.tax_id);
             setValue("profAddress", data.company_address);

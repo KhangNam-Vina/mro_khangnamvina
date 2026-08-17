@@ -195,90 +195,60 @@
             <div class="rfq-detail-page-layout">
 
                 <!-- =================================================
-                     SIDEBAR TÀI KHOẢN - ĐỒNG BỘ VỚI TRANG LỊCH SỬ RFQ
+                     SIDEBAR TÀI KHOẢN - ĐỒNG BỘ 100% VỚI CÁC TRANG KHÁC
                 ================================================== -->
-
-                <aside class="profile-sidebar" aria-label="Điều hướng tài khoản">
+                <aside class="profile-sidebar no-print">
 
                     <div class="profile-sidebar-profile">
-                        <div class="profile-avatar" aria-hidden="true">
-                            KN
-                        </div>
-
-                        <p class="profile-sidebar-name">
-                            Tài khoản khách hàng
-                        </p>
-
-                        <p class="profile-sidebar-email">
-                            Khang Nam MRO
-                        </p>
+                        <div id="rfqSidebarAvatar" class="profile-avatar">TN</div>
+                        <p id="rfqSidebarName" class="profile-sidebar-name">Đang tải...</p>
+                        <p id="rfqSidebarEmail" class="profile-sidebar-email">Đang tải...</p>
                     </div>
 
                     <nav class="profile-sidebar-nav">
-
-                        <a
-                            href="profile.html"
-                            class="profile-sidebar-link"
-                        >
+                        
+                        <!-- THÔNG TIN CÔNG TY -->
+                        <a href="profile.html" class="profile-sidebar-link">
                             <svg class="profile-sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9 9 0 1118.879 6.196A9 9 0 015.121 17.804z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10a3 3 0 11-6 0a3 3 0 016 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.5 18a4.5 4.5 0 019 0"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                             </svg>
-                            Thông tin tài khoản
+                            <span>Thông tin Công ty</span>
                         </a>
 
-                        <a
-                            href="my-orders.html"
-                            class="profile-sidebar-link"
-                        >
+                        <!-- LỊCH SỬ MUA HÀNG -->
+                        <a href="my-orders.html" class="profile-sidebar-link">
                             <svg class="profile-sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5a3 3 0 016 0v1H9V5z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6M9 16h4"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                             </svg>
-                            Đơn hàng của tôi
+                            <span>Lịch sử mua hàng</span>
                         </a>
 
-                        <a
-                            href="my-rfq.html"
-                            class="profile-sidebar-link is-active"
-                            aria-current="page"
-                        >
+                        <!-- LỊCH SỬ BÁO GIÁ (RFQ) -->
+                        <a href="my-rfq.html" class="profile-sidebar-link is-active">
                             <svg class="profile-sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 3h12a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h8M8 11h8M8 15h5"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2-2z"></path>
                             </svg>
-                            Lịch sử yêu cầu báo giá
+                            <span>Lịch sử Báo giá (RFQ)</span>
                         </a>
 
-                        <a
-                            href="purchased-products.html"
-                            class="profile-sidebar-link"
-                        >
+                        <!-- SẢN PHẨM THƯỜNG MUA -->
+                        <a href="purchased-products.html" class="profile-sidebar-link">
                             <svg class="profile-sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 8h12l1 12H5L6 8z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 8V6a3 3 0 016 0v2"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h8"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
                             </svg>
-                            Sản phẩm đã mua
+                            <span>Sản phẩm thường mua</span>
                         </a>
 
-                        <div class="profile-sidebar-divider" aria-hidden="true"></div>
+                        <div class="profile-sidebar-divider"></div>
 
-                        <button
-                            type="button"
-                            class="profile-sidebar-link profile-sidebar-logout"
-                            onclick="window.handleCustomerLogout ? window.handleCustomerLogout() : (window.location.href='../index.html')"
-                        >
+                        <!-- ĐĂNG XUẤT -->
+                        <button type="button" onclick="window.handleLogout()" class="profile-sidebar-link profile-sidebar-logout">
                             <svg class="profile-sidebar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 17l5-5-5-5"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H3"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 19V5a2 2 0 00-2-2h-6"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                             </svg>
-                            Đăng xuất
+                            <span>Đăng xuất</span>
                         </button>
-
+                        
                     </nav>
 
                 </aside>

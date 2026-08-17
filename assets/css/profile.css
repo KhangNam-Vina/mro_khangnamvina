@@ -109,7 +109,13 @@
 }
 .profile-sidebar-link:hover { background: #f9fafb; color: #00479b; }
 .profile-sidebar-link.is-active { background: #eff6ff; color: #00479b; font-weight: 800; }
-.profile-sidebar-icon { width: 20px; height: 20px; margin-right: 12px; flex-shrink: 0; color: #9ca3af; }
+.profile-sidebar-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 12px;
+    flex: 0 0 18px;
+    color: #9ca3af;
+}
 .profile-sidebar-link.is-active .profile-sidebar-icon { color: #00479b; }
 .profile-sidebar-divider { height: 1px; margin: 8px 4px; background: #f3f4f6; }
 
@@ -134,7 +140,12 @@
 .profile-form { padding: 24px; }
 .profile-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
 .profile-form-section { display: flex; flex-direction: column; gap: 24px; }
-.profile-form-group { min-width: 0; }
+.profile-form-group {
+    width: 100%;
+    margin-top: 20px;
+}
+
+
 .profile-form-label { display: block; margin: 0 0 8px; color: #374151; font-size: 11px; font-weight: 800; text-transform: uppercase; }
 .profile-form-label .required { color: #ef4444; }
 .profile-form-input {
