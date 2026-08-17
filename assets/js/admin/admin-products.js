@@ -1,6 +1,6 @@
 // ========================================================
 // FILE: assets/js/admin/admin-products.js
-// QUẢN LÝ SẢN PHẨM - TÍCH HỢP DROPDOWN LIÊN HOÀN & CKEDITOR
+// QUẢN LÝ SẢN PHẨM - TÍCH HỢP TỰ ĐỘNG TẠO THƯƠNG HIỆU MỚI
 // ========================================================
 
 const state = {
@@ -21,18 +21,13 @@ const state = {
 // 1. KHỞI TẠO
 // ========================================================
 document.addEventListener("DOMContentLoaded", async () => {
-    // Khởi tạo CKEditor cho ô mô tả chi tiết nếu có
     if (typeof CKEDITOR !== 'undefined' && document.getElementById('description')) {
         CKEDITOR.replace('description', { height: 250 });
     }
 
-    // Tải tất cả dữ liệu thả xuống (Dropdowns)
     await loadAllDropdowns();
-    
-    // Tải danh sách sản phẩm
     await fetchProducts();
 
-    // Gắn sự kiện tìm kiếm
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.addEventListener('keypress', (e) => {
@@ -44,7 +39,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // Gắn sự kiện Lọc Dropdown liên hoàn
     setupCascadingDropdowns();
 });
 
@@ -53,7 +47,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 // ========================================================
 async function loadAllDropdowns() {
     try {
-        // Gọi song song nhiều API để load nhanh
         const [catRes, subCatRes, famRes, indRes, brandRes] = await Promise.all([
             window.supabaseClient.from('categories').select('id, name'),
             window.supabaseClient.from('sub_categories').select('id, name, category_id'),
@@ -68,18 +61,20 @@ async function loadAllDropdowns() {
         state.industries = indRes.data || [];
         state.brands = brandRes.data || [];
 
-        // Đổ dữ liệu vào UI
         populateSelect('category_id', state.categories, '-- Chọn danh mục gốc --');
-        populateSelect('industrySelect', state.industries, '-- Chọn ngành hàng --'); // FIX: ID HTML là industrySelect
+        populateSelect('industrySelect', state.industries, '-- Chọn ngành hàng --');
         
-        // Đổ Datalist cho Thương hiệu
-        const brandList = document.getElementById('brandList');
-        if (brandList) {
-            brandList.innerHTML = state.brands.map(b => `<option value="${b.name}"></option>`).join('');
-        }
+        refreshBrandDatalist();
 
     } catch (error) {
         console.error("Lỗi tải Dropdowns:", error);
+    }
+}
+
+function refreshBrandDatalist() {
+    const brandList = document.getElementById('brandList');
+    if (brandList) {
+        brandList.innerHTML = state.brands.map(b => `<option value="${b.name}"></option>`).join('');
     }
 }
 
@@ -100,7 +95,7 @@ function setupCascadingDropdowns() {
             const catId = e.target.value;
             const filteredSubCats = catId ? state.subCategories.filter(s => s.category_id == catId) : state.subCategories;
             populateSelect('sub_category_id', filteredSubCats, '-- Chọn danh mục con --');
-            famSelect.innerHTML = '<option value="">-- Chọn dòng sản phẩm --</option>'; // Reset Family
+            famSelect.innerHTML = '<option value="">-- Chọn dòng sản phẩm --</option>'; 
         });
     }
 
@@ -199,7 +194,7 @@ function renderPagination() {
 }
 
 // ========================================================
-// 4. THÊM / SỬA SẢN PHẨM (XỬ LÝ DỮ LIỆU ĐỂ TRÁNH LỖI 400)
+// 4. THÊM / SỬA SẢN PHẨM (AUTO CREATE BRAND)
 // ========================================================
 window.showAddForm = function() {
     state.editingId = null;
@@ -224,7 +219,7 @@ window.saveProduct = async function() {
     btn.innerHTML = "Đang lưu...";
 
     try {
-        // 1. LẤY CKEDITOR (NẾU CÓ) HOẶC TEXTAREA BÌNH THƯỜNG
+        // 1. LẤY CKEDITOR 
         let descValue = '';
         if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances.description) {
             descValue = CKEDITOR.instances.description.getData();
@@ -232,35 +227,48 @@ window.saveProduct = async function() {
             descValue = document.getElementById('description').value;
         }
 
-        // 2. XỬ LÝ ID THƯƠNG HIỆU (BRAND_ID) TỪ CHỮ GÕ VÀO
+        // 2. XỬ LÝ ID THƯƠNG HIỆU (TỰ ĐỘNG TẠO MỚI NẾU CHƯA CÓ)
         const brandInputText = document.getElementById('brand_input').value.trim();
         let finalBrandId = null;
+
         if (brandInputText) {
             const foundBrand = state.brands.find(b => b.name.toLowerCase() === brandInputText.toLowerCase());
+            
             if (foundBrand) {
+                // Đã có sẵn -> Lấy ID
                 finalBrandId = foundBrand.id;
             } else {
-                // Nếu khách gõ tên hãng mới tinh chưa có trong DB, báo lỗi bắt tạo trước.
-                alert(`Thương hiệu "${brandInputText}" chưa tồn tại trong hệ thống. Vui lòng vào Quản lý Danh mục tạo trước!`);
-                btn.disabled = false;
-                btn.innerHTML = state.editingId ? "Cập Nhật Sản Phẩm" : "Nhập Kho Sản Phẩm";
-                return;
+                // Chưa có -> Bơm lên DB tạo mới ngay lập tức
+                btn.innerHTML = "Đang tạo hãng mới...";
+                const { data: newBrand, error: brandErr } = await window.supabaseClient
+                    .from('brands')
+                    .insert([{ name: brandInputText }])
+                    .select('id, name')
+                    .single();
+
+                if (brandErr) {
+                    throw new Error("Lỗi khi tạo Thương hiệu mới: " + brandErr.message);
+                }
+
+                // Cập nhật ID mới và đẩy vào mảng state để xài luôn không cần F5
+                finalBrandId = newBrand.id;
+                state.brands.push(newBrand);
+                refreshBrandDatalist();
             }
         }
 
         // 3. GOM DATA
+        btn.innerHTML = "Đang lưu sản phẩm...";
         const payload = {
             sku: document.getElementById('sku').value.trim(),
             name: document.getElementById('name').value.trim(),
             
-            // Các ID Khóa ngoại (Sử dụng || null để tránh đẩy chuỗi rỗng gây lỗi 400)
             category_id: document.getElementById('category_id').value || null,
             sub_category_id: document.getElementById('sub_category_id').value || null,
             family_id: document.getElementById('family_id').value || null,
             industry_id: document.getElementById('industrySelect').value || null,
             brand_id: finalBrandId,
             
-            // Thông số
             origin: document.getElementById('origin').value.trim() || null,
             price: document.getElementById('price').value || null,
             discount_price: document.getElementById('discount_price').value || null,
@@ -269,7 +277,6 @@ window.saveProduct = async function() {
             min_order_quantity: document.getElementById('min_order_quantity').value || 1,
             badge: document.getElementById('badge').value || null,
             
-            // Media & Nội dung
             image_url: document.getElementById('image_url').value.trim() || null,
             images: document.getElementById('inExtraImages').value.trim() || null,
             datasheet_url: document.getElementById('inDatasheet').value.trim() || null,
@@ -314,7 +321,6 @@ window.editProduct = function(id) {
     state.editingId = item.id;
     document.getElementById('formTitle').innerText = "Sửa Sản Phẩm: " + item.sku;
     
-    // Fill Basic
     document.getElementById('sku').value = item.sku || '';
     document.getElementById('name').value = item.name || '';
     document.getElementById('origin').value = item.origin || '';
@@ -325,7 +331,6 @@ window.editProduct = function(id) {
     document.getElementById('min_order_quantity').value = item.min_order_quantity || 1;
     document.getElementById('badge').value = item.badge || '';
     
-    // Fill Media
     document.getElementById('image_url').value = item.image_url || '';
     document.getElementById('inExtraImages').value = item.images || '';
     document.getElementById('inDatasheet').value = item.datasheet_url || '';
@@ -338,7 +343,6 @@ window.editProduct = function(id) {
         document.getElementById('description').value = item.description || '';
     }
 
-    // Fill Dropdowns (Trigger lại sự kiện để Cascading chạy)
     document.getElementById('category_id').value = item.category_id || '';
     document.getElementById('category_id').dispatchEvent(new Event('change'));
     
@@ -353,7 +357,6 @@ window.editProduct = function(id) {
 
     document.getElementById('industrySelect').value = item.industry_id || '';
     
-    // Fill Brand Input Text
     if (item.brand_id) {
         const foundBrand = state.brands.find(b => b.id == item.brand_id);
         document.getElementById('brand_input').value = foundBrand ? foundBrand.name : '';
