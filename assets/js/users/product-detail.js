@@ -263,12 +263,28 @@ async function loadProductDetail() {
         }
 
 
-        const detailPrice =
-            document.getElementById("detailPrice");
+       /* -------------------------------------------------
+           PRICE (ĐÃ FIX: ƯU TIÊN GIÁ KHUYẾN MÃI)
+        ------------------------------------------------- */
+        const detailPrice = document.getElementById("detailPrice");
 
         if (detailPrice) {
-            detailPrice.innerText =
-                priceFormat;
+            // Nếu có giá giảm và giá giảm nhỏ hơn giá gốc
+            if (item.discount_price && Number(item.discount_price) > 0 && Number(item.discount_price) < Number(item.price)) {
+                const oldPrice = pdFormatCurrency(item.price);
+                const newPrice = pdFormatCurrency(item.discount_price);
+                
+                // Hiển thị giá cũ bị gạch chéo ở trên, giá mới màu cam chà bá ở dưới
+                detailPrice.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                        <span style="font-size: 14px; color: #9ca3af; text-decoration: line-through; font-weight: 600; line-height: 1;">${oldPrice}</span>
+                        <span>${newPrice}</span>
+                    </div>
+                `;
+            } else {
+                // Nếu không có giảm giá thì hiện giá gốc bình thường
+                detailPrice.innerHTML = priceFormat;
+            }
         }
 
 
@@ -1763,36 +1779,68 @@ function printProduct() {
 
 
 /* ========================================================
-   13. INIT
+   HIỆU ỨNG ZOOM KÍNH LÚP ẢNH SẢN PHẨM (MAGNIFIER)
 ======================================================== */
+function initMagnifierZoom() {
+    const wrapper = document.querySelector('.product-main-image-wrapper');
+    const img = document.getElementById('mainImage');
 
+    if (!wrapper || !img) return;
+
+    // Khi chuột di chuyển bên trong khung ảnh
+    wrapper.addEventListener('mousemove', function(e) {
+        const rect = wrapper.getBoundingClientRect();
+        
+        // Tính toán tọa độ chuột theo phần trăm (0% -> 100%)
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+        // Tắt transition khi đang di chuột để ảnh chạy theo mượt mà, không bị giật lag
+        img.style.transition = 'none';
+        
+        // Đặt tâm phóng to vào đúng tọa độ con chuột
+        img.style.transformOrigin = `${x}% ${y}%`;
+        
+        // Phóng to gấp 2.2 lần (Bro có thể chỉnh số này to nhỏ tùy ý)
+        img.style.transform = 'scale(2.2)'; 
+    });
+
+    // Khi chuột rời khỏi khung ảnh
+    wrapper.addEventListener('mouseleave', function() {
+        // Bật lại hiệu ứng mượt (transition) để thu nhỏ từ từ
+        img.style.transition = 'transform 0.4s ease';
+        img.style.transformOrigin = 'center center';
+        img.style.transform = 'scale(1)'; // Trả về nguyên trạng
+    });
+
+    // Lúc mới đưa chuột vào cũng cho phóng to từ từ cho mượt
+    wrapper.addEventListener('mouseenter', function() {
+        img.style.transition = 'transform 0.4s ease';
+    });
+}
+
+/* ========================================================
+   KHỞI TẠO TRANG (INIT)
+======================================================== */
 window.addEventListener(
     "load",
     async () => {
+        const urlParams = new URLSearchParams(window.location.search);
 
-        const urlParams =
-            new URLSearchParams(
-                window.location.search
-            );
-
-
-        if (
-            urlParams.get("id")
-        ) {
-
+        if (urlParams.get("id")) {
             await loadProductDetail();
         }
-
 
         if (
             document.getElementById(
                 "cartList"
             )
         ) {
-
             loadCartFromStorage();
         }
 
+        // KÍCH HOẠT HIỆU ỨNG ZOOM KÍNH LÚP TẠI ĐÂY
+        initMagnifierZoom();
 
         /* -----------------------------------------------
            XÁC THỰC "TRÙM CUỐI" ĐỒNG BỘ CSS TĨNH
@@ -1824,3 +1872,4 @@ window.addEventListener(
         }
     }
 );
+

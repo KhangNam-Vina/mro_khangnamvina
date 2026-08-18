@@ -2438,3 +2438,19 @@
             1fr 1fr;
     }
 }
+
+/* =========================================================
+   FIX LỖI GẠCH CHÂN TÊN SẢN PHẨM CÙNG DÒNG
+========================================================= */
+.product-related-section a,
+.product-related-grid a,
+.product-related-section a:hover,
+.product-related-grid a:hover {
+    text-decoration: none !important;
+}
+
+/* Thêm tí hiệu ứng đổi màu xịn xò khi rê chuột vào tên */
+.product-related-section a:hover,
+.product-related-grid a:hover {
+    color: #00479b !important; 
+}

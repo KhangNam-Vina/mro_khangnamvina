@@ -101,7 +101,7 @@ async function loadBrandsToMarquee() {
             <div class="brand-track-group">${brandItemsHTML}</div>
             <div class="brand-track-group" aria-hidden="true">${brandItemsHTML}</div>
         `;
-        initDragAndScroll('brandScrollContainer', 1);
+        initDragAndScroll('brandScrollContainer', 1.5);
     } catch (error) {
         container.innerHTML = `<span class="brand-marquee-loading" style="color:#fca5a5;">Lỗi tải dữ liệu: ${error.message}</span>`;
     }
@@ -178,7 +178,7 @@ async function loadBestSellers(filterKeyword = 'ALL') {
             <div class="product-slider-track">${productItemsHTML}</div>
             <div class="product-slider-track" aria-hidden="true">${productItemsHTML}</div>
         `;
-        initDragAndScroll('bestSellingGrid', 0.5);
+        initDragAndScroll('bestSellingGrid', 2);
     } catch (error) {
         container.innerHTML = `<p class="empty-msg" style="color:red;">Lỗi lấy dữ liệu: ${error.message}</p>`;
     }
@@ -491,11 +491,23 @@ window.onload = async function() {
 };
 
 window.scrollBestSellers = function(amount) {
-    const container = document.getElementById('bestSellingGrid');
-    if (container) {
-        container.scrollBy({
+    const slider = document.getElementById('bestSellingGrid');
+    if (slider) {
+        // 1. Tạm tắt auto-scroll ngay lập tức để không bị "đánh lộn"
+        if (slider.scrollInterval) clearInterval(slider.scrollInterval);
+        
+        // 2. Chống lỗi bấm liên tục (Spam click)
+        if (slider.resumeTimeout) clearTimeout(slider.resumeTimeout);
+
+        // 3. Cuộn mượt mà sang trái/phải
+        slider.scrollBy({
             left: amount,
             behavior: 'smooth'
         });
+
+        // 4. Kích hoạt lại Auto-scroll sau 600ms (khi đã cuộn xong)
+        slider.resumeTimeout = setTimeout(() => {
+            slider.dispatchEvent(new Event('mouseleave'));
+        }, 600);
     }
 };

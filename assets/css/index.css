@@ -244,12 +244,27 @@
     line-height: 1.375; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .category-link:hover { color: #ff5e00; }
+/* =========================================================
+   NÚT "+ XEM TẤT CẢ" BÊN TRONG THẺ DANH MỤC
+========================================================= */
 .category-view-all {
-    font-size: 14px; text-transform: uppercase; font-weight: 700;
-    color: #ff5e00; font-style: italic; text-decoration: none;
-    transition: color 0.3s;
+    display: inline-block;
+    font-size: 13px; /* Nhỏ hơn tên danh mục một chút */
+    text-transform: uppercase; 
+    font-weight: 800; /* In đậm chuẩn B2B */
+    color: #ff5e00; /* Màu cam đặc trưng */
+    font-style: italic; /* Ép in nghiêng giống ảnh */
+    text-decoration: none;
+    transition: color 0.3s ease, transform 0.2s ease;
+    margin-top: 4px;
 }
-.category-view-all:hover { color: #c2410c; text-decoration: underline; }
+
+/* Hiệu ứng khi khách hơ chuột vào */
+.category-view-all:hover { 
+    color: #c2410c; 
+    text-decoration: underline; 
+    transform: translateX(4px); /* Nhích nhẹ sang phải cho mượt */
+}   
 .cat-empty { font-size: 14px; color: #9ca3af; font-style: italic; }
 .home-grid-message {
     grid-column: 1 / -1;
@@ -683,65 +698,26 @@
     .category-grid { grid-template-columns: 1fr; }
     .home-hero-title { font-size: 36px; }
 }
+
 /* =========================================================
-   HOME - EXTRACTED INLINE CSS
-   File: assets/css/index-inline.css
+   FIX: PHÓNG TO ẢNH SẢN PHẨM BÁN CHẠY MAXIMUM
 ========================================================= */
 
-.home-page {
-    font-family: "Inter", Arial, Helvetica, sans-serif;
+/* 1. Nới rộng chiều cao khung chứa ảnh và bóp mỏng lề */
+#bestSellingGrid .product-image-link {
+    height: 240px !important; /* Tăng không gian lên 240px */
+    padding: 4px !important;  /* Bóp lề sát rạt để ảnh có chỗ bung */
+    overflow: hidden;
 }
 
-.home-page .home-hero,
-.home-page #danh-muc,
-.home-page .group-section,
-.home-page .brand-marquee-section,
-.home-page #industriesGrid,
-.home-page .blog-grid {
-    font-family: "Inter", Arial, Helvetica, sans-serif;
+/* 2. Dùng tuyệt chiêu phóng to (Scale) triệt tiêu viền trắng của ảnh gốc */
+#bestSellingGrid .product-img {
+    transform: scale(1.3) !important; /* Phóng to hẳn 30% */
+    object-fit: contain !important;
+    transition: transform 0.4s ease;
 }
 
-.home-page .home-hero h1,
-.home-page .home-hero p,
-.home-page .home-section h2,
-.home-page .home-section h3,
-.home-page .home-section p,
-.home-page .home-section a,
-.home-page .home-section button,
-.home-page .brand-marquee-section h3,
-.home-page .brand-marquee-section a {
-    font-family: inherit;
-}
-
-.cat-empty-centered {
-    grid-column: 1 / -1;
-    text-align: center;
-}
-
-.cat-empty-error {
-    color: red;
-}
-
-.empty-msg-error {
-    color: red;
-}
-
-.brand-marquee-error {
-    color: #fca5a5;
-}
-
-.home-data-error {
-    grid-column: 1 / -1;
-    text-align: center;
-    color: red;
-    font-weight: bold;
-}
-
-.category-item-view-all {
-    margin-top: 16px;
-}
-
-.tabs-error {
-    font-size: 12px;
-    color: red;
+/* 3. Hiệu ứng Hover - Rê chuột vào bự chà bá luôn */
+#bestSellingGrid .product-card:hover .product-img {
+    transform: scale(1.45) !important; /* Phóng to 45% khi hover */
 }

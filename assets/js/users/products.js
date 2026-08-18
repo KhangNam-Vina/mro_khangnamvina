@@ -11,7 +11,7 @@
 // - Badge / Tồn kho / Giá
 // ========================================================
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 16;
 
 let currentSort = 'newest';
 
