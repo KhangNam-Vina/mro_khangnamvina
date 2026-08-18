@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Chi tiết Đơn hàng - KN Admin
+    </title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "kn-blue": "#00479b",
+                        "kn-orange": "#ff5e00"
+                    }
+                }
+            }
+        };
+    </script>
+
+</head>
+
+
+<body
+    class="
+        bg-gray-50
+        font-sans
+        text-gray-800
+        flex
+        h-screen
+        overflow-hidden
+    "
+>
+
+
+<!-- =========================================================
+     SIDEBAR
+========================================================= -->
+
+<aside
+    id="adminSidebar"
+    class="
+        w-64
+        bg-gray-900
+        text-white
+        flex
+        flex-col
+        hidden
+        md:flex
+        shrink-0
+    "
+></aside>
+
+
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
+<div
+    class="
+        flex-1
+        flex
+        flex-col
+        h-screen
+        overflow-hidden
+    "
+>
+
+
+    <!-- HEADER -->
+
+    <header
+        class="
+            bg-white
+            shadow-sm
+            px-6
+            py-4
+            border-b
+            border-gray-200
+            shrink-0
+        "
+    >
+
+        <div
+            class="
+                flex
+                items-center
+                justify-between
+                gap-4
+            "
+        >
+
+            <div>
+
+                <h1
+                    class="
+                        text-xl
+                        font-black
+                        text-gray-900
+                    "
+                >
+                    Chi tiết Đơn hàng
+                </h1>
+
+                <p
+                    class="
+                        text-xs
+                        text-gray-500
+                        mt-1
+                    "
+                >
+                    Xem thông tin và xử lý đơn hàng.
+                </p>
+
+            </div>
+
+
+            <a
+                href="manage-orders.html"
+                class="
+                    px-4
+                    py-2
+                    rounded-lg
+                    border
+                    border-gray-300
+                    bg-white
+                    hover:bg-gray-50
+                    text-sm
+                    font-bold
+                    text-gray-700
+                "
+            >
+                ← Quay lại đơn hàng
+            </a>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- CONTENT -->
+
+    <main
+        class="
+            flex-1
+            overflow-y-auto
+            bg-gray-50
+            p-6
+        "
+    >
+
+        <div
+            class="
+                max-w-[1536px]
+                mx-auto
+            "
+        >
+
+
+            <!-- LOADING -->
+
+            <div
+                id="orderDetailLoading"
+                class="
+                    bg-white
+                    border
+                    border-gray-200
+                    rounded-xl
+                    p-16
+                    text-center
+                    text-gray-400
+                "
+            >
+
+                <div
+                    class="
+                        w-8
+                        h-8
+                        border-4
+                        border-kn-blue
+                        border-t-transparent
+                        rounded-full
+                        animate-spin
+                        mx-auto
+                        mb-4
+                    "
+                ></div>
+
+                <p class="font-bold">
+                    Đang tải đơn hàng...
+                </p>
+
+            </div>
+
+
+
+            <!-- ERROR -->
+
+            <div
+                id="orderDetailError"
+                class="
+                    hidden
+                    bg-white
+                    border
+                    border-red-200
+                    rounded-xl
+                    p-10
+                    text-center
+                "
+            >
+
+                <p
+                    class="
+                        text-red-600
+                        font-black
+                    "
+                >
+                    Không thể tải đơn hàng
+                </p>
+
+                <p
+                    id="orderDetailErrorText"
+                    class="
+                        text-sm
+                        text-gray-500
+                        mt-2
+                    "
+                ></p>
+
+            </div>
+
+
+
+            <!-- DETAIL -->
+
+            <div
+                id="orderDetailContent"
+                class="
+                    hidden
+                    space-y-5
+                "
+            >
+
+
+                <!-- ORDER HEADER -->
+
+                <section
+                    class="
+                        bg-white
+                        border
+                        border-gray-200
+                        rounded-xl
+                        shadow-sm
+                        p-6
+                    "
+                >
+
+                    <div
+                        class="
+                            flex
+                            flex-wrap
+                            items-start
+                            justify-between
+                            gap-5
+                        "
+                    >
+
+                        <div>
+
+                            <p
+                                class="
+                                    text-xs
+                                    uppercase
+                                    tracking-wider
+                                    text-gray-400
+                                    font-black
+                                "
+                            >
+                                Mã đơn hàng
+                            </p>
+
+                            <h2
+                                id="orderCode"
+                                class="
+                                    text-2xl
+                                    font-black
+                                    text-kn-blue
+                                    mt-1
+                                "
+                            >
+                                -
+                            </h2>
+
+                            <p
+                                id="orderCreatedAt"
+                                class="
+                                    text-sm
+                                    text-gray-500
+                                    mt-2
+                                "
+                            >
+                                -
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            class="
+                                flex
+                                flex-wrap
+                                items-center
+                                gap-3
+                            "
+                        >
+
+                            <span
+                                id="orderStatusBadge"
+                                class="
+                                    inline-flex
+                                    px-3
+                                    py-1.5
+                                    rounded-full
+                                    border
+                                    text-xs
+                                    font-black
+                                "
+                            >
+                                -
+                            </span>
+
+
+                            <select
+                                id="orderStatusSelect"
+                                class="
+                                    px-3
+                                    py-2
+                                    rounded-lg
+                                    border
+                                    border-gray-300
+                                    bg-white
+                                    text-sm
+                                    font-bold
+                                    outline-none
+                                    focus:border-kn-blue
+                                "
+                            >
+
+                                <option value="pending">
+                                    Chờ xử lý
+                                </option>
+
+                                <option value="confirmed">
+                                    Đã xác nhận
+                                </option>
+
+                                <option value="processing">
+                                    Đang xử lý
+                                </option>
+
+                                <option value="shipped">
+                                    Đang giao
+                                </option>
+
+                                <option value="delivered">
+                                    Đã giao
+                                </option>
+
+                                <option value="cancelled">
+                                    Đã hủy
+                                </option>
+
+                            </select>
+
+
+                            <button
+                                id="btnUpdateOrderStatus"
+                                type="button"
+                                class="
+                                    px-4
+                                    py-2
+                                    rounded-lg
+                                    bg-kn-orange
+                                    text-white
+                                    hover:bg-orange-600
+                                    text-sm
+                                    font-black
+                                "
+                            >
+                                Cập nhật
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- TWO COLUMNS -->
+
+                <div
+                    class="
+                        grid
+                        grid-cols-1
+                        lg:grid-cols-3
+                        gap-5
+                    "
+                >
+
+
+                    <!-- LEFT -->
+
+                    <div
+                        class="
+                            lg:col-span-2
+                            space-y-5
+                        "
+                    >
+
+
+                        <!-- CUSTOMER -->
+
+                        <section
+                            class="
+                                bg-white
+                                border
+                                border-gray-200
+                                rounded-xl
+                                shadow-sm
+                                p-6
+                            "
+                        >
+
+                            <div
+                                class="
+                                    flex
+                                    items-center
+                                    justify-between
+                                    gap-3
+                                    mb-5
+                                "
+                            >
+
+                                <h3
+                                    class="
+                                        text-lg
+                                        font-black
+                                        text-gray-900
+                                    "
+                                >
+                                    Thông tin khách hàng
+                                </h3>
+
+                            </div>
+
+
+                            <div
+                                class="
+                                    grid
+                                    grid-cols-1
+                                    md:grid-cols-2
+                                    gap-5
+                                "
+                            >
+
+                                <div>
+
+                                    <p
+                                        class="
+                                            text-[11px]
+                                            uppercase
+                                            tracking-wider
+                                            text-gray-400
+                                            font-black
+                                        "
+                                    >
+                                        Họ tên
+                                    </p>
+
+                                    <p
+                                        id="customerName"
+                                        class="
+                                            font-bold
+                                            mt-1
+                                        "
+                                    >
+                                        -
+                                    </p>
+
+                                </div>
+
+
+                                <div>
+
+                                    <p
+                                        class="
+                                            text-[11px]
+                                            uppercase
+                                            tracking-wider
+                                            text-gray-400
+                                            font-black
+                                        "
+                                    >
+                                        Số điện thoại
+                                    </p>
+
+                                    <p
+                                        id="customerPhone"
+                                        class="
+                                            font-bold
+                                            mt-1
+                                        "
+                                    >
+                                        -
+                                    </p>
+
+                                </div>
+
+
+                                <div>
+
+                                    <p
+                                        class="
+                                            text-[11px]
+                                            uppercase
+                                            tracking-wider
+                                            text-gray-400
+                                            font-black
+                                        "
+                                    >
+                                        Email
+                                    </p>
+
+                                    <p
+                                        id="customerEmail"
+                                        class="
+                                            font-bold
+                                            mt-1
+                                            break-all
+                                        "
+                                    >
+                                        -
+                                    </p>
+
+                                </div>
+
+
+                                <div>
+
+                                    <p
+                                        class="
+                                            text-[11px]
+                                            uppercase
+                                            tracking-wider
+                                            text-gray-400
+                                            font-black
+                                        "
+                                    >
+                                        User ID
+                                    </p>
+
+                                    <p
+                                        id="customerUserId"
+                                        class="
+                                            text-xs
+                                            font-mono
+                                            text-gray-500
+                                            mt-1
+                                            break-all
+                                        "
+                                    >
+                                        -
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+
+
+                        <!-- SHIPPING -->
+
+                        <section
+                            class="
+                                bg-white
+                                border
+                                border-gray-200
+                                rounded-xl
+                                shadow-sm
+                                p-6
+                            "
+                        >
+
+                            <h3
+                                class="
+                                    text-lg
+                                    font-black
+                                    text-gray-900
+                                    mb-5
+                                "
+                            >
+                                Thông tin giao hàng
+                            </h3>
+
+
+                            <div
+                                class="
+                                    grid
+                                    grid-cols-1
+                                    md:grid-cols-2
+                                    gap-5
+                                "
+                            >
+
+                                <div>
+
+                                    <p
+                                        class="
+                                            text-[11px]
+                                            uppercase
+                                            tracking-wider
+                                            text-gray-400
+                                            font-black
+                                        "
+                                    >
+                                        Người nhận
+                                    </p>
+
+                                    <p
+                                        id="shippingName"
+                                        class="font-bold mt-1"
+                                    >
+                                        -
+                                    </p>
+
+                                </div>
+
+
+                                <div>
+
+                                    <p
+                                        class="
+                                            text-[11px]
+                                            uppercase
+                                            tracking-wider
+                                            text-gray-400
+                                            font-black
+                                        "
+                                    >
+                                        Số điện thoại
+                                    </p>
+
+                                    <p
+                                        id="shippingPhone"
+                                        class="font-bold mt-1"
+                                    >
+                                        -
+                                    </p>
+
+                                </div>
+
+
+                                <div
+                                    class="md:col-span-2"
+                                >
+
+                                    <p
+                                        class="
+                                            text-[11px]
+                                            uppercase
+                                            tracking-wider
+                                            text-gray-400
+                                            font-black
+                                        "
+                                    >
+                                        Địa chỉ giao hàng
+                                    </p>
+
+                                    <p
+                                        id="shippingAddress"
+                                        class="
+                                            font-bold
+                                            mt-1
+                                        "
+                                    >
+                                        -
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+
+
+                        <!-- ITEMS -->
+
+                        <section
+                            class="
+                                bg-white
+                                border
+                                border-gray-200
+                                rounded-xl
+                                shadow-sm
+                                overflow-hidden
+                            "
+                        >
+
+                            <div
+                                class="
+                                    px-6
+                                    py-5
+                                    border-b
+                                    border-gray-200
+                                "
+                            >
+
+                                <h3
+                                    class="
+                                        text-lg
+                                        font-black
+                                        text-gray-900
+                                    "
+                                >
+                                    Sản phẩm trong đơn
+                                </h3>
+
+                            </div>
+
+
+                            <div
+                                class="overflow-x-auto"
+                            >
+
+                                <table
+                                    class="
+                                        w-full
+                                        min-w-[700px]
+                                    "
+                                >
+
+                                    <thead
+                                        class="
+                                            bg-gray-50
+                                            border-b
+                                            border-gray-200
+                                        "
+                                    >
+
+                                        <tr>
+
+                                            <th
+                                                class="
+                                                    p-4
+                                                    text-left
+                                                    text-[11px]
+                                                    uppercase
+                                                    font-black
+                                                    text-gray-500
+                                                "
+                                            >
+                                                Sản phẩm
+                                            </th>
+
+                                            <th
+                                                class="
+                                                    p-4
+                                                    text-left
+                                                    text-[11px]
+                                                    uppercase
+                                                    font-black
+                                                    text-gray-500
+                                                "
+                                            >
+                                                SKU
+                                            </th>
+
+                                            <th
+                                                class="
+                                                    p-4
+                                                    text-right
+                                                    text-[11px]
+                                                    uppercase
+                                                    font-black
+                                                    text-gray-500
+                                                "
+                                            >
+                                                Đơn giá
+                                            </th>
+
+                                            <th
+                                                class="
+                                                    p-4
+                                                    text-center
+                                                    text-[11px]
+                                                    uppercase
+                                                    font-black
+                                                    text-gray-500
+                                                "
+                                            >
+                                                SL
+                                            </th>
+
+                                            <th
+                                                class="
+                                                    p-4
+                                                    text-right
+                                                    text-[11px]
+                                                    uppercase
+                                                    font-black
+                                                    text-gray-500
+                                                "
+                                            >
+                                                Thành tiền
+                                            </th>
+
+                                        </tr>
+
+                                    </thead>
+
+
+                                    <tbody
+                                        id="orderItemsBody"
+                                        class="
+                                            divide-y
+                                            divide-gray-100
+                                        "
+                                    ></tbody>
+
+                                </table>
+
+                            </div>
+
+                        </section>
+
+
+
+                        <!-- NOTE -->
+
+                        <section
+                            id="orderNoteSection"
+                            class="
+                                hidden
+                                bg-white
+                                border
+                                border-gray-200
+                                rounded-xl
+                                shadow-sm
+                                p-6
+                            "
+                        >
+
+                            <h3
+                                class="
+                                    text-lg
+                                    font-black
+                                    text-gray-900
+                                    mb-3
+                                "
+                            >
+                                Ghi chú đơn hàng
+                            </h3>
+
+                            <p
+                                id="orderNote"
+                                class="
+                                    text-sm
+                                    text-gray-600
+                                    whitespace-pre-wrap
+                                "
+                            ></p>
+
+                        </section>
+
+                    </div>
+
+
+
+                    <!-- RIGHT -->
+
+                    <div
+                        class="
+                            space-y-5
+                        "
+                    >
+
+
+                        <!-- SUMMARY -->
+
+                        <section
+                            class="
+                                bg-white
+                                border
+                                border-gray-200
+                                rounded-xl
+                                shadow-sm
+                                p-6
+                            "
+                        >
+
+                            <h3
+                                class="
+                                    text-lg
+                                    font-black
+                                    text-gray-900
+                                    mb-5
+                                "
+                            >
+                                Tổng đơn hàng
+                            </h3>
+
+
+                            <div
+                                class="
+                                    space-y-4
+                                    text-sm
+                                "
+                            >
+
+                                <div
+                                    class="
+                                        flex
+                                        justify-between
+                                        gap-4
+                                    "
+                                >
+
+                                    <span
+                                        class="text-gray-500"
+                                    >
+                                        Tạm tính
+                                    </span>
+
+                                    <strong
+                                        id="orderSubtotal"
+                                    >
+                                        0 ₫
+                                    </strong>
+
+                                </div>
+
+
+                                <div
+                                    class="
+                                        flex
+                                        justify-between
+                                        gap-4
+                                    "
+                                >
+
+                                    <span
+                                        class="text-gray-500"
+                                    >
+                                        Phí giao hàng
+                                    </span>
+
+                                    <strong
+                                        id="orderShippingFee"
+                                    >
+                                        0 ₫
+                                    </strong>
+
+                                </div>
+
+
+                                <div
+                                    class="
+                                        border-t
+                                        border-gray-200
+                                        pt-4
+                                        flex
+                                        justify-between
+                                        gap-4
+                                    "
+                                >
+
+                                    <span
+                                        class="
+                                            font-black
+                                            text-gray-900
+                                        "
+                                    >
+                                        Tổng cộng
+                                    </span>
+
+                                    <strong
+                                        id="orderTotal"
+                                        class="
+                                            text-xl
+                                            font-black
+                                            text-kn-orange
+                                        "
+                                    >
+                                        0 ₫
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+
+
+                        <!-- QUICK INFO -->
+
+                        <section
+                            class="
+                                bg-white
+                                border
+                                border-gray-200
+                                rounded-xl
+                                shadow-sm
+                                p-6
+                            "
+                        >
+
+                            <h3
+                                class="
+                                    text-lg
+                                    font-black
+                                    text-gray-900
+                                    mb-5
+                                "
+                            >
+                                Thông tin đơn
+                            </h3>
+
+
+                            <div
+                                class="space-y-4"
+                            >
+
+                                <div>
+
+                                    <p
+                                        class="
+                                            text-[11px]
+                                            uppercase
+                                            tracking-wider
+                                            text-gray-400
+                                            font-black
+                                        "
+                                    >
+                                        Mã đơn
+                                    </p>
+
+                                    <p
+                                        id="quickOrderCode"
+                                        class="
+                                            font-bold
+                                            mt-1
+                                        "
+                                    >
+                                        -
+                                    </p>
+
+                                </div>
+
+
+                                <div>
+
+                                    <p
+                                        class="
+                                            text-[11px]
+                                            uppercase
+                                            tracking-wider
+                                            text-gray-400
+                                            font-black
+                                        "
+                                    >
+                                        Ngày tạo
+                                    </p>
+
+                                    <p
+                                        id="quickCreatedAt"
+                                        class="
+                                            font-bold
+                                            mt-1
+                                        "
+                                    >
+                                        -
+                                    </p>
+
+                                </div>
+
+
+                                <div>
+
+                                    <p
+                                        class="
+                                            text-[11px]
+                                            uppercase
+                                            tracking-wider
+                                            text-gray-400
+                                            font-black
+                                        "
+                                    >
+                                        Số sản phẩm
+                                    </p>
+
+                                    <p
+                                        id="quickItemsCount"
+                                        class="
+                                            font-bold
+                                            mt-1
+                                        "
+                                    >
+                                        0
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+
+<!-- =========================================================
+     SCRIPTS
+========================================================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/common/supabase.js"></script>
+<script src="../assets/js/common/utils.js"></script>
+<script src="../assets/js/admin/admin-core.js"></script>
+<script src="../assets/js/admin/admin-nav.js"></script>
+<script src="../assets/js/admin/admin-order-detail.js"></script>
+</body>
+</html>

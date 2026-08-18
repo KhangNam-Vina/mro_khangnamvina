@@ -14,29 +14,19 @@
     <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none"></div>
 
     <!-- SIDEBAR -->
-    <aside class="w-64 bg-gray-900 text-white flex flex-col hidden md:flex shrink-0">
-        <div class="h-16 flex items-center px-6 bg-gray-950 border-b border-gray-800">
-            <span class="text-xl font-black tracking-wider text-white">Khangnam <span class="text-kn-orange">ADMIN</span></span>
-        </div>
-        <div class="flex-1 overflow-y-auto py-4">
-            <nav class="space-y-1 px-3" id="adminSidebarNav">
-                <a href="dashboard.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Tổng quan & Đơn hàng</a>
-                <a href="manage-categories.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Danh mục</a>
-                <a href="manage-subcategories.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Nhóm hàng</a>
-                <a href="manage-families.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Dòng sản phẩm</a>
-                <a href="manage-products.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Sản phẩm</a>
-                <a href="manage-industries.html" class="nav-link flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-md transition font-bold">Quản lý Ngành hàng</a>
-                <a href="manage-blog.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Bài viết</a>
-                <a href="manage-about.html"class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Giới thiệu</a>
-                <a href="manage-contacts.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Liên hệ</a>
-                <a href="manage-users.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Người dùng</a>
-                <a href="manage-settings.html" class="nav-link flex items-center px-3 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white rounded-md transition">Quản lý Cấu hình</a>
-            </nav> 
-        </div>
-        <div class="p-4 border-t border-gray-800">
-            <button onclick="handleAdminLogout()" class="flex items-center text-sm text-gray-400 hover:text-white transition-colors w-full">Đăng xuất</button>
-        </div>
-    </aside>
+    <aside
+    id="adminSidebar"
+    class="
+        w-64
+        bg-gray-900
+        text-white
+        flex
+        flex-col
+        hidden
+        md:flex
+        shrink-0
+    "
+></aside>
 
     <div class="flex-1 flex flex-col h-screen overflow-hidden">
         
@@ -137,6 +127,7 @@
     <script src="../assets/js/common/supabase.js"></script>
     <script src="../assets/js/common/utils.js"></script>
     <script src="../assets/js/admin/admin-core.js"></script>
+    <script src="../assets/js/admin/admin-nav.js"></script>
     <script src="../assets/js/admin/admin-industries.js"></script>
 </body>
 </html>

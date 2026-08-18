@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản lý Đơn hàng - KN Admin</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{'kn-blue':'#00479b','kn-orange':'#ff5e00'}}}}
+</script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 flex h-screen overflow-hidden">
+
+<aside
+    id="adminSidebar"
+    class="
+        w-64
+        bg-gray-900
+        text-white
+        flex
+        flex-col
+        hidden
+        md:flex
+        shrink-0
+    "
+></aside>
+
+<div class="flex-1 flex flex-col h-screen overflow-hidden">
+<header class="bg-white shadow-sm px-6 py-4 border-b border-gray-200">
+  <div class="flex flex-wrap gap-4 justify-between items-center">
+    <div>
+      <h1 class="text-xl font-black text-gray-900">Quản lý Đơn hàng</h1>
+      <p class="text-xs text-gray-500 mt-1">Theo dõi và xử lý các đơn hàng từ khách hàng.</p>
+    </div>
+    <div class="flex flex-wrap items-center gap-3">
+      <input id="searchOrderInput" type="text" placeholder="Mã đơn, tên, SĐT..." class="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm w-52 outline-none focus:border-kn-blue">
+      <select id="statusFilter" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-bold outline-none focus:border-kn-blue">
+        <option value="all">Tất cả trạng thái</option>
+        <option value="pending">Chờ xử lý</option>
+        <option value="confirmed">Đã xác nhận</option>
+        <option value="processing">Đang xử lý</option>
+        <option value="shipped">Đang giao</option>
+        <option value="delivered">Đã giao</option>
+        <option value="cancelled">Đã hủy</option>
+      </select>
+    </div>
+  </div>
+</header>
+
+<main class="flex-1 overflow-y-auto bg-gray-50 p-6">
+<div class="max-w-[1536px] mx-auto space-y-5">
+
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5"><p class="text-xs uppercase tracking-wider text-gray-400 font-black">Tổng đơn hàng</p><p id="kpiTotal" class="text-3xl font-black mt-2">0</p></div>
+  <div class="bg-white rounded-xl border border-orange-200 shadow-sm p-5"><p class="text-xs uppercase tracking-wider text-orange-500 font-black">Chờ xử lý</p><p id="kpiPending" class="text-3xl font-black text-orange-600 mt-2">0</p></div>
+  <div class="bg-white rounded-xl border border-blue-200 shadow-sm p-5"><p class="text-xs uppercase tracking-wider text-blue-500 font-black">Đang xử lý</p><p id="kpiProcessing" class="text-3xl font-black text-kn-blue mt-2">0</p></div>
+  <div class="bg-white rounded-xl border border-green-200 shadow-sm p-5"><p class="text-xs uppercase tracking-wider text-green-500 font-black">Đã giao</p><p id="kpiDelivered" class="text-3xl font-black text-green-600 mt-2">0</p></div>
+</section>
+
+<section class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+  <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center gap-3">
+    <div><h2 class="font-black text-gray-900">Danh sách đơn hàng</h2><p class="text-xs text-gray-500 mt-1">Nhấn "Xem đơn" để mở chi tiết.</p></div>
+    <button id="btnRefreshOrders" type="button" class="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-bold">↻ Làm mới</button>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full min-w-[1050px] text-left">
+      <thead class="bg-gray-50 border-b border-gray-200">
+        <tr>
+          <th class="p-4 text-center text-[11px] uppercase font-black text-gray-500">#</th>
+          <th class="p-4 text-[11px] uppercase font-black text-gray-500">Mã đơn</th>
+          <th class="p-4 text-[11px] uppercase font-black text-gray-500">Khách hàng</th>
+          <th class="p-4 text-[11px] uppercase font-black text-gray-500">Ngày đặt</th>
+          <th class="p-4 text-right text-[11px] uppercase font-black text-gray-500">Tổng tiền</th>
+          <th class="p-4 text-center text-[11px] uppercase font-black text-gray-500">Trạng thái</th>
+          <th class="p-4 text-right text-[11px] uppercase font-black text-gray-500">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody id="orderTableBody" class="divide-y divide-gray-100"><tr><td colspan="7" class="p-12 text-center text-gray-400">Đang tải đơn hàng...</td></tr></tbody>
+    </table>
+  </div>
+  <div id="paginationContainer" class="px-6 py-4 border-t border-gray-200 flex justify-end"></div>
+</section>
+
+</div>
+</main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/common/supabase.js"></script>
+<script src="../assets/js/common/utils.js"></script>
+<script src="../assets/js/admin/admin-core.js"></script>
+<script src="../assets/js/admin/admin-nav.js"></script>
+<script src="../assets/js/admin/admin-orders.js"></script>
+</body>
+</html>

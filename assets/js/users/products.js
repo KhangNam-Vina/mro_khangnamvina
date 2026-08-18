@@ -127,6 +127,11 @@ async function fetchFilteredProducts() {
         urlParams.get(
             'family_id'
         );
+    
+    const industryId = 
+        urlParams.get(
+            'industry_id'
+        );
 
 
     let currentPage = 1;
@@ -435,6 +440,18 @@ async function fetchFilteredProducts() {
 
             }
 
+        }
+
+        // ==================================================
+        // INDUSTRY
+        // ==================================================
+        if (industryId) {
+            query = query.eq('industry_id', industryId);
+
+            if (!searchQuery) {
+                pageTitleText = 'Sản phẩm theo Ngành hàng';
+                breadcrumbText = 'Ngành hàng';
+            }
         }
 
 
@@ -965,6 +982,10 @@ async function loadSidebar() {
             'category_id'
         );
 
+    const industryId = 
+        urlParams.get(
+            'industry_id'
+        );
 
     const filterCategoryBlock =
         document.getElementById(
@@ -1055,6 +1076,16 @@ async function loadSidebar() {
                 );
 
         }
+
+         else if (
+            industryId) {
+            prodQuery = 
+                prodQuery.eq(
+                    'industry_id', 
+                    industryId
+                );
+        }
+        
 
 
         const {
