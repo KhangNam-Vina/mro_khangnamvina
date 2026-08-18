@@ -38,7 +38,7 @@
         {
             type: "single",
             label: "Quản lý Báo giá",
-            href: "manage-rfq-detail.html",
+            href: "manage-rfq.html",
             key: "manage-rfq",
             icon: "rfq"
         },

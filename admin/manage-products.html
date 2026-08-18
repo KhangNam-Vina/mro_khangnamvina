@@ -1,229 +1,1990 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Kho Sản Phẩm - KN Admin</title>
+
+    <title>Quản lý Sản phẩm - KN Admin</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- THÊM THƯ VIỆN CKEDITOR -->
+
     <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+
     <script>
-        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00' } } } }
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "kn-blue": "#00479b",
+                        "kn-orange": "#ff5e00"
+                    }
+                }
+            }
+        };
     </script>
 </head>
-<body class="bg-gray-50 font-sans text-gray-800 flex h-screen overflow-hidden relative">
 
-    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none"></div>
 
-    <aside
-    id="adminSidebar"
-    class="
-        w-64
-        bg-gray-900
-        text-white
-        flex
-        flex-col
-        hidden
-        md:flex
-        shrink-0
-    "
-></aside>
+<body class="bg-gray-50 text-gray-800 font-sans">
 
-    <div class="flex-1 flex flex-col h-screen overflow-hidden">
-        
-        <header class="bg-white shadow-sm px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200">
-            <div class="mb-4 md:mb-0">
-                <h2 class="text-xl font-bold text-gray-900">Quản lý Kho Sản Phẩm</h2>
-                <p class="text-xs text-gray-500 mt-1">Danh mục vật tư MRO, tra cứu SKU & quản lý tồn kho</p>
-            </div>
-            
-            <div class="flex space-x-3 w-full md:w-auto">
-                <div class="flex items-center space-x-2 bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 focus-within:border-kn-blue transition flex-1 md:flex-none w-full md:w-64">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" id="searchInput" placeholder="Tìm theo tên hoặc mã SKU..." class="bg-transparent border-none outline-none text-sm text-gray-700 w-full">
+
+    <!-- =====================================================
+         TOAST
+    ====================================================== -->
+
+    <div
+        id="toastContainer"
+        class="
+            fixed
+            right-6
+            bottom-6
+            z-[100]
+            flex
+            flex-col
+            items-end
+            gap-2
+            pointer-events-none
+        "
+    ></div>
+
+
+    <!-- =====================================================
+         ADMIN LAYOUT
+    ====================================================== -->
+
+    <div class="min-h-screen flex">
+
+
+        <!-- SIDEBAR -->
+
+        <aside
+            id="adminSidebar"
+            class="
+                w-64
+                shrink-0
+                bg-gray-900
+                text-white
+                hidden
+                md:flex
+                flex-col
+            "
+        ></aside>
+
+
+        <!-- MAIN -->
+
+        <div class="flex-1 min-w-0 flex flex-col">
+
+
+            <!-- =================================================
+                 HEADER
+            ================================================== -->
+
+            <header
+                class="
+                    h-16
+                    bg-white
+                    border-b
+                    border-gray-200
+                    px-6
+                    flex
+                    items-center
+                    justify-between
+                    shrink-0
+                "
+            >
+
+                <div>
+
+                    <h1
+                        class="
+                            text-xl
+                            font-black
+                            text-gray-900
+                            tracking-tight
+                        "
+                    >
+                        Quản lý Sản phẩm
+                    </h1>
+
+                    <p
+                        class="
+                            hidden
+                            lg:block
+                            text-xs
+                            text-gray-500
+                            mt-0.5
+                        "
+                    >
+                        Quản lý SKU, giá bán, tồn kho và thông tin sản phẩm
+                    </p>
+
                 </div>
-                <button onclick="showAddForm()" class="bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition flex items-center whitespace-nowrap">
-                    <span class="mr-2 text-lg leading-none">+</span> Nhập sản phẩm
+
+
+                <button
+                    type="button"
+                    id="btnAddProduct"
+                    class="
+                        inline-flex
+                        items-center
+                        gap-2
+                        bg-kn-blue
+                        hover:bg-blue-800
+                        text-white
+                        font-bold
+                        text-sm
+                        px-4
+                        py-2.5
+                        rounded-lg
+                        shadow-sm
+                        transition
+                    "
+                >
+
+                    <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 4v16m8-8H4"
+                        />
+                    </svg>
+
+                    Thêm sản phẩm
+
                 </button>
-            </div>
-        </header>
 
-        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
+            </header>
 
-            <div id="productListView" class="space-y-4">
-                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                    <table class="w-full text-left text-sm text-gray-600">
-                        <thead class="bg-gray-50 text-gray-700 font-bold border-b border-gray-200 text-xs uppercase tracking-wider">
-                            <tr>
-                                <th class="p-4 text-center w-12">#</th>
-                                <th class="p-4 w-16">Ảnh</th>
-                                <th class="p-4 w-32">Mã SKU</th>
-                                <th class="p-4">Tên Sản Phẩm</th>
-                                <th class="p-4 w-32">Thương hiệu</th>
-                                <th class="p-4 w-32">Đơn giá</th>
-                                <th class="p-4 text-center w-28">Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody id="productTableBody" class="divide-y divide-gray-100 bg-white">
-                            <tr><td colspan="7" class="text-center py-8 text-gray-400">Đang tải danh sách kho...</td></tr>
-                        </tbody>
-                    </table>
+
+            <!-- =================================================
+                 CONTENT
+            ================================================== -->
+
+            <main
+                class="
+                    flex-1
+                    overflow-y-auto
+                    p-4
+                    md:p-6
+                "
+            >
+
+                <div
+                    id="productListView"
+                    class="max-w-[1600px] mx-auto"
+                >
+
+
+                    <!-- =================================================
+                         STATISTICS
+                    ================================================== -->
+
+                    <div
+                        class="
+                            grid
+                            grid-cols-1
+                            sm:grid-cols-2
+                            xl:grid-cols-4
+                            gap-4
+                            mb-6
+                        "
+                    >
+
+
+                        <!-- TOTAL -->
+
+                        <div
+                            class="
+                                bg-white
+                                border
+                                border-gray-200
+                                rounded-xl
+                                shadow-sm
+                                p-5
+                            "
+                        >
+
+                            <div
+                                class="
+                                    text-xs
+                                    font-bold
+                                    text-gray-500
+                                    uppercase
+                                    tracking-wider
+                                "
+                            >
+                                Tổng sản phẩm
+                            </div>
+
+                            <div
+                                id="productTotal"
+                                class="
+                                    mt-2
+                                    text-2xl
+                                    font-black
+                                    text-kn-blue
+                                "
+                            >
+                                0
+                            </div>
+
+                        </div>
+
+
+                        <!-- IN STOCK -->
+
+                        <div
+                            class="
+                                bg-white
+                                border
+                                border-gray-200
+                                rounded-xl
+                                shadow-sm
+                                p-5
+                            "
+                        >
+
+                            <div
+                                class="
+                                    text-xs
+                                    font-bold
+                                    text-gray-500
+                                    uppercase
+                                    tracking-wider
+                                "
+                            >
+                                Còn hàng
+                            </div>
+
+                            <div
+                                id="productInStock"
+                                class="
+                                    mt-2
+                                    text-2xl
+                                    font-black
+                                    text-green-600
+                                "
+                            >
+                                0
+                            </div>
+
+                        </div>
+
+
+                        <!-- OUT OF STOCK -->
+
+                        <div
+                            class="
+                                bg-white
+                                border
+                                border-gray-200
+                                rounded-xl
+                                shadow-sm
+                                p-5
+                            "
+                        >
+
+                            <div
+                                class="
+                                    text-xs
+                                    font-bold
+                                    text-gray-500
+                                    uppercase
+                                    tracking-wider
+                                "
+                            >
+                                Hết hàng
+                            </div>
+
+                            <div
+                                id="productOutOfStock"
+                                class="
+                                    mt-2
+                                    text-2xl
+                                    font-black
+                                    text-red-500
+                                "
+                            >
+                                0
+                            </div>
+
+                        </div>
+
+
+                        <!-- SALE -->
+
+                        <div
+                            class="
+                                bg-white
+                                border
+                                border-gray-200
+                                rounded-xl
+                                shadow-sm
+                                p-5
+                            "
+                        >
+
+                            <div
+                                class="
+                                    text-xs
+                                    font-bold
+                                    text-gray-500
+                                    uppercase
+                                    tracking-wider
+                                "
+                            >
+                                Đang giảm giá
+                            </div>
+
+                            <div
+                                id="productOnSale"
+                                class="
+                                    mt-2
+                                    text-2xl
+                                    font-black
+                                    text-kn-orange
+                                "
+                            >
+                                0
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         FILTER BAR
+                    ================================================== -->
+
+                    <div
+                        class="
+                            bg-white
+                            border
+                            border-gray-200
+                            rounded-xl
+                            shadow-sm
+                            p-4
+                            mb-6
+                        "
+                    >
+
+                        <div
+                            class="
+                                flex
+                                flex-col
+                                xl:flex-row
+                                gap-3
+                                xl:items-center
+                            "
+                        >
+
+
+                            <!-- SEARCH -->
+
+                            <div
+                                class="
+                                    relative
+                                    flex-1
+                                    min-w-0
+                                "
+                            >
+
+                                <svg
+                                    class="
+                                        absolute
+                                        left-3
+                                        top-1/2
+                                        -translate-y-1/2
+                                        w-4
+                                        h-4
+                                        text-gray-400
+                                    "
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
+                                    />
+                                </svg>
+
+                                <input
+                                    type="text"
+                                    id="searchInput"
+                                    placeholder="Tìm theo tên sản phẩm hoặc mã SKU..."
+                                    autocomplete="off"
+                                    class="
+                                        w-full
+                                        pl-10
+                                        pr-4
+                                        py-2.5
+                                        border
+                                        border-gray-300
+                                        rounded-lg
+                                        text-sm
+                                        outline-none
+                                        focus:border-kn-blue
+                                        focus:ring-2
+                                        focus:ring-blue-100
+                                    "
+                                >
+
+                            </div>
+
+
+                            <!-- CATEGORY FILTER -->
+
+                            <select
+                                id="filterCategorySelect"
+                                class="
+                                    w-full
+                                    xl:w-56
+                                    border
+                                    border-gray-300
+                                    rounded-lg
+                                    px-3
+                                    py-2.5
+                                    text-sm
+                                    bg-white
+                                    outline-none
+                                    focus:border-kn-blue
+                                "
+                            >
+
+                                <option value="all">
+                                    Tất cả danh mục
+                                </option>
+
+                            </select>
+
+
+                            <!-- INDUSTRY FILTER -->
+
+                            <select
+                                id="filterIndustrySelect"
+                                class="
+                                    w-full
+                                    xl:w-56
+                                    border
+                                    border-gray-300
+                                    rounded-lg
+                                    px-3
+                                    py-2.5
+                                    text-sm
+                                    bg-white
+                                    outline-none
+                                    focus:border-kn-blue
+                                "
+                            >
+
+                                <option value="all">
+                                    Tất cả ngành hàng
+                                </option>
+
+                            </select>
+
+
+                            <!-- STOCK FILTER -->
+
+                            <select
+                                id="filterStockSelect"
+                                class="
+                                    w-full
+                                    xl:w-48
+                                    border
+                                    border-gray-300
+                                    rounded-lg
+                                    px-3
+                                    py-2.5
+                                    text-sm
+                                    bg-white
+                                    outline-none
+                                    focus:border-kn-blue
+                                "
+                            >
+
+                                <option value="all">
+                                    Tất cả tồn kho
+                                </option>
+
+                                <option value="in_stock">
+                                    Còn hàng
+                                </option>
+
+                                <option value="out_of_stock">
+                                    Hết hàng
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         TABLE
+                    ================================================== -->
+
+                    <div
+                        class="
+                            bg-white
+                            border
+                            border-gray-200
+                            rounded-xl
+                            shadow-sm
+                            overflow-hidden
+                        "
+                    >
+
+                        <div class="overflow-x-auto">
+
+                            <table
+                                class="
+                                    w-full
+                                    min-w-[1050px]
+                                    text-sm
+                                    text-left
+                                "
+                            >
+
+                                <thead
+                                    class="
+                                        bg-gray-50
+                                        border-b
+                                        border-gray-200
+                                        text-xs
+                                        font-bold
+                                        text-gray-500
+                                        uppercase
+                                        tracking-wider
+                                    "
+                                >
+
+                                    <tr>
+
+                                        <th
+                                            class="
+                                                px-4
+                                                py-3.5
+                                                w-14
+                                                text-center
+                                            "
+                                        >
+                                            #
+                                        </th>
+
+                                        <th
+                                            class="
+                                                px-4
+                                                py-3.5
+                                                w-20
+                                                text-center
+                                            "
+                                        >
+                                            Ảnh
+                                        </th>
+
+                                        <th
+                                            class="
+                                                px-4
+                                                py-3.5
+                                                w-32
+                                            "
+                                        >
+                                            SKU
+                                        </th>
+
+                                        <th
+                                            class="
+                                                px-4
+                                                py-3.5
+                                                min-w-[260px]
+                                            "
+                                        >
+                                            Sản phẩm
+                                        </th>
+
+                                        <th
+                                            class="
+                                                px-4
+                                                py-3.5
+                                                w-32
+                                            "
+                                        >
+                                            Thương hiệu
+                                        </th>
+
+                                        <th
+                                            class="
+                                                px-4
+                                                py-3.5
+                                                w-36
+                                            "
+                                        >
+                                            Giá
+                                        </th>
+
+                                        <th
+                                            class="
+                                                px-4
+                                                py-3.5
+                                                w-28
+                                                text-center
+                                            "
+                                        >
+                                            Tồn kho
+                                        </th>
+
+                                        <th
+                                            class="
+                                                px-4
+                                                py-3.5
+                                                w-32
+                                                text-right
+                                            "
+                                        >
+                                            Thao tác
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+
+                                <tbody
+                                    id="productTableBody"
+                                    class="
+                                        divide-y
+                                        divide-gray-100
+                                    "
+                                >
+
+                                    <tr>
+
+                                        <td
+                                            colspan="8"
+                                            class="
+                                                text-center
+                                                py-12
+                                                text-gray-400
+                                            "
+                                        >
+                                            Đang tải sản phẩm...
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+
+                        <!-- PAGINATION -->
+
+                        <div
+                            id="paginationContainer"
+                            class="
+                                flex
+                                flex-col
+                                sm:flex-row
+                                gap-3
+                                sm:gap-0
+                                justify-between
+                                items-center
+                                p-4
+                                border-t
+                                border-gray-100
+                                bg-gray-50/50
+                            "
+                        ></div>
+
+                    </div>
+
                 </div>
 
-                <div id="paginationContainer" class="flex justify-between items-center text-sm py-2"></div>
-            </div>
 
-            <!-- FORM NHẬP LIỆU (ĐÃ GỠ BỎ max-w, ĐỂ w-full CHO FORM FULL MÀN HÌNH) -->
-            <div id="productFormView" class="hidden bg-white rounded-xl border border-gray-200 shadow-sm p-6 w-full">
-                <div class="flex justify-between items-center border-b pb-4 mb-6 border-gray-100">
-                    <h3 id="formTitle" class="text-lg font-bold text-gray-900">Nhập Sản Phẩm Mới</h3>
-                    <button type="button" onclick="cancelForm()" class="text-gray-400 hover:text-gray-600 text-sm font-bold">✕ Đóng</button>
+                <!-- =================================================
+                     PRODUCT FORM
+                ================================================== -->
+
+                <div
+                    id="productFormView"
+                    class="
+                        hidden
+                        max-w-[1500px]
+                        mx-auto
+                    "
+                >
+
+                    <div
+                        class="
+                            bg-white
+                            border
+                            border-gray-200
+                            rounded-2xl
+                            shadow-sm
+                            overflow-hidden
+                        "
+                    >
+
+
+                        <!-- FORM HEADER -->
+
+                        <div
+                            class="
+                                px-6
+                                py-5
+                                border-b
+                                border-gray-200
+                                flex
+                                items-center
+                                justify-between
+                                gap-4
+                            "
+                        >
+
+                            <div>
+
+                                <button
+                                    type="button"
+                                    id="btnBackToProducts"
+                                    class="
+                                        inline-flex
+                                        items-center
+                                        gap-1.5
+                                        text-xs
+                                        font-bold
+                                        text-gray-500
+                                        hover:text-kn-blue
+                                        mb-2
+                                    "
+                                >
+                                    ← Quay lại danh sách
+                                </button>
+
+                                <h2
+                                    id="formTitle"
+                                    class="
+                                        text-xl
+                                        font-black
+                                        text-gray-900
+                                    "
+                                >
+                                    Nhập Sản Phẩm Mới
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- FORM -->
+
+                        <form
+                            id="productForm"
+                            class="
+                                p-6
+                                space-y-6
+                            "
+                        >
+
+
+                            <!-- =================================================
+                                 1. BASIC
+                            ================================================== -->
+
+                            <section
+                                class="
+                                    rounded-xl
+                                    border
+                                    border-gray-200
+                                    overflow-hidden
+                                "
+                            >
+
+                                <div
+                                    class="
+                                        px-5
+                                        py-3.5
+                                        bg-gray-50
+                                        border-b
+                                        border-gray-200
+                                        flex
+                                        items-center
+                                        gap-2
+                                    "
+                                >
+
+                                    <span
+                                        class="
+                                            w-7
+                                            h-7
+                                            rounded-lg
+                                            bg-blue-50
+                                            text-kn-blue
+                                            flex
+                                            items-center
+                                            justify-center
+                                            text-xs
+                                            font-black
+                                        "
+                                    >
+                                        1
+                                    </span>
+
+                                    <h3
+                                        class="
+                                            text-sm
+                                            font-black
+                                            text-kn-blue
+                                            uppercase
+                                            tracking-wide
+                                        "
+                                    >
+                                        Thông tin cơ bản
+                                    </h3>
+
+                                </div>
+
+
+                                <div
+                                    class="
+                                        p-5
+                                        grid
+                                        grid-cols-1
+                                        md:grid-cols-2
+                                        xl:grid-cols-4
+                                        gap-5
+                                    "
+                                >
+
+
+                                    <!-- SKU -->
+
+                                    <div class="xl:col-span-2">
+
+                                        <label
+                                            for="sku"
+                                            class="
+                                                block
+                                                text-xs
+                                                font-bold
+                                                text-gray-700
+                                                mb-1.5
+                                            "
+                                        >
+                                            Mã SKU
+                                            <span class="text-red-500">*</span>
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="sku"
+                                            required
+                                            class="
+                                                w-full
+                                                border
+                                                border-gray-300
+                                                rounded-lg
+                                                px-3
+                                                py-2.5
+                                                text-sm
+                                                font-mono
+                                                outline-none
+                                                focus:border-kn-blue
+                                                focus:ring-2
+                                                focus:ring-blue-100
+                                            "
+                                        >
+
+                                    </div>
+
+
+                                    <!-- NAME -->
+
+                                    <div class="xl:col-span-2">
+
+                                        <label
+                                            for="name"
+                                            class="
+                                                block
+                                                text-xs
+                                                font-bold
+                                                text-gray-700
+                                                mb-1.5
+                                            "
+                                        >
+                                            Tên sản phẩm
+                                            <span class="text-red-500">*</span>
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="name"
+                                            required
+                                            class="
+                                                w-full
+                                                border
+                                                border-gray-300
+                                                rounded-lg
+                                                px-3
+                                                py-2.5
+                                                text-sm
+                                                outline-none
+                                                focus:border-kn-blue
+                                                focus:ring-2
+                                                focus:ring-blue-100
+                                            "
+                                        >
+
+                                    </div>
+
+
+                                    <!-- CATEGORY -->
+
+                                    <div>
+
+                                        <label
+                                            for="category_id"
+                                            class="
+                                                block
+                                                text-xs
+                                                font-bold
+                                                text-gray-700
+                                                mb-1.5
+                                            "
+                                        >
+                                            Danh mục gốc
+                                        </label>
+
+                                        <select
+                                            id="category_id"
+                                            class="
+                                                w-full
+                                                border
+                                                border-gray-300
+                                                rounded-lg
+                                                px-3
+                                                py-2.5
+                                                text-sm
+                                                bg-white
+                                                outline-none
+                                                focus:border-kn-blue
+                                            "
+                                        ></select>
+
+                                    </div>
+
+
+                                    <!-- SUBCATEGORY -->
+
+                                    <div>
+
+                                        <label
+                                            for="sub_category_id"
+                                            class="
+                                                block
+                                                text-xs
+                                                font-bold
+                                                text-gray-700
+                                                mb-1.5
+                                            "
+                                        >
+                                            Nhóm hàng
+                                        </label>
+
+                                        <select
+                                            id="sub_category_id"
+                                            class="
+                                                w-full
+                                                border
+                                                border-gray-300
+                                                rounded-lg
+                                                px-3
+                                                py-2.5
+                                                text-sm
+                                                bg-white
+                                                outline-none
+                                                focus:border-kn-blue
+                                            "
+                                        ></select>
+
+                                    </div>
+
+
+                                    <!-- FAMILY -->
+
+                                    <div>
+
+                                        <label
+                                            for="family_id"
+                                            class="
+                                                block
+                                                text-xs
+                                                font-bold
+                                                text-gray-700
+                                                mb-1.5
+                                            "
+                                        >
+                                            Dòng sản phẩm
+                                        </label>
+
+                                        <select
+                                            id="family_id"
+                                            class="
+                                                w-full
+                                                border
+                                                border-gray-300
+                                                rounded-lg
+                                                px-3
+                                                py-2.5
+                                                text-sm
+                                                bg-white
+                                                outline-none
+                                                focus:border-kn-blue
+                                            "
+                                        ></select>
+
+                                    </div>
+
+
+                                    <!-- INDUSTRY -->
+
+                                    <div>
+
+                                        <label
+                                            for="industrySelect"
+                                            class="
+                                                block
+                                                text-xs
+                                                font-bold
+                                                text-gray-700
+                                                mb-1.5
+                                            "
+                                        >
+                                            Ngành hàng
+                                        </label>
+
+                                        <select
+                                            id="industrySelect"
+                                            class="
+                                                w-full
+                                                border
+                                                border-gray-300
+                                                rounded-lg
+                                                px-3
+                                                py-2.5
+                                                text-sm
+                                                bg-white
+                                                outline-none
+                                                focus:border-kn-blue
+                                            "
+                                        ></select>
+
+                                    </div>
+
+
+                                    <!-- BRAND -->
+
+                                    <div class="xl:col-span-2">
+
+                                        <label
+                                            for="brand_input"
+                                            class="
+                                                block
+                                                text-xs
+                                                font-bold
+                                                text-gray-700
+                                                mb-1.5
+                                            "
+                                        >
+                                            Thương hiệu
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="brand_input"
+                                            list="brandList"
+                                            placeholder="Gõ để tìm hoặc thêm mới..."
+                                            class="
+                                                w-full
+                                                border
+                                                border-gray-300
+                                                rounded-lg
+                                                px-3
+                                                py-2.5
+                                                text-sm
+                                                outline-none
+                                                focus:border-kn-blue
+                                                focus:ring-2
+                                                focus:ring-blue-100
+                                            "
+                                        >
+
+                                        <datalist
+                                            id="brandList"
+                                        ></datalist>
+
+                                    </div>
+
+
+                                    <!-- ORIGIN -->
+
+                                    <div class="xl:col-span-2">
+
+                                        <label
+                                            for="origin"
+                                            class="
+                                                block
+                                                text-xs
+                                                font-bold
+                                                text-gray-700
+                                                mb-1.5
+                                            "
+                                        >
+                                            Xuất xứ
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="origin"
+                                            placeholder="Japan, Germany, Vietnam..."
+                                            class="
+                                                w-full
+                                                border
+                                                border-gray-300
+                                                rounded-lg
+                                                px-3
+                                                py-2.5
+                                                text-sm
+                                                outline-none
+                                                focus:border-kn-blue
+                                            "
+                                        >
+
+                                    </div>
+
+                                </div>
+
+                            </section>
+
+
+                            <!-- =================================================
+                                 2. PRICE / STOCK
+                            ================================================== -->
+
+                            <section
+                                class="
+                                    rounded-xl
+                                    border
+                                    border-gray-200
+                                    overflow-hidden
+                                "
+                            >
+
+                                <div
+                                    class="
+                                        px-5
+                                        py-3.5
+                                        bg-gray-50
+                                        border-b
+                                        border-gray-200
+                                        flex
+                                        items-center
+                                        gap-2
+                                    "
+                                >
+
+                                    <span
+                                        class="
+                                            w-7
+                                            h-7
+                                            rounded-lg
+                                            bg-orange-50
+                                            text-kn-orange
+                                            flex
+                                            items-center
+                                            justify-center
+                                            text-xs
+                                            font-black
+                                        "
+                                    >
+                                        2
+                                    </span>
+
+                                    <h3
+                                        class="
+                                            text-sm
+                                            font-black
+                                            text-kn-blue
+                                            uppercase
+                                            tracking-wide
+                                        "
+                                    >
+                                        Giá cả & Kho hàng
+                                    </h3>
+
+                                </div>
+
+
+                                <div
+                                    class="
+                                        p-5
+                                        grid
+                                        grid-cols-1
+                                        md:grid-cols-2
+                                        xl:grid-cols-3
+                                        gap-5
+                                    "
+                                >
+
+
+                                    <!-- PRICE -->
+
+                                    <div>
+
+                                        <label
+                                            for="price"
+                                            class="
+                                                block
+                                                text-xs
+                                                font-bold
+                                                text-gray-700
+                                                mb-1.5
+                                            "
+                                        >
+                                            Giá niêm yết (VNĐ)
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            id="price"
+                                            min="0"
+                                            class="
+                                                w-full
+                                                border
+                                                border-gray-300
+                                                rounded-lg
+                                                px-3
+                                                py-2.5
+                                                text-sm
+                                                outline-none
+                                                focus:border-kn-blue
+                                            "
+                                            placeholder="0"
+                                        >
+
+                                    </div>
+
+
+                                    <!-- DISCOUNT -->
+
+                                    <div>
+
+                                        <label
+                                            for="discount_price"
+                                            class="
+                                                block
+                                                text-xs
+                                                font-bold
+                                                text-gray-700
+                                                mb-1.5
+                                            "
+                                        >
+                                            Giá khuyến mãi
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            id="discount_price"
+                                            min="0"
+                                            class="
+                                                w-full
+                                                border
+                                                border-gray-300
+                                                rounded-lg
+                                                px-3
+                                                py-2.5
+                                                text-sm
+                                                outline-none
+                                                focus:border-kn-blue
+                                            "
+                                            placeholder="0"
+                                        >
+
+                                    </div>
+
+
+                                    <!-- UNIT -->
+
+                                    <div>
+
+                                        <label
+                                            for="unit"
+                                            class="
+                                                block
+                                                text-xs
+                                                font-bold
+                                                text-gray-700
+                                                mb-1.5
+                                            "
+                                        >
+                                            Đơn vị tính
+                                        </label>
+
+                                        <select
+                                            id="unit"
+                                            class="
+                                                w-full
+                                                border
+                                                border-gray-300
+                                                rounded-lg
+                                                px-3
+                                                py-2.5
+                                                text-sm
+                                                bg-white
+                                                outline-none
+                                                focus:border-kn-blue
+                                            "
+                                        >
+
+                                            <option value="Cái">Cái</option>
+                                            <option value="Bộ">Bộ</option>
+                                            <option value="Hộp">Hộp</option>
+                                            <option value="Thùng">Thùng</option>
+                                            <option value="Cuộn">Cuộn</option>
+
+                                        </select>
+
+                                    </div>
+
+
+                                    <!-- STOCK -->
+
+                                    <div>
+
+                                        <label
+                                            for="stock_quantity"
+                                            class="
+                                                block
+                                                text-xs
+                                                font-bold
+                                                text-gray-700
+                                                mb-1.5
+                                            "
+                                        >
+                                            Số lượng tồn kho
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            id="stock_quantity"
+                                            min="0"
+                                            class="
+                                                w-full
+                                                border
+                                                border-gray-300
+                                                rounded-lg
+                                                px-3
+                                                py-2.5
+                                                text-sm
+                                                outline-none
+                                                focus:border-kn-blue
+                                            "
+                                            placeholder="0"
+                                        >
+
+                                    </div>
+
+
+                                    <!-- MOQ -->
+
+                                    <div>
+
+                                        <label
+                                            for="min_order_quantity"
+                                            class="
+                                                block
+                                                text-xs
+                                                font-bold
+                                                text-gray-700
+                                                mb-1.5
+                                            "
+                                        >
+                                            MOQ
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            id="min_order_quantity"
+                                            min="1"
+                                            value="1"
+                                            class="
+                                                w-full
+                                                border
+                                                border-gray-300
+                                                rounded-lg
+                                                px-3
+                                                py-2.5
+                                                text-sm
+                                                outline-none
+                                                focus:border-kn-blue
+                                            "
+                                        >
+
+                                    </div>
+
+
+                                    <!-- BADGE -->
+
+                                    <div>
+
+                                        <label
+                                            for="badge"
+                                            class="
+                                                block
+                                                text-xs
+                                                font-bold
+                                                text-gray-700
+                                                mb-1.5
+                                            "
+                                        >
+                                            Nhãn trạng thái
+                                        </label>
+
+                                        <select
+                                            id="badge"
+                                            class="
+                                                w-full
+                                                border
+                                                border-gray-300
+                                                rounded-lg
+                                                px-3
+                                                py-2.5
+                                                text-sm
+                                                bg-white
+                                                font-bold
+                                                outline-none
+                                                focus:border-kn-blue
+                                            "
+                                        >
+
+                                            <option value="">
+                                                -- Không có nhãn --
+                                            </option>
+
+                                            <option value="NEW">
+                                                NEW
+                                            </option>
+
+                                            <option value="HOT">
+                                                HOT
+                                            </option>
+
+                                            <option value="SALE">
+                                                SALE
+                                            </option>
+
+                                            <option value="BEST SELLER">
+                                                BEST SELLER
+                                            </option>
+
+                                            <option value="CLEARANCE">
+                                                CLEARANCE
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+                            </section>
+
+
+                            <!-- =================================================
+                                 3. MEDIA
+                            ================================================== -->
+
+                            <section
+                                class="
+                                    rounded-xl
+                                    border
+                                    border-gray-200
+                                    overflow-hidden
+                                "
+                            >
+
+                                <div
+                                    class="
+                                        px-5
+                                        py-3.5
+                                        bg-gray-50
+                                        border-b
+                                        border-gray-200
+                                        flex
+                                        items-center
+                                        gap-2
+                                    "
+                                >
+
+                                    <span
+                                        class="
+                                            w-7
+                                            h-7
+                                            rounded-lg
+                                            bg-blue-50
+                                            text-kn-blue
+                                            flex
+                                            items-center
+                                            justify-center
+                                            text-xs
+                                            font-black
+                                        "
+                                    >
+                                        3
+                                    </span>
+
+                                    <h3
+                                        class="
+                                            text-sm
+                                            font-black
+                                            text-kn-blue
+                                            uppercase
+                                            tracking-wide
+                                        "
+                                    >
+                                        Hình ảnh & Tài liệu
+                                    </h3>
+
+                                </div>
+
+
+                                <div
+                                    class="
+                                        p-5
+                                        space-y-5
+                                    "
+                                >
+
+                                    <div>
+
+                                        <label
+                                            for="image_url"
+                                            class="
+                                                block
+                                                text-xs
+                                                font-bold
+                                                text-gray-700
+                                                mb-1.5
+                                            "
+                                        >
+                                            URL ảnh đại diện
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="image_url"
+                                            placeholder="https://..."
+                                            class="
+                                                w-full
+                                                border
+                                                border-gray-300
+                                                rounded-lg
+                                                px-3
+                                                py-2.5
+                                                text-sm
+                                                outline-none
+                                                focus:border-kn-blue
+                                            "
+                                        >
+
+                                    </div>
+
+
+                                    <div
+                                        class="
+                                            grid
+                                            grid-cols-1
+                                            lg:grid-cols-2
+                                            gap-5
+                                        "
+                                    >
+
+                                        <div>
+
+                                            <label
+                                                for="inExtraImages"
+                                                class="
+                                                    block
+                                                    text-xs
+                                                    font-bold
+                                                    text-gray-700
+                                                    mb-1.5
+                                                "
+                                            >
+                                                Link ảnh phụ
+                                            </label>
+
+                                            <textarea
+                                                id="inExtraImages"
+                                                rows="5"
+                                                class="
+                                                    w-full
+                                                    border
+                                                    border-gray-300
+                                                    rounded-lg
+                                                    px-3
+                                                    py-2.5
+                                                    text-sm
+                                                    outline-none
+                                                    resize-none
+                                                    focus:border-kn-blue
+                                                "
+                                                placeholder="Mỗi link một dòng..."
+                                            ></textarea>
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <label
+                                                for="inDatasheet"
+                                                class="
+                                                    block
+                                                    text-xs
+                                                    font-bold
+                                                    text-gray-700
+                                                    mb-1.5
+                                                "
+                                            >
+                                                Link Datasheet PDF
+                                            </label>
+
+                                            <input
+                                                type="text"
+                                                id="inDatasheet"
+                                                placeholder="https://..."
+                                                class="
+                                                    w-full
+                                                    border
+                                                    border-gray-300
+                                                    rounded-lg
+                                                    px-3
+                                                    py-2.5
+                                                    text-sm
+                                                    outline-none
+                                                    focus:border-kn-blue
+                                                "
+                                            >
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </section>
+
+
+                            <!-- =================================================
+                                 4. CONTENT
+                            ================================================== -->
+
+                            <section
+                                class="
+                                    rounded-xl
+                                    border
+                                    border-gray-200
+                                    overflow-hidden
+                                "
+                            >
+
+                                <div
+                                    class="
+                                        px-5
+                                        py-3.5
+                                        bg-gray-50
+                                        border-b
+                                        border-gray-200
+                                        flex
+                                        items-center
+                                        gap-2
+                                    "
+                                >
+
+                                    <span
+                                        class="
+                                            w-7
+                                            h-7
+                                            rounded-lg
+                                            bg-orange-50
+                                            text-kn-orange
+                                            flex
+                                            items-center
+                                            justify-center
+                                            text-xs
+                                            font-black
+                                        "
+                                    >
+                                        4
+                                    </span>
+
+                                    <h3
+                                        class="
+                                            text-sm
+                                            font-black
+                                            text-kn-blue
+                                            uppercase
+                                            tracking-wide
+                                        "
+                                    >
+                                        Nội dung sản phẩm
+                                    </h3>
+
+                                </div>
+
+
+                                <div
+                                    class="
+                                        p-5
+                                        space-y-5
+                                    "
+                                >
+
+                                    <!-- SHORT DESCRIPTION -->
+
+                                    <div>
+
+                                        <label
+                                            for="short_description"
+                                            class="
+                                                block
+                                                text-xs
+                                                font-bold
+                                                text-gray-700
+                                                mb-1.5
+                                            "
+                                        >
+                                            Mô tả ngắn
+                                        </label>
+
+                                        <textarea
+                                            id="short_description"
+                                            rows="3"
+                                            class="
+                                                w-full
+                                                border
+                                                border-gray-300
+                                                rounded-lg
+                                                px-3
+                                                py-2.5
+                                                text-sm
+                                                outline-none
+                                                resize-y
+                                                focus:border-kn-blue
+                                            "
+                                            placeholder="Tóm tắt đặc điểm sản phẩm..."
+                                        ></textarea>
+
+                                    </div>
+
+
+                                    <div
+                                        class="
+                                            grid
+                                            grid-cols-1
+                                            lg:grid-cols-2
+                                            gap-5
+                                        "
+                                    >
+
+                                        <!-- SPECS -->
+
+                                        <div>
+
+                                            <label
+                                                for="specifications"
+                                                class="
+                                                    block
+                                                    text-xs
+                                                    font-bold
+                                                    text-gray-700
+                                                    mb-1.5
+                                                "
+                                            >
+                                                Thông số kỹ thuật
+                                            </label>
+
+                                            <textarea
+                                                id="specifications"
+                                                rows="7"
+                                                class="
+                                                    w-full
+                                                    border
+                                                    border-gray-300
+                                                    rounded-lg
+                                                    px-3
+                                                    py-2.5
+                                                    text-sm
+                                                    font-mono
+                                                    outline-none
+                                                    resize-y
+                                                    focus:border-kn-blue
+                                                "
+                                                placeholder="Nhập cấu hình, kích thước..."
+                                            ></textarea>
+
+                                        </div>
+
+
+                                        <!-- DESCRIPTION -->
+
+                                        <div>
+
+                                            <label
+                                                for="description"
+                                                class="
+                                                    block
+                                                    text-xs
+                                                    font-bold
+                                                    text-gray-700
+                                                    mb-1.5
+                                                "
+                                            >
+                                                Mô tả sản phẩm
+                                            </label>
+
+                                            <textarea
+                                                id="description"
+                                                rows="7"
+                                                class="
+                                                    w-full
+                                                    border
+                                                    border-gray-300
+                                                    rounded-lg
+                                                    px-3
+                                                    py-2.5
+                                                    text-sm
+                                                    outline-none
+                                                    resize-y
+                                                    focus:border-kn-blue
+                                                "
+                                            ></textarea>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </section>
+
+
+                            <!-- =================================================
+                                 ACTIONS
+                            ================================================== -->
+
+                            <div
+                                class="
+                                    sticky
+                                    bottom-0
+                                    bg-white
+                                    border-t
+                                    border-gray-200
+                                    pt-4
+                                    pb-1
+                                    flex
+                                    justify-end
+                                    gap-3
+                                "
+                            >
+
+                                <button
+                                    type="button"
+                                    id="btnCancelForm"
+                                    class="
+                                        px-5
+                                        py-2.5
+                                        rounded-lg
+                                        bg-gray-100
+                                        hover:bg-gray-200
+                                        text-gray-700
+                                        font-bold
+                                        text-sm
+                                    "
+                                >
+                                    Hủy
+                                </button>
+
+
+                                <button
+                                    type="submit"
+                                    id="btnSubmit"
+                                    class="
+                                        px-7
+                                        py-2.5
+                                        rounded-lg
+                                        bg-kn-blue
+                                        hover:bg-blue-800
+                                        text-white
+                                        font-bold
+                                        text-sm
+                                        shadow-sm
+                                    "
+                                >
+                                    Nhập kho sản phẩm
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
                 </div>
 
-                <form id="productForm" class="space-y-6">
-                    <!-- KHỐI 1: THÔNG TIN CƠ BẢN -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 bg-gray-50/50 p-4 rounded-lg border border-gray-100">
-                        <h4 class="md:col-span-2 lg:col-span-4 font-bold text-kn-blue text-sm uppercase border-b border-gray-200 pb-2">1. Thông tin cơ bản</h4>
-                        
-                        <!-- Cho SKU và Tên Sản Phẩm chiếm 2 cột trên màn hình rộng -->
-                        <div class="lg:col-span-2">
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Mã SKU <span class="text-red-500">*</span></label>
-                            <input type="text" id="sku" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue">
-                        </div>
-                        <div class="lg:col-span-2">
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Tên Sản Phẩm <span class="text-red-500">*</span></label>
-                            <input type="text" id="name" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue">
-                        </div>
+            </main>
 
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Danh mục Gốc</label>
-                            <select id="category_id" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue bg-white"></select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Danh mục Con</label>
-                            <select id="sub_category_id" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue bg-white"></select>
-                        </div>
+        </div>
 
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Dòng sản phẩm (Family)</label>
-                            <select id="family_id" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue bg-white"></select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Ngành hàng (Industry)</label>
-                            <select id="industrySelect" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue bg-white"></select>
-                        </div>
-
-                        <div class="lg:col-span-2">
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Thương hiệu</label>
-                            <!-- Thêm list="brandList" để liên kết với datalist -->
-                            <input type="text" id="brand_input" list="brandList" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue bg-white" placeholder="Gõ để tìm hoặc thêm mới...">
-                            <!-- Khung chứa danh sách xổ xuống -->
-                            <datalist id="brandList"></datalist>
-                        </div>
-                        <div class="lg:col-span-2">
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Xuất xứ (Origin)</label>
-                            <input type="text" id="origin" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue bg-white" placeholder="VD: Japan, Germany, Vietnam...">
-                        </div>
-                    </div>
-
-                    <!-- KHỐI 2: GIÁ & KHO -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6 bg-gray-50/50 p-4 rounded-lg border border-gray-100">
-                        <h4 class="md:col-span-3 lg:col-span-6 font-bold text-kn-blue text-sm uppercase border-b border-gray-200 pb-2">2. Giá cả & Kho hàng</h4>
-                        
-                        <div class="lg:col-span-2">
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Giá niêm yết (VNĐ)</label>
-                            <input type="number" id="price" min="0" oninput="validity.valid||(value='');" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue bg-white" placeholder="0">
-                        </div>
-                        <div class="lg:col-span-2">
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Giá khuyến mãi</label>
-                            <input type="number" id="discount_price" min="0" oninput="validity.valid||(value='');" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue bg-white" placeholder="0">
-                        </div>
-                        <div class="lg:col-span-2">
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Đơn vị tính</label>
-                            <select id="unit" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue bg-white">
-                                <option value="Cái">Cái</option>
-                                <option value="Bộ">Bộ</option>
-                                <option value="Hộp">Hộp</option>
-                                <option value="Thùng">Thùng</option>
-                                <option value="Cuộn">Cuộn</option>
-                            </select>
-                        </div>
-                        
-                        <div class="lg:col-span-2">
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Số lượng tồn kho</label>
-                            <input type="number" id="stock_quantity" min="0" oninput="validity.valid||(value='');" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue bg-white" placeholder="0">
-                        </div>
-                        <div class="lg:col-span-2">
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">MOQ (Mua tối thiểu)</label>
-                            <input type="number" id="min_order_quantity" min="1" oninput="validity.valid||(value='');" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue bg-white" placeholder="1" value="1">
-                        </div>
-                        <div class="lg:col-span-2">
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Nhãn trạng thái (Badge)</label>
-                            <select id="badge" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue bg-white font-bold">
-                                <option value="">-- Không có nhãn --</option>
-                                <option value="NEW" class="text-green-600">NEW (Sản phẩm mới)</option>
-                                <option value="HOT" class="text-red-600">HOT (Đang hot)</option>
-                                <option value="SALE" class="text-orange-500">SALE (Đang khuyến mãi)</option>
-                                <option value="BEST SELLER" class="text-purple-600">BEST SELLER (Bán chạy nhất)</option>
-                                <option value="CLEARANCE" class="text-yellow-600">CLEARANCE (Xả kho)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- KHỐI 3: MEDIA & CHI TIẾT -->
-                    <div class="grid grid-cols-1 gap-6 bg-gray-50/50 p-4 rounded-lg border border-gray-100">
-                        <h4 class="font-bold text-kn-blue text-sm uppercase border-b border-gray-200 pb-2">3. Hình ảnh & Tài liệu</h4>
-                        
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">URL Ảnh Đại Diện</label>
-                            <input type="text" id="image_url" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue bg-white" placeholder="https://...">
-                        </div>
-                        
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Link ảnh phụ (Mỗi link 1 dòng - Xuống dòng bằng Enter)</label>
-                                <textarea id="inExtraImages" rows="4" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue bg-white resize-none" placeholder="https://link-anh-1.jpg&#10;https://link-anh-2.jpg"></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Link Datasheet (PDF)</label>
-                                <input type="text" id="inDatasheet" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue bg-white" placeholder="https://...">
-                            </div>
-                        </div>
-
-                        <!-- Ô MÔ TẢ NGẮN MỚI BỔ SUNG -->
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Mô tả ngắn (SEO & Top hiển thị)</label>
-                            <textarea id="short_description" rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue resize-none bg-white" placeholder="Tóm tắt đặc điểm, tên SP... (khoảng 150 ký tự)"></textarea>
-                        </div>
-
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Thông số kỹ thuật chi tiết (Specs)</label>
-                                <textarea id="specifications" rows="4" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue resize-none bg-white font-mono" placeholder="Nhập cấu hình, kích thước..."></textarea>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Mô tả sản phẩm</label>
-                                <textarea id="description" rows="4" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue resize-none bg-white" placeholder="Nhập bài giới thiệu vật tư..."></textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pt-4 flex justify-end space-x-3">
-                        <button type="button" onclick="cancelForm()" class="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-bold text-sm hover:bg-gray-100 transition">Hủy Bỏ</button>
-                        <button type="button" onclick="saveProduct()" id="btnSubmit" class="px-8 py-2.5 bg-kn-blue text-white rounded-lg font-bold text-sm hover:bg-blue-800 transition shadow-md uppercase tracking-wide">Nhập Kho Sản Phẩm</button>
-                    </div>
-                </form>
-            </div>
-        </main>
     </div>
 
+
+    <!-- =====================================================
+         SCRIPTS
+    ====================================================== -->
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script src="../assets/js/common/supabase.js"></script>
+
     <script src="../assets/js/common/utils.js"></script>
+
     <script src="../assets/js/admin/admin-core.js"></script>
+
     <script src="../assets/js/admin/admin-nav.js"></script>
+
     <script src="../assets/js/services/productService.js"></script>
+
     <script src="../assets/js/admin/admin-products.js"></script>
+
 </body>
+
 </html>

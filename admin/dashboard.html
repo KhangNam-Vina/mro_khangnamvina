@@ -1,134 +1,1097 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Tổng quan - KN Admin</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
-        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00' } } } }
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'kn-blue': '#00479b',
+                        'kn-orange': '#ff5e00'
+                    }
+                }
+            }
+        }
     </script>
 </head>
+
+
 <body class="bg-gray-50 font-sans text-gray-800 flex h-screen overflow-hidden">
 
-    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2 pointer-events-none"></div>
+
+    <!-- TOAST -->
+
+    <div
+        id="toastContainer"
+        class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2 pointer-events-none"
+    ></div>
+
+
+    <!-- SIDEBAR -->
 
     <aside
-    id="adminSidebar"
-    class="
-        w-64
-        bg-gray-900
-        text-white
-        flex
-        flex-col
-        hidden
-        md:flex
-        shrink-0
-    "
-></aside>
+        id="adminSidebar"
+        class="
+            w-64
+            bg-gray-900
+            text-white
+            flex
+            flex-col
+            hidden
+            md:flex
+            shrink-0
+        "
+    ></aside>
 
-    <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
-        
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-            <div>
-                <h2 class="text-xl font-bold text-gray-900">Bảng Điều Khiển</h2>
-                <p class="text-xs text-gray-500 mt-1">Tổng quan chỉ số kinh doanh & danh sách đơn RFQ cần xử lý</p>
-            </div>
-            <div class="relative w-full md:w-64 mt-4 md:mt-0">
-                <input type="text" id="quickSearchInput" placeholder="Tìm tên công ty hoặc mã..." class="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:border-kn-blue focus:ring-1 focus:ring-kn-blue shadow-sm">
-                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            </div>
-        </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
-                <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Đơn chờ xử lý</p>
-                <h3 id="kpiRfq" class="text-2xl font-black text-kn-orange">--</h3>
-            </div>
-            <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
-                <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Tổng Sản Phẩm</p>
-                <h3 id="kpiProduct" class="text-2xl font-black text-kn-blue">--</h3>
-            </div>
-            <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
-                <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Liên hệ cần duyệt</p>
-                <h3 id="kpiContact" class="text-2xl font-black text-red-500">--</h3>
-            </div>
-            <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
-                <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Bài viết Blog</p>
-                <h3 id="kpiBlog" class="text-2xl font-black text-green-600">--</h3>
-            </div>
-        </div>
- 
-        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6 shadow-sm">
+    <!-- MAIN -->
 
-    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 border-b border-gray-100 pb-3 mb-4">
+    <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-6">
 
-        <div>
-            <h3 class="font-bold text-gray-900 uppercase text-xs tracking-wider">
-                Tần suất Yêu cầu Báo giá
-            </h3>
 
-            <p class="text-[11px] text-gray-400 mt-1">
-                Thống kê 6 tháng gần nhất
-            </p>
-        </div>
+        <div class="max-w-[1600px] mx-auto">
 
-        <label class="sr-only" for="chartMonthFilter">
-            Chọn tháng
-        </label>
 
-        <input
-            type="month"
-            id="chartMonthFilter"
-            class="text-sm border border-gray-300 rounded-md px-3 py-1.5
-                   outline-none focus:border-kn-blue
-                   focus:ring-1 focus:ring-kn-blue
-                   text-gray-700 cursor-pointer font-medium
-                   shadow-sm bg-white">
-    </div>
+            <!-- ================================================= -->
+            <!-- HEADER -->
+            <!-- ================================================= -->
 
-    <div class="relative w-full h-[220px]">
-        <canvas id="monthlyChart"></canvas>
-    </div>
+            <div
+                class="
+                    flex
+                    flex-col
+                    lg:flex-row
+                    lg:items-center
+                    lg:justify-between
+                    gap-4
+                    mb-6
+                "
+            >
 
-</div>
+                <div>
 
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
-            <div class="px-6 py-4 border-b border-gray-100 flex flex-col md:flex-row md:justify-between md:items-center">
-                <h3 class="font-bold text-gray-900 uppercase text-xs tracking-wider mb-3 md:mb-0">Yêu cầu Báo giá (RFQ)</h3>
-                
-                <div class="flex space-x-1 bg-gray-100 p-1 rounded-lg" id="filterStatusGroup">
-                    <button onclick="filterRFQs('Chờ xử lý')" id="btnFilterPending" class="px-3 py-1 font-bold text-xs rounded-md bg-white text-kn-orange shadow-sm transition">Chờ xử lý</button>
-                    <button onclick="filterRFQs('Đã báo giá')" id="btnFilterDone" class="px-3 py-1 font-bold text-xs rounded-md text-gray-600 hover:bg-gray-200 transition">Đã xử lý</button>
-                    <button onclick="filterRFQs('Tất cả')" id="btnFilterAll" class="px-3 py-1 font-bold text-xs rounded-md text-gray-600 hover:bg-gray-200 transition">Tất cả</button>
+                    <h1 class="text-2xl font-black text-gray-900">
+                        Bảng Điều Khiển
+                    </h1>
+
+                    <p class="text-sm text-gray-500 mt-1">
+                        Tổng quan hoạt động kinh doanh và công việc cần xử lý.
+                    </p>
+
                 </div>
+
+
+                <div class="flex items-center gap-3">
+
+                    <button
+                        id="btnRefreshDashboard"
+                        class="
+                            px-4
+                            py-2.5
+                            bg-white
+                            border
+                            border-gray-300
+                            rounded-lg
+                            text-sm
+                            font-bold
+                            text-gray-700
+                            hover:bg-gray-50
+                            transition
+                        "
+                    >
+                        ↻ Làm mới
+                    </button>
+
+                </div>
+
             </div>
-            
-            <table class="w-full text-left text-sm text-gray-600">
-                <thead class="bg-gray-50 text-gray-700 font-bold border-b border-gray-200 text-xs uppercase tracking-wider">
-                    <tr>
-                        <th class="px-6 py-3.5">Mã RFQ</th>
-                        <th class="px-6 py-3.5">Công ty / Khách hàng</th>
-                        <th class="px-6 py-3.5">Ngày gửi</th>
-                        <th class="px-6 py-3.5">Trạng thái</th>
-                        <th class="px-6 py-3.5 text-center">Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody id="rfqTableBody" class="divide-y divide-gray-100 bg-white">
-                    <tr><td colspan="5" class="text-center py-8 text-gray-400">Đang tải dữ liệu...</td></tr>
-                </tbody>
-            </table>
-            <div id="dashboardContactPagination" class="flex justify-between items-center text-sm py-3 px-4 border-t border-gray-100"></div>
+
+
+
+            <!-- ================================================= -->
+            <!-- KPI -->
+            <!-- ================================================= -->
+
+            <section
+                class="
+                    grid
+                    grid-cols-1
+                    sm:grid-cols-2
+                    xl:grid-cols-4
+                    gap-4
+                    mb-6
+                "
+            >
+
+
+                <!-- ORDERS -->
+
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+
+                            <p class="text-xs font-bold uppercase tracking-wider text-gray-400">
+                                Tổng đơn hàng
+                            </p>
+
+                            <p
+                                id="kpiOrders"
+                                class="text-3xl font-black text-kn-blue mt-2"
+                            >
+                                --
+                            </p>
+
+                        </div>
+
+                        <div
+                            class="
+                                w-11
+                                h-11
+                                rounded-xl
+                                bg-blue-50
+                                text-kn-blue
+                                flex
+                                items-center
+                                justify-center
+                                text-xl
+                            "
+                        >
+                            🛒
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ORDER PENDING -->
+
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+
+                            <p class="text-xs font-bold uppercase tracking-wider text-gray-400">
+                                Đơn hàng chờ xử lý
+                            </p>
+
+                            <p
+                                id="kpiOrdersPending"
+                                class="text-3xl font-black text-kn-orange mt-2"
+                            >
+                                --
+                            </p>
+
+                        </div>
+
+                        <div
+                            class="
+                                w-11
+                                h-11
+                                rounded-xl
+                                bg-orange-50
+                                text-kn-orange
+                                flex
+                                items-center
+                                justify-center
+                                text-xl
+                            "
+                        >
+                            ⏳
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- RFQ -->
+
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+
+                            <p class="text-xs font-bold uppercase tracking-wider text-gray-400">
+                                Tổng yêu cầu báo giá
+                            </p>
+
+                            <p
+                                id="kpiRfq"
+                                class="text-3xl font-black text-kn-blue mt-2"
+                            >
+                                --
+                            </p>
+
+                        </div>
+
+                        <div
+                            class="
+                                w-11
+                                h-11
+                                rounded-xl
+                                bg-blue-50
+                                text-kn-blue
+                                flex
+                                items-center
+                                justify-center
+                                text-xl
+                            "
+                        >
+                            📄
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- RFQ PENDING -->
+
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+
+                            <p class="text-xs font-bold uppercase tracking-wider text-gray-400">
+                                RFQ chờ xử lý
+                            </p>
+
+                            <p
+                                id="kpiRfqPending"
+                                class="text-3xl font-black text-kn-orange mt-2"
+                            >
+                                --
+                            </p>
+
+                        </div>
+
+                        <div
+                            class="
+                                w-11
+                                h-11
+                                rounded-xl
+                                bg-orange-50
+                                text-kn-orange
+                                flex
+                                items-center
+                                justify-center
+                                text-xl
+                            "
+                        >
+                            ⚠
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- CONTACT -->
+
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+
+                            <p class="text-xs font-bold uppercase tracking-wider text-gray-400">
+                                Liên hệ chờ duyệt
+                            </p>
+
+                            <p
+                                id="kpiContact"
+                                class="text-3xl font-black text-red-500 mt-2"
+                            >
+                                --
+                            </p>
+
+                        </div>
+
+                        <div
+                            class="
+                                w-11
+                                h-11
+                                rounded-xl
+                                bg-red-50
+                                text-red-500
+                                flex
+                                items-center
+                                justify-center
+                                text-xl
+                            "
+                        >
+                            ✉
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- USERS -->
+
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+
+                            <p class="text-xs font-bold uppercase tracking-wider text-gray-400">
+                                Người dùng
+                            </p>
+
+                            <p
+                                id="kpiUsers"
+                                class="text-3xl font-black text-gray-900 mt-2"
+                            >
+                                --
+                            </p>
+
+                        </div>
+
+                        <div
+                            class="
+                                w-11
+                                h-11
+                                rounded-xl
+                                bg-gray-100
+                                text-gray-700
+                                flex
+                                items-center
+                                justify-center
+                                text-xl
+                            "
+                        >
+                            👥
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- PRODUCTS -->
+
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+
+                            <p class="text-xs font-bold uppercase tracking-wider text-gray-400">
+                                Sản phẩm
+                            </p>
+
+                            <p
+                                id="kpiProduct"
+                                class="text-3xl font-black text-kn-blue mt-2"
+                            >
+                                --
+                            </p>
+
+                        </div>
+
+                        <div
+                            class="
+                                w-11
+                                h-11
+                                rounded-xl
+                                bg-blue-50
+                                text-kn-blue
+                                flex
+                                items-center
+                                justify-center
+                                text-xl
+                            "
+                        >
+                            📦
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- BLOG -->
+
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+
+                    <div class="flex items-center justify-between">
+
+                        <div>
+
+                            <p class="text-xs font-bold uppercase tracking-wider text-gray-400">
+                                Bài viết
+                            </p>
+
+                            <p
+                                id="kpiBlog"
+                                class="text-3xl font-black text-green-600 mt-2"
+                            >
+                                --
+                            </p>
+
+                        </div>
+
+                        <div
+                            class="
+                                w-11
+                                h-11
+                                rounded-xl
+                                bg-green-50
+                                text-green-600
+                                flex
+                                items-center
+                                justify-center
+                                text-xl
+                            "
+                        >
+                            📝
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ================================================= -->
+            <!-- CHARTS -->
+            <!-- ================================================= -->
+
+            <section
+                class="
+                    grid
+                    grid-cols-1
+                    xl:grid-cols-3
+                    gap-5
+                    mb-6
+                "
+            >
+
+
+                <!-- ACTIVITY CHART -->
+
+                <div
+                    class="
+                        xl:col-span-2
+                        bg-white
+                        rounded-xl
+                        border
+                        border-gray-200
+                        shadow-sm
+                        p-6
+                    "
+                >
+
+                    <div
+                        class="
+                            flex
+                            flex-col
+                            sm:flex-row
+                            sm:items-center
+                            sm:justify-between
+                            gap-3
+                            border-b
+                            border-gray-100
+                            pb-4
+                            mb-4
+                        "
+                    >
+
+                        <div>
+
+                            <h2 class="font-black text-gray-900">
+                                Hoạt động hệ thống
+                            </h2>
+
+                            <p class="text-xs text-gray-400 mt-1">
+                                Đơn hàng và yêu cầu báo giá trong 6 tháng gần nhất.
+                            </p>
+
+                        </div>
+
+
+                        <input
+                            type="month"
+                            id="chartMonthFilter"
+                            class="
+                                text-sm
+                                border
+                                border-gray-300
+                                rounded-lg
+                                px-3
+                                py-2
+                                outline-none
+                                focus:border-kn-blue
+                            "
+                        >
+
+                    </div>
+
+
+                    <div class="relative h-[280px]">
+
+                        <canvas id="activityChart"></canvas>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- STATUS -->
+
+                <div
+                    class="
+                        bg-white
+                        rounded-xl
+                        border
+                        border-gray-200
+                        shadow-sm
+                        p-6
+                    "
+                >
+
+                    <div class="border-b border-gray-100 pb-4 mb-5">
+
+                        <h2 class="font-black text-gray-900">
+                            Trạng thái xử lý
+                        </h2>
+
+                        <p class="text-xs text-gray-400 mt-1">
+                            Tổng quan công việc hiện tại.
+                        </p>
+
+                    </div>
+
+
+                    <div class="space-y-5">
+
+
+                        <div>
+
+                            <div class="flex justify-between mb-2">
+
+                                <span class="text-sm font-bold text-gray-700">
+                                    Đơn hàng
+                                </span>
+
+                                <span
+                                    id="orderStatusSummary"
+                                    class="text-xs font-bold text-gray-400"
+                                >
+                                    --
+                                </span>
+
+                            </div>
+
+                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+
+                                <div
+                                    id="orderPendingBar"
+                                    class="h-full bg-kn-orange rounded-full"
+                                    style="width:0%"
+                                ></div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div>
+
+                            <div class="flex justify-between mb-2">
+
+                                <span class="text-sm font-bold text-gray-700">
+                                    Báo giá
+                                </span>
+
+                                <span
+                                    id="rfqStatusSummary"
+                                    class="text-xs font-bold text-gray-400"
+                                >
+                                    --
+                                </span>
+
+                            </div>
+
+                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+
+                                <div
+                                    id="rfqPendingBar"
+                                    class="h-full bg-kn-blue rounded-full"
+                                    style="width:0%"
+                                ></div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="pt-2 space-y-2">
+
+
+                            <a
+                                href="manage-orders.html"
+                                class="
+                                    flex
+                                    items-center
+                                    justify-between
+                                    px-4
+                                    py-3
+                                    rounded-lg
+                                    bg-blue-50
+                                    text-kn-blue
+                                    hover:bg-blue-100
+                                    transition
+                                    text-sm
+                                    font-bold
+                                "
+                            >
+                                <span>Quản lý đơn hàng</span>
+                                <span>→</span>
+                            </a>
+
+
+                            <a
+                                href="manage-rfq.html"
+                                class="
+                                    flex
+                                    items-center
+                                    justify-between
+                                    px-4
+                                    py-3
+                                    rounded-lg
+                                    bg-orange-50
+                                    text-kn-orange
+                                    hover:bg-orange-100
+                                    transition
+                                    text-sm
+                                    font-bold
+                                "
+                            >
+                                <span>Quản lý báo giá</span>
+                                <span>→</span>
+                            </a>
+
+
+                            <a
+                                href="manage-contacts.html"
+                                class="
+                                    flex
+                                    items-center
+                                    justify-between
+                                    px-4
+                                    py-3
+                                    rounded-lg
+                                    bg-gray-100
+                                    text-gray-700
+                                    hover:bg-gray-200
+                                    transition
+                                    text-sm
+                                    font-bold
+                                "
+                            >
+                                <span>Quản lý liên hệ</span>
+                                <span>→</span>
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ================================================= -->
+            <!-- WORK QUEUE -->
+            <!-- ================================================= -->
+
+            <section
+                class="
+                    grid
+                    grid-cols-1
+                    xl:grid-cols-2
+                    gap-5
+                    mb-6
+                "
+            >
+
+
+                <!-- ORDERS -->
+
+                <div
+                    class="
+                        bg-white
+                        rounded-xl
+                        border
+                        border-gray-200
+                        shadow-sm
+                        overflow-hidden
+                    "
+                >
+
+                    <div
+                        class="
+                            px-6
+                            py-4
+                            border-b
+                            border-gray-100
+                            flex
+                            items-center
+                            justify-between
+                        "
+                    >
+
+                        <div>
+
+                            <h2 class="font-black text-gray-900">
+                                Đơn hàng cần xử lý
+                            </h2>
+
+                            <p class="text-xs text-gray-400 mt-1">
+                                Các đơn hàng mới nhất.
+                            </p>
+
+                        </div>
+
+
+                        <a
+                            href="manage-orders.html"
+                            class="
+                                text-xs
+                                font-bold
+                                text-kn-blue
+                                hover:underline
+                            "
+                        >
+                            Xem tất cả →
+                        </a>
+
+                    </div>
+
+
+                    <div class="overflow-x-auto">
+
+                        <table class="w-full min-w-[650px]">
+
+                            <thead class="bg-gray-50">
+
+                                <tr>
+
+                                    <th class="px-5 py-3 text-left text-[11px] font-black uppercase text-gray-500">
+                                        Mã đơn
+                                    </th>
+
+                                    <th class="px-5 py-3 text-left text-[11px] font-black uppercase text-gray-500">
+                                        Khách hàng
+                                    </th>
+
+                                    <th class="px-5 py-3 text-left text-[11px] font-black uppercase text-gray-500">
+                                        Ngày
+                                    </th>
+
+                                    <th class="px-5 py-3 text-center text-[11px] font-black uppercase text-gray-500">
+                                        Trạng thái
+                                    </th>
+
+                                    <th class="px-5 py-3"></th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody
+                                id="dashboardOrdersBody"
+                                class="divide-y divide-gray-100"
+                            >
+
+                                <tr>
+                                    <td
+                                        colspan="5"
+                                        class="text-center py-8 text-gray-400"
+                                    >
+                                        Đang tải...
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- RFQ -->
+
+                <div
+                    class="
+                        bg-white
+                        rounded-xl
+                        border
+                        border-gray-200
+                        shadow-sm
+                        overflow-hidden
+                    "
+                >
+
+                    <div
+                        class="
+                            px-6
+                            py-4
+                            border-b
+                            border-gray-100
+                            flex
+                            items-center
+                            justify-between
+                        "
+                    >
+
+                        <div>
+
+                            <h2 class="font-black text-gray-900">
+                                Yêu cầu báo giá
+                            </h2>
+
+                            <p class="text-xs text-gray-400 mt-1">
+                                RFQ mới nhất cần theo dõi.
+                            </p>
+
+                        </div>
+
+
+                        <a
+                            href="manage-rfq.html"
+                            class="
+                                text-xs
+                                font-bold
+                                text-kn-blue
+                                hover:underline
+                            "
+                        >
+                            Xem tất cả →
+                        </a>
+
+                    </div>
+
+
+                    <div class="overflow-x-auto">
+
+                        <table class="w-full min-w-[650px]">
+
+                            <thead class="bg-gray-50">
+
+                                <tr>
+
+                                    <th class="px-5 py-3 text-left text-[11px] font-black uppercase text-gray-500">
+                                        Mã RFQ
+                                    </th>
+
+                                    <th class="px-5 py-3 text-left text-[11px] font-black uppercase text-gray-500">
+                                        Công ty
+                                    </th>
+
+                                    <th class="px-5 py-3 text-left text-[11px] font-black uppercase text-gray-500">
+                                        Ngày
+                                    </th>
+
+                                    <th class="px-5 py-3 text-center text-[11px] font-black uppercase text-gray-500">
+                                        Trạng thái
+                                    </th>
+
+                                    <th class="px-5 py-3"></th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody
+                                id="dashboardRfqBody"
+                                class="divide-y divide-gray-100"
+                            >
+
+                                <tr>
+                                    <td
+                                        colspan="5"
+                                        class="text-center py-8 text-gray-400"
+                                    >
+                                        Đang tải...
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ================================================= -->
+            <!-- CONTACTS -->
+            <!-- ================================================= -->
+
+            <section
+                class="
+                    bg-white
+                    rounded-xl
+                    border
+                    border-gray-200
+                    shadow-sm
+                    overflow-hidden
+                "
+            >
+
+                <div
+                    class="
+                        px-6
+                        py-4
+                        border-b
+                        border-gray-100
+                        flex
+                        items-center
+                        justify-between
+                    "
+                >
+
+                    <div>
+
+                        <h2 class="font-black text-gray-900">
+                            Liên hệ mới
+                        </h2>
+
+                        <p class="text-xs text-gray-400 mt-1">
+                            Các yêu cầu liên hệ gần đây từ khách hàng.
+                        </p>
+
+                    </div>
+
+
+                    <a
+                        href="manage-contacts.html"
+                        class="
+                            text-xs
+                            font-bold
+                            text-kn-blue
+                            hover:underline
+                        "
+                    >
+                        Xem tất cả →
+                    </a>
+
+                </div>
+
+
+                <div class="overflow-x-auto">
+
+                    <table class="w-full min-w-[800px]">
+
+                        <thead class="bg-gray-50">
+
+                            <tr>
+
+                                <th class="px-6 py-3 text-left text-[11px] font-black uppercase text-gray-500">
+                                    Người liên hệ
+                                </th>
+
+                                <th class="px-6 py-3 text-left text-[11px] font-black uppercase text-gray-500">
+                                    Email
+                                </th>
+
+                                <th class="px-6 py-3 text-left text-[11px] font-black uppercase text-gray-500">
+                                    Số điện thoại
+                                </th>
+
+                                <th class="px-6 py-3 text-left text-[11px] font-black uppercase text-gray-500">
+                                    Ngày gửi
+                                </th>
+
+                                <th class="px-6 py-3 text-center text-[11px] font-black uppercase text-gray-500">
+                                    Trạng thái
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody
+                            id="dashboardContactsBody"
+                            class="divide-y divide-gray-100"
+                        >
+
+                            <tr>
+                                <td
+                                    colspan="5"
+                                    class="text-center py-8 text-gray-400"
+                                >
+                                    Đang tải...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
         </div>
 
     </main>
 
+
+    <!-- SCRIPTS -->
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script src="../assets/js/common/supabase.js"></script>
     <script src="../assets/js/common/utils.js"></script>
-    <script src="../assets/js/admin/admin-core.js"></script> 
+
+    <script src="../assets/js/admin/admin-core.js"></script>
     <script src="../assets/js/admin/admin-nav.js"></script>
+
     <script src="../assets/js/admin/admin-dashboard.js"></script>
+
 </body>
+
 </html>
