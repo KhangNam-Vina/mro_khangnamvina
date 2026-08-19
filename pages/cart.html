@@ -2,6 +2,7 @@
 <html lang="vi">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -45,7 +46,10 @@
     >
 
 
-    <!-- GOOGLE FONT -->
+    <!-- =====================================================
+         GOOGLE FONT
+    ====================================================== -->
+
     <link
         rel="preconnect"
         href="https://fonts.googleapis.com"
@@ -63,7 +67,10 @@
     >
 
 
-    <!-- CSS CHUNG -->
+    <!-- =====================================================
+         CSS CHUNG
+    ====================================================== -->
+
     <link
         rel="stylesheet"
         href="../assets/css/style.css"
@@ -80,7 +87,10 @@
     >
 
 
-    <!-- CSS RIÊNG -->
+    <!-- =====================================================
+         CSS TRANG GIỎ HÀNG
+    ====================================================== -->
+
     <link
         rel="stylesheet"
         href="../assets/css/cart.css"
@@ -110,7 +120,10 @@
 
         <div class="cart-hero-overlay"></div>
 
+
         <div class="cart-container">
+
+            <!-- BREADCRUMB -->
 
             <nav
                 class="cart-breadcrumb"
@@ -124,12 +137,14 @@
                     Trang chủ
                 </a>
 
+
                 <span
                     class="cart-breadcrumb-separator"
                     aria-hidden="true"
                 >
                     /
                 </span>
+
 
                 <span class="cart-breadcrumb-current">
                     Giỏ hàng Mua sắm
@@ -138,14 +153,16 @@
             </nav>
 
 
+            <!-- TITLE -->
+
             <h1 class="cart-hero-title">
                 Giỏ Hàng Của Bạn
             </h1>
 
 
             <p class="cart-hero-description">
-                Quản lý sản phẩm đã chọn và kiểm tra tổng giá trị
-                đơn hàng trước khi tiến hành thanh toán.
+                Quản lý sản phẩm đã chọn, bao gồm từng kích thước
+                và số lượng, trước khi tiến hành thanh toán.
             </p>
 
         </div>
@@ -168,15 +185,24 @@
                      PRODUCT LIST
                 ================================================== -->
 
-                <section class="cart-products-section">
+                <section
+                    class="cart-products-section"
+                    aria-labelledby="cartProductsTitle"
+                >
 
                     <div class="cart-products-card">
 
 
-                        <!-- HEADER -->
+                        <!-- =================================================
+                             PRODUCT LIST HEADER
+                        ================================================== -->
+
                         <div class="cart-products-header">
 
-                            <h2 class="cart-products-title">
+                            <h2
+                                id="cartProductsTitle"
+                                class="cart-products-title"
+                            >
                                 Chi tiết đơn hàng
                             </h2>
 
@@ -191,28 +217,83 @@
                         </div>
 
 
-                        <!-- CONTENT -->
+                        <!-- =================================================
+                             PRODUCT LIST BODY
+                        ================================================== -->
+
                         <div class="cart-products-body">
 
                             <div
                                 id="cartItemsContainer"
                                 class="cart-items-container"
+                                aria-live="polite"
+                                aria-label="Danh sách sản phẩm trong giỏ hàng"
                             >
 
                                 <!--
-                                    Loading skeleton.
-                                    JS sẽ thay bằng danh sách thật.
+                                    =================================================
+                                    LOADING SKELETON
+                                    =================================================
+
+                                    cart.js sẽ thay phần này bằng danh sách thật.
+
+                                    Mỗi item sau khi render có dạng:
+
+                                    SKU: ABC123
+                                    Tên sản phẩm
+                                    Size: S
+                                    100.000 đ / Cái
+                                    [-] 10 [+]
+                                    1.000.000 đ
+
+                                    QUAN TRỌNG:
+                                    Size không hard-code tại đây.
+
+                                    cart.js sẽ lấy:
+
+                                    item.size
+
+                                    và render thành:
+
+                                    <span class="cart-item-size">
+                                        Size:
+                                        <strong>S</strong>
+                                    </span>
+
+                                    Nhờ vậy:
+
+                                    ABC123 + S
+                                    ABC123 + M
+
+                                    là 2 item riêng biệt.
                                 -->
 
                                 <div class="cart-loading-item">
 
-                                    <div class="cart-loading-image"></div>
+                                    <div
+                                        class="cart-loading-image"
+                                        aria-hidden="true"
+                                    ></div>
+
 
                                     <div class="cart-loading-content">
 
-                                        <div class="cart-loading-line cart-loading-line-large"></div>
-                                        <div class="cart-loading-line cart-loading-line-small"></div>
-                                        <div class="cart-loading-line cart-loading-line-price"></div>
+                                        <div
+                                            class="cart-loading-line cart-loading-line-large"
+                                            aria-hidden="true"
+                                        ></div>
+
+
+                                        <div
+                                            class="cart-loading-line cart-loading-line-small"
+                                            aria-hidden="true"
+                                        ></div>
+
+
+                                        <div
+                                            class="cart-loading-line cart-loading-line-price"
+                                            aria-hidden="true"
+                                        ></div>
 
                                     </div>
 
@@ -221,27 +302,33 @@
                             </div>
 
 
-                            <!-- EMPTY STATE -->
+                            <!-- =================================================
+                                 EMPTY CART
+                            ================================================== -->
 
                             <div
                                 id="emptyCartState"
                                 class="cart-empty-state is-hidden"
                             >
 
-                                <div class="cart-empty-icon">
+                                <div
+                                    class="cart-empty-icon"
+                                    aria-hidden="true"
+                                >
 
                                     <svg
                                         fill="none"
                                         stroke="currentColor"
                                         viewBox="0 0 24 24"
-                                        aria-hidden="true"
                                     >
+
                                         <path
                                             stroke-linecap="round"
                                             stroke-linejoin="round"
                                             stroke-width="1.5"
                                             d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                                         ></path>
+
                                     </svg>
 
                                 </div>
@@ -278,7 +365,10 @@
                      ORDER SUMMARY
                 ================================================== -->
 
-                <aside class="cart-summary-section">
+                <aside
+                    class="cart-summary-section"
+                    aria-label="Tổng đơn hàng"
+                >
 
                     <div class="cart-summary-card">
 
@@ -288,6 +378,9 @@
 
 
                         <div class="cart-summary-list">
+
+
+                            <!-- TẠM TÍNH -->
 
                             <div class="cart-summary-row">
 
@@ -302,6 +395,8 @@
                             </div>
 
 
+                            <!-- VẬN CHUYỂN -->
+
                             <div class="cart-summary-row">
 
                                 <span>
@@ -315,6 +410,8 @@
                             </div>
 
 
+                            <!-- VAT -->
+
                             <div class="cart-summary-row">
 
                                 <span>
@@ -327,6 +424,8 @@
 
                             </div>
 
+
+                            <!-- TOTAL -->
 
                             <div class="cart-summary-total">
 
@@ -343,11 +442,16 @@
                         </div>
 
 
+                        <!-- =================================================
+                             CHECKOUT
+                        ================================================== -->
+
                         <button
                             type="button"
                             id="btnProceedCheckout"
                             onclick="proceedToCheckout()"
                             class="cart-checkout-button"
+                            disabled
                         >
 
                             <span>
@@ -362,12 +466,14 @@
                                 viewBox="0 0 24 24"
                                 aria-hidden="true"
                             >
+
                                 <path
                                     stroke-linecap="round"
                                     stroke-linejoin="round"
                                     stroke-width="2"
                                     d="M14 5l7 7m0 0l-7 7m7-7H3"
                                 ></path>
+
                             </svg>
 
                         </button>
@@ -397,19 +503,32 @@
 
 
     <!-- =====================================================
-         SCRIPT
+         JAVASCRIPT
     ====================================================== -->
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+
+    <!-- COMMON -->
+
     <script src="../assets/js/common/supabase.js"></script>
+
     <script src="../assets/js/common/auth.js"></script>
+
     <script src="../assets/js/common/utils.js"></script>
 
+
+    <!-- COMPONENTS -->
+
     <script src="../assets/components/header.js"></script>
+
     <script src="../assets/components/footer.js"></script>
 
+
+    <!-- USER -->
+
     <script src="../assets/js/users/auth-ui.js"></script>
+
     <script src="../assets/js/users/cart.js"></script>
 
 </body>

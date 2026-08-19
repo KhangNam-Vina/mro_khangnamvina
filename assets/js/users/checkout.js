@@ -1,11 +1,10 @@
 // ========================================================
 // FILE: assets/js/users/checkout.js
 // XỬ LÝ THANH TOÁN ĐƠN MUA NGAY
-// STATIC CSS VERSION
+// ĐÃ ĐỒNG BỘ SIZE SẢN PHẨM
 // ========================================================
 
 "use strict";
-
 
 let currentUser = null;
 let shoppingCart = [];
@@ -18,17 +17,10 @@ let checkoutTotalAmount = 0;
 
 async function initCheckout() {
 
-    shoppingCart =
-        getShoppingCart();
-
-
-    /*
-     * Giỏ hàng trống
-     */
+    shoppingCart = getShoppingCart();
 
     if (
-        shoppingCart.length ===
-        0
+        shoppingCart.length === 0
     ) {
 
         alert(
@@ -42,10 +34,6 @@ async function initCheckout() {
     }
 
 
-    /*
-     * Kiểm tra Supabase
-     */
-
     if (
         !window.supabaseClient
     ) {
@@ -57,10 +45,6 @@ async function initCheckout() {
         return;
     }
 
-
-    /*
-     * Kiểm tra đăng nhập
-     */
 
     const {
         data: {
@@ -78,12 +62,10 @@ async function initCheckout() {
             "Vui lòng đăng nhập để tiến hành đặt hàng!"
         );
 
-
         localStorage.setItem(
             "redirect_after_login",
             "checkout.html"
         );
-
 
         window.location.href =
             "login.html";
@@ -127,8 +109,7 @@ function renderCheckoutBill() {
     }
 
 
-    let html =
-        "";
+    let html = "";
 
     checkoutTotalAmount =
         0;
@@ -153,8 +134,7 @@ function renderCheckoutBill() {
 
 
             const itemSubtotal =
-                price *
-                qty;
+                price * qty;
 
 
             checkoutTotalAmount +=
@@ -186,6 +166,33 @@ function renderCheckoutBill() {
                 );
 
 
+            /*
+             * SIZE
+             */
+            const normalizedSize =
+                item.size !== undefined &&
+                item.size !== null
+                    ? String(
+                        item.size
+                    ).trim()
+                    : "";
+
+
+            const sizeHTML =
+                normalizedSize
+                    ? `
+                        <span class="checkout-item-size">
+                            Size:
+                            <strong>
+                                ${escapeHTML(
+                                    normalizedSize
+                                )}
+                            </strong>
+                        </span>
+                    `
+                    : "";
+
+
             html += `
 
                 <article class="checkout-item">
@@ -212,6 +219,9 @@ function renderCheckoutBill() {
 
 
                         <div class="checkout-item-meta">
+
+                            ${sizeHTML}
+
 
                             <span class="checkout-item-quantity">
                                 SL: ${qty} ${safeUnit}
@@ -272,10 +282,12 @@ async function handleOrderSubmit(
             "btnSubmitOrder"
         );
 
+
     const loadingScreen =
         document.getElementById(
             "checkoutLoading"
         );
+
 
     const form =
         document.getElementById(
@@ -283,34 +295,29 @@ async function handleOrderSubmit(
         );
 
 
-    /*
-     * Lấy dữ liệu form
-     */
-
     const shippingName =
         getInputValue(
             "shippingName"
         );
+
 
     const shippingPhone =
         getInputValue(
             "shippingPhone"
         );
 
+
     const shippingAddress =
         getInputValue(
             "shippingAddress"
         );
+
 
     const orderNotes =
         getInputValue(
             "orderNotes"
         );
 
-
-    /*
-     * Validate
-     */
 
     if (
         !shippingName ||
@@ -325,10 +332,6 @@ async function handleOrderSubmit(
         return;
     }
 
-
-    /*
-     * Kiểm tra user
-     */
 
     if (!currentUser) {
 
@@ -345,10 +348,6 @@ async function handleOrderSubmit(
 
     try {
 
-        /*
-         * Disable UI
-         */
-
         setSubmitLoading(
             btnSubmit,
             true
@@ -356,7 +355,6 @@ async function handleOrderSubmit(
 
 
         if (form) {
-
             form.classList.add(
                 "is-hidden"
             );
@@ -364,16 +362,11 @@ async function handleOrderSubmit(
 
 
         if (loadingScreen) {
-
             loadingScreen.classList.remove(
                 "is-hidden"
             );
         }
 
-
-        /*
-         * Tạo mã đơn
-         */
 
         const dateStr =
             new Date()
@@ -401,9 +394,8 @@ async function handleOrderSubmit(
 
 
         /*
-         * INSERT ORDERS
+         * CREATE ORDER
          */
-
         const {
             data: newOrder,
             error: orderError
@@ -453,9 +445,11 @@ async function handleOrderSubmit(
 
 
         /*
-         * Chuẩn bị order_items
+         * CREATE ORDER ITEMS
+         *
+         * QUAN TRỌNG:
+         * Lưu SIZE vào order_items.
          */
-
         const orderItemsData =
             shoppingCart.map(
                 item => ({
@@ -463,24 +457,47 @@ async function handleOrderSubmit(
                     order_id:
                         newOrder.id,
 
+
                     product_id:
-                        item.id,
+                        item.id ||
+                        item.product_id ||
+                        null,
+
 
                     product_name:
-                        item.name,
+                        item.name ||
+                        item.product_name ||
+                        "Sản phẩm",
+
 
                     sku:
-                        item.sku,
+                        item.sku ||
+                        "",
+
+
+                    size:
+                        item.size !== undefined &&
+                        item.size !== null &&
+                        String(
+                            item.size
+                        ).trim()
+                            ? String(
+                                item.size
+                            ).trim()
+                            : null,
+
 
                     unit_price:
                         Number(
                             item.price
                         ) || 0,
 
+
                     quantity:
                         Number(
                             item.qty
                         ) || 1,
+
 
                     subtotal:
                         (
@@ -493,6 +510,7 @@ async function handleOrderSubmit(
                                 item.qty
                             ) || 1
                         )
+
                 })
             );
 
@@ -500,7 +518,6 @@ async function handleOrderSubmit(
         /*
          * INSERT ORDER ITEMS
          */
-
         const {
             error: itemsError
         } =
@@ -517,17 +534,12 @@ async function handleOrderSubmit(
 
 
         /*
-         * Xóa giỏ hàng
+         * XÓA CART
          */
-
         localStorage.removeItem(
             "mro_shopping_cart"
         );
 
-
-        /*
-         * Cập nhật header cart
-         */
 
         if (
             typeof updateHeaderCartCount ===
@@ -538,20 +550,12 @@ async function handleOrderSubmit(
         }
 
 
-        /*
-         * Thành công
-         */
-
         alert(
             `🎉 Đặt hàng thành công!\n\n` +
             `Mã đơn hàng của bạn là: ${orderCode}\n\n` +
             `Chúng tôi sẽ sớm liên hệ để xác nhận.`
         );
 
-
-        /*
-         * Redirect
-         */
 
         window.location.href =
             "my-orders.html";
@@ -569,10 +573,6 @@ async function handleOrderSubmit(
             `❌ Có lỗi xảy ra trong quá trình đặt hàng: ${error.message}`
         );
 
-
-        /*
-         * Khôi phục UI
-         */
 
         if (btnSubmit) {
 
@@ -602,7 +602,7 @@ async function handleOrderSubmit(
 
 
 // ========================================================
-// 4. BUTTON LOADING STATE
+// 4. BUTTON LOADING
 // ========================================================
 
 function setSubmitLoading(
@@ -624,37 +624,8 @@ function setSubmitLoading(
             "is-disabled"
         );
 
-        button.innerHTML = `
-
-            <svg
-                class="checkout-submit-spinner"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden="true"
-            >
-
-                <circle
-                    class="checkout-submit-spinner-track"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                ></circle>
-
-                <path
-                    class="checkout-submit-spinner-head"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                ></path>
-
-            </svg>
-
-            <span>
-                Đang xử lý...
-            </span>
-
-        `;
+        button.innerHTML =
+            "Đang xử lý...";
 
     } else {
 
@@ -665,34 +636,14 @@ function setSubmitLoading(
             "is-disabled"
         );
 
-        button.innerHTML = `
-
-            <span>
-                Xác Nhận Đặt Hàng
-            </span>
-
-            <svg
-                class="checkout-submit-icon"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M5 13l4 4L19 7"
-                ></path>
-            </svg>
-
-        `;
+        button.innerHTML =
+            "Đặt hàng";
     }
 }
 
 
 // ========================================================
-// 5. STORAGE
+// 5. LOAD SHOPPING CART
 // ========================================================
 
 function getShoppingCart() {
@@ -716,11 +667,41 @@ function getShoppingCart() {
             );
 
 
-        return Array.isArray(
-            parsed
-        )
-            ? parsed
-            : [];
+        if (
+            !Array.isArray(
+                parsed
+            )
+        ) {
+
+            return [];
+        }
+
+
+        /*
+         * Chuẩn hóa dữ liệu cart cũ.
+         */
+        return parsed.map(
+            item => ({
+
+                ...item,
+
+
+                id:
+                    item.id ||
+                    item.product_id ||
+                    null,
+
+
+                size:
+                    item.size !== undefined &&
+                    item.size !== null
+                        ? String(
+                            item.size
+                        ).trim()
+                        : null
+
+            })
+        );
 
     } catch (error) {
 
@@ -735,26 +716,7 @@ function getShoppingCart() {
 
 
 // ========================================================
-// 6. FORMAT MONEY
-// ========================================================
-
-function formatCurrency(
-    value
-) {
-
-    return (
-        new Intl.NumberFormat(
-            "vi-VN"
-        ).format(
-            Number(value) || 0
-        ) +
-        " đ"
-    );
-}
-
-
-// ========================================================
-// 7. HELPERS
+// 6. HELPERS
 // ========================================================
 
 function getInputValue(
@@ -783,6 +745,21 @@ function setText(
         element.textContent =
             value ?? "";
     }
+}
+
+
+function formatCurrency(
+    value
+) {
+
+    return (
+        new Intl.NumberFormat(
+            "vi-VN"
+        ).format(
+            Number(value) || 0
+        ) +
+        " đ"
+    );
 }
 
 
@@ -839,15 +816,12 @@ function escapeAttribute(
 
 
 // ========================================================
-// 8. INIT
+// 7. INIT
 // ========================================================
 
 document.addEventListener(
     "DOMContentLoaded",
     () => {
-
-        initCheckout();
-
 
         const form =
             document.getElementById(
@@ -863,5 +837,7 @@ document.addEventListener(
             );
         }
 
+
+        initCheckout();
     }
-);
+);  

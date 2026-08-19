@@ -2,31 +2,58 @@
 <html lang="vi">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Quản lý Sản phẩm - KN Admin</title>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Quản lý Sản phẩm - KN Admin
+    </title>
 
     <script src="https://cdn.tailwindcss.com"></script>
 
     <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 
     <script>
+
         tailwind.config = {
+
             theme: {
+
                 extend: {
+
                     colors: {
-                        "kn-blue": "#00479b",
-                        "kn-orange": "#ff5e00"
+
+                        "kn-blue":
+                            "#00479b",
+
+                        "kn-orange":
+                            "#ff5e00"
+
                     }
+
                 }
+
             }
+
         };
+
     </script>
+
 </head>
 
 
-<body class="bg-gray-50 text-gray-800 font-sans">
+<body
+    class="
+        bg-gray-50
+        text-gray-800
+        font-sans
+    "
+>
 
 
     <!-- =====================================================
@@ -53,10 +80,17 @@
          ADMIN LAYOUT
     ====================================================== -->
 
-    <div class="min-h-screen flex">
+    <div
+        class="
+            min-h-screen
+            flex
+        "
+    >
 
 
-        <!-- SIDEBAR -->
+        <!-- =================================================
+             SIDEBAR
+        ================================================== -->
 
         <aside
             id="adminSidebar"
@@ -72,9 +106,18 @@
         ></aside>
 
 
-        <!-- MAIN -->
+        <!-- =================================================
+             MAIN
+        ================================================== -->
 
-        <div class="flex-1 min-w-0 flex flex-col">
+        <div
+            class="
+                flex-1
+                min-w-0
+                flex
+                flex-col
+            "
+        >
 
 
             <!-- =================================================
@@ -87,10 +130,10 @@
                     bg-white
                     border-b
                     border-gray-200
-                    px-6
                     flex
                     items-center
                     justify-between
+                    px-5
                     shrink-0
                 "
             >
@@ -98,11 +141,11 @@
                 <div>
 
                     <h1
+                        id="formTitleHeader"
                         class="
-                            text-xl
+                            text-lg
                             font-black
                             text-gray-900
-                            tracking-tight
                         "
                     >
                         Quản lý Sản phẩm
@@ -110,11 +153,8 @@
 
                     <p
                         class="
-                            hidden
-                            lg:block
                             text-xs
-                            text-gray-500
-                            mt-0.5
+                            text-gray-400
                         "
                     >
                         Quản lý SKU, giá bán, tồn kho và thông tin sản phẩm
@@ -127,38 +167,19 @@
                     type="button"
                     id="btnAddProduct"
                     class="
-                        inline-flex
-                        items-center
-                        gap-2
-                        bg-kn-blue
-                        hover:bg-blue-800
-                        text-white
-                        font-bold
-                        text-sm
-                        px-4
+                        px-5
                         py-2.5
                         rounded-lg
-                        shadow-sm
+                        bg-kn-blue
+                        text-white
+                        text-sm
+                        font-bold
+                        hover:bg-blue-800
                         transition
+                        shadow-sm
                     "
                 >
-
-                    <svg
-                        class="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M12 4v16m8-8H4"
-                        />
-                    </svg>
-
-                    Thêm sản phẩm
-
+                    + Thêm sản phẩm
                 </button>
 
             </header>
@@ -172,20 +193,21 @@
                 class="
                     flex-1
                     overflow-y-auto
-                    p-4
-                    md:p-6
+                    p-5
                 "
             >
 
-                <div
+
+                <!-- =================================================
+                     PRODUCT LIST
+                ================================================== -->
+
+                <section
                     id="productListView"
-                    class="max-w-[1600px] mx-auto"
                 >
 
 
-                    <!-- =================================================
-                         STATISTICS
-                    ================================================== -->
+                    <!-- STATISTICS -->
 
                     <div
                         class="
@@ -194,10 +216,9 @@
                             sm:grid-cols-2
                             xl:grid-cols-4
                             gap-4
-                            mb-6
+                            mb-5
                         "
                     >
-
 
                         <!-- TOTAL -->
 
@@ -207,24 +228,24 @@
                                 border
                                 border-gray-200
                                 rounded-xl
-                                shadow-sm
                                 p-5
+                                shadow-sm
                             "
                         >
 
-                            <div
+                            <p
                                 class="
-                                    text-xs
-                                    font-bold
-                                    text-gray-500
+                                    text-[11px]
                                     uppercase
-                                    tracking-wider
+                                    tracking-wide
+                                    font-black
+                                    text-gray-400
                                 "
                             >
                                 Tổng sản phẩm
-                            </div>
+                            </p>
 
-                            <div
+                            <p
                                 id="productTotal"
                                 class="
                                     mt-2
@@ -234,7 +255,7 @@
                                 "
                             >
                                 0
-                            </div>
+                            </p>
 
                         </div>
 
@@ -247,24 +268,24 @@
                                 border
                                 border-gray-200
                                 rounded-xl
-                                shadow-sm
                                 p-5
+                                shadow-sm
                             "
                         >
 
-                            <div
+                            <p
                                 class="
-                                    text-xs
-                                    font-bold
-                                    text-gray-500
+                                    text-[11px]
                                     uppercase
-                                    tracking-wider
+                                    tracking-wide
+                                    font-black
+                                    text-gray-400
                                 "
                             >
                                 Còn hàng
-                            </div>
+                            </p>
 
-                            <div
+                            <p
                                 id="productInStock"
                                 class="
                                     mt-2
@@ -274,7 +295,7 @@
                                 "
                             >
                                 0
-                            </div>
+                            </p>
 
                         </div>
 
@@ -287,24 +308,24 @@
                                 border
                                 border-gray-200
                                 rounded-xl
-                                shadow-sm
                                 p-5
+                                shadow-sm
                             "
                         >
 
-                            <div
+                            <p
                                 class="
-                                    text-xs
-                                    font-bold
-                                    text-gray-500
+                                    text-[11px]
                                     uppercase
-                                    tracking-wider
+                                    tracking-wide
+                                    font-black
+                                    text-gray-400
                                 "
                             >
                                 Hết hàng
-                            </div>
+                            </p>
 
-                            <div
+                            <p
                                 id="productOutOfStock"
                                 class="
                                     mt-2
@@ -314,7 +335,7 @@
                                 "
                             >
                                 0
-                            </div>
+                            </p>
 
                         </div>
 
@@ -327,24 +348,24 @@
                                 border
                                 border-gray-200
                                 rounded-xl
-                                shadow-sm
                                 p-5
+                                shadow-sm
                             "
                         >
 
-                            <div
+                            <p
                                 class="
-                                    text-xs
-                                    font-bold
-                                    text-gray-500
+                                    text-[11px]
                                     uppercase
-                                    tracking-wider
+                                    tracking-wide
+                                    font-black
+                                    text-gray-400
                                 "
                             >
                                 Đang giảm giá
-                            </div>
+                            </p>
 
-                            <div
+                            <p
                                 id="productOnSale"
                                 class="
                                     mt-2
@@ -354,16 +375,14 @@
                                 "
                             >
                                 0
-                            </div>
+                            </p>
 
                         </div>
 
                     </div>
 
 
-                    <!-- =================================================
-                         FILTER BAR
-                    ================================================== -->
+                    <!-- FILTER -->
 
                     <div
                         class="
@@ -371,86 +390,58 @@
                             border
                             border-gray-200
                             rounded-xl
-                            shadow-sm
                             p-4
-                            mb-6
+                            mb-5
+                            shadow-sm
                         "
                     >
 
                         <div
                             class="
-                                flex
-                                flex-col
-                                xl:flex-row
+                                grid
+                                grid-cols-1
+                                md:grid-cols-2
+                                xl:grid-cols-4
                                 gap-3
-                                xl:items-center
                             "
                         >
-
 
                             <!-- SEARCH -->
 
                             <div
                                 class="
                                     relative
-                                    flex-1
-                                    min-w-0
                                 "
                             >
-
-                                <svg
-                                    class="
-                                        absolute
-                                        left-3
-                                        top-1/2
-                                        -translate-y-1/2
-                                        w-4
-                                        h-4
-                                        text-gray-400
-                                    "
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
-                                    />
-                                </svg>
 
                                 <input
                                     type="text"
                                     id="searchInput"
-                                    placeholder="Tìm theo tên sản phẩm hoặc mã SKU..."
-                                    autocomplete="off"
                                     class="
                                         w-full
-                                        pl-10
-                                        pr-4
-                                        py-2.5
                                         border
                                         border-gray-300
                                         rounded-lg
+                                        px-3
+                                        py-2.5
                                         text-sm
                                         outline-none
                                         focus:border-kn-blue
                                         focus:ring-2
                                         focus:ring-blue-100
                                     "
+                                    placeholder="Tìm theo tên sản phẩm hoặc mã SKU..."
                                 >
 
                             </div>
 
 
-                            <!-- CATEGORY FILTER -->
+                            <!-- CATEGORY -->
 
                             <select
                                 id="filterCategorySelect"
                                 class="
                                     w-full
-                                    xl:w-56
                                     border
                                     border-gray-300
                                     rounded-lg
@@ -470,13 +461,12 @@
                             </select>
 
 
-                            <!-- INDUSTRY FILTER -->
+                            <!-- INDUSTRY -->
 
                             <select
                                 id="filterIndustrySelect"
                                 class="
                                     w-full
-                                    xl:w-56
                                     border
                                     border-gray-300
                                     rounded-lg
@@ -496,13 +486,12 @@
                             </select>
 
 
-                            <!-- STOCK FILTER -->
+                            <!-- STOCK -->
 
                             <select
                                 id="filterStockSelect"
                                 class="
                                     w-full
-                                    xl:w-48
                                     border
                                     border-gray-300
                                     rounded-lg
@@ -534,9 +523,7 @@
                     </div>
 
 
-                    <!-- =================================================
-                         TABLE
-                    ================================================== -->
+                    <!-- TABLE -->
 
                     <div
                         class="
@@ -549,13 +536,16 @@
                         "
                     >
 
-                        <div class="overflow-x-auto">
+                        <div
+                            class="
+                                overflow-x-auto
+                            "
+                        >
 
                             <table
                                 class="
                                     w-full
-                                    min-w-[1050px]
-                                    text-sm
+                                    min-w-[900px]
                                     text-left
                                 "
                             >
@@ -565,11 +555,6 @@
                                         bg-gray-50
                                         border-b
                                         border-gray-200
-                                        text-xs
-                                        font-bold
-                                        text-gray-500
-                                        uppercase
-                                        tracking-wider
                                     "
                                 >
 
@@ -578,30 +563,36 @@
                                         <th
                                             class="
                                                 px-4
-                                                py-3.5
-                                                w-14
+                                                py-3
+                                                text-[10px]
+                                                font-black
+                                                text-gray-500
                                                 text-center
                                             "
                                         >
-                                            #
+                                            id
                                         </th>
 
                                         <th
                                             class="
                                                 px-4
-                                                py-3.5
-                                                w-20
+                                                py-3
+                                                text-[10px]
+                                                font-black
+                                                text-gray-500
                                                 text-center
                                             "
                                         >
-                                            Ảnh
+                                            ẢNH
                                         </th>
 
                                         <th
                                             class="
                                                 px-4
-                                                py-3.5
-                                                w-32
+                                                py-3
+                                                text-[10px]
+                                                font-black
+                                                text-gray-500
                                             "
                                         >
                                             SKU
@@ -610,53 +601,75 @@
                                         <th
                                             class="
                                                 px-4
-                                                py-3.5
-                                                min-w-[260px]
+                                                py-3
+                                                text-[10px]
+                                                font-black
+                                                text-gray-500
                                             "
                                         >
-                                            Sản phẩm
+                                            SẢN PHẨM
                                         </th>
 
                                         <th
                                             class="
                                                 px-4
-                                                py-3.5
-                                                w-32
+                                                py-3
+                                                text-[10px]
+                                                font-black
+                                                text-gray-500
                                             "
                                         >
-                                            Thương hiệu
+                                            THƯƠNG HIỆU
                                         </th>
 
                                         <th
                                             class="
                                                 px-4
-                                                py-3.5
-                                                w-36
+                                                py-3
+                                                text-[10px]
+                                                font-black
+                                                text-gray-500
                                             "
                                         >
-                                            Giá
+                                            Size
                                         </th>
 
                                         <th
                                             class="
                                                 px-4
-                                                py-3.5
-                                                w-28
+                                                py-3
+                                                text-[10px]
+                                                font-black
+                                                text-gray-500
+                                            "
+                                        >
+                                            GIÁ
+                                        </th>
+
+                                        <th
+                                            class="
+                                                px-4
+                                                py-3
+                                                text-[10px]
+                                                font-black
+                                                text-gray-500
                                                 text-center
                                             "
                                         >
-                                            Tồn kho
+                                            TỒN KHO
                                         </th>
 
                                         <th
                                             class="
                                                 px-4
-                                                py-3.5
-                                                w-32
+                                                py-3
+                                                text-[10px]
+                                                font-black
+                                                text-gray-500
                                                 text-right
                                             "
                                         >
-                                            Thao tác
+                                            THAO TÁC
                                         </th>
 
                                     </tr>
@@ -666,28 +679,7 @@
 
                                 <tbody
                                     id="productTableBody"
-                                    class="
-                                        divide-y
-                                        divide-gray-100
-                                    "
-                                >
-
-                                    <tr>
-
-                                        <td
-                                            colspan="8"
-                                            class="
-                                                text-center
-                                                py-12
-                                                text-gray-400
-                                            "
-                                        >
-                                            Đang tải sản phẩm...
-                                        </td>
-
-                                    </tr>
-
-                                </tbody>
+                                ></tbody>
 
                             </table>
 
@@ -699,184 +691,161 @@
                         <div
                             id="paginationContainer"
                             class="
+                                border-t
+                                border-gray-100
+                                px-4
+                                py-4
                                 flex
                                 flex-col
                                 sm:flex-row
-                                gap-3
-                                sm:gap-0
-                                justify-between
                                 items-center
-                                p-4
-                                border-t
-                                border-gray-100
-                                bg-gray-50/50
+                                justify-between
+                                gap-3
                             "
                         ></div>
 
                     </div>
 
-                </div>
+                </section>
 
 
                 <!-- =================================================
                      PRODUCT FORM
                 ================================================== -->
 
-                <div
+                <section
                     id="productFormView"
-                    class="
-                        hidden
-                        max-w-[1500px]
-                        mx-auto
-                    "
+                    class="hidden"
                 >
+
+
+                    <!-- FORM HEADER -->
 
                     <div
                         class="
-                            bg-white
-                            border
-                            border-gray-200
-                            rounded-2xl
-                            shadow-sm
-                            overflow-hidden
+                            flex
+                            items-center
+                            justify-between
+                            mb-5
                         "
                     >
 
+                        <div>
 
-                        <!-- FORM HEADER -->
+                            <h2
+                                id="formTitle"
+                                class="
+                                    text-xl
+                                    font-black
+                                    text-gray-900
+                                "
+                            >
+                                Nhập Sản Phẩm Mới
+                            </h2>
 
-                        <div
-                            class="
-                                px-6
-                                py-5
-                                border-b
-                                border-gray-200
-                                flex
-                                items-center
-                                justify-between
-                                gap-4
-                            "
-                        >
-
-                            <div>
-
-                                <button
-                                    type="button"
-                                    id="btnBackToProducts"
-                                    class="
-                                        inline-flex
-                                        items-center
-                                        gap-1.5
-                                        text-xs
-                                        font-bold
-                                        text-gray-500
-                                        hover:text-kn-blue
-                                        mb-2
-                                    "
-                                >
-                                    ← Quay lại danh sách
-                                </button>
-
-                                <h2
-                                    id="formTitle"
-                                    class="
-                                        text-xl
-                                        font-black
-                                        text-gray-900
-                                    "
-                                >
-                                    Nhập Sản Phẩm Mới
-                                </h2>
-
-                            </div>
+                            <p
+                                class="
+                                    text-xs
+                                    text-gray-400
+                                    mt-1
+                                "
+                            >
+                                Nhập đầy đủ thông tin sản phẩm và tồn kho.
+                            </p>
 
                         </div>
 
 
-                        <!-- FORM -->
-
-                        <form
-                            id="productForm"
+                        <button
+                            type="button"
+                            id="btnBackToProducts"
                             class="
-                                p-6
-                                space-y-6
+                                px-4
+                                py-2
+                                rounded-lg
+                                bg-white
+                                border
+                                border-gray-300
+                                text-gray-700
+                                text-sm
+                                font-bold
+                                hover:bg-gray-50
+                                transition
+                            "
+                        >
+                            ← Danh sách sản phẩm
+                        </button>
+
+                    </div>
+
+
+                    <!-- FORM -->
+
+                    <form
+                        id="productForm"
+                        class="space-y-5"
+                    >
+
+
+                        <!-- =================================================
+                             1. THÔNG TIN CƠ BẢN
+                        ================================================== -->
+
+                        <div
+                            class="
+                                bg-white
+                                border
+                                border-gray-200
+                                rounded-xl
+                                overflow-hidden
+                                shadow-sm
                             "
                         >
 
-
-                            <!-- =================================================
-                                 1. BASIC
-                            ================================================== -->
-
-                            <section
+                            <div
                                 class="
-                                    rounded-xl
-                                    border
+                                    px-5
+                                    py-4
+                                    border-b
                                     border-gray-200
-                                    overflow-hidden
+                                    bg-gray-50
                                 "
                             >
 
-                                <div
+                                <h3
                                     class="
-                                        px-5
-                                        py-3.5
-                                        bg-gray-50
-                                        border-b
-                                        border-gray-200
-                                        flex
-                                        items-center
-                                        gap-2
+                                        text-sm
+                                        font-black
+                                        text-kn-blue
+                                        uppercase
                                     "
                                 >
+                                    1. Thông tin cơ bản
+                                </h3>
 
-                                    <span
-                                        class="
-                                            w-7
-                                            h-7
-                                            rounded-lg
-                                            bg-blue-50
-                                            text-kn-blue
-                                            flex
-                                            items-center
-                                            justify-center
-                                            text-xs
-                                            font-black
-                                        "
-                                    >
-                                        1
-                                    </span>
+                            </div>
 
-                                    <h3
-                                        class="
-                                            text-sm
-                                            font-black
-                                            text-kn-blue
-                                            uppercase
-                                            tracking-wide
-                                        "
-                                    >
-                                        Thông tin cơ bản
-                                    </h3>
 
-                                </div>
+                            <div
+                                class="
+                                    p-5
+                                    space-y-5
+                                "
+                            >
 
+
+                                <!-- SKU + NAME -->
 
                                 <div
                                     class="
-                                        p-5
                                         grid
                                         grid-cols-1
-                                        md:grid-cols-2
-                                        xl:grid-cols-4
+                                        lg:grid-cols-2
                                         gap-5
                                     "
                                 >
 
-
-                                    <!-- SKU -->
-
-                                    <div class="xl:col-span-2">
+                                    <div>
 
                                         <label
                                             for="sku"
@@ -905,19 +874,19 @@
                                                 py-2.5
                                                 text-sm
                                                 font-mono
+                                                uppercase
                                                 outline-none
                                                 focus:border-kn-blue
                                                 focus:ring-2
                                                 focus:ring-blue-100
                                             "
+                                            placeholder="VD: 3M-6200-M"
                                         >
 
                                     </div>
 
 
-                                    <!-- NAME -->
-
-                                    <div class="xl:col-span-2">
+                                    <div>
 
                                         <label
                                             for="name"
@@ -950,10 +919,25 @@
                                                 focus:ring-2
                                                 focus:ring-blue-100
                                             "
+                                            placeholder="Tên sản phẩm"
                                         >
 
                                     </div>
 
+                                </div>
+
+
+                                <!-- CATEGORY -->
+
+                                <div
+                                    class="
+                                        grid
+                                        grid-cols-1
+                                        md:grid-cols-2
+                                        xl:grid-cols-4
+                                        gap-4
+                                    "
+                                >
 
                                     <!-- CATEGORY -->
 
@@ -986,7 +970,13 @@
                                                 outline-none
                                                 focus:border-kn-blue
                                             "
-                                        ></select>
+                                        >
+
+                                            <option value="">
+                                                -- Chọn danh mục gốc --
+                                            </option>
+
+                                        </select>
 
                                     </div>
 
@@ -1022,7 +1012,13 @@
                                                 outline-none
                                                 focus:border-kn-blue
                                             "
-                                        ></select>
+                                        >
+
+                                            <option value="">
+                                                -- Chọn nhóm hàng --
+                                            </option>
+
+                                        </select>
 
                                     </div>
 
@@ -1058,7 +1054,13 @@
                                                 outline-none
                                                 focus:border-kn-blue
                                             "
-                                        ></select>
+                                        >
+
+                                            <option value="">
+                                                -- Chọn dòng sản phẩm --
+                                            </option>
+
+                                        </select>
 
                                     </div>
 
@@ -1094,14 +1096,31 @@
                                                 outline-none
                                                 focus:border-kn-blue
                                             "
-                                        ></select>
+                                        >
+
+                                            <option value="">
+                                                -- Chọn ngành hàng --
+                                            </option>
+
+                                        </select>
 
                                     </div>
 
+                                </div>
 
-                                    <!-- BRAND -->
 
-                                    <div class="xl:col-span-2">
+                                <!-- BRAND + ORIGIN -->
+
+                                <div
+                                    class="
+                                        grid
+                                        grid-cols-1
+                                        lg:grid-cols-2
+                                        gap-5
+                                    "
+                                >
+
+                                    <div>
 
                                         <label
                                             for="brand_input"
@@ -1120,7 +1139,6 @@
                                             type="text"
                                             id="brand_input"
                                             list="brandList"
-                                            placeholder="Gõ để tìm hoặc thêm mới..."
                                             class="
                                                 w-full
                                                 border
@@ -1131,9 +1149,8 @@
                                                 text-sm
                                                 outline-none
                                                 focus:border-kn-blue
-                                                focus:ring-2
-                                                focus:ring-blue-100
                                             "
+                                            placeholder="Gõ để tìm hoặc thêm mới..."
                                         >
 
                                         <datalist
@@ -1143,9 +1160,7 @@
                                     </div>
 
 
-                                    <!-- ORIGIN -->
-
-                                    <div class="xl:col-span-2">
+                                    <div>
 
                                         <label
                                             for="origin"
@@ -1163,7 +1178,6 @@
                                         <input
                                             type="text"
                                             id="origin"
-                                            placeholder="Japan, Germany, Vietnam..."
                                             class="
                                                 w-full
                                                 border
@@ -1175,76 +1189,65 @@
                                                 outline-none
                                                 focus:border-kn-blue
                                             "
+                                            placeholder="Japan, Germany, Vietnam..."
                                         >
 
                                     </div>
 
                                 </div>
 
-                            </section>
+                            </div>
+
+                        </div>
 
 
-                            <!-- =================================================
-                                 2. PRICE / STOCK
-                            ================================================== -->
+                        <!-- =================================================
+                             2. GIÁ & KHO HÀNG
+                        ================================================== -->
 
-                            <section
+                        <div
+                            class="
+                                bg-white
+                                border
+                                border-gray-200
+                                rounded-xl
+                                overflow-hidden
+                                shadow-sm
+                            "
+                        >
+
+                            <div
                                 class="
-                                    rounded-xl
-                                    border
+                                    px-5
+                                    py-4
+                                    border-b
                                     border-gray-200
-                                    overflow-hidden
+                                    bg-gray-50
+                                "
+                            >
+
+                                <h3
+                                    class="
+                                        text-sm
+                                        font-black
+                                        text-kn-blue
+                                        uppercase
+                                    "
+                                >
+                                    2. Giá & Kho hàng
+                                </h3>
+
+                            </div>
+
+
+                            <div
+                                class="
+                                    p-5
                                 "
                             >
 
                                 <div
                                     class="
-                                        px-5
-                                        py-3.5
-                                        bg-gray-50
-                                        border-b
-                                        border-gray-200
-                                        flex
-                                        items-center
-                                        gap-2
-                                    "
-                                >
-
-                                    <span
-                                        class="
-                                            w-7
-                                            h-7
-                                            rounded-lg
-                                            bg-orange-50
-                                            text-kn-orange
-                                            flex
-                                            items-center
-                                            justify-center
-                                            text-xs
-                                            font-black
-                                        "
-                                    >
-                                        2
-                                    </span>
-
-                                    <h3
-                                        class="
-                                            text-sm
-                                            font-black
-                                            text-kn-blue
-                                            uppercase
-                                            tracking-wide
-                                        "
-                                    >
-                                        Giá cả & Kho hàng
-                                    </h3>
-
-                                </div>
-
-
-                                <div
-                                    class="
-                                        p-5
                                         grid
                                         grid-cols-1
                                         md:grid-cols-2
@@ -1285,6 +1288,8 @@
                                                 text-sm
                                                 outline-none
                                                 focus:border-kn-blue
+                                                focus:ring-2
+                                                focus:ring-blue-100
                                             "
                                             placeholder="0"
                                         >
@@ -1323,9 +1328,68 @@
                                                 text-sm
                                                 outline-none
                                                 focus:border-kn-blue
+                                                focus:ring-2
+                                                focus:ring-blue-100
                                             "
                                             placeholder="0"
                                         >
+
+                                    </div>
+
+
+                                    <!-- =================================================
+                                         SIZE - ĐÃ SỬA
+                                    ================================================== -->
+
+                                    <div>
+
+                                        <label
+                                            for="available_sizes"
+                                            class="
+                                                block
+                                                text-xs
+                                                font-bold
+                                                text-gray-700
+                                                mb-1.5
+                                            "
+                                        >
+                                            Các Size hỗ trợ
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="available_sizes"
+                                            name="available_sizes"
+                                            maxlength="500"
+                                            class="
+                                                w-full
+                                                border
+                                                border-gray-300
+                                                rounded-lg
+                                                px-3
+                                                py-2.5
+                                                text-sm
+                                                text-gray-800
+                                                bg-white
+                                                outline-none
+                                                transition
+                                                focus:border-kn-blue
+                                                focus:ring-2
+                                                focus:ring-blue-100
+                                            "
+                                            placeholder="VD: S, M, L, XL hoặc 39, 40"
+                                            autocomplete="off"
+                                        >
+
+                                        <p
+                                            class="
+                                                mt-1.5
+                                                text-[10px]
+                                                text-gray-400
+                                            "
+                                        >
+                                            Ngăn cách các size bằng dấu phẩy (,)
+                                        </p>
 
                                     </div>
 
@@ -1363,11 +1427,33 @@
                                             "
                                         >
 
-                                            <option value="Cái">Cái</option>
-                                            <option value="Bộ">Bộ</option>
-                                            <option value="Hộp">Hộp</option>
-                                            <option value="Thùng">Thùng</option>
-                                            <option value="Cuộn">Cuộn</option>
+                                            <option value="Cái">
+                                                Cái
+                                            </option>
+
+                                            <option value="Bộ">
+                                                Bộ
+                                            </option>
+
+                                            <option value="Hộp">
+                                                Hộp
+                                            </option>
+
+                                            <option value="Thùng">
+                                                Thùng
+                                            </option>
+
+                                            <option value="Cuộn">
+                                                Cuộn
+                                            </option>
+
+                                            <option value="Mét">
+                                                Mét
+                                            </option>
+
+                                            <option value="Kg">
+                                                Kg
+                                            </option>
 
                                         </select>
 
@@ -1395,6 +1481,7 @@
                                             type="number"
                                             id="stock_quantity"
                                             min="0"
+                                            value="0"
                                             class="
                                                 w-full
                                                 border
@@ -1426,7 +1513,7 @@
                                                 mb-1.5
                                             "
                                         >
-                                            MOQ
+                                            MOQ (Mua tối thiểu)
                                         </label>
 
                                         <input
@@ -1445,6 +1532,7 @@
                                                 outline-none
                                                 focus:border-kn-blue
                                             "
+                                            placeholder="1"
                                         >
 
                                     </div>
@@ -1478,7 +1566,6 @@
                                                 py-2.5
                                                 text-sm
                                                 bg-white
-                                                font-bold
                                                 outline-none
                                                 focus:border-kn-blue
                                             "
@@ -1512,80 +1599,113 @@
 
                                     </div>
 
+
                                 </div>
 
-                            </section>
+                            </div>
+
+                        </div>
 
 
-                            <!-- =================================================
-                                 3. MEDIA
-                            ================================================== -->
+                        <!-- =================================================
+                             3. HÌNH ẢNH & TÀI LIỆU
+                        ================================================== -->
 
-                            <section
+                        <div
+                            class="
+                                bg-white
+                                border
+                                border-gray-200
+                                rounded-xl
+                                overflow-hidden
+                                shadow-sm
+                            "
+                        >
+
+                            <div
                                 class="
-                                    rounded-xl
-                                    border
+                                    px-5
+                                    py-4
+                                    border-b
                                     border-gray-200
-                                    overflow-hidden
+                                    bg-gray-50
                                 "
                             >
 
-                                <div
+                                <h3
                                     class="
-                                        px-5
-                                        py-3.5
-                                        bg-gray-50
-                                        border-b
-                                        border-gray-200
-                                        flex
-                                        items-center
-                                        gap-2
+                                        text-sm
+                                        font-black
+                                        text-kn-blue
+                                        uppercase
                                     "
                                 >
+                                    3. Hình ảnh & Tài liệu
+                                </h3>
 
-                                    <span
+                            </div>
+
+
+                            <div
+                                class="
+                                    p-5
+                                    space-y-5
+                                "
+                            >
+
+
+                                <!-- MAIN IMAGE -->
+
+                                <div>
+
+                                    <label
+                                        for="image_url"
                                         class="
-                                            w-7
-                                            h-7
-                                            rounded-lg
-                                            bg-blue-50
-                                            text-kn-blue
-                                            flex
-                                            items-center
-                                            justify-center
+                                            block
                                             text-xs
-                                            font-black
+                                            font-bold
+                                            text-gray-700
+                                            mb-1.5
                                         "
                                     >
-                                        3
-                                    </span>
+                                        URL ảnh đại diện
+                                    </label>
 
-                                    <h3
+                                    <input
+                                        type="text"
+                                        id="image_url"
                                         class="
+                                            w-full
+                                            border
+                                            border-gray-300
+                                            rounded-lg
+                                            px-3
+                                            py-2.5
                                             text-sm
-                                            font-black
-                                            text-kn-blue
-                                            uppercase
-                                            tracking-wide
+                                            outline-none
+                                            focus:border-kn-blue
                                         "
+                                        placeholder="https://..."
                                     >
-                                        Hình ảnh & Tài liệu
-                                    </h3>
 
                                 </div>
 
 
+                                <!-- EXTRA + DATASHEET -->
+
                                 <div
                                     class="
-                                        p-5
-                                        space-y-5
+                                        grid
+                                        grid-cols-1
+                                        lg:grid-cols-2
+                                        gap-5
                                     "
                                 >
 
                                     <div>
 
                                         <label
-                                            for="image_url"
+                                            for="inExtraImages"
                                             class="
                                                 block
                                                 text-xs
@@ -1594,13 +1714,48 @@
                                                 mb-1.5
                                             "
                                         >
-                                            URL ảnh đại diện
+                                            Link ảnh phụ
+                                        </label>
+
+                                        <textarea
+                                            id="inExtraImages"
+                                            rows="5"
+                                            class="
+                                                w-full
+                                                border
+                                                border-gray-300
+                                                rounded-lg
+                                                px-3
+                                                py-2.5
+                                                text-sm
+                                                outline-none
+                                                resize-none
+                                                focus:border-kn-blue
+                                            "
+                                            placeholder="Mỗi link một dòng..."
+                                        ></textarea>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <label
+                                            for="inDatasheet"
+                                            class="
+                                                block
+                                                text-xs
+                                                font-bold
+                                                text-gray-700
+                                                mb-1.5
+                                            "
+                                        >
+                                            Link Datasheet (PDF)
                                         </label>
 
                                         <input
                                             type="text"
-                                            id="image_url"
-                                            placeholder="https://..."
+                                            id="inDatasheet"
                                             class="
                                                 w-full
                                                 border
@@ -1612,168 +1767,126 @@
                                                 outline-none
                                                 focus:border-kn-blue
                                             "
+                                            placeholder="https://..."
                                         >
 
                                     </div>
 
-
-                                    <div
-                                        class="
-                                            grid
-                                            grid-cols-1
-                                            lg:grid-cols-2
-                                            gap-5
-                                        "
-                                    >
-
-                                        <div>
-
-                                            <label
-                                                for="inExtraImages"
-                                                class="
-                                                    block
-                                                    text-xs
-                                                    font-bold
-                                                    text-gray-700
-                                                    mb-1.5
-                                                "
-                                            >
-                                                Link ảnh phụ
-                                            </label>
-
-                                            <textarea
-                                                id="inExtraImages"
-                                                rows="5"
-                                                class="
-                                                    w-full
-                                                    border
-                                                    border-gray-300
-                                                    rounded-lg
-                                                    px-3
-                                                    py-2.5
-                                                    text-sm
-                                                    outline-none
-                                                    resize-none
-                                                    focus:border-kn-blue
-                                                "
-                                                placeholder="Mỗi link một dòng..."
-                                            ></textarea>
-
-                                        </div>
-
-
-                                        <div>
-
-                                            <label
-                                                for="inDatasheet"
-                                                class="
-                                                    block
-                                                    text-xs
-                                                    font-bold
-                                                    text-gray-700
-                                                    mb-1.5
-                                                "
-                                            >
-                                                Link Datasheet PDF
-                                            </label>
-
-                                            <input
-                                                type="text"
-                                                id="inDatasheet"
-                                                placeholder="https://..."
-                                                class="
-                                                    w-full
-                                                    border
-                                                    border-gray-300
-                                                    rounded-lg
-                                                    px-3
-                                                    py-2.5
-                                                    text-sm
-                                                    outline-none
-                                                    focus:border-kn-blue
-                                                "
-                                            >
-
-                                        </div>
-
-                                    </div>
-
                                 </div>
 
-                            </section>
+                            </div>
+
+                        </div>
 
 
-                            <!-- =================================================
-                                 4. CONTENT
-                            ================================================== -->
+                        <!-- =================================================
+                             4. NỘI DUNG SẢN PHẨM
+                        ================================================== -->
 
-                            <section
+                        <div
+                            class="
+                                bg-white
+                                border
+                                border-gray-200
+                                rounded-xl
+                                overflow-hidden
+                                shadow-sm
+                            "
+                        >
+
+                            <div
                                 class="
-                                    rounded-xl
-                                    border
+                                    px-5
+                                    py-4
+                                    border-b
                                     border-gray-200
-                                    overflow-hidden
+                                    bg-gray-50
                                 "
                             >
 
-                                <div
+                                <h3
                                     class="
-                                        px-5
-                                        py-3.5
-                                        bg-gray-50
-                                        border-b
-                                        border-gray-200
-                                        flex
-                                        items-center
-                                        gap-2
+                                        text-sm
+                                        font-black
+                                        text-kn-blue
+                                        uppercase
                                     "
                                 >
+                                    4. Nội dung sản phẩm
+                                </h3>
 
-                                    <span
+                            </div>
+
+
+                            <div
+                                class="
+                                    p-5
+                                    space-y-5
+                                "
+                            >
+
+
+                                <!-- SHORT DESCRIPTION -->
+
+                                <div>
+
+                                    <label
+                                        for="short_description"
                                         class="
-                                            w-7
-                                            h-7
-                                            rounded-lg
-                                            bg-orange-50
-                                            text-kn-orange
-                                            flex
-                                            items-center
-                                            justify-center
+                                            block
                                             text-xs
-                                            font-black
+                                            font-bold
+                                            text-gray-700
+                                            mb-1.5
                                         "
                                     >
-                                        4
-                                    </span>
+                                        Mô tả ngắn
+                                        <span
+                                            class="
+                                                text-gray-400
+                                                font-normal
+                                            "
+                                        >
+                                            (SEO & Top hiển thị)
+                                        </span>
+                                    </label>
 
-                                    <h3
+                                    <textarea
+                                        id="short_description"
+                                        rows="3"
                                         class="
+                                            w-full
+                                            border
+                                            border-gray-300
+                                            rounded-lg
+                                            px-3
+                                            py-2.5
                                             text-sm
-                                            font-black
-                                            text-kn-blue
-                                            uppercase
-                                            tracking-wide
+                                            outline-none
+                                            resize-none
+                                            focus:border-kn-blue
                                         "
-                                    >
-                                        Nội dung sản phẩm
-                                    </h3>
+                                        placeholder="Tóm tắt đặc điểm sản phẩm..."
+                                    ></textarea>
 
                                 </div>
 
 
+                                <!-- SPECS + DESCRIPTION -->
+
                                 <div
                                     class="
-                                        p-5
-                                        space-y-5
+                                        grid
+                                        grid-cols-1
+                                        lg:grid-cols-2
+                                        gap-5
                                     "
                                 >
-
-                                    <!-- SHORT DESCRIPTION -->
 
                                     <div>
 
                                         <label
-                                            for="short_description"
+                                            for="specifications"
                                             class="
                                                 block
                                                 text-xs
@@ -1782,12 +1895,49 @@
                                                 mb-1.5
                                             "
                                         >
-                                            Mô tả ngắn
+                                            Thông số kỹ thuật chi tiết
                                         </label>
 
                                         <textarea
-                                            id="short_description"
-                                            rows="3"
+                                            id="specifications"
+                                            rows="7"
+                                            class="
+                                                w-full
+                                                border
+                                                border-gray-300
+                                                rounded-lg
+                                                px-3
+                                                py-2.5
+                                                text-sm
+                                                font-mono
+                                                outline-none
+                                                resize-y
+                                                focus:border-kn-blue
+                                            "
+                                            placeholder="Nhập cấu hình, kích thước..."
+                                        ></textarea>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <label
+                                            for="description"
+                                            class="
+                                                block
+                                                text-xs
+                                                font-bold
+                                                text-gray-700
+                                                mb-1.5
+                                            "
+                                        >
+                                            Mô tả sản phẩm
+                                        </label>
+
+                                        <textarea
+                                            id="description"
+                                            rows="7"
                                             class="
                                                 w-full
                                                 border
@@ -1800,165 +1950,75 @@
                                                 resize-y
                                                 focus:border-kn-blue
                                             "
-                                            placeholder="Tóm tắt đặc điểm sản phẩm..."
+                                            placeholder="Nhập bài giới thiệu sản phẩm..."
                                         ></textarea>
-
-                                    </div>
-
-
-                                    <div
-                                        class="
-                                            grid
-                                            grid-cols-1
-                                            lg:grid-cols-2
-                                            gap-5
-                                        "
-                                    >
-
-                                        <!-- SPECS -->
-
-                                        <div>
-
-                                            <label
-                                                for="specifications"
-                                                class="
-                                                    block
-                                                    text-xs
-                                                    font-bold
-                                                    text-gray-700
-                                                    mb-1.5
-                                                "
-                                            >
-                                                Thông số kỹ thuật
-                                            </label>
-
-                                            <textarea
-                                                id="specifications"
-                                                rows="7"
-                                                class="
-                                                    w-full
-                                                    border
-                                                    border-gray-300
-                                                    rounded-lg
-                                                    px-3
-                                                    py-2.5
-                                                    text-sm
-                                                    font-mono
-                                                    outline-none
-                                                    resize-y
-                                                    focus:border-kn-blue
-                                                "
-                                                placeholder="Nhập cấu hình, kích thước..."
-                                            ></textarea>
-
-                                        </div>
-
-
-                                        <!-- DESCRIPTION -->
-
-                                        <div>
-
-                                            <label
-                                                for="description"
-                                                class="
-                                                    block
-                                                    text-xs
-                                                    font-bold
-                                                    text-gray-700
-                                                    mb-1.5
-                                                "
-                                            >
-                                                Mô tả sản phẩm
-                                            </label>
-
-                                            <textarea
-                                                id="description"
-                                                rows="7"
-                                                class="
-                                                    w-full
-                                                    border
-                                                    border-gray-300
-                                                    rounded-lg
-                                                    px-3
-                                                    py-2.5
-                                                    text-sm
-                                                    outline-none
-                                                    resize-y
-                                                    focus:border-kn-blue
-                                                "
-                                            ></textarea>
-
-                                        </div>
 
                                     </div>
 
                                 </div>
 
-                            </section>
-
-
-                            <!-- =================================================
-                                 ACTIONS
-                            ================================================== -->
-
-                            <div
-                                class="
-                                    sticky
-                                    bottom-0
-                                    bg-white
-                                    border-t
-                                    border-gray-200
-                                    pt-4
-                                    pb-1
-                                    flex
-                                    justify-end
-                                    gap-3
-                                "
-                            >
-
-                                <button
-                                    type="button"
-                                    id="btnCancelForm"
-                                    class="
-                                        px-5
-                                        py-2.5
-                                        rounded-lg
-                                        bg-gray-100
-                                        hover:bg-gray-200
-                                        text-gray-700
-                                        font-bold
-                                        text-sm
-                                    "
-                                >
-                                    Hủy
-                                </button>
-
-
-                                <button
-                                    type="submit"
-                                    id="btnSubmit"
-                                    class="
-                                        px-7
-                                        py-2.5
-                                        rounded-lg
-                                        bg-kn-blue
-                                        hover:bg-blue-800
-                                        text-white
-                                        font-bold
-                                        text-sm
-                                        shadow-sm
-                                    "
-                                >
-                                    Nhập kho sản phẩm
-                                </button>
-
                             </div>
 
-                        </form>
+                        </div>
 
-                    </div>
 
-                </div>
+                        <!-- ACTIONS -->
+
+                        <div
+                            class="
+                                flex
+                                justify-end
+                                gap-3
+                                pb-5
+                            "
+                        >
+
+                            <button
+                                type="button"
+                                id="btnCancelForm"
+                                class="
+                                    px-5
+                                    py-2.5
+                                    border
+                                    border-gray-300
+                                    text-gray-700
+                                    rounded-lg
+                                    font-bold
+                                    text-sm
+                                    hover:bg-gray-100
+                                    transition
+                                "
+                            >
+                                Hủy bỏ
+                            </button>
+
+
+                            <button
+                                type="submit"
+                                id="btnSubmit"
+                                class="
+                                    px-8
+                                    py-2.5
+                                    bg-kn-blue
+                                    text-white
+                                    rounded-lg
+                                    font-bold
+                                    text-sm
+                                    hover:bg-blue-800
+                                    transition
+                                    shadow-md
+                                "
+                            >
+                                Nhập kho sản phẩm
+                            </button>
+
+                        </div>
+
+
+                    </form>
+
+                </section>
+
 
             </main>
 
@@ -1984,6 +2044,7 @@
     <script src="../assets/js/services/productService.js"></script>
 
     <script src="../assets/js/admin/admin-products.js"></script>
+
 
 </body>
 

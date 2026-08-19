@@ -565,3 +565,83 @@
     .profile-layout-grid { display:block; width:100%; }
     .order-detail-card { border:0; box-shadow:none; }
 }
+
+/* =========================================================
+   ORDER ITEM SIZE
+   Đồng bộ Size với Product Detail / Cart / Checkout
+========================================================= */
+
+.order-item-size {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    margin-top: 6px;
+
+    color: #6b7280;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    line-height: 1.4;
+}
+
+
+.order-item-size strong {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 28px;
+
+    min-height: 22px;
+
+    padding: 2px 7px;
+
+    border: 1px solid #fed7aa;
+
+    border-radius: 5px;
+
+    background: #fff7ed;
+
+    color: #ea580c;
+
+    font-size: 10px;
+
+    font-weight: 900;
+}
+
+
+/* =========================================================
+   MOBILE TABLE
+========================================================= */
+
+.order-items-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+
+.order-items-table {
+    min-width: 760px;
+}
+
+
+/* =========================================================
+   SIZE COLUMN
+========================================================= */
+
+.order-items-table th:nth-child(3),
+.order-items-table td:nth-child(3) {
+    text-align: center;
+
+    white-space: nowrap;
+}

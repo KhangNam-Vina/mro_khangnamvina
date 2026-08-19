@@ -123,13 +123,14 @@ async function loadBestSellers(filterKeyword = 'ALL') {
     `;
 
     try {
-        let query = supabaseClient
+        let query = window.supabaseClient
             .from('products')
             .select('*, brands(name)')
             .order('created_at', { ascending: false });
 
+        // ĐÃ FIX: Lọc chính xác theo category_id thay vì tìm trong tên sản phẩm
         if (filterKeyword !== 'ALL') {
-            query = query.ilike('name', `%${filterKeyword}%`);
+            query = query.eq('category_id', filterKeyword);
         }
 
         const { data, error } = await query.limit(8);

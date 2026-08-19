@@ -464,6 +464,7 @@ async function loadOrderItems() {
                 product_id,
                 product_name,
                 sku,
+                size,
                 unit_price,
                 quantity,
                 subtotal
@@ -721,7 +722,7 @@ function renderItems() {
             <tr>
 
                 <td
-                    colspan="5"
+                    colspan="6"
                     class="
                         p-10
                         text-center
@@ -741,12 +742,25 @@ function renderItems() {
     orderDetailDOM.itemsBody.innerHTML =
         items
             .map(
-                (item) => {
+                item => {
+
+                    const size =
+                        item.size !== undefined &&
+                        item.size !== null
+                            ? String(
+                                item.size
+                            ).trim()
+                            : "";
+
 
                     return `
                         <tr>
 
-                            <td class="p-4">
+                            <!-- SẢN PHẨM -->
+
+                            <td
+                                class="p-4"
+                            >
 
                                 <p
                                     class="
@@ -755,9 +769,11 @@ function renderItems() {
                                     "
                                 >
                                     ${escapeOrderDetailHTML(
-                                        item.product_name
+                                        item.product_name ||
+                                        "Sản phẩm"
                                     )}
                                 </p>
+
 
                                 <p
                                     class="
@@ -768,12 +784,15 @@ function renderItems() {
                                 >
                                     Product ID:
                                     ${escapeOrderDetailHTML(
-                                        item.product_id
+                                        item.product_id ||
+                                        "-"
                                     )}
                                 </p>
 
                             </td>
 
+
+                            <!-- SKU -->
 
                             <td
                                 class="
@@ -782,14 +801,62 @@ function renderItems() {
                                     text-gray-500
                                 "
                             >
-                                ${
-                                    escapeOrderDetailHTML(
-                                        item.sku ||
-                                        "-"
-                                    )
-                                }
+
+                                ${escapeOrderDetailHTML(
+                                    item.sku ||
+                                    "-"
+                                )}
+
                             </td>
 
+
+                            <!-- SIZE -->
+
+                            <td
+                                class="
+                                    p-4
+                                    text-center
+                                "
+                            >
+
+                                ${
+                                    size
+                                        ? `
+                                            <span
+                                                class="
+                                                    inline-flex
+                                                    items-center
+                                                    justify-center
+                                                    min-w-[32px]
+                                                    px-2
+                                                    py-1
+                                                    rounded
+                                                    border
+                                                    border-orange-200
+                                                    bg-orange-50
+                                                    text-orange-600
+                                                    text-xs
+                                                    font-black
+                                                "
+                                            >
+                                                ${escapeOrderDetailHTML(
+                                                    size
+                                                )}
+                                            </span>
+                                        `
+                                        : `
+                                            <span
+                                                class="text-gray-400"
+                                            >
+                                                -
+                                            </span>
+                                        `
+                                }
+
+                            </td>
+
+
+                            <!-- ĐƠN GIÁ -->
 
                             <td
                                 class="
@@ -799,15 +866,17 @@ function renderItems() {
                                     whitespace-nowrap
                                 "
                             >
-                                ${
-                                    escapeOrderDetailHTML(
-                                        formatOrderDetailMoney(
-                                            item.unit_price
-                                        )
+
+                                ${escapeOrderDetailHTML(
+                                    formatOrderDetailMoney(
+                                        item.unit_price
                                     )
-                                }
+                                )}
+
                             </td>
 
+
+                            <!-- SỐ LƯỢNG -->
 
                             <td
                                 class="
@@ -816,13 +885,15 @@ function renderItems() {
                                     font-bold
                                 "
                             >
-                                ${
-                                    escapeOrderDetailHTML(
-                                        item.quantity
-                                    )
-                                }
+
+                                ${escapeOrderDetailHTML(
+                                    item.quantity
+                                )}
+
                             </td>
 
+
+                            <!-- THÀNH TIỀN -->
 
                             <td
                                 class="
@@ -832,13 +903,13 @@ function renderItems() {
                                     whitespace-nowrap
                                 "
                             >
-                                ${
-                                    escapeOrderDetailHTML(
-                                        formatOrderDetailMoney(
-                                            item.subtotal
-                                        )
+
+                                ${escapeOrderDetailHTML(
+                                    formatOrderDetailMoney(
+                                        item.subtotal
                                     )
-                                }
+                                )}
+
                             </td>
 
                         </tr>

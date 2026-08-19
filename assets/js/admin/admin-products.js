@@ -1,37 +1,43 @@
 /* =========================================================
-   ADMIN PRODUCTS
-   QUẢN LÝ SẢN PHẨM
+   FILE: assets/js/admin/admin-products.js
 
+   QUẢN LÝ SẢN PHẨM
+   ---------------------------------------------------------
    DATABASE CONTRACT - KHÔNG THAY ĐỔI
 
    products:
-   sku
-   name
-   category_id
-   sub_category_id
-   family_id
-   industry_id
-   brand_id
-   origin
-   price
-   discount_price
-   unit
-   stock_quantity
-   min_order_quantity
-   badge
-   image_url
-   images
-   datasheet_url
-   short_description
-   specifications
-   description
+   - sku
+   - name
+   - category_id
+   - sub_category_id
+   - family_id
+   - industry_id
+   - brand_id
+   - origin
+   - price
+   - discount_price
+   - unit
+   - stock_quantity
+   - min_order_quantity
+   - badge
+   - image_url
+   - images
+   - datasheet_url
+   - short_description
+   - specifications
+   - description
+   - available_sizes
+   - size
 
    Brand:
    - Nếu brand tồn tại -> dùng brand_id
    - Nếu chưa tồn tại -> tạo brands trước
    - Sau đó lưu brand_id vào products
 
-   Chỉ chuẩn hóa UI / event / pagination / search.
+   Size:
+   - available_sizes là nguồn chính
+   - size là fallback cho dữ liệu cũ
+   - Không thay đổi cấu trúc database
 ========================================================= */
 
 
@@ -200,9 +206,7 @@ const DOM = {
    HELPERS
 ========================================================= */
 
-function escapeHTML(
-    value
-) {
+function escapeHTML(value) {
 
     if (
         value === null ||
@@ -213,21 +217,14 @@ function escapeHTML(
 
     }
 
-
-    return String(
-        value
-    ).replace(
+    return String(value).replace(
         /[&<>'"]/g,
         character => ({
 
             "&": "&amp;",
-
             "<": "&lt;",
-
             ">": "&gt;",
-
             "'": "&#39;",
-
             '"': "&quot;"
 
         })[character]
@@ -236,26 +233,17 @@ function escapeHTML(
 }
 
 
-function escapeAttribute(
-    value
-) {
+function escapeAttribute(value) {
 
-    return escapeHTML(
-        value
-    );
+    return escapeHTML(value);
 
 }
 
 
-function formatCurrency(
-    value
-) {
+function formatCurrency(value) {
 
     const number =
-        Number(
-            value
-        );
-
+        Number(value);
 
     if (
         !number
@@ -265,12 +253,214 @@ function formatCurrency(
 
     }
 
-
     return new Intl.NumberFormat(
         "vi-VN"
-    ).format(
-        number
-    ) + " đ";
+    ).format(number) + " đ";
+
+}
+
+
+/* =========================================================
+   FORMAT SIZE
+   ---------------------------------------------------------
+   available_sizes:
+       ["S", "M", "L"]
+
+   hoặc:
+
+       "S,M,L"
+
+   fallback:
+
+       size = "S"
+
+   => render:
+       S M L
+========================================================= */
+
+function normalizeProductSizes(product) {
+
+    if (!product) {
+
+        return [];
+
+    }
+
+
+    let sizes =
+        product.available_sizes;
+
+
+    /*
+       JSONB bình thường:
+       ["S", "M", "L"]
+    */
+
+    if (
+        Array.isArray(sizes)
+    ) {
+
+        sizes =
+            sizes
+                .map(
+                    size =>
+                        String(size)
+                            .trim()
+                )
+                .filter(Boolean);
+
+    }
+
+
+    /*
+       Trường hợp dữ liệu trả về dạng string:
+       "S,M,L"
+    */
+
+    else if (
+        typeof sizes === "string"
+    ) {
+
+        sizes =
+            sizes
+                .split(",")
+                .map(
+                    size =>
+                        size.trim()
+                )
+                .filter(Boolean);
+
+    }
+
+
+    else {
+
+        sizes = [];
+
+    }
+
+
+    /*
+       Fallback dữ liệu cũ:
+       size = "S"
+       hoặc:
+       size = "S,M,L"
+    */
+
+    if (
+        sizes.length === 0 &&
+        product.size !== null &&
+        product.size !== undefined &&
+        String(product.size).trim()
+    ) {
+
+        sizes =
+            String(product.size)
+                .split(",")
+                .map(
+                    size =>
+                        size.trim()
+                )
+                .filter(Boolean);
+
+    }
+
+
+    /*
+       Loại bỏ size trùng
+    */
+
+    sizes =
+        [
+            ...new Set(
+                sizes
+            )
+        ];
+
+
+    return sizes;
+
+}
+
+
+function renderProductSizes(product) {
+
+    const sizes =
+        normalizeProductSizes(
+            product
+        );
+
+
+    if (
+        sizes.length === 0
+    ) {
+
+        return `
+
+            <span
+                class="
+                    text-xs
+                    text-gray-400
+                    italic
+                "
+            >
+                —
+            </span>
+
+        `;
+
+    }
+
+
+    return `
+
+        <div
+            class="
+                flex
+                flex-wrap
+                items-center
+                gap-1
+                max-w-[180px]
+            "
+        >
+
+            ${
+                sizes
+                    .map(
+                        size => `
+
+                            <span
+                                class="
+                                    inline-flex
+                                    items-center
+                                    justify-center
+                                    min-w-[28px]
+                                    px-2
+                                    py-1
+                                    rounded-md
+                                    bg-blue-50
+                                    border
+                                    border-blue-100
+                                    text-kn-blue
+                                    text-[10px]
+                                    font-black
+                                    leading-none
+                                "
+                                title="Size ${escapeAttribute(
+                                    size
+                                )}"
+                            >
+                                ${escapeHTML(size)}
+                            </span>
+
+                        `
+                    )
+                    .join("")
+            }
+
+        </div>
+
+    `;
 
 }
 
@@ -310,10 +500,14 @@ function initCKEditor() {
     }
 
 
-    if (
-        !document.getElementById(
+    const description =
+        document.getElementById(
             "description"
-        )
+        );
+
+
+    if (
+        !description
     ) {
 
         return;
@@ -377,6 +571,7 @@ async function loadAllDropdowns() {
                         }
                     ),
 
+
                 window.supabaseClient
 
                     .from(
@@ -393,6 +588,7 @@ async function loadAllDropdowns() {
                             ascending: true
                         }
                     ),
+
 
                 window.supabaseClient
 
@@ -411,6 +607,7 @@ async function loadAllDropdowns() {
                         }
                     ),
 
+
                 window.supabaseClient
 
                     .from(
@@ -427,6 +624,7 @@ async function loadAllDropdowns() {
                             ascending: true
                         }
                     ),
+
 
                 window.supabaseClient
 
@@ -494,28 +692,23 @@ async function loadAllDropdowns() {
 
 
         state.categories =
-            categoryResult.data ||
-            [];
+            categoryResult.data || [];
 
 
         state.subCategories =
-            subCategoryResult.data ||
-            [];
+            subCategoryResult.data || [];
 
 
         state.families =
-            familyResult.data ||
-            [];
+            familyResult.data || [];
 
 
         state.industries =
-            industryResult.data ||
-            [];
+            industryResult.data || [];
 
 
         state.brands =
-            brandResult.data ||
-            [];
+            brandResult.data || [];
 
 
         populateSelect(
@@ -547,7 +740,6 @@ async function loadAllDropdowns() {
 
 
         resetCatalogDropdowns();
-
 
         refreshBrandDatalist();
 
@@ -605,9 +797,13 @@ function populateSelect(
                     item => `
 
                         <option
-                            value="${escapeAttribute(item.id)}"
+                            value="${escapeAttribute(
+                                item.id
+                            )}"
                         >
-                            ${escapeHTML(item.name)}
+                            ${escapeHTML(
+                                item.name
+                            )}
                         </option>
 
                     `
@@ -955,7 +1151,7 @@ async function fetchProducts() {
             <tr>
 
                 <td
-                    colspan="8"
+                    colspan="9"
                     class="
                         text-center
                         py-12
@@ -996,12 +1192,21 @@ async function fetchProducts() {
 
 function renderTableLoading() {
 
+    if (
+        !DOM.tableBody
+    ) {
+
+        return;
+
+    }
+
+
     DOM.tableBody.innerHTML = `
 
         <tr>
 
             <td
-                colspan="8"
+                colspan="9"
                 class="
                     text-center
                     py-12
@@ -1041,11 +1246,6 @@ function renderTableLoading() {
 
 async function updateStatistics() {
 
-    /*
-       Không thay đổi cách lưu database.
-       Đây chỉ là thống kê phục vụ UI.
-    */
-
     if (
         DOM.total
     ) {
@@ -1055,12 +1255,6 @@ async function updateStatistics() {
 
     }
 
-
-    /*
-       Các số liệu bên dưới lấy từ page hiện tại.
-       Không fetch thêm toàn bộ products để tránh
-       làm trang admin nặng hơn.
-    */
 
     const inStock =
         state.products.filter(
@@ -1162,7 +1356,7 @@ function renderProducts() {
             <tr>
 
                 <td
-                    colspan="8"
+                    colspan="9"
                     class="
                         text-center
                         py-14
@@ -1185,17 +1379,20 @@ function renderProducts() {
                     >
 
                         <svg
+                            xmlns="http://www.w3.org/2000/svg"
                             class="w-6 h-6 text-gray-400"
                             fill="none"
-                            stroke="currentColor"
                             viewBox="0 0 24 24"
+                            stroke="currentColor"
                         >
+
                             <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
-                                stroke-width="1.7"
-                                d="M20 13V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7m16 0v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5m16 0H4"
+                                stroke-width="2"
+                                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0l-8 5-8-5m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5"
                             />
+
                         </svg>
 
                     </div>
@@ -1207,17 +1404,17 @@ function renderProducts() {
                             text-gray-500
                         "
                     >
-                        Không tìm thấy sản phẩm
+                        Không tìm thấy sản phẩm.
                     </div>
-
 
                     <div
                         class="
                             text-xs
+                            text-gray-400
                             mt-1
                         "
                     >
-                        Thử thay đổi bộ lọc hoặc từ khóa.
+                        Thử thay đổi từ khóa hoặc bộ lọc.
                     </div>
 
                 </td>
@@ -1240,6 +1437,7 @@ function renderProducts() {
 
     DOM.tableBody.innerHTML =
         state.products
+
             .map(
                 (
                     item,
@@ -1251,138 +1449,96 @@ function renderProducts() {
                         "OEM";
 
 
-                    const stock =
-                        Number(
-                            item.stock_quantity
-                        ) || 0;
+                    const imgObj =
+                        item.image_url
+
+                            ? `
+
+                                <img
+                                    src="${escapeAttribute(
+                                        item.image_url
+                                    )}"
+                                    alt="${escapeAttribute(
+                                        item.name
+                                    )}"
+                                    class="
+                                        w-10
+                                        h-10
+                                        object-contain
+                                        mx-auto
+                                        border
+                                        border-gray-200
+                                        rounded
+                                        bg-white
+                                    "
+                                    loading="lazy"
+                                >
+
+                            `
+
+                            : `
+
+                                <div
+                                    class="
+                                        w-10
+                                        h-10
+                                        bg-gray-100
+                                        border
+                                        border-gray-200
+                                        rounded
+                                        flex
+                                        items-center
+                                        justify-center
+                                        text-[10px]
+                                        text-gray-400
+                                        mx-auto
+                                    "
+                                >
+                                    No Img
+                                </div>
+
+                            `;
 
 
-                    const hasDiscount =
+                    const priceHTML =
+                        item.discount_price &&
                         Number(
                             item.discount_price
-                        ) > 0 &&
-                        Number(
-                            item.price
                         ) > 0 &&
                         Number(
                             item.discount_price
                         ) <
                         Number(
                             item.price
-                        );
-
-
-                    const imageHTML =
-                        item.image_url
-
-                            ? `
-                                <div
-                                    class="
-                                        w-11
-                                        h-11
-                                        mx-auto
-                                        rounded-lg
-                                        border
-                                        border-gray-200
-                                        bg-white
-                                        overflow-hidden
-                                        flex
-                                        items-center
-                                        justify-center
-                                    "
-                                >
-
-                                    <img
-                                        src="${escapeAttribute(
-                                            item.image_url
-                                        )}"
-                                        alt="${escapeAttribute(
-                                            item.name
-                                        )}"
-                                        class="
-                                            w-full
-                                            h-full
-                                            object-contain
-                                        "
-                                        loading="lazy"
-                                        onerror="
-                                            this.style.display='none';
-                                            this.nextElementSibling.classList.remove('hidden');
-                                        "
-                                    >
-
-                                    <span
-                                        class="
-                                            hidden
-                                            text-[9px]
-                                            text-gray-400
-                                            font-bold
-                                        "
-                                    >
-                                        IMG
-                                    </span>
-
-                                </div>
-                            `
-
-                            : `
-                                <div
-                                    class="
-                                        w-11
-                                        h-11
-                                        mx-auto
-                                        rounded-lg
-                                        bg-gray-100
-                                        border
-                                        border-gray-200
-                                        flex
-                                        items-center
-                                        justify-center
-                                        text-[9px]
-                                        font-bold
-                                        text-gray-400
-                                    "
-                                >
-                                    No Img
-                                </div>
-                            `;
-
-
-                    const priceHTML =
-                        hasDiscount
+                        )
 
                             ? `
 
-                                <div
-                                    class="
-                                        flex
-                                        flex-col
-                                    "
-                                >
+                                <div>
 
-                                    <span
+                                    <div
                                         class="
-                                            text-[11px]
-                                            text-gray-400
-                                            line-through
-                                        "
-                                    >
-                                        ${formatCurrency(
-                                            item.price
-                                        )}
-                                    </span>
-
-                                    <span
-                                        class="
-                                            text-sm
                                             font-black
-                                            text-red-500
+                                            text-kn-orange
                                         "
                                     >
                                         ${formatCurrency(
                                             item.discount_price
                                         )}
-                                    </span>
+                                    </div>
+
+                                    <div
+                                        class="
+                                            text-[10px]
+                                            text-gray-400
+                                            line-through
+                                            mt-0.5
+                                        "
+                                    >
+                                        ${formatCurrency(
+                                            item.price
+                                        )}
+                                    </div>
 
                                 </div>
 
@@ -1392,9 +1548,8 @@ function renderProducts() {
 
                                 <span
                                     class="
-                                        text-sm
-                                        font-black
-                                        text-kn-orange
+                                        font-bold
+                                        text-gray-800
                                     "
                                 >
                                     ${formatCurrency(
@@ -1405,15 +1560,22 @@ function renderProducts() {
                             `;
 
 
+                    const stock =
+                        Number(
+                            item.stock_quantity
+                        ) || 0;
+
+
                     const stockHTML =
                         stock > 0
 
                             ? `
+
                                 <span
                                     class="
                                         inline-flex
                                         items-center
-                                        gap-1.5
+                                        gap-1
                                         px-2.5
                                         py-1.5
                                         rounded-lg
@@ -1422,7 +1584,7 @@ function renderProducts() {
                                         border-green-100
                                         text-green-700
                                         text-xs
-                                        font-bold
+                                        font-black
                                     "
                                 >
 
@@ -1438,14 +1600,16 @@ function renderProducts() {
                                     ${stock}
 
                                 </span>
+
                             `
 
                             : `
+
                                 <span
                                     class="
                                         inline-flex
                                         items-center
-                                        gap-1.5
+                                        gap-1
                                         px-2.5
                                         py-1.5
                                         rounded-lg
@@ -1454,70 +1618,54 @@ function renderProducts() {
                                         border-red-100
                                         text-red-600
                                         text-xs
-                                        font-bold
+                                        font-black
                                     "
                                 >
+
+                                    <span
+                                        class="
+                                            w-1.5
+                                            h-1.5
+                                            rounded-full
+                                            bg-red-500
+                                        "
+                                    ></span>
 
                                     Hết hàng
 
                                 </span>
+
                             `;
-
-
-                    const badgeHTML =
-                        item.badge
-
-                            ? `
-                                <span
-                                    class="
-                                        inline-flex
-                                        px-2
-                                        py-0.5
-                                        rounded
-                                        bg-orange-50
-                                        border
-                                        border-orange-100
-                                        text-orange-600
-                                        text-[9px]
-                                        font-black
-                                        uppercase
-                                        mt-1.5
-                                    "
-                                >
-                                    ${escapeHTML(
-                                        item.badge
-                                    )}
-                                </span>
-                            `
-
-                            : "";
 
 
                     return `
 
                         <tr
                             class="
-                                group
-                                hover:bg-blue-50/40
-                                transition-colors
+                                border-b
+                                border-gray-100
+                                hover:bg-blue-50/30
+                                transition
                             "
                         >
 
-
-                            <!-- INDEX -->
+                            <!-- STT -->
 
                             <td
                                 class="
                                     px-4
                                     py-4
                                     text-center
-                                    text-xs
-                                    font-mono
                                     font-bold
                                     text-gray-400
+                                    text-xs
                                 "
                             >
-                                ${from + index + 1}
+                                ${
+                                    from +
+                                    index +
+                                    1
+                                }
                             </td>
 
 
@@ -1530,7 +1678,7 @@ function renderProducts() {
                                     text-center
                                 "
                             >
-                                ${imageHTML}
+                                ${imgObj}
                             </td>
 
 
@@ -1545,17 +1693,10 @@ function renderProducts() {
 
                                 <span
                                     class="
-                                        inline-block
-                                        px-2.5
-                                        py-1
-                                        rounded-md
-                                        bg-blue-50
-                                        border
-                                        border-blue-100
+                                        font-mono
+                                        font-bold
                                         text-kn-blue
                                         text-xs
-                                        font-mono
-                                        font-black
                                     "
                                 >
                                     ${escapeHTML(
@@ -1577,17 +1718,27 @@ function renderProducts() {
 
                                 <div
                                     class="
-                                        font-bold
-                                        text-gray-900
-                                        line-clamp-2
+                                        max-w-[260px]
                                     "
                                 >
-                                    ${escapeHTML(
-                                        item.name
-                                    )}
-                                </div>
 
-                                ${badgeHTML}
+                                    <div
+                                        class="
+                                            font-bold
+                                            text-gray-800
+                                            text-sm
+                                            leading-snug
+                                        "
+                                        title="${escapeAttribute(
+                                            item.name
+                                        )}"
+                                    >
+                                        ${escapeHTML(
+                                            item.name
+                                        )}
+                                    </div>
+
+                                </div>
 
                             </td>
 
@@ -1603,6 +1754,14 @@ function renderProducts() {
 
                                 <span
                                     class="
+                                        inline-flex
+                                        items-center
+                                        px-2.5
+                                        py-1.5
+                                        rounded-lg
+                                        bg-gray-50
+                                        border
+                                        border-gray-200
                                         text-xs
                                         font-bold
                                         text-gray-600
@@ -1617,6 +1776,22 @@ function renderProducts() {
                             </td>
 
 
+                            <!-- SIZE -->
+
+                            <td
+                                class="
+                                    px-4
+                                    py-4
+                                "
+                            >
+
+                                ${renderProductSizes(
+                                    item
+                                )}
+
+                            </td>
+
+
                             <!-- PRICE -->
 
                             <td
@@ -1625,7 +1800,9 @@ function renderProducts() {
                                     py-4
                                 "
                             >
+
                                 ${priceHTML}
+
                             </td>
 
 
@@ -1638,7 +1815,9 @@ function renderProducts() {
                                     text-center
                                 "
                             >
+
                                 ${stockHTML}
+
                             </td>
 
 
@@ -1648,13 +1827,14 @@ function renderProducts() {
                                 class="
                                     px-4
                                     py-4
+                                    text-center
+                                    whitespace-nowrap
                                 "
                             >
 
                                 <div
                                     class="
-                                        flex
-                                        justify-end
+                                        inline-flex
                                         items-center
                                         gap-1
                                     "
@@ -1666,28 +1846,32 @@ function renderProducts() {
                                         data-id="${escapeAttribute(
                                             item.id
                                         )}"
+                                        title="Sửa sản phẩm"
                                         class="
                                             p-2
-                                            rounded-lg
                                             text-blue-600
-                                            hover:bg-blue-50
+                                            hover:bg-blue-100
+                                            rounded-lg
                                             transition
+                                            font-bold
                                         "
-                                        title="Chỉnh sửa"
                                     >
 
                                         <svg
+                                            xmlns="http://www.w3.org/2000/svg"
                                             class="w-4 h-4"
                                             fill="none"
-                                            stroke="currentColor"
                                             viewBox="0 0 24 24"
+                                            stroke="currentColor"
                                         >
+
                                             <path
                                                 stroke-linecap="round"
                                                 stroke-linejoin="round"
                                                 stroke-width="2"
-                                                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652l-9.193 9.193a4.5 4.5 0 01-1.897 1.13l-2.052.616.616-2.052a4.5 4.5 0 011.13-1.897l9.193-9.193z"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                                             />
+
                                         </svg>
 
                                     </button>
@@ -1699,28 +1883,32 @@ function renderProducts() {
                                         data-id="${escapeAttribute(
                                             item.id
                                         )}"
+                                        title="Xóa sản phẩm"
                                         class="
                                             p-2
-                                            rounded-lg
                                             text-red-500
                                             hover:bg-red-50
+                                            rounded-lg
                                             transition
+                                            font-bold
                                         "
-                                        title="Xóa"
                                     >
 
                                         <svg
+                                            xmlns="http://www.w3.org/2000/svg"
                                             class="w-4 h-4"
                                             fill="none"
-                                            stroke="currentColor"
                                             viewBox="0 0 24 24"
+                                            stroke="currentColor"
                                         >
+
                                             <path
                                                 stroke-linecap="round"
                                                 stroke-linejoin="round"
                                                 stroke-width="2"
                                                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4V4a1 1 0 011-1h4a1 1 0 011 1v3m5 0H4"
                                             />
+
                                         </svg>
 
                                     </button>
@@ -1774,7 +1962,8 @@ function renderPagination() {
                     text-gray-500
                 "
             >
-                ${state.totalItems} sản phẩm
+                ${state.totalItems}
+                sản phẩm
             </span>
 
         `;
@@ -1857,9 +2046,15 @@ function renderPagination() {
     }
 
 
-    pages.push(
-        totalPages
-    );
+    if (
+        totalPages > 1
+    ) {
+
+        pages.push(
+            totalPages
+        );
+
+    }
 
 
     DOM.pagination.innerHTML = `
@@ -1873,13 +2068,21 @@ function renderPagination() {
 
             Hiển thị
 
-            <strong class="text-gray-700">
+            <strong
+                class="
+                    text-gray-700
+                "
+            >
                 ${startItem}-${endItem}
             </strong>
 
             /
 
-            <strong class="text-gray-700">
+            <strong
+                class="
+                    text-gray-700
+                "
+            >
                 ${state.totalItems}
             </strong>
 
@@ -1897,7 +2100,11 @@ function renderPagination() {
             <button
                 type="button"
                 data-page-action="prev"
-                ${state.currentPage === 1 ? "disabled" : ""}
+                ${
+                    state.currentPage === 1
+                        ? "disabled"
+                        : ""
+                }
                 class="
                     px-3
                     py-1.5
@@ -1907,8 +2114,18 @@ function renderPagination() {
                     border
                     ${
                         state.currentPage === 1
-                            ? "text-gray-300 border-gray-100 cursor-not-allowed"
-                            : "text-gray-600 border-gray-200 hover:bg-gray-50"
+
+                            ? `
+                                text-gray-300
+                                border-gray-100
+                                cursor-not-allowed
+                            `
+
+                            : `
+                                text-gray-600
+                                border-gray-200
+                                hover:bg-gray-50
+                            `
                     }
                 "
             >
@@ -1959,9 +2176,18 @@ function renderPagination() {
                                             page ===
                                             state.currentPage
 
-                                                ? "bg-kn-blue text-white border-kn-blue"
+                                                ? `
+                                                    bg-kn-blue
+                                                    text-white
+                                                    border-kn-blue
+                                                `
 
-                                                : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+                                                : `
+                                                    bg-white
+                                                    text-gray-600
+                                                    border-gray-200
+                                                    hover:bg-gray-50
+                                                `
                                         }
                                     "
                                 >
@@ -1979,7 +2205,11 @@ function renderPagination() {
             <button
                 type="button"
                 data-page-action="next"
-                ${state.currentPage === totalPages ? "disabled" : ""}
+                ${
+                    state.currentPage === totalPages
+                        ? "disabled"
+                        : ""
+                }
                 class="
                     px-3
                     py-1.5
@@ -1989,8 +2219,18 @@ function renderPagination() {
                     border
                     ${
                         state.currentPage === totalPages
-                            ? "text-gray-300 border-gray-100 cursor-not-allowed"
-                            : "text-gray-600 border-gray-200 hover:bg-gray-50"
+
+                            ? `
+                                text-gray-300
+                                border-gray-100
+                                cursor-not-allowed
+                            `
+
+                            : `
+                                text-gray-600
+                                border-gray-200
+                                hover:bg-gray-50
+                            `
                     }
                 "
             >
@@ -2035,23 +2275,35 @@ function showAddForm() {
     }
 
 
-    DOM.formTitle.textContent =
-        "Nhập Sản Phẩm Mới";
+    if (
+        DOM.formTitle
+    ) {
+
+        DOM.formTitle.textContent =
+            "Nhập Sản Phẩm Mới";
+
+    }
 
 
-    DOM.btnSubmit.textContent =
-        "Nhập kho sản phẩm";
+    if (
+        DOM.btnSubmit
+    ) {
+
+        DOM.btnSubmit.textContent =
+            "Nhập kho sản phẩm";
+
+    }
 
 
     resetCatalogDropdowns();
 
 
-    DOM.listView.classList.add(
+    DOM.listView?.classList.add(
         "hidden"
     );
 
 
-    DOM.formView.classList.remove(
+    DOM.formView?.classList.remove(
         "hidden"
     );
 
@@ -2076,12 +2328,12 @@ function cancelForm() {
         null;
 
 
-    DOM.formView.classList.add(
+    DOM.formView?.classList.add(
         "hidden"
     );
 
 
-    DOM.listView.classList.remove(
+    DOM.listView?.classList.remove(
         "hidden"
     );
 
@@ -2097,7 +2349,7 @@ function cancelForm() {
 
 
 /* =========================================================
-   EDIT
+   EDIT PRODUCT
 ========================================================= */
 
 function editProduct(
@@ -2132,122 +2384,201 @@ function editProduct(
         item.id;
 
 
-    DOM.formTitle.textContent =
-        `Sửa Sản Phẩm: ${item.sku}`;
-
-
     /* -----------------------------------------
        BASIC
     ------------------------------------------ */
 
-    document.getElementById(
-        "sku"
-    ).value =
-        item.sku ||
-        "";
+    const sku =
+        document.getElementById(
+            "sku"
+        );
+
+    const name =
+        document.getElementById(
+            "name"
+        );
+
+    const origin =
+        document.getElementById(
+            "origin"
+        );
+
+    const price =
+        document.getElementById(
+            "price"
+        );
+
+    const discountPrice =
+        document.getElementById(
+            "discount_price"
+        );
+
+    const unit =
+        document.getElementById(
+            "unit"
+        );
+
+    const stock =
+        document.getElementById(
+            "stock_quantity"
+        );
+
+    const minOrder =
+        document.getElementById(
+            "min_order_quantity"
+        );
+
+    const badge =
+        document.getElementById(
+            "badge"
+        );
 
 
-    document.getElementById(
-        "name"
-    ).value =
-        item.name ||
-        "";
+    if (sku) {
+
+        sku.value =
+            item.sku || "";
+
+    }
 
 
-    document.getElementById(
-        "origin"
-    ).value =
-        item.origin ||
-        "";
+    if (name) {
+
+        name.value =
+            item.name || "";
+
+    }
+
+
+    if (origin) {
+
+        origin.value =
+            item.origin || "";
+
+    }
+
+
+    if (price) {
+
+        price.value =
+            item.price || "";
+
+    }
+
+
+    if (discountPrice) {
+
+        discountPrice.value =
+            item.discount_price || "";
+
+    }
+
+
+    if (unit) {
+
+        unit.value =
+            item.unit || "Cái";
+
+    }
+
+
+    if (stock) {
+
+        stock.value =
+            item.stock_quantity || 0;
+
+    }
+
+
+    if (minOrder) {
+
+        minOrder.value =
+            item.min_order_quantity || 1;
+
+    }
+
+
+    if (badge) {
+
+        badge.value =
+            item.badge || "";
+
+    }
 
 
     /* -----------------------------------------
-       PRICE
+       IMAGE / DOCUMENT
     ------------------------------------------ */
 
-    document.getElementById(
-        "price"
-    ).value =
-        item.price ??
-        "";
+    const imageUrl =
+        document.getElementById(
+            "image_url"
+        );
+
+    const extraImages =
+        document.getElementById(
+            "inExtraImages"
+        );
+
+    const datasheet =
+        document.getElementById(
+            "inDatasheet"
+        );
 
 
-    document.getElementById(
-        "discount_price"
-    ).value =
-        item.discount_price ??
-        "";
+    if (imageUrl) {
+
+        imageUrl.value =
+            item.image_url || "";
+
+    }
 
 
-    document.getElementById(
-        "unit"
-    ).value =
-        item.unit ||
-        "Cái";
+    if (extraImages) {
+
+        extraImages.value =
+            item.images || "";
+
+    }
 
 
-    document.getElementById(
-        "stock_quantity"
-    ).value =
-        item.stock_quantity ??
-        0;
+    if (datasheet) {
 
+        datasheet.value =
+            item.datasheet_url || "";
 
-    document.getElementById(
-        "min_order_quantity"
-    ).value =
-        item.min_order_quantity ??
-        1;
-
-
-    document.getElementById(
-        "badge"
-    ).value =
-        item.badge ||
-        "";
-
-
-    /* -----------------------------------------
-       MEDIA
-    ------------------------------------------ */
-
-    document.getElementById(
-        "image_url"
-    ).value =
-        item.image_url ||
-        "";
-
-
-    document.getElementById(
-        "inExtraImages"
-    ).value =
-        item.images ||
-        "";
-
-
-    document.getElementById(
-        "inDatasheet"
-    ).value =
-        item.datasheet_url ||
-        "";
+    }
 
 
     /* -----------------------------------------
        CONTENT
     ------------------------------------------ */
 
-    document.getElementById(
-        "short_description"
-    ).value =
-        item.short_description ||
-        "";
+    const shortDescription =
+        document.getElementById(
+            "short_description"
+        );
+
+    const specifications =
+        document.getElementById(
+            "specifications"
+        );
 
 
-    document.getElementById(
-        "specifications"
-    ).value =
-        item.specifications ||
-        "";
+    if (shortDescription) {
+
+        shortDescription.value =
+            item.short_description || "";
+
+    }
+
+
+    if (specifications) {
+
+        specifications.value =
+            item.specifications || "";
+
+    }
 
 
     if (
@@ -2256,17 +2587,52 @@ function editProduct(
     ) {
 
         CKEDITOR.instances.description.setData(
-            item.description ||
-            ""
+            item.description || ""
         );
 
     } else {
 
+        const description =
+            document.getElementById(
+                "description"
+            );
+
+
+        if (description) {
+
+            description.value =
+                item.description || "";
+
+        }
+
+    }
+
+
+    /* -----------------------------------------
+       SIZE
+       available_sizes -> size fallback
+    ------------------------------------------ */
+
+    const availableSizes =
         document.getElementById(
-            "description"
-        ).value =
-            item.description ||
-            "";
+            "available_sizes"
+        );
+
+
+    if (
+        availableSizes
+    ) {
+
+        const sizes =
+            normalizeProductSizes(
+                item
+            );
+
+
+        availableSizes.value =
+            sizes.join(
+                ", "
+            );
 
     }
 
@@ -2275,83 +2641,135 @@ function editProduct(
        CATEGORY CASCADE
     ------------------------------------------ */
 
-    DOM.category.value =
-        item.category_id ||
-        "";
+    if (
+        DOM.category
+    ) {
+
+        DOM.category.value =
+            item.category_id || "";
 
 
-    updateSubCategories(
-        item.category_id
-    );
+        updateSubCategories(
+            item.category_id
+        );
+
+    }
 
 
-    DOM.subCategory.value =
-        item.sub_category_id ||
-        "";
+    if (
+        DOM.subCategory
+    ) {
+
+        DOM.subCategory.value =
+            item.sub_category_id || "";
 
 
-    updateFamilies(
-        item.sub_category_id
-    );
+        updateFamilies(
+            item.sub_category_id
+        );
+
+    }
 
 
-    DOM.family.value =
-        item.family_id ||
-        "";
+    if (
+        DOM.family
+    ) {
+
+        DOM.family.value =
+            item.family_id || "";
+
+    }
 
 
-    DOM.industry.value =
-        item.industry_id ||
-        "";
+    if (
+        DOM.industry
+    ) {
+
+        DOM.industry.value =
+            item.industry_id || "";
+
+    }
 
 
     /* -----------------------------------------
        BRAND
     ------------------------------------------ */
 
+    const brandInput =
+        document.getElementById(
+            "brand_input"
+        );
+
+
     if (
-        item.brand_id
+        brandInput
     ) {
 
-        const foundBrand =
-            state.brands.find(
-                brand =>
-                    String(
-                        brand.id
-                    ) ===
-                    String(
-                        item.brand_id
-                    )
-            );
+        if (
+            item.brand_id
+        ) {
+
+            const foundBrand =
+                state.brands.find(
+                    brand =>
+                        String(
+                            brand.id
+                        ) ===
+                        String(
+                            item.brand_id
+                        )
+                );
 
 
-        document.getElementById(
-            "brand_input"
-        ).value =
-            foundBrand
-                ? foundBrand.name
-                : "";
+            brandInput.value =
+                foundBrand
+                    ? foundBrand.name
+                    : "";
 
-    } else {
+        } else {
 
-        document.getElementById(
-            "brand_input"
-        ).value =
-            "";
+            brandInput.value =
+                "";
+
+        }
 
     }
 
 
-    DOM.btnSubmit.textContent =
-        "Cập nhật sản phẩm";
+    /* -----------------------------------------
+       SHOW FORM
+    ------------------------------------------ */
+
+    if (
+        DOM.formTitle
+    ) {
+
+        DOM.formTitle.textContent =
+            "Sửa Sản Phẩm: " +
+            (
+                item.sku ||
+                ""
+            );
+
+    }
 
 
-    DOM.listView.classList.add(
+    if (
+        DOM.btnSubmit
+    ) {
+
+        DOM.btnSubmit.textContent =
+            "Cập nhật sản phẩm";
+
+    }
+
+
+    DOM.listView?.classList.add(
         "hidden"
     );
 
 
-    DOM.formView.classList.remove(
+    DOM.formView?.classList.remove(
         "hidden"
     );
 
@@ -2368,6 +2786,7 @@ function editProduct(
 
 /* =========================================================
    SAVE PRODUCT
+   ---------------------------------------------------------
    DATABASE PAYLOAD GIỮ NGUYÊN
 ========================================================= */
 
@@ -2386,6 +2805,15 @@ async function saveProduct(
 
     const btn =
         DOM.btnSubmit;
+
+
+    if (
+        !btn
+    ) {
+
+        return;
+
+    }
 
 
     const originalText =
@@ -2420,10 +2848,16 @@ async function saveProduct(
 
         } else {
 
-            descValue =
+            const description =
                 document.getElementById(
                     "description"
-                ).value;
+                );
+
+
+            descValue =
+                description
+                    ? description.value
+                    : "";
 
         }
 
@@ -2433,10 +2867,16 @@ async function saveProduct(
            GIỮ NGUYÊN LOGIC CŨ
         ------------------------------------------ */
 
-        const brandInputText =
+        const brandInput =
             document.getElementById(
                 "brand_input"
-            ).value.trim();
+            );
+
+
+        const brandInputText =
+            brandInput
+                ? brandInput.value.trim()
+                : "";
 
 
         let finalBrandId =
@@ -2523,6 +2963,55 @@ async function saveProduct(
 
 
         /* -----------------------------------------
+           SIZE
+           INPUT:
+           S, M, L, XL
+
+           DATABASE:
+           ["S", "M", "L", "XL"]
+        ------------------------------------------ */
+
+        const sizeInput =
+            document.getElementById(
+                "available_sizes"
+            );
+
+
+        const sizeText =
+            sizeInput
+                ? sizeInput.value.trim()
+                : "";
+
+
+        let sizesArray =
+            null;
+
+
+        if (
+            sizeText
+        ) {
+
+            sizesArray =
+                sizeText
+                    .split(",")
+                    .map(
+                        size =>
+                            size.trim()
+                    )
+                    .filter(Boolean);
+
+
+            sizesArray =
+                [
+                    ...new Set(
+                        sizesArray
+                    )
+                ];
+
+        }
+
+
+        /* -----------------------------------------
            DATABASE PAYLOAD
            KHÔNG ĐỔI
         ------------------------------------------ */
@@ -2534,116 +3023,180 @@ async function saveProduct(
         const payload = {
 
             sku:
-                document.getElementById(
-                    "sku"
-                ).value.trim(),
+                document
+                    .getElementById(
+                        "sku"
+                    )
+                    .value
+                    .trim(),
+
 
             name:
-                document.getElementById(
-                    "name"
-                ).value.trim(),
+                document
+                    .getElementById(
+                        "name"
+                    )
+                    .value
+                    .trim(),
+
+
+            available_sizes:
+                sizesArray,
 
 
             category_id:
-                document.getElementById(
-                    "category_id"
-                ).value ||
+                document
+                    .getElementById(
+                        "category_id"
+                    )
+                    .value ||
                 null,
+
 
             sub_category_id:
-                document.getElementById(
-                    "sub_category_id"
-                ).value ||
+                document
+                    .getElementById(
+                        "sub_category_id"
+                    )
+                    .value ||
                 null,
+
 
             family_id:
-                document.getElementById(
-                    "family_id"
-                ).value ||
+                document
+                    .getElementById(
+                        "family_id"
+                    )
+                    .value ||
                 null,
 
+
             industry_id:
-                document.getElementById(
-                    "industrySelect"
-                ).value ||
+                document
+                    .getElementById(
+                        "industrySelect"
+                    )
+                    .value ||
                 null,
+
 
             brand_id:
                 finalBrandId,
 
 
             origin:
-                document.getElementById(
-                    "origin"
-                ).value.trim() ||
+                document
+                    .getElementById(
+                        "origin"
+                    )
+                    .value
+                    .trim() ||
                 null,
+
 
             price:
-                document.getElementById(
-                    "price"
-                ).value ||
+                document
+                    .getElementById(
+                        "price"
+                    )
+                    .value ||
                 null,
+
 
             discount_price:
-                document.getElementById(
-                    "discount_price"
-                ).value ||
+                document
+                    .getElementById(
+                        "discount_price"
+                    )
+                    .value ||
                 null,
 
+
             unit:
-                document.getElementById(
-                    "unit"
-                ).value ||
+                document
+                    .getElementById(
+                        "unit"
+                    )
+                    .value ||
                 "Cái",
 
+
             stock_quantity:
-                document.getElementById(
-                    "stock_quantity"
-                ).value ||
+                document
+                    .getElementById(
+                        "stock_quantity"
+                    )
+                    .value ||
                 0,
 
+
             min_order_quantity:
-                document.getElementById(
-                    "min_order_quantity"
-                ).value ||
+                document
+                    .getElementById(
+                        "min_order_quantity"
+                    )
+                    .value ||
                 1,
 
+
             badge:
-                document.getElementById(
-                    "badge"
-                ).value ||
+                document
+                    .getElementById(
+                        "badge"
+                    )
+                    .value ||
                 null,
 
 
             image_url:
-                document.getElementById(
-                    "image_url"
-                ).value.trim() ||
+                document
+                    .getElementById(
+                        "image_url"
+                    )
+                    .value
+                    .trim() ||
                 null,
+
 
             images:
-                document.getElementById(
-                    "inExtraImages"
-                ).value.trim() ||
+                document
+                    .getElementById(
+                        "inExtraImages"
+                    )
+                    .value
+                    .trim() ||
                 null,
+
 
             datasheet_url:
-                document.getElementById(
-                    "inDatasheet"
-                ).value.trim() ||
+                document
+                    .getElementById(
+                        "inDatasheet"
+                    )
+                    .value
+                    .trim() ||
                 null,
+
 
             short_description:
-                document.getElementById(
-                    "short_description"
-                ).value.trim() ||
+                document
+                    .getElementById(
+                        "short_description"
+                    )
+                    .value
+                    .trim() ||
                 null,
 
+
             specifications:
-                document.getElementById(
-                    "specifications"
-                ).value.trim() ||
+                document
+                    .getElementById(
+                        "specifications"
+                    )
+                    .value
+                    .trim() ||
                 null,
+
 
             description:
                 descValue ||
@@ -2938,102 +3491,62 @@ function showToast(
         );
 
 
-    const isSuccess =
-        type === "success";
+    const bgColor =
+        type === "success"
+            ? "bg-green-500"
+            : "bg-red-500";
 
 
     toast.className = `
 
-        pointer-events-auto
+        ${bgColor}
+
+        text-white
+
+        px-4
+        py-2
+
+        rounded
+
+        shadow-lg
+
+        transform
+        transition-all
+        duration-300
+
+        translate-y-0
+        opacity-100
+
+        mb-2
+
+        font-bold
+        text-sm
 
         flex
         items-center
         gap-2
 
-        px-4
-        py-3
-
-        rounded-xl
-        shadow-xl
-
-        text-sm
-        font-bold
-        text-white
-
-        ${
-            isSuccess
-                ? "bg-gray-900"
-                : "bg-red-600"
-        }
-
-        opacity-0
-        translate-y-2
-
-        transition-all
-        duration-300
+        z-50
 
     `;
 
 
-    toast.innerHTML = `
+    toast.innerHTML =
+        type === "success"
 
-        ${
-            isSuccess
+            ? `
+                <span>✔</span>
+                ${escapeHTML(message)}
+            `
 
-                ? `
-                    <svg
-                        class="w-4 h-4 text-green-400 shrink-0"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="m5 12 4 4L19 6"
-                        />
-                    </svg>
-                `
-
-                : `
-                    <svg
-                        class="w-4 h-4 shrink-0"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M6 18 18 6M6 6l12 12"
-                        />
-                    </svg>
-                `
-        }
-
-        <span>
-            ${escapeHTML(message)}
-        </span>
-
-    `;
+            : `
+                <span>⚠</span>
+                ${escapeHTML(message)}
+            `;
 
 
     DOM.toast.appendChild(
         toast
-    );
-
-
-    requestAnimationFrame(
-        () => {
-
-            toast.classList.remove(
-                "opacity-0",
-                "translate-y-2"
-            );
-
-        }
     );
 
 
@@ -3056,7 +3569,7 @@ function showToast(
             );
 
         },
-        3500
+        3000
     );
 
 }
@@ -3068,9 +3581,8 @@ function showToast(
 
 function bindEvents() {
 
-
     /* -----------------------------------------
-       ADD
+       ADD PRODUCT
     ------------------------------------------ */
 
     DOM.btnAdd?.addEventListener(
@@ -3088,6 +3600,10 @@ function bindEvents() {
         cancelForm
     );
 
+
+    /* -----------------------------------------
+       CANCEL
+    ------------------------------------------ */
 
     DOM.btnCancel?.addEventListener(
         "click",
@@ -3398,8 +3914,9 @@ function bindEvents() {
 
 /* =========================================================
    BACKWARD COMPATIBILITY
-   Giữ lại để những file khác nếu đang gọi
-   các function cũ không bị gãy.
+   ---------------------------------------------------------
+   Giữ lại để những chỗ khác trong HTML/JS nếu đang gọi
+   trực tiếp các function này thì không bị gãy.
 ========================================================= */
 
 window.showAddForm =

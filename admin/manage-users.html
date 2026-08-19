@@ -1,118 +1,1209 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>Quản lý Người dùng - KN Admin</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
+
     <script>
-        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00' } } } }
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "kn-blue": "#00479b",
+                        "kn-orange": "#ff5e00"
+                    }
+                }
+            }
+        };
     </script>
 </head>
-<body class="bg-gray-50 font-sans text-gray-800 flex h-screen overflow-hidden relative">
 
-    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none"></div>
 
-    <aside
-    id="adminSidebar"
+<body
     class="
-        w-64
-        bg-gray-900
-        text-white
-        flex
-        flex-col
-        hidden
-        md:flex
-        shrink-0
+        bg-gray-50
+        font-sans
+        text-gray-800
     "
-></aside>
+>
 
-    <div class="flex-1 flex flex-col h-screen overflow-hidden">
-        <header class="bg-white shadow-sm px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200">
-            <div>
-                <h2 class="text-xl font-bold text-gray-900">Quản lý Người dùng</h2>
-                <p class="text-xs text-gray-500 mt-1">Quản lý tài khoản nhân viên nội bộ và hồ sơ khách hàng</p>
-            </div>
-            
-            <div class="flex space-x-3 w-full md:w-auto mt-3 md:mt-0">
-                <div class="flex items-center space-x-2 bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 focus-within:border-kn-blue transition flex-1 md:flex-none w-full md:w-64">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" id="searchInput" placeholder="Tìm email, sđt..." class="bg-transparent border-none outline-none text-sm text-gray-700 w-full">
+
+    <!-- =====================================================
+         TOAST
+    ====================================================== -->
+
+    <div
+        id="toastContainer"
+        class="
+            fixed
+            right-6
+            bottom-6
+            z-[100]
+            flex
+            flex-col
+            items-end
+            gap-2
+            pointer-events-none
+        "
+    ></div>
+
+
+    <!-- =====================================================
+         ADMIN LAYOUT
+    ====================================================== -->
+
+    <div
+        class="
+            min-h-screen
+            flex
+        "
+    >
+
+
+        <!-- =================================================
+             SIDEBAR
+        ================================================== -->
+
+        <aside
+            id="adminSidebar"
+            class="
+                w-64
+                shrink-0
+                bg-gray-900
+                text-white
+                hidden
+                md:flex
+                flex-col
+            "
+        ></aside>
+
+
+        <!-- =================================================
+             MAIN
+        ================================================== -->
+
+        <div
+            class="
+                flex-1
+                min-w-0
+                flex
+                flex-col
+            "
+        >
+
+
+            <!-- =================================================
+                 HEADER
+            ================================================== -->
+
+            <header
+                class="
+                    min-h-16
+                    bg-white
+                    border-b
+                    border-gray-200
+                    px-4
+                    md:px-6
+                    py-3
+                    flex
+                    flex-col
+                    lg:flex-row
+                    lg:items-center
+                    lg:justify-between
+                    gap-3
+                    shrink-0
+                "
+            >
+
+                <div>
+
+                    <h1
+                        id="pageTitle"
+                        class="
+                            text-xl
+                            font-black
+                            text-gray-900
+                            tracking-tight
+                        "
+                    >
+                        Quản lý Người dùng
+                    </h1>
+
+                    <p
+                        id="pageDescription"
+                        class="
+                            text-xs
+                            text-gray-500
+                            mt-0.5
+                        "
+                    >
+                        Quản lý tài khoản khách hàng và tài khoản quản trị
+                    </p>
+
                 </div>
-                <!-- Nút chỉ hiện bên Tab Nhân viên -->
-                <button id="btnAddStaff" onclick="showUserModal()" class="bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition flex items-center whitespace-nowrap">
-                    <span class="mr-2 text-lg leading-none">+</span> Cấp quyền mới
-                </button>
-            </div>
-        </header>
 
-        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
-            
-            <!-- TABS ĐIỀU HƯỚNG -->
-            <div class="flex space-x-4 mb-4 border-b border-gray-200">
-                <button onclick="switchTab('staff')" id="btnTabStaff" class="pb-3 px-2 font-bold text-sm text-gray-900 border-b-2 border-gray-900 transition">Nhân viên Nội bộ</button>
-                <button onclick="switchTab('customer')" id="btnTabCustomer" class="pb-3 px-2 font-bold text-sm text-gray-500 hover:text-gray-800 transition border-b-2 border-transparent">Khách hàng Đăng ký</button>
-            </div>
 
-            <!-- BẢNG DANH SÁCH -->
-            <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
-                <table class="w-full text-left text-sm text-gray-600">
-                    <thead class="bg-gray-50 text-gray-700 font-bold border-b border-gray-200 text-xs uppercase tracking-wider">
-                        <tr id="tableHeader">
-                            <!-- JS Sẽ đổ Header tương ứng vào đây -->
-                        </tr>
-                    </thead>
-                    <tbody id="userTableBody" class="divide-y divide-gray-100 bg-white">
-                        <tr><td colspan="6" class="text-center py-8 text-gray-400">Đang tải dữ liệu...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <div id="paginationContainer" class="flex justify-between items-center text-sm py-2"></div>
-        </main>
+                <div
+                    class="
+                        flex
+                        flex-col
+                        sm:flex-row
+                        gap-2
+                        w-full
+                        lg:w-auto
+                    "
+                >
+
+
+                    <!-- SEARCH -->
+
+                    <div
+                        class="
+                            flex
+                            items-center
+                            gap-2
+                            bg-gray-50
+                            border
+                            border-gray-300
+                            rounded-lg
+                            px-3
+                            py-2.5
+                            focus-within:border-kn-blue
+                            focus-within:ring-2
+                            focus-within:ring-blue-100
+                            transition
+                            w-full
+                            sm:w-72
+                        "
+                    >
+
+                        <svg
+                            class="
+                                w-4
+                                h-4
+                                text-gray-400
+                                shrink-0
+                            "
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="m21 21-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"
+                            />
+                        </svg>
+
+                        <input
+                            type="text"
+                            id="searchInput"
+                            autocomplete="off"
+                            placeholder="Tìm email, tên, SĐT..."
+                            class="
+                                bg-transparent
+                                border-none
+                                outline-none
+                                text-sm
+                                text-gray-700
+                                w-full
+                                min-w-0
+                            "
+                        >
+
+                    </div>
+
+
+                    <!-- ADD ADMIN -->
+
+                    <button
+                        type="button"
+                        id="btnAddAdmin"
+                        class="
+                            inline-flex
+                            items-center
+                            justify-center
+                            gap-2
+                            bg-kn-blue
+                            hover:bg-blue-800
+                            text-white
+                            px-4
+                            py-2.5
+                            rounded-lg
+                            text-sm
+                            font-bold
+                            shadow-sm
+                            transition
+                            whitespace-nowrap
+                        "
+                    >
+
+                        <svg
+                            class="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 4v16m8-8H4"
+                            />
+                        </svg>
+
+                        Cấp Admin
+
+                    </button>
+
+                </div>
+
+            </header>
+
+
+            <!-- =================================================
+                 CONTENT
+            ================================================== -->
+
+            <main
+                class="
+                    flex-1
+                    overflow-y-auto
+                    p-4
+                    md:p-6
+                "
+            >
+
+                <div
+                    class="
+                        max-w-[1600px]
+                        mx-auto
+                    "
+                >
+
+
+                    <!-- =================================================
+                         STATISTICS
+                    ================================================== -->
+
+                    <div
+                        class="
+                            grid
+                            grid-cols-1
+                            sm:grid-cols-2
+                            xl:grid-cols-4
+                            gap-4
+                            mb-6
+                        "
+                    >
+
+
+                        <!-- TOTAL USERS -->
+
+                        <div
+                            class="
+                                bg-white
+                                border
+                                border-gray-200
+                                rounded-xl
+                                shadow-sm
+                                p-5
+                            "
+                        >
+
+                            <div
+                                class="
+                                    flex
+                                    items-center
+                                    justify-between
+                                "
+                            >
+
+                                <div>
+
+                                    <p
+                                        class="
+                                            text-xs
+                                            font-bold
+                                            text-gray-500
+                                            uppercase
+                                            tracking-wider
+                                        "
+                                    >
+                                        Người dùng
+                                    </p>
+
+                                    <p
+                                        id="userTotal"
+                                        class="
+                                            mt-2
+                                            text-2xl
+                                            font-black
+                                            text-kn-blue
+                                        "
+                                    >
+                                        0
+                                    </p>
+
+                                </div>
+
+
+                                <div
+                                    class="
+                                        w-10
+                                        h-10
+                                        rounded-xl
+                                        bg-blue-50
+                                        text-kn-blue
+                                        flex
+                                        items-center
+                                        justify-center
+                                    "
+                                >
+
+                                    <svg
+                                        class="w-5 h-5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="1.8"
+                                            d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m7-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm9 10v-2a4 4 0 0 0-3-3.87m-1-11a4 4 0 0 1 0 7.75"
+                                        />
+                                    </svg>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- TOTAL ADMINS -->
+
+                        <div
+                            class="
+                                bg-white
+                                border
+                                border-gray-200
+                                rounded-xl
+                                shadow-sm
+                                p-5
+                            "
+                        >
+
+                            <div
+                                class="
+                                    flex
+                                    items-center
+                                    justify-between
+                                "
+                            >
+
+                                <div>
+
+                                    <p
+                                        class="
+                                            text-xs
+                                            font-bold
+                                            text-gray-500
+                                            uppercase
+                                            tracking-wider
+                                        "
+                                    >
+                                        Admin
+                                    </p>
+
+                                    <p
+                                        id="adminTotal"
+                                        class="
+                                            mt-2
+                                            text-2xl
+                                            font-black
+                                            text-kn-orange
+                                        "
+                                    >
+                                        0
+                                    </p>
+
+                                </div>
+
+
+                                <div
+                                    class="
+                                        w-10
+                                        h-10
+                                        rounded-xl
+                                        bg-orange-50
+                                        text-kn-orange
+                                        flex
+                                        items-center
+                                        justify-center
+                                    "
+                                >
+
+                                    <svg
+                                        class="w-5 h-5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="1.8"
+                                            d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm7.5-3a7.5 7.5 0 0 1-.15 1.5l1.65 1.28-2 3.46-2-.8a7.4 7.4 0 0 1-2.6 1.5L14 21h-4l-.4-2.06a7.4 7.4 0 0 1-2.6-1.5l-2 .8-2-3.46 1.65-1.28A7.5 7.5 0 0 1 4.5 12L2.85 10.72l2-3.46 2 .8a7.4 7.4 0 0 1 2.6-1.5L10 4h4l.4 2.06a7.4 7.4 0 0 1 2.6 1.5l2-.8 2 3.46L19.35 11A7.5 7.5 0 0 1 19.5 12Z"
+                                        />
+                                    </svg>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- CURRENT LIST -->
+
+                        <div
+                            class="
+                                bg-white
+                                border
+                                border-gray-200
+                                rounded-xl
+                                shadow-sm
+                                p-5
+                            "
+                        >
+
+                            <div
+                                class="
+                                    flex
+                                    items-center
+                                    justify-between
+                                "
+                            >
+
+                                <div>
+
+                                    <p
+                                        class="
+                                            text-xs
+                                            font-bold
+                                            text-gray-500
+                                            uppercase
+                                            tracking-wider
+                                        "
+                                    >
+                                        Đang xem
+                                    </p>
+
+                                    <p
+                                        id="currentListCount"
+                                        class="
+                                            mt-2
+                                            text-2xl
+                                            font-black
+                                            text-gray-900
+                                        "
+                                    >
+                                        0
+                                    </p>
+
+                                </div>
+
+
+                                <div
+                                    class="
+                                        w-10
+                                        h-10
+                                        rounded-xl
+                                        bg-gray-100
+                                        text-gray-600
+                                        flex
+                                        items-center
+                                        justify-center
+                                    "
+                                >
+
+                                    <svg
+                                        class="w-5 h-5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="1.8"
+                                            d="M4 6h16M4 12h16M4 18h10"
+                                        />
+                                    </svg>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- PAGE -->
+
+                        <div
+                            class="
+                                bg-white
+                                border
+                                border-gray-200
+                                rounded-xl
+                                shadow-sm
+                                p-5
+                            "
+                        >
+
+                            <div
+                                class="
+                                    flex
+                                    items-center
+                                    justify-between
+                                "
+                            >
+
+                                <div>
+
+                                    <p
+                                        class="
+                                            text-xs
+                                            font-bold
+                                            text-gray-500
+                                            uppercase
+                                            tracking-wider
+                                        "
+                                    >
+                                        Trang hiện tại
+                                    </p>
+
+                                    <p
+                                        id="currentPageStat"
+                                        class="
+                                            mt-2
+                                            text-2xl
+                                            font-black
+                                            text-gray-900
+                                        "
+                                    >
+                                        1
+                                    </p>
+
+                                </div>
+
+
+                                <div
+                                    class="
+                                        w-10
+                                        h-10
+                                        rounded-xl
+                                        bg-green-50
+                                        text-green-600
+                                        flex
+                                        items-center
+                                        justify-center
+                                    "
+                                >
+
+                                    <svg
+                                        class="w-5 h-5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="1.8"
+                                            d="M6 2h9l3 3v17H6V2Zm9 0v4h3M9 12h6M9 16h6"
+                                        />
+                                    </svg>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         TABS
+                    ================================================== -->
+
+                    <div
+                        class="
+                            flex
+                            items-center
+                            gap-6
+                            border-b
+                            border-gray-200
+                            mb-4
+                        "
+                    >
+
+                        <button
+                            type="button"
+                            id="btnTabUser"
+                            class="
+                                relative
+                                pb-3
+                                px-1
+                                text-sm
+                                font-black
+                                text-kn-blue
+                            "
+                        >
+
+                            Người dùng
+
+                            <span
+                                id="userTabCount"
+                                class="
+                                    ml-1.5
+                                    inline-flex
+                                    min-w-5
+                                    h-5
+                                    px-1.5
+                                    items-center
+                                    justify-center
+                                    rounded-full
+                                    bg-blue-50
+                                    text-kn-blue
+                                    text-[10px]
+                                    font-black
+                                "
+                            >
+                                0
+                            </span>
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            id="btnTabAdmin"
+                            class="
+                                relative
+                                pb-3
+                                px-1
+                                text-sm
+                                font-bold
+                                text-gray-500
+                                hover:text-gray-800
+                            "
+                        >
+
+                            Admin
+
+                            <span
+                                id="adminTabCount"
+                                class="
+                                    ml-1.5
+                                    inline-flex
+                                    min-w-5
+                                    h-5
+                                    px-1.5
+                                    items-center
+                                    justify-center
+                                    rounded-full
+                                    bg-gray-100
+                                    text-gray-500
+                                    text-[10px]
+                                    font-black
+                                "
+                            >
+                                0
+                            </span>
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         TABLE CARD
+                    ================================================== -->
+
+                    <div
+                        class="
+                            bg-white
+                            border
+                            border-gray-200
+                            rounded-xl
+                            shadow-sm
+                            overflow-hidden
+                        "
+                    >
+
+                        <div class="overflow-x-auto">
+
+                            <table
+                                class="
+                                    w-full
+                                    min-w-[900px]
+                                    text-left
+                                    text-sm
+                                "
+                            >
+
+                                <thead
+                                    class="
+                                        bg-gray-50
+                                        border-b
+                                        border-gray-200
+                                        text-xs
+                                        font-bold
+                                        text-gray-500
+                                        uppercase
+                                        tracking-wider
+                                    "
+                                >
+
+                                    <tr id="tableHeader"></tr>
+
+                                </thead>
+
+
+                                <tbody
+                                    id="userTableBody"
+                                    class="
+                                        divide-y
+                                        divide-gray-100
+                                        bg-white
+                                    "
+                                >
+
+                                    <tr>
+
+                                        <td
+                                            colspan="6"
+                                            class="
+                                                text-center
+                                                py-12
+                                                text-gray-400
+                                            "
+                                        >
+                                            Đang tải dữ liệu...
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+
+                        <!-- PAGINATION -->
+
+                        <div
+                            id="paginationContainer"
+                            class="
+                                flex
+                                flex-col
+                                sm:flex-row
+                                justify-between
+                                items-center
+                                gap-3
+                                p-4
+                                border-t
+                                border-gray-100
+                                bg-gray-50/50
+                            "
+                        ></div>
+
+                    </div>
+
+                </div>
+
+            </main>
+
+        </div>
+
     </div>
 
-    <!-- MODAL FORM CẤP QUYỀN (Dành cho Nhân viên) -->
-    <div id="userModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center transition-opacity">
-        <div class="bg-white rounded-xl w-full max-w-md shadow-2xl overflow-hidden transform transition-all">
-            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-                <h3 id="modalTitle" class="text-lg font-bold text-gray-900">Cấp quyền Tài khoản</h3>
-                <button onclick="closeUserModal()" class="text-gray-400 hover:text-red-500 transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+
+    <!-- =====================================================
+         ADMIN MODAL
+    ====================================================== -->
+
+    <div
+        id="userModal"
+        class="
+            fixed
+            inset-0
+            bg-black/60
+            backdrop-blur-sm
+            z-[80]
+            hidden
+            items-center
+            justify-center
+            p-4
+        "
+    >
+
+        <div
+            class="
+                bg-white
+                rounded-2xl
+                w-full
+                max-w-md
+                shadow-2xl
+                overflow-hidden
+            "
+        >
+
+
+            <!-- MODAL HEADER -->
+
+            <div
+                class="
+                    px-6
+                    py-5
+                    border-b
+                    border-gray-200
+                    flex
+                    items-center
+                    justify-between
+                "
+            >
+
+                <div>
+
+                    <h3
+                        id="modalTitle"
+                        class="
+                            text-lg
+                            font-black
+                            text-gray-900
+                        "
+                    >
+                        Cấp quyền Admin
+                    </h3>
+
+                    <p
+                        class="
+                            text-xs
+                            text-gray-500
+                            mt-1
+                        "
+                    >
+                        Thêm tài khoản vào danh sách quản trị.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    id="btnCloseModal"
+                    class="
+                        w-9
+                        h-9
+                        rounded-lg
+                        flex
+                        items-center
+                        justify-center
+                        text-gray-400
+                        hover:text-red-500
+                        hover:bg-red-50
+                        transition
+                    "
+                    aria-label="Đóng"
+                >
+
+                    <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 6l12 12M18 6 6 18"
+                        />
+                    </svg>
+
                 </button>
+
             </div>
-            
-            <form id="userForm" class="p-6 space-y-5">
-                <input type="hidden" id="inUserId"> 
-                <div class="bg-blue-50 text-blue-800 p-3 rounded-md text-xs mb-4">
-                    <strong>Lưu ý:</strong> Người dùng cần tạo tài khoản trên web trước. Sau đó bạn nhập Email của họ vào đây để cấp quyền Quản trị.
+
+
+            <!-- FORM -->
+
+            <form
+                id="userForm"
+                class="
+                    p-6
+                    space-y-5
+                "
+            >
+
+                <input
+                    type="hidden"
+                    id="inUserId"
+                >
+
+
+                <div
+                    class="
+                        bg-blue-50
+                        border
+                        border-blue-100
+                        text-blue-800
+                        p-4
+                        rounded-xl
+                        text-xs
+                        leading-5
+                    "
+                >
+
+                    <strong>
+                        Lưu ý:
+                    </strong>
+
+                    Tài khoản cần đăng ký trên website trước.
+                    Sau đó nhập đúng email để cấp quyền Admin.
+
                 </div>
+
+
+                <!-- EMAIL -->
+
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1 uppercase">Email Tài Khoản <span class="text-red-500">*</span></label>
-                    <input type="email" id="inUserEmail" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue" placeholder="VD: nhanvien@khangnam.com">
+
+                    <label
+                        for="inUserEmail"
+                        class="
+                            block
+                            text-xs
+                            font-bold
+                            text-gray-700
+                            mb-1.5
+                        "
+                    >
+
+                        Email tài khoản
+
+                        <span class="text-red-500">
+                            *
+                        </span>
+
+                    </label>
+
+
+                    <input
+                        type="email"
+                        id="inUserEmail"
+                        required
+                        autocomplete="email"
+                        placeholder="VD: admin@khangnam.com"
+                        class="
+                            w-full
+                            border
+                            border-gray-300
+                            rounded-lg
+                            px-3
+                            py-2.5
+                            text-sm
+                            outline-none
+                            focus:border-kn-blue
+                            focus:ring-2
+                            focus:ring-blue-100
+                        "
+                    >
+
                 </div>
+
+
+                <!-- ROLE -->
+
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1 uppercase">Phân Quyền (Role) <span class="text-red-500">*</span></label>
-                    <select id="inUserRole" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue bg-white">
-                        <option value="admin">Admin (Toàn quyền)</option>
-                        <option value="editor">Editor (Đăng bài, Cập nhật SP)</option>
-                        <option value="sales">Sales (Xử lý đơn Báo giá)</option>
-                    </select>
+
+                    <label
+                        class="
+                            block
+                            text-xs
+                            font-bold
+                            text-gray-700
+                            mb-1.5
+                        "
+                    >
+                        Cấp quyền
+                    </label>
+
+
+                    <div
+                        class="
+                            border
+                            border-orange-100
+                            bg-orange-50
+                            rounded-xl
+                            px-4
+                            py-3
+                            flex
+                            items-center
+                            gap-3
+                        "
+                    >
+
+                        <div
+                            class="
+                                w-9
+                                h-9
+                                rounded-lg
+                                bg-white
+                                text-kn-orange
+                                flex
+                                items-center
+                                justify-center
+                                shrink-0
+                            "
+                        >
+
+                            <svg
+                                class="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.8"
+                                    d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm7.5-3a7.5 7.5 0 0 1-.15 1.5l1.65 1.28-2 3.46-2-.8a7.4 7.4 0 0 1-2.6 1.5L14 21h-4l-.4-2.06a7.4 7.4 0 0 1-2.6-1.5l-2 .8-2-3.46 1.65-1.28A7.5 7.5 0 0 1 4.5 12L2.85 10.72l2-3.46 2 .8a7.4 7.4 0 0 1 2.6-1.5L10 4h4l.4 2.06a7.4 7.4 0 0 1 2.6 1.5l2-.8 2 3.46L19.35 11A7.5 7.5 0 0 1 19.5 12Z"
+                                />
+                            </svg>
+
+                        </div>
+
+
+                        <div>
+
+                            <p
+                                class="
+                                    text-sm
+                                    font-black
+                                    text-orange-700
+                                "
+                            >
+                                Admin
+                            </p>
+
+                            <p
+                                class="
+                                    text-[11px]
+                                    text-orange-600
+                                    mt-0.5
+                                "
+                            >
+                                Toàn quyền quản trị hệ thống
+                            </p>
+
+                        </div>
+
+                    </div>
+
                 </div>
+
+
+                <!-- ACTIONS -->
+
+                <div
+                    class="
+                        pt-2
+                        flex
+                        justify-end
+                        gap-3
+                    "
+                >
+
+                    <button
+                        type="button"
+                        id="btnCancelModal"
+                        class="
+                            px-5
+                            py-2.5
+                            bg-gray-100
+                            hover:bg-gray-200
+                            rounded-lg
+                            text-sm
+                            font-bold
+                            text-gray-700
+                            transition
+                        "
+                    >
+                        Hủy
+                    </button>
+
+
+                    <button
+                        type="submit"
+                        id="btnSaveUser"
+                        class="
+                            px-6
+                            py-2.5
+                            bg-kn-blue
+                            hover:bg-blue-800
+                            text-white
+                            rounded-lg
+                            text-sm
+                            font-bold
+                            shadow-sm
+                            transition
+                        "
+                    >
+                        Lưu Admin
+                    </button>
+
+                </div>
+
             </form>
 
-            <div class="px-6 py-4 border-t border-gray-100 flex justify-end space-x-3 bg-gray-50/50">
-                <button onclick="closeUserModal()" class="px-5 py-2 bg-white border border-gray-300 rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-100 transition">Hủy</button>
-                <button onclick="saveUser()" id="btnSaveUser" class="px-6 py-2 bg-gray-900 text-white rounded-lg text-sm font-bold hover:bg-black transition shadow-sm">Lưu Quyền</button>
-            </div>
         </div>
+
     </div>
 
+
+    <!-- =====================================================
+         SCRIPTS
+    ====================================================== -->
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script src="../assets/js/common/supabase.js"></script>
+
     <script src="../assets/js/common/utils.js"></script>
-    <script src="../assets/js/admin/admin-core.js"></script> 
+
+    <script src="../assets/js/admin/admin-core.js"></script>
+
     <script src="../assets/js/admin/admin-nav.js"></script>
+
     <script src="../assets/js/admin/admin-users.js"></script>
+
 </body>
+
 </html>

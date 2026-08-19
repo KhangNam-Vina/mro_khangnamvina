@@ -72,11 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchRfqDetail();
 
     const btnExport = document.getElementById("btnExportPdf");
-
     if(btnExport){
         btnExport.addEventListener("click", exportPDF);
     }
-
 });
 
 // --------------------------------------------------------
@@ -84,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // --------------------------------------------------------
 async function fetchRfqDetail() {
     try {
-        // Thay vì gọi Service ngoài, truy vấn trực tiếp với JOIN qua Supabase
         const { data, error } = await window.supabaseClient
         .from('rfqs')
         .select('*') 
@@ -155,9 +152,8 @@ function renderRfqInfo() {
     const data = state.rfqData;
     if (!data) return;
 
-    const escapeHTML = window.utils && window.utils.escapeHTML ? window.utils.escapeHTML : (str) => str;
+    const escapeHTML = window.utils && window.utils.escapeHTML ? window.utils.escapeHTML : (str) => String(str).replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[c]);
 
-    // ĐÃ FIX: Gọi đúng cột rfq_code thay vì id
     if (DOM.lblRfqCode) DOM.lblRfqCode.textContent = escapeHTML(data.rfq_code || `RFQ-${data.id}`);
     
     if (DOM.lblDate) {
@@ -171,7 +167,6 @@ function renderRfqInfo() {
     if (DOM.lblEmail) DOM.lblEmail.textContent = escapeHTML(data.email) || '-';
     if (DOM.lblNotes) DOM.lblNotes.textContent = escapeHTML(data.notes || data.note) || 'Không có ghi chú';
     
-    // Thẻ Badge trạng thái màu sắc
     if (DOM.lblStatus) {
         const status = escapeHTML(data.status) || 'Chờ xử lý';
         DOM.lblStatus.textContent = status;
@@ -183,7 +178,6 @@ function renderRfqInfo() {
         else DOM.lblStatus.className += "bg-gray-100 text-gray-600 border-gray-200";
     }
 
-    // KHÓA CỨNG ĐƠN HÀNG NẾU ĐÃ XỬ LÝ XONG
     const actionButtons = document.getElementById('actionButtons');
     if (actionButtons) {
         const currentStatus = data.status || 'Chờ xử lý';
@@ -201,23 +195,30 @@ function renderProducts() {
     const items = state.rfqData.items || [];
     
     if (items.length === 0) {
-        DOM.itemList.innerHTML = `<tr><td colspan="4" class="text-center py-6 text-gray-500 italic">Không có vật tư nào được yêu cầu trong đơn này.</td></tr>`;
+        DOM.itemList.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-500 italic">Không có vật tư nào được yêu cầu trong đơn này.</td></tr>`;
         return;
     }
 
-    const escapeHTML = window.utils && window.utils.escapeHTML ? window.utils.escapeHTML : (str) => str;
+    // Hàm bọc escape an toàn
+    const safeEscape = (val) => {
+        const str = String(val ?? "");
+        if (window.utils && window.utils.escapeHTML) return window.utils.escapeHTML(str);
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    };
 
     DOM.itemList.innerHTML = items.map((item, index) => {
-        // Fix chống null/undefined bằng Optional Chaining
-        const safeName = escapeHTML(item.name ?? "Sản phẩm không xác định");
-        const sku = escapeHTML(item.sku ?? "-");
-        const qty = escapeHTML(item.qty ?? 1);
+        // Đã FIX chống lỗi crash bằng String()
+        const safeName = safeEscape(String(item.name ?? "Sản phẩm không xác định"));
+        const sku = safeEscape(String(item.sku ?? "-"));
+        const size = safeEscape(String(item.size ?? "-"));
+        const qty = safeEscape(String(item.qty ?? item.quantity ?? 1));
         
         return `
             <tr class="hover:bg-gray-50 transition border-b border-gray-100">
                 <td class="px-6 py-4 text-center text-gray-500">${index + 1}</td>
                 <td class="px-6 py-4 font-bold text-kn-blue">${sku}</td>
                 <td class="px-6 py-4 font-medium text-gray-800">${safeName}</td>
+                <td class="px-6 py-4 text-center font-bold text-gray-700">${size}</td>
                 <td class="px-6 py-4 text-center font-black text-kn-orange text-lg">${qty}</td>
             </tr>
         `;
@@ -243,7 +244,6 @@ async function exportPDF() {
     pdf.text("YEU CAU BAO GIA (RFQ)", 105, 25, { align: "center" });
 
     pdf.setFontSize(11);
-    // ĐÃ FIX: Đồng bộ rfq_code vào PDF
     pdf.text(`Ma RFQ: ${data.rfq_code || data.id}`, 15, 40);
     pdf.text(`Ngay tao: ${new Date(data.created_at).toLocaleString("vi-VN")}`, 15, 48);
     pdf.text(`Cong ty: ${data.company_name || ""}`, 15, 60);
@@ -256,19 +256,20 @@ async function exportPDF() {
 
     const rows = [];
 
-    // ĐÃ FIX: Đọc từ cột data.items và trỏ đúng key (sku, name, qty)
+    // Cập nhật PDF thêm cột SIZE
     (data.items || []).forEach((item, index) => {
         rows.push([
-            index + 1,
-            item.sku || "",
-            item.name || "",
-            item.qty || 1
+            String(index + 1),
+            String(item.sku || ""),
+            String(item.name || ""),
+            String(item.size || "-"),
+            String(item.qty ?? item.quantity ?? 1)
         ]);
     });
 
     pdf.autoTable({
         startY: 125,
-        head: [["STT", "SKU", "Ten san pham", "SL"]],
+        head: [["STT", "SKU", "Ten san pham", "Size", "SL"]],
         body: rows,
         theme: "grid",
         headStyles: {

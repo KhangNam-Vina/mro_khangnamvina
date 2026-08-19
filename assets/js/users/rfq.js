@@ -1,7 +1,8 @@
 // ========================================================
 // FILE: assets/js/users/rfq.js
 // RFQ CENTER - MRO KHANG NAM
-// CSS ĐÃ TÁCH KHỎI HTML / JS
+// HỖ TRỢ SIZE SẢN PHẨM
+// FIX: KHÔNG NHẢY VỀ SẢN PHẨM ĐẦU TIÊN KHI CÙNG SKU KHÁC SIZE
 // ========================================================
 
 let cartItems = [];
@@ -33,6 +34,17 @@ function loadCartFromStorage() {
         cartItems = [];
     }
 
+
+    /*
+     * QUAN TRỌNG:
+     * Không gộp sản phẩm theo SKU.
+     *
+     * Ví dụ:
+     * SKU ABC - Size S
+     * SKU ABC - Size M
+     *
+     * vẫn phải là 2 item riêng biệt.
+     */
 
     filteredCart = [
         ...cartItems
@@ -81,10 +93,9 @@ function handleCartSearch(event) {
 
     if (!keyword) {
 
-        filteredCart =
-            [
-                ...cartItems
-            ];
+        filteredCart = [
+            ...cartItems
+        ];
 
     } else {
 
@@ -107,10 +118,20 @@ function handleCartSearch(event) {
                             item.brand || ""
                         ).toLowerCase();
 
+                    const size =
+                        String(
+                            item.size ||
+                            item.selectedSize ||
+                            item.productSize ||
+                            ""
+                        ).toLowerCase();
+
+
                     return (
                         sku.includes(keyword) ||
                         name.includes(keyword) ||
-                        brand.includes(keyword)
+                        brand.includes(keyword) ||
+                        size.includes(keyword)
                     );
                 }
             );
@@ -186,7 +207,41 @@ function updateCartCounters() {
 
 
 /* ========================================================
-   4. RENDER CART
+   4. GET SIZE
+======================================================== */
+
+function getRFQItemSize(item) {
+
+    return String(
+        item?.size ??
+        item?.selectedSize ??
+        item?.productSize ??
+        ""
+    ).trim();
+}
+
+
+/* ========================================================
+   5. GET ORIGINAL INDEX
+======================================================== */
+
+function getOriginalCartIndex(item) {
+
+    /*
+     * KHÔNG tìm bằng SKU.
+     *
+     * SKU có thể giống nhau nhưng SIZE khác nhau.
+     *
+     * indexOf() lấy đúng object đang nằm trong
+     * filteredCart.
+     */
+
+    return cartItems.indexOf(item);
+}
+
+
+/* ========================================================
+   6. RENDER CART
 ======================================================== */
 
 function renderCartUI() {
@@ -270,29 +325,66 @@ function renderCartUI() {
     }
 
 
-    let html =
-        "";
+    let html = "";
 
 
     filteredCart.forEach(
         (item) => {
 
+            /*
+             * FIX QUAN TRỌNG:
+             *
+             * KHÔNG dùng SKU để tìm index.
+             *
+             * Vì cùng SKU có thể có nhiều SIZE.
+             */
+
             const originalIndex =
-                cartItems.findIndex(
-                    (originalItem) =>
-                        originalItem.sku ===
-                        item.sku
+                getOriginalCartIndex(
+                    item
                 );
+
+
+            /*
+             * Nếu item không tồn tại thì bỏ qua.
+             */
+
+            if (
+                originalIndex < 0
+            ) {
+                return;
+            }
+
+
+            const size =
+                getRFQItemSize(
+                    item
+                );
+
+
+            const safeSize =
+                escapeRFQValue(
+                    size
+                );
+
+
+            const quantity =
+                Number(
+                    item.qty
+                ) || 1;
 
 
             html += `
 
-                <article class="rfq-product-card">
+                <article
+                    class="rfq-product-card"
+                    data-cart-index="${originalIndex}"
+                >
 
                     <button
                         type="button"
                         onclick="removeItem(${originalIndex})"
-                        title="Xóa mã này"
+                        title="Xóa sản phẩm này"
                         class="rfq-product-remove"
                     >
                         XÓA
@@ -329,6 +421,23 @@ function renderCartUI() {
                             </strong>
                         </p>
 
+
+                        ${
+                            size
+                                ? `
+                                    <div class="rfq-product-size">
+                                        <span class="rfq-product-size-label">
+                                            Size:
+                                        </span>
+
+                                        <strong>
+                                            ${safeSize}
+                                        </strong>
+                                    </div>
+                                `
+                                : ""
+                        }
+
                     </div>
 
 
@@ -356,7 +465,7 @@ function renderCartUI() {
                                 type="number"
                                 id="rfqQty-${originalIndex}"
                                 min="1"
-                                value="${Number(item.qty) || 1}"
+                                value="${quantity}"
                                 class="rfq-product-qty-input"
                                 onchange="updateQty(${originalIndex}, this.value)"
                             >
@@ -378,7 +487,7 @@ function renderCartUI() {
 
 
 /* ========================================================
-   5. ESCAPE HTML
+   7. ESCAPE HTML
 ======================================================== */
 
 function escapeRFQValue(value) {
@@ -421,7 +530,7 @@ function escapeRFQValue(value) {
 
 
 /* ========================================================
-   6. UPDATE QUANTITY
+   8. UPDATE QUANTITY
 ======================================================== */
 
 window.updateQty =
@@ -497,6 +606,15 @@ function (
                             item.brand || ""
                         ).toLowerCase();
 
+                    const size =
+                        String(
+                            item.size ||
+                            item.selectedSize ||
+                            item.productSize ||
+                            ""
+                        ).toLowerCase();
+
+
                     return (
                         sku.includes(
                             searchValue
@@ -505,6 +623,9 @@ function (
                             searchValue
                         ) ||
                         brand.includes(
+                            searchValue
+                        ) ||
+                        size.includes(
                             searchValue
                         )
                     );
@@ -519,7 +640,7 @@ function (
 
 
 /* ========================================================
-   7. REMOVE ITEM
+   9. REMOVE ITEM
 ======================================================== */
 
 window.removeItem =
@@ -555,7 +676,7 @@ function (
 
 
 /* ========================================================
-   8. CLEAR ALL
+   10. CLEAR ALL
 ======================================================== */
 
 window.clearAllCart =
@@ -592,6 +713,7 @@ function () {
 
 
     if (searchInput) {
+
         searchInput.value =
             "";
     }
@@ -602,7 +724,7 @@ function () {
 
 
 /* ========================================================
-   9. EXPORT CSV
+   11. EXPORT CSV
 ======================================================== */
 
 window.exportCartToCSV =
@@ -625,7 +747,7 @@ function () {
 
 
     csvContent +=
-        "STT,Mã SKU,Tên Sản Phẩm,Thương Hiệu,ĐVT,Số Lượng\n";
+        "STT,Mã SKU,Tên Sản Phẩm,Thương Hiệu,Size,ĐVT,Số Lượng\n";
 
 
     cartItems.forEach(
@@ -667,6 +789,15 @@ function () {
                     : "OEM";
 
 
+            const safeSize =
+                getRFQItemSize(
+                    item
+                ).replace(
+                    /"/g,
+                    '""'
+                );
+
+
             const safeUnit =
                 item.unit
                     ? String(
@@ -685,7 +816,7 @@ function () {
 
 
             csvContent +=
-                `${index + 1},"${safeSku}","${safeName}","${safeBrand}","${safeUnit}",${qty}\n`;
+                `${index + 1},"${safeSku}","${safeName}","${safeBrand}","${safeSize}","${safeUnit}",${qty}\n`;
         }
     );
 
@@ -725,7 +856,7 @@ function () {
 
 
 /* ========================================================
-   10. SUBMIT RFQ
+   12. SUBMIT RFQ
 ======================================================== */
 
 window.submitRFQ =
@@ -825,7 +956,9 @@ async function () {
     const selectedItems =
         cartItems.filter(
             (item) =>
-                Number(item.qty) > 0
+                Number(
+                    item.qty
+                ) > 0
         );
 
 
@@ -977,6 +1110,7 @@ async function () {
 
 
         if (searchInput) {
+
             searchInput.value =
                 "";
         }
@@ -1020,7 +1154,7 @@ async function () {
 
 
 /* ========================================================
-   11. INIT
+   13. INIT
 ======================================================== */
 
 document.addEventListener(

@@ -844,6 +844,36 @@
         uppercase;
 }
 
+.rfq-product-size {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    color: #00479b;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.rfq-product-size-label {
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.rfq-product-size strong {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    min-height: 24px;
+    padding: 2px 8px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 5px;
+    color: #ea580c;
+    font-size: 11px;
+    font-weight: 800;
+}
+
 .rfq-product-footer {
     display:
         flex;
@@ -1096,21 +1126,17 @@
 ========================================================= */
 
 .rfq-sidebar-card {
-    position: sticky;
+    position: static;
 
-    top: 170px;
+    top: auto;
 
-    overflow:
-        hidden;
+    overflow: hidden;
 
-    background:
-        #fff;
+    background: #fff;
 
-    border:
-        1px solid #e5e7eb;
+    border: 1px solid #e5e7eb;
 
-    border-radius:
-        12px;
+    border-radius: 12px;
 
     box-shadow:
         0 4px 14px rgba(
@@ -1650,16 +1676,62 @@
     }
 }
 
+/* =========================================================
+   17. RESPONSIVE
+========================================================= */
+
+@media (min-width: 640px) {
+
+    .rfq-toolbar-left {
+        flex-direction:
+            row;
+    }
+
+    .rfq-toolbar-title {
+        text-align:
+            left;
+    }
+
+    .rfq-toolbar-search {
+        width:
+            260px;
+    }
+
+    .rfq-btn {
+        flex:
+            0 0 auto;
+    }
+
+    .rfq-product-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+}
+
+
+/* =========================================================
+   DESKTOP LAYOUT
+========================================================= */
 
 @media (min-width: 1024px) {
 
+    /* -----------------------------
+       TOOLBAR
+    ----------------------------- */
+
     .rfq-toolbar {
-    flex-direction: row;
+        flex-direction:
+            row;
 
-    align-items: center;
+        align-items:
+            center;
 
-    padding: 16px;
-}
+        padding:
+            16px;
+    }
 
     .rfq-toolbar-left {
         width:
@@ -1674,33 +1746,203 @@
             flex-end;
     }
 
+
+    /* -----------------------------
+       MAIN + SIDEBAR
+    ----------------------------- */
+
     .rfq-grid-layout {
+        display:
+            grid;
+
         grid-template-columns:
-            repeat(10, minmax(0, 1fr));
+            repeat(
+                10,
+                minmax(0, 1fr)
+            );
+
+        gap:
+            24px;
+
+        align-items:
+            start;
     }
+
 
     .rfq-col-main {
         grid-column:
-            span 7 / span 7;
+            span 7 /
+            span 7;
+
+        width:
+            100%;
+
+        min-width:
+            0;
     }
+
 
     .rfq-col-sidebar {
         grid-column:
-            span 3 / span 3;
+            span 3 /
+            span 3;
+
+        width:
+            100%;
+
+        min-width:
+            0;
     }
 
+
+    /*
+     * QUAN TRỌNG:
+     * Sidebar chạy theo document bình thường.
+     * Không sticky.
+     * Không top 170px.
+     * Không top 180px.
+     */
+
     .rfq-sidebar-card {
+        position:
+            static;
+
         top:
-            180px;
+            auto;
+
+        bottom:
+            auto;
+
+        inset:
+            auto;
     }
 }
 
+
+/* =========================================================
+   LARGE DESKTOP
+========================================================= */
 
 @media (min-width: 1280px) {
 
     .rfq-product-grid {
         grid-template-columns:
-            repeat(3, minmax(0, 1fr));
+            repeat(
+                3,
+                minmax(0, 1fr)
+            );
+    }
+}
+
+
+/* =========================================================
+   MOBILE / TABLET
+========================================================= */
+
+@media (max-width: 767px) {
+
+    .rfq-container {
+        width:
+            calc(100% - 24px);
+    }
+
+    .rfq-hero {
+        padding:
+            36px 0;
+    }
+
+    .rfq-hero-title {
+        font-size:
+            28px;
+    }
+
+    .rfq-hero-description {
+        font-size:
+            13px;
+    }
+
+    .rfq-main {
+        padding:
+            20px 0 48px;
+    }
+
+    .rfq-sidebar-card {
+        position:
+            static;
+    }
+
+    .rfq-toolbar-actions {
+        display:
+            grid;
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+    .rfq-btn {
+        width:
+            100%;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .rfq-container {
+        width:
+            calc(100% - 20px);
+    }
+
+    .rfq-toolbar {
+        padding:
+            10px;
+    }
+
+    .rfq-toolbar-actions {
+        grid-template-columns:
+            1fr;
+    }
+
+    .rfq-toolbar-title {
+        font-size:
+            15px;
+    }
+
+    .rfq-toolbar-badge {
+        width:
+            36px;
+
+        height:
+            36px;
+    }
+
+    .rfq-product-card {
+        padding:
+            14px;
+    }
+
+    .rfq-product-footer {
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+    }
+
+    .rfq-product-qty-wrap {
+        width:
+            100%;
+
+        justify-content:
+            space-between;
+    }
+
+    .rfq-sidebar-body {
+        padding:
+            16px;
     }
 }
 
@@ -1852,4 +2094,15 @@
         box-shadow:
             none;
     }
+}
+/* =========================================================
+   FIX: SIDEBAR RFQ KHÔNG STICKY
+========================================================= */
+
+.rfq-sidebar-card,
+.rfq-col-sidebar {
+    position: static !important;
+    top: auto !important;
+    bottom: auto !important;
+    inset: auto !important;
 }
