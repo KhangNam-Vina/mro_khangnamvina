@@ -833,7 +833,6 @@
                                 "
                             >
 
-
                                 <!-- SKU + NAME -->
 
                                 <div
@@ -939,8 +938,6 @@
                                     "
                                 >
 
-                                    <!-- CATEGORY -->
-
                                     <div>
 
                                         <label
@@ -980,8 +977,6 @@
 
                                     </div>
 
-
-                                    <!-- SUBCATEGORY -->
 
                                     <div>
 
@@ -1023,8 +1018,6 @@
                                     </div>
 
 
-                                    <!-- FAMILY -->
-
                                     <div>
 
                                         <label
@@ -1064,8 +1057,6 @@
 
                                     </div>
 
-
-                                    <!-- INDUSTRY -->
 
                                     <div>
 
@@ -1256,7 +1247,6 @@
                                     "
                                 >
 
-
                                     <!-- PRICE -->
 
                                     <div>
@@ -1337,9 +1327,7 @@
                                     </div>
 
 
-                                    <!-- =================================================
-                                         SIZE - ĐÃ SỬA
-                                    ================================================== -->
+                                    <!-- SIZE -->
 
                                     <div>
 
@@ -1599,7 +1587,6 @@
 
                                     </div>
 
-
                                 </div>
 
                             </div>
@@ -1649,17 +1636,230 @@
                             <div
                                 class="
                                     p-5
-                                    space-y-5
+                                    space-y-6
                                 "
                             >
 
-
-                                <!-- MAIN IMAGE -->
+                                <!-- =================================================
+                                     ẢNH ĐẠI DIỆN
+                                ================================================== -->
 
                                 <div>
 
                                     <label
-                                        for="image_url"
+                                        for="image_file"
+                                        class="
+                                            block
+                                            text-xs
+                                            font-bold
+                                            text-gray-700
+                                            mb-2
+                                        "
+                                    >
+                                        Ảnh đại diện
+                                    </label>
+
+                                    <div
+                                        class="
+                                            border-2
+                                            border-dashed
+                                            border-gray-300
+                                            rounded-xl
+                                            p-5
+                                            hover:border-kn-blue
+                                            transition
+                                        "
+                                    >
+
+                                        <div
+                                            class="
+                                                flex
+                                                flex-col
+                                                sm:flex-row
+                                                items-start
+                                                sm:items-center
+                                                gap-4
+                                            "
+                                        >
+
+                                            <!-- PREVIEW -->
+
+                                            <div
+                                                id="mainImagePreview"
+                                                class="
+                                                    w-28
+                                                    h-28
+                                                    rounded-lg
+                                                    border
+                                                    border-gray-200
+                                                    bg-gray-50
+                                                    flex
+                                                    items-center
+                                                    justify-center
+                                                    overflow-hidden
+                                                    shrink-0
+                                                "
+                                            >
+
+                                                <span
+                                                    class="
+                                                        text-[11px]
+                                                        text-gray-400
+                                                        text-center
+                                                        px-2
+                                                    "
+                                                >
+                                                    Chưa có ảnh
+                                                </span>
+
+                                            </div>
+
+
+                                            <!-- INPUT -->
+
+                                            <div
+                                                class="
+                                                    flex-1
+                                                "
+                                            >
+
+                                                <input
+                                                    type="file"
+                                                    id="image_file"
+                                                    name="image_file"
+                                                    accept="image/jpeg,image/png,image/webp,image/gif"
+                                                    class="
+                                                        block
+                                                        w-full
+                                                        text-sm
+                                                        text-gray-500
+                                                        file:mr-4
+                                                        file:py-2.5
+                                                        file:px-4
+                                                        file:rounded-lg
+                                                        file:border-0
+                                                        file:text-sm
+                                                        file:font-bold
+                                                        file:bg-blue-50
+                                                        file:text-kn-blue
+                                                        hover:file:bg-blue-100
+                                                        cursor-pointer
+                                                    "
+                                                >
+
+                                                <p
+                                                    class="
+                                                        mt-2
+                                                        text-[11px]
+                                                        text-gray-400
+                                                    "
+                                                >
+                                                    JPG, PNG, WEBP hoặc GIF. Chọn 1 ảnh làm ảnh đại diện.
+                                                </p>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- =================================================
+                                     ẢNH PHỤ
+                                ================================================== -->
+
+                                <div>
+
+                                    <label
+                                        for="extra_image_files"
+                                        class="
+                                            block
+                                            text-xs
+                                            font-bold
+                                            text-gray-700
+                                            mb-2
+                                        "
+                                    >
+                                        Ảnh phụ
+                                    </label>
+
+                                    <div
+                                        class="
+                                            border-2
+                                            border-dashed
+                                            border-gray-300
+                                            rounded-xl
+                                            p-5
+                                            hover:border-kn-blue
+                                            transition
+                                        "
+                                    >
+
+                                        <input
+                                            type="file"
+                                            id="extra_image_files"
+                                            name="extra_image_files"
+                                            accept="image/jpeg,image/png,image/webp,image/gif"
+                                            multiple
+                                            class="
+                                                block
+                                                w-full
+                                                text-sm
+                                                text-gray-500
+                                                file:mr-4
+                                                file:py-2.5
+                                                file:px-4
+                                                file:rounded-lg
+                                                file:border-0
+                                                file:text-sm
+                                                file:font-bold
+                                                file:bg-blue-50
+                                                file:text-kn-blue
+                                                hover:file:bg-blue-100
+                                                cursor-pointer
+                                            "
+                                        >
+
+                                        <p
+                                            class="
+                                                mt-2
+                                                text-[11px]
+                                                text-gray-400
+                                            "
+                                        >
+                                            Có thể chọn nhiều ảnh cùng lúc để tạo gallery sản phẩm.
+                                        </p>
+
+
+                                        <!-- EXTRA IMAGE PREVIEW -->
+
+                                        <div
+                                            id="extraImagesPreview"
+                                            class="
+                                                mt-4
+                                                grid
+                                                grid-cols-2
+                                                sm:grid-cols-4
+                                                lg:grid-cols-6
+                                                gap-3
+                                            "
+                                        ></div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- =================================================
+                                     DATASHEET
+                                ================================================== -->
+
+                                <div>
+
+                                    <label
+                                        for="inDatasheet"
                                         class="
                                             block
                                             text-xs
@@ -1668,12 +1868,12 @@
                                             mb-1.5
                                         "
                                     >
-                                        URL ảnh đại diện
+                                        Link Datasheet (PDF)
                                     </label>
 
                                     <input
                                         type="text"
-                                        id="image_url"
+                                        id="inDatasheet"
                                         class="
                                             w-full
                                             border
@@ -1688,89 +1888,15 @@
                                         placeholder="https://..."
                                     >
 
-                                </div>
-
-
-                                <!-- EXTRA + DATASHEET -->
-
-                                <div
-                                    class="
-                                        grid
-                                        grid-cols-1
-                                        lg:grid-cols-2
-                                        gap-5
-                                    "
-                                >
-
-                                    <div>
-
-                                        <label
-                                            for="inExtraImages"
-                                            class="
-                                                block
-                                                text-xs
-                                                font-bold
-                                                text-gray-700
-                                                mb-1.5
-                                            "
-                                        >
-                                            Link ảnh phụ
-                                        </label>
-
-                                        <textarea
-                                            id="inExtraImages"
-                                            rows="5"
-                                            class="
-                                                w-full
-                                                border
-                                                border-gray-300
-                                                rounded-lg
-                                                px-3
-                                                py-2.5
-                                                text-sm
-                                                outline-none
-                                                resize-none
-                                                focus:border-kn-blue
-                                            "
-                                            placeholder="Mỗi link một dòng..."
-                                        ></textarea>
-
-                                    </div>
-
-
-                                    <div>
-
-                                        <label
-                                            for="inDatasheet"
-                                            class="
-                                                block
-                                                text-xs
-                                                font-bold
-                                                text-gray-700
-                                                mb-1.5
-                                            "
-                                        >
-                                            Link Datasheet (PDF)
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            id="inDatasheet"
-                                            class="
-                                                w-full
-                                                border
-                                                border-gray-300
-                                                rounded-lg
-                                                px-3
-                                                py-2.5
-                                                text-sm
-                                                outline-none
-                                                focus:border-kn-blue
-                                            "
-                                            placeholder="https://..."
-                                        >
-
-                                    </div>
+                                    <p
+                                        class="
+                                            mt-1.5
+                                            text-[10px]
+                                            text-gray-400
+                                        "
+                                    >
+                                        Hiện tại vẫn sử dụng đường dẫn PDF. Phần này chưa chuyển sang upload file.
+                                    </p>
 
                                 </div>
 
@@ -1824,7 +1950,6 @@
                                     space-y-5
                                 "
                             >
-
 
                                 <!-- SHORT DESCRIPTION -->
 
