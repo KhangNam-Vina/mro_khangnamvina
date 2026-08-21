@@ -82,7 +82,7 @@ const state = {
 
     currentPage: 1,
 
-    itemsPerPage: 10,
+    itemsPerPage: 20,
 
     totalItems: 0,
 
@@ -2625,17 +2625,19 @@ async function loadAllDropdowns() {
 
 
         populateSelect(
-            DOM.filterCategory,
-            state.categories,
-            "Tất cả danh mục"
-        );
+                DOM.filterCategory,
+                state.categories,
+                "Tất cả danh mục",
+                "all"
+            );
 
 
-        populateSelect(
-            DOM.filterIndustry,
-            state.industries,
-            "Tất cả ngành hàng"
-        );
+            populateSelect(
+                DOM.filterIndustry,
+                state.industries,
+                "Tất cả ngành hàng",
+                "all"
+            );
 
 
         resetCatalogDropdowns();
@@ -2670,7 +2672,8 @@ async function loadAllDropdowns() {
 function populateSelect(
     element,
     data,
-    placeholder
+    placeholder,
+    placeholderValue = ""
 ) {
 
     if (
@@ -2684,7 +2687,9 @@ function populateSelect(
 
     element.innerHTML = `
 
-        <option value="">
+        <option value="${escapeAttribute(
+            placeholderValue
+        )}">
             ${escapeHTML(
                 placeholder
             )}
@@ -3132,88 +3137,265 @@ function renderTableLoading() {
    STATISTICS
 ========================================================= */
 
-function updateStatistics() {
+async function updateStatistics() {
 
-    if (
-        DOM.total
-    ) {
+    try {
 
-        DOM.total.textContent =
-            state.totalItems;
-
-    }
-
-
-    const inStock =
-        state.products.filter(
-            product =>
-                Number(
-                    product.stock_quantity
-                ) > 0
-        ).length;
+        /*
+         * THỐNG KÊ TOÀN BỘ SẢN PHẨM
+         *
+         * Không phụ thuộc:
+         * - trang hiện tại
+         * - tìm kiếm
+         * - danh mục
+         * - ngành hàng
+         * - bộ lọc tồn kho
+         */
 
 
-    const outOfStock =
-        state.products.filter(
-            product =>
-                Number(
-                    product.stock_quantity
-                ) <= 0
-        ).length;
+        /* -------------------------------------------------
+           1. TỔNG SẢN PHẨM
+        ------------------------------------------------- */
 
-
-    const onSale =
-        state.products.filter(
-            product => {
-
-                const price =
-                    Number(
-                        product.price
-                    );
-
-
-                const discount =
-                    Number(
-                        product.discount_price
-                    );
-
-
-                return (
-                    discount > 0 &&
-                    price > 0 &&
-                    discount < price
+        const {
+            count: totalCount,
+            error: totalError
+        } =
+            await window.supabaseClient
+                .from("products")
+                .select(
+                    "id",
+                    {
+                        count: "exact",
+                        head: true
+                    }
                 );
 
-            }
-        ).length;
+
+        if (
+            totalError
+        ) {
+
+            throw totalError;
+
+        }
 
 
-    if (
-        DOM.inStock
+        /* -------------------------------------------------
+           2. CÒN HÀNG
+        ------------------------------------------------- */
+
+        const {
+            count: inStockCount,
+            error: inStockError
+        } =
+            await window.supabaseClient
+                .from("products")
+                .select(
+                    "id",
+                    {
+                        count: "exact",
+                        head: true
+                    }
+                )
+                .gt(
+                    "stock_quantity",
+                    0
+                );
+
+
+        if (
+            inStockError
+        ) {
+
+            throw inStockError;
+
+        }
+
+
+        /* -------------------------------------------------
+           3. HẾT HÀNG
+        ------------------------------------------------- */
+
+        const {
+            count: outOfStockCount,
+            error: outOfStockError
+        } =
+            await window.supabaseClient
+                .from("products")
+                .select(
+                    "id",
+                    {
+                        count: "exact",
+                        head: true
+                    }
+                )
+                .lte(
+                    "stock_quantity",
+                    0
+                );
+
+
+        if (
+            outOfStockError
+        ) {
+
+            throw outOfStockError;
+
+        }
+
+
+        /* -------------------------------------------------
+           4. ĐANG GIẢM GIÁ
+        -------------------------------------------------
+           
+           Lấy price + discount_price của toàn bộ sản phẩm
+           rồi kiểm tra:
+           
+           discount_price > 0
+           discount_price < price
+        ------------------------------------------------- */
+
+        const {
+            data: saleProducts,
+            error: saleError
+        } =
+            await window.supabaseClient
+                .from("products")
+                .select(
+                    "price, discount_price"
+                );
+
+
+        if (
+            saleError
+        ) {
+
+            throw saleError;
+
+        }
+
+
+        const onSaleCount =
+            (
+                saleProducts || []
+            ).filter(
+                product => {
+
+                    const price =
+                        Number(
+                            product.price
+                        );
+
+
+                    const discount =
+                        Number(
+                            product.discount_price
+                        );
+
+
+                    return (
+                        price > 0 &&
+                        discount > 0 &&
+                        discount < price
+                    );
+
+                }
+            ).length;
+
+
+        /* -------------------------------------------------
+           5. HIỂN THỊ
+        ------------------------------------------------- */
+
+        if (
+            DOM.total
+        ) {
+
+            DOM.total.textContent =
+                totalCount || 0;
+
+        }
+
+
+        if (
+            DOM.inStock
+        ) {
+
+            DOM.inStock.textContent =
+                inStockCount || 0;
+
+        }
+
+
+        if (
+            DOM.outOfStock
+        ) {
+
+            DOM.outOfStock.textContent =
+                outOfStockCount || 0;
+
+        }
+
+
+        if (
+            DOM.onSale
+        ) {
+
+            DOM.onSale.textContent =
+                onSaleCount || 0;
+
+        }
+
+
+    } catch (
+        error
     ) {
 
-        DOM.inStock.textContent =
-            inStock;
-
-    }
-
-
-    if (
-        DOM.outOfStock
-    ) {
-
-        DOM.outOfStock.textContent =
-            outOfStock;
-
-    }
+        console.error(
+            "Lỗi tải thống kê sản phẩm:",
+            error
+        );
 
 
-    if (
-        DOM.onSale
-    ) {
+        if (
+            DOM.total
+        ) {
 
-        DOM.onSale.textContent =
-            onSale;
+            DOM.total.textContent =
+                "—";
+
+        }
+
+
+        if (
+            DOM.inStock
+        ) {
+
+            DOM.inStock.textContent =
+                "—";
+
+        }
+
+
+        if (
+            DOM.outOfStock
+        ) {
+
+            DOM.outOfStock.textContent =
+                "—";
+
+        }
+
+
+        if (
+            DOM.onSale
+        ) {
+
+            DOM.onSale.textContent =
+                "—";
+
+        }
 
     }
 
