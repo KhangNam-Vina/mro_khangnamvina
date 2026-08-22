@@ -32,23 +32,27 @@ function buildProductImageUrl(imagePath) {
         return '../assets/images/world mark.png';
     }
 
-    // Đã là CDN Worker URL
     if (path.startsWith(IMAGE_CDN_BASE)) {
         return path;
     }
 
-    // Nếu database còn URL Supabase cũ
     const supabasePrefix =
         'https://wnhrkziiujbswnrfnlly.supabase.co/storage/v1/object/public/product-images/';
 
     if (path.startsWith(supabasePrefix)) {
-        path = path.slice(supabasePrefix.length);
+        path = path.slice(
+            supabasePrefix.length
+        );
     }
 
-    path = path.replace(/^\/+/, '');
+    path = path.replace(
+        /^\/+/,
+        ''
+    );
 
     return `${IMAGE_CDN_BASE}/${path}`;
 }
+
 
 // ========================================================
 // 1. UTILITY
@@ -161,8 +165,8 @@ async function fetchFilteredProducts() {
         urlParams.get(
             'family_id'
         );
-    
-    const industryId = 
+
+    const industryId =
         urlParams.get(
             'industry_id'
         );
@@ -476,16 +480,31 @@ async function fetchFilteredProducts() {
 
         }
 
+
         // ==================================================
         // INDUSTRY
         // ==================================================
-        if (industryId) {
-            query = query.eq('industry_id', industryId);
 
-            if (!searchQuery) {
-                pageTitleText = 'Sản phẩm theo Ngành hàng';
-                breadcrumbText = 'Ngành hàng';
+        if (industryId) {
+
+            query =
+                query.eq(
+                    'industry_id',
+                    industryId
+                );
+
+            if (
+                !searchQuery
+            ) {
+
+                pageTitleText =
+                    'Sản phẩm theo Ngành hàng';
+
+                breadcrumbText =
+                    'Ngành hàng';
+
             }
+
         }
 
 
@@ -549,7 +568,7 @@ async function fetchFilteredProducts() {
 
 
         // ==================================================
-        // PAGINATION
+        // PAGINATION QUERY
         // ==================================================
 
         query =
@@ -752,32 +771,38 @@ async function fetchFilteredProducts() {
                     if (
                         badgeVal === 'NEW'
                     ) {
+
                         badgeType =
                             'product-badge-new';
 
                     } else if (
                         badgeVal === 'HOT'
                     ) {
+
                         badgeType =
                             'product-badge-hot';
 
                     } else if (
                         badgeVal === 'SALE'
                     ) {
+
                         badgeType =
                             'product-badge-sale-custom';
 
                     } else if (
                         badgeVal === 'BEST SELLER'
                     ) {
+
                         badgeType =
                             'product-badge-best';
 
                     } else if (
                         badgeVal === 'CLEARANCE'
                     ) {
+
                         badgeType =
                             'product-badge-clearance';
+
                     }
 
 
@@ -806,12 +831,19 @@ async function fetchFilteredProducts() {
 
                             ${rightBadgeHtml}
 
-                           <img
-                                src="${escapeProductsHTML(buildProductImageUrl(item.image_path))}"
-                                alt="${escapeProductsHTML(item.name || '')}"
+                            <img
+                                src="${escapeProductsHTML(
+                                    buildProductImageUrl(
+                                        item.image_path
+                                    )
+                                )}"
+                                alt="${escapeProductsHTML(
+                                    item.name || ''
+                                )}"
                                 loading="lazy"
                                 onerror="this.onerror=null;this.src='../assets/images/world mark.png';"
                             >
+
                         </a>
 
 
@@ -820,11 +852,15 @@ async function fetchFilteredProducts() {
                             <div class="product-meta">
 
                                 <span class="product-sku">
-                                    ${escapeProductsHTML(item.sku || '')}
+                                    ${escapeProductsHTML(
+                                        item.sku || ''
+                                    )}
                                 </span>
 
                                 <span class="product-brand">
-                                    ${escapeProductsHTML(brandName)}
+                                    ${escapeProductsHTML(
+                                        brandName
+                                    )}
                                 </span>
 
                             </div>
@@ -836,7 +872,9 @@ async function fetchFilteredProducts() {
                             >
 
                                 <h3 class="product-card-name">
-                                    ${escapeProductsHTML(item.name || '')}
+                                    ${escapeProductsHTML(
+                                        item.name || ''
+                                    )}
                                 </h3>
 
                             </a>
@@ -847,7 +885,9 @@ async function fetchFilteredProducts() {
                                 <span class="product-unit">
                                     ĐVT:
                                     <strong>
-                                        ${escapeProductsHTML(item.unit || '')}
+                                        ${escapeProductsHTML(
+                                            item.unit || ''
+                                        )}
                                     </strong>
                                 </span>
 
@@ -901,13 +941,97 @@ async function fetchFilteredProducts() {
                 };
 
 
+            let pages = [];
+
+
+            // ==================================================
+            // 7 TRANG TRỞ XUỐNG
+            // ==================================================
+
+            if (
+                totalPages <= 7
+            ) {
+
+                for (
+                    let page = 1;
+                    page <= totalPages;
+                    page++
+                ) {
+
+                    pages.push(
+                        page
+                    );
+
+                }
+
+            }
+
+
+            // ==================================================
+            // NHIỀU TRANG
+            // ==================================================
+
+            else {
+
+                if (
+                    currentPage <= 4
+                ) {
+
+                    pages = [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        '...',
+                        totalPages
+                    ];
+
+                } else if (
+                    currentPage >=
+                    totalPages - 3
+                ) {
+
+                    pages = [
+                        1,
+                        '...',
+                        totalPages - 4,
+                        totalPages - 3,
+                        totalPages - 2,
+                        totalPages - 1,
+                        totalPages
+                    ];
+
+                } else {
+
+                    pages = [
+                        1,
+                        '...',
+                        currentPage - 1,
+                        currentPage,
+                        currentPage + 1,
+                        '...',
+                        totalPages
+                    ];
+
+                }
+
+            }
+
+
+            // ==================================================
+            // PREVIOUS
+            // ==================================================
+
             if (
                 currentPage > 1
             ) {
 
                 paginationContainer.innerHTML += `
                     <a
-                        href="${buildUrl(currentPage - 1)}"
+                        href="${buildUrl(
+                            currentPage - 1
+                        )}"
                         class="pagination-button pagination-arrow"
                     >
                         &laquo;
@@ -917,37 +1041,62 @@ async function fetchFilteredProducts() {
             }
 
 
-            for (
-                let page = 1;
-                page <= totalPages;
-                page++
-            ) {
+            // ==================================================
+            // PAGE NUMBERS
+            // ==================================================
 
-                if (
-                    page === currentPage
-                ) {
+            pages.forEach(
+                page => {
 
-                    paginationContainer.innerHTML += `
-                        <span class="pagination-button pagination-current">
-                            ${page}
-                        </span>
-                    `;
+                    if (
+                        page === '...'
+                    ) {
 
-                } else {
+                        paginationContainer.innerHTML += `
+                            <span
+                                class="pagination-button pagination-ellipsis"
+                            >
+                                ...
+                            </span>
+                        `;
 
-                    paginationContainer.innerHTML += `
-                        <a
-                            href="${buildUrl(page)}"
-                            class="pagination-button pagination-link"
-                        >
-                            ${page}
-                        </a>
-                    `;
+                        return;
+
+                    }
+
+
+                    if (
+                        page === currentPage
+                    ) {
+
+                        paginationContainer.innerHTML += `
+                            <span
+                                class="pagination-button pagination-current"
+                            >
+                                ${page}
+                            </span>
+                        `;
+
+                    } else {
+
+                        paginationContainer.innerHTML += `
+                            <a
+                                href="${buildUrl(page)}"
+                                class="pagination-button pagination-link"
+                            >
+                                ${page}
+                            </a>
+                        `;
+
+                    }
 
                 }
+            );
 
-            }
 
+            // ==================================================
+            // NEXT
+            // ==================================================
 
             if (
                 currentPage < totalPages
@@ -955,7 +1104,9 @@ async function fetchFilteredProducts() {
 
                 paginationContainer.innerHTML += `
                     <a
-                        href="${buildUrl(currentPage + 1)}"
+                        href="${buildUrl(
+                            currentPage + 1
+                        )}"
                         class="pagination-button pagination-arrow"
                     >
                         &raquo;
@@ -974,7 +1125,6 @@ async function fetchFilteredProducts() {
             error
         );
 
-
         container.innerHTML = `
             <div class="products-error">
                 Lỗi:
@@ -985,6 +1135,7 @@ async function fetchFilteredProducts() {
         `;
 
     }
+
 }
 
 
@@ -1015,7 +1166,7 @@ async function loadSidebar() {
             'category_id'
         );
 
-    const industryId = 
+    const industryId =
         urlParams.get(
             'industry_id'
         );
@@ -1108,17 +1259,17 @@ async function loadSidebar() {
                     categoryId
                 );
 
-        }
+        } else if (
+            industryId
+        ) {
 
-         else if (
-            industryId) {
-            prodQuery = 
+            prodQuery =
                 prodQuery.eq(
-                    'industry_id', 
+                    'industry_id',
                     industryId
                 );
+
         }
-        
 
 
         const {
@@ -1400,11 +1551,15 @@ async function loadSidebar() {
                                         ${isChecked ? 'checked' : ''}
                                         class="sidebar-filter-cb products-checkbox"
                                         data-filter="sub_category_id"
-                                        data-name="${escapeProductsHTML(sub.name)}"
+                                        data-name="${escapeProductsHTML(
+                                            sub.name
+                                        )}"
                                     >
 
                                     <span class="products-filter-name">
-                                        ${escapeProductsHTML(sub.name)}
+                                        ${escapeProductsHTML(
+                                            sub.name
+                                        )}
                                     </span>
 
                                 </span>
@@ -1502,11 +1657,15 @@ async function loadSidebar() {
                                     ${isChecked ? 'checked' : ''}
                                     class="sidebar-filter-cb products-checkbox"
                                     data-filter="brand_id"
-                                    data-name="${escapeProductsHTML(brand.name)}"
+                                    data-name="${escapeProductsHTML(
+                                        brand.name
+                                    )}"
                                 >
 
                                 <span class="products-filter-name">
-                                    ${escapeProductsHTML(brand.name)}
+                                    ${escapeProductsHTML(
+                                        brand.name
+                                    )}
                                 </span>
 
                             </span>
@@ -1711,12 +1870,18 @@ function renderActiveFilters() {
                 <button
                     type="button"
                     class="active-filter-tag"
-                    data-filter-type="${escapeProductsHTML(filterType)}"
-                    data-filter-id="${escapeProductsHTML(checkbox.value)}"
+                    data-filter-type="${escapeProductsHTML(
+                        filterType
+                    )}"
+                    data-filter-id="${escapeProductsHTML(
+                        checkbox.value
+                    )}"
                 >
 
                     <span>
-                        ${escapeProductsHTML(name)}
+                        ${escapeProductsHTML(
+                            name
+                        )}
                     </span>
 
                     <svg
@@ -2009,11 +2174,15 @@ async function loadDynamicBrands(
                                 ${isChecked ? 'checked' : ''}
                                 class="sidebar-filter-cb products-checkbox"
                                 data-filter="brand_id"
-                                data-name="${escapeProductsHTML(brand.name)}"
+                                data-name="${escapeProductsHTML(
+                                    brand.name
+                                )}"
                             >
 
                             <span class="products-filter-name">
-                                ${escapeProductsHTML(brand.name)}
+                                ${escapeProductsHTML(
+                                    brand.name
+                                )}
                             </span>
 
                         </span>

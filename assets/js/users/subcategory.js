@@ -159,6 +159,15 @@ async function fetchSubCategories() {
         allSubCats =
             subRes.data || [];
 
+        const subcategoryCount =
+            document.getElementById(
+                'subcategoryCount'
+            );
+
+        if (subcategoryCount) {
+            subcategoryCount.textContent =
+                allSubCats.length;
+        }
 
         // ==================================================
         // RESET PRODUCT COUNTS
@@ -217,7 +226,6 @@ async function fetchSubCategories() {
                 bcCategory.textContent =
                     categoryName;
             }
-
 
             const dynamicTitle =
                 `${categoryName} - Danh mục nhóm hàng | MRO Khang Nam`;

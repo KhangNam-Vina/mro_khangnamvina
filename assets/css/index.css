@@ -330,7 +330,11 @@
 .slider-nav-btn svg { width: 24px; height: 24px; }
 
 .product-slider {
-    width: 100%; position: relative; overflow-x: auto;
+    width: 100%;
+    max-width: 100%;
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: hidden;
     display: flex; align-items: stretch; padding: 8px 0;
     cursor: grab; scroll-behavior: smooth;
     mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
@@ -720,4 +724,25 @@
 /* 3. Hiệu ứng Hover - Rê chuột vào bự chà bá luôn */
 #bestSellingGrid .product-card:hover .product-img {
     transform: scale(1.45) !important; /* Phóng to 45% khi hover */
+}
+/* =========================================================
+   FIX: CHẶN TRÀN NGANG TOÀN TRANG
+========================================================= */
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.home-page {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.home-container {
+    width: min(1536px, calc(100% - 32px));
+    max-width: 100%;
+    box-sizing: border-box;
 }

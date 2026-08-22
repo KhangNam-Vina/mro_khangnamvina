@@ -154,6 +154,17 @@ async function fetchFamilies() {
         allFamilies =
             familiesRes.data || [];
 
+        const familyCount =
+            document.getElementById(
+                'familyCount'
+            );
+
+        if (familyCount) {
+
+            familyCount.textContent =
+                allFamilies.length;
+
+        }
 
         // ==================================================
         // SEO + BREADCRUMB

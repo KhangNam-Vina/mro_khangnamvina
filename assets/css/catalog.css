@@ -390,69 +390,133 @@
    9. CATEGORY
 ========================================================= */
 
+.catalog-section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 18px;
+}
+
+.catalog-section-heading {
+    min-width: 0;
+}
+
+.catalog-section-eyebrow {
+    display: block;
+    margin-bottom: 4px;
+    color: #ff5e00;
+    font-size: 11px;
+    line-height: 1.2;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.catalog-section-title {
+    margin: 0;
+    color: #00479b;
+    font-size: 24px;
+    line-height: 1.25;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.catalog-section-description {
+    margin: 5px 0 0;
+    color: #6b7280;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
 .catalog-category-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
 }
 
 .catalog-category-card {
     position: relative;
-    min-height: 172px;
+    min-height: 142px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 18px 16px 16px;
     overflow: hidden;
     box-sizing: border-box;
     background: #fff;
-    border: 1px solid #f3f4f6;
-    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 9px;
     color: #1f2937;
     text-align: center;
     text-decoration: none;
-    box-shadow: 0 2px 6px rgba(15, 23, 42, .05);
+    box-shadow: 0 2px 6px rgba(15, 23, 42, .04);
     transition:
-        border-color .3s ease,
-        box-shadow .3s ease,
-        transform .3s ease;
+        border-color .2s ease,
+        box-shadow .2s ease,
+        transform .2s ease,
+        background-color .2s ease;
+}
+
+.catalog-category-card::after {
+    content: "";
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 0;
+    height: 2px;
+    border-radius: 999px 999px 0 0;
+    background: #ff5e00;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform .2s ease;
 }
 
 .catalog-category-card:hover {
-    border-color: #00479b;
-    box-shadow: 0 10px 22px rgba(15, 23, 42, .1);
-    transform: translateY(-4px);
+    border-color: #bfdbfe;
+    background: #fcfdff;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, .08);
+    transform: translateY(-3px);
+}
+
+.catalog-category-card:hover::after {
+    transform: scaleX(1);
 }
 
 .catalog-category-icon {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     border: 1px solid #e5e7eb;
     border-radius: 50%;
-    background: #f9fafb;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .03);
+    background: #f8fafc;
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, .03);
     transition:
-        background-color .3s ease,
-        transform .3s ease;
+        background-color .2s ease,
+        border-color .2s ease,
+        transform .2s ease;
 }
 
 .catalog-category-card:hover .catalog-category-icon {
     background: #eff6ff;
-    border-color: #dbeafe;
-    transform: scale(1.05);
+    border-color: #bfdbfe;
+    transform: translateY(-1px);
 }
 
 .catalog-category-icon span {
-    font-size: 25px;
+    display: block;
+    font-size: 22px;
     line-height: 1;
-    transition: transform .3s ease;
+    filter: saturate(.9);
+    transition: transform .2s ease;
 }
 
 .catalog-category-card:hover .catalog-category-icon span {
-    transform: scale(1.1);
+    transform: scale(1.06);
 }
 
 .catalog-category-title {
@@ -461,10 +525,10 @@
     width: 100%;
     margin: 0;
     padding: 0 8px;
-    color: #1f2937;
-    font-size: 14px;
-    line-height: 1.45;
-    font-weight: 900;
+    color: #111827;
+    font-size: 13px;
+    line-height: 1.4;
+    font-weight: 800;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
@@ -476,56 +540,64 @@
     color: #00479b;
 }
 
-.catalog-category-initials {
-    position: absolute;
-    right: -8px;
-    bottom: -16px;
-    color: #d1d5db;
-    opacity: .16;
-    font-size: 60px;
+.catalog-category-link {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 7px;
+    color: #9ca3af;
+    font-size: 10px;
     line-height: 1;
-    font-weight: 900;
-    pointer-events: none;
-    user-select: none;
-    transition:
-        color .5s ease,
-        transform .5s ease;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .02em;
+    transition: color .2s ease, transform .2s ease;
 }
 
-.catalog-category-card:hover .catalog-category-initials {
-    color: #00479b;
-    transform: scale(1.1);
+.catalog-category-link-arrow {
+    font-size: 12px;
+    line-height: 1;
+    transition: transform .2s ease;
+}
+
+.catalog-category-card:hover .catalog-category-link {
+    color: #ff5e00;
+}
+
+.catalog-category-card:hover .catalog-category-link-arrow {
+    transform: translateX(2px);
 }
 
 .catalog-category-skeleton {
-    height: 128px;
+    height: 142px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    padding: 24px;
+    gap: 10px;
+    padding: 20px;
     box-sizing: border-box;
     background: #fff;
-    border: 1px solid #f3f4f6;
-    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 9px;
     animation: catalog-pulse 1.5s ease-in-out infinite;
 }
 
 .catalog-skeleton-icon {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: #e5e7eb;
 }
 
 .catalog-skeleton-title {
-    width: 75%;
-    height: 16px;
+    width: 65%;
+    height: 13px;
     border-radius: 4px;
     background: #e5e7eb;
 }
-
 
 /* =========================================================
    10. SUBCATEGORY
@@ -1830,6 +1902,10 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .catalog-section-header {
+        align-items: flex-start;
+    }
+
     .catalog-products-layout {
         grid-template-columns: 1fr;
     }
@@ -1873,13 +1949,14 @@
         font-size: 13px;
     }
 
-    .catalog-counter-wrapper {
-        justify-content: stretch;
+    .catalog-section-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
     }
 
     .catalog-counter {
-        width: 100%;
-        justify-content: center;
+        align-self: flex-start;
     }
 
     .catalog-category-grid,
@@ -1929,8 +2006,12 @@
         font-size: 25px;
     }
 
+    .catalog-section-title {
+        font-size: 21px;
+    }
+
     .catalog-category-title {
-        font-size: 14px;
+        font-size: 13px;
     }
 
     .family-card-title {
@@ -1952,4 +2033,765 @@
     .product-card-body {
         padding: 14px;
     }
+}
+
+/* =========================================================
+   SUBCATEGORY - ĐỒNG BỘ CATEGORY
+========================================================= */
+
+.subcategory-main {
+    width: min(1536px, calc(100% - 32px));
+    margin: 0 auto;
+    padding-bottom: 64px;
+}
+
+.subcategory-section-header {
+    margin-bottom: 18px;
+}
+
+.subcategory-counter-wrapper {
+    margin-bottom: 0;
+}
+
+.subcategory-search-wrapper {
+    justify-content: flex-end;
+    margin-bottom: 18px;
+}
+
+
+/* CARD ĐỒNG BỘ CATEGORY */
+
+.subcategory-grid {
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 14px;
+}
+
+.subcategory-card {
+    min-height: 142px;
+
+    padding: 18px 16px 16px;
+
+    border-radius: 9px;
+
+    box-shadow:
+        0 2px 6px rgba(15, 23, 42, .04);
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        transform .2s ease,
+        background-color .2s ease;
+}
+
+.subcategory-card::after {
+    content: "";
+
+    position: absolute;
+
+    left: 16px;
+    right: 16px;
+    bottom: 0;
+
+    height: 2px;
+
+    border-radius:
+        999px 999px 0 0;
+
+    background: #ff5e00;
+
+    transform: scaleX(0);
+
+    transform-origin: center;
+
+    transition:
+        transform .2s ease;
+}
+
+.subcategory-card:hover {
+    border-color: #bfdbfe;
+
+    background: #fcfdff;
+
+    box-shadow:
+        0 8px 20px rgba(15, 23, 42, .08);
+
+    transform: translateY(-3px);
+}
+
+.subcategory-card:hover::after {
+    transform: scaleX(1);
+}
+
+
+/* ICON */
+
+.subcategory-card-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 10px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 50%;
+
+    background: #f8fafc;
+
+    font-size: 22px;
+
+    line-height: 1;
+
+    transition:
+        background-color .2s ease,
+        border-color .2s ease,
+        transform .2s ease;
+}
+
+.subcategory-card:hover
+.subcategory-card-icon {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+
+    transform:
+        translateY(-1px)
+        scale(1.04);
+}
+
+
+/* TITLE */
+
+.subcategory-card-title {
+    width: 100%;
+
+    margin: 0;
+
+    padding: 0 8px;
+
+    color: #111827;
+
+    font-size: 13px;
+    line-height: 1.4;
+
+    font-weight: 800;
+
+    text-align: center;
+
+    text-transform: none;
+
+    letter-spacing: 0;
+
+    display: -webkit-box;
+
+    -webkit-box-orient: vertical;
+
+    -webkit-line-clamp: 2;
+
+    overflow: hidden;
+
+    transition:
+        color .2s ease;
+}
+
+.subcategory-card:hover
+.subcategory-card-title {
+    color: #00479b;
+}
+
+
+/* PRODUCT COUNT */
+
+.subcategory-card-count {
+    margin-top: 7px;
+
+    padding: 4px 8px;
+
+    border-radius: 5px;
+
+    background: #f3f4f6;
+
+    color: #9ca3af;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    transition:
+        background-color .2s ease,
+        color .2s ease;
+}
+
+.subcategory-card:hover
+.subcategory-card-count {
+    background: #fff7ed;
+    color: #ff5e00;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1199px) {
+
+    .subcategory-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+}
+
+@media (max-width: 900px) {
+
+    .subcategory-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .subcategory-main {
+        width: calc(100% - 24px);
+    }
+
+    .subcategory-section-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .subcategory-counter-wrapper {
+        justify-content: flex-start;
+    }
+
+    .subcategory-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .subcategory-card {
+        min-height: 142px;
+    }
+
+}
+/* =========================================================
+   SUBCATEGORY - TOOLS RIGHT
+========================================================= */
+
+.subcategory-section-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 18px;
+}
+
+.subcategory-tools {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+
+/* Tổng số nhóm hàng */
+
+.subcategory-counter-wrapper {
+    margin: 0;
+}
+
+.subcategory-counter-wrapper .catalog-counter {
+    height: 44px;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+
+
+/* Ô tìm kiếm */
+
+.subcategory-search-wrapper {
+    display: block;
+    margin: 0;
+}
+
+.subcategory-search-box {
+    width: 288px;
+    max-width: 100%;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .subcategory-tools {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .subcategory-counter-wrapper {
+        justify-content: flex-start;
+    }
+
+    .subcategory-search-box {
+        width: 100%;
+    }
+
+}
+/* =========================================================
+   11. FAMILY
+   ĐỒNG BỘ UI VỚI CATEGORY
+========================================================= */
+
+.family-hero {
+    margin-bottom: 24px;
+}
+
+.family-main {
+    padding-bottom: 56px;
+}
+
+
+/* =========================================================
+   FAMILY TOOLS
+========================================================= */
+
+.family-section-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 18px;
+}
+
+.family-tools {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+
+/* COUNTER */
+
+.family-counter-wrapper {
+    margin: 0;
+}
+
+.family-counter-wrapper .catalog-counter {
+    height: 44px;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+
+
+/* SEARCH */
+
+.family-search-wrapper {
+    display: block;
+    margin: 0;
+}
+
+.family-search-wrapper .catalog-search-box {
+    width: 288px;
+    max-width: 100%;
+}
+
+
+/* =========================================================
+   FAMILY GRID
+========================================================= */
+
+.family-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 14px;
+}
+
+
+/* =========================================================
+   FAMILY CARD
+========================================================= */
+
+.family-card {
+    position: relative;
+
+    min-width: 0;
+    min-height: 142px;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    box-sizing: border-box;
+
+    background: #fff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 9px;
+
+    color: #1f2937;
+
+    text-decoration: none;
+
+    box-shadow:
+        0 2px 6px rgba(15, 23, 42, .04);
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        transform .2s ease,
+        background-color .2s ease;
+}
+
+
+/* ORANGE LINE */
+
+.family-card::after {
+    content: "";
+
+    position: absolute;
+
+    left: 16px;
+    right: 16px;
+    bottom: 0;
+
+    height: 2px;
+
+    border-radius:
+        999px 999px 0 0;
+
+    background: #ff5e00;
+
+    transform: scaleX(0);
+
+    transform-origin: center;
+
+    transition:
+        transform .2s ease;
+}
+
+
+/* HOVER */
+
+.family-card:hover {
+    border-color: #bfdbfe;
+
+    background: #fcfdff;
+
+    box-shadow:
+        0 8px 20px rgba(15, 23, 42, .08);
+
+    transform: translateY(-3px);
+}
+
+.family-card:hover::after {
+    transform: scaleX(1);
+}
+
+
+/* =========================================================
+   FAMILY IMAGE
+========================================================= */
+
+.family-card-image {
+    height: 82px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 10px 16px;
+
+    overflow: hidden;
+
+    background: #f9fafb;
+
+    border-bottom: 1px solid #f3f4f6;
+
+    box-sizing: border-box;
+}
+
+
+.family-card-image-element {
+    display: block;
+
+    width: auto;
+    height: auto;
+
+    max-width: 100%;
+    max-height: 68px;
+
+    object-fit: contain;
+
+    transition:
+        transform .2s ease;
+}
+
+
+.family-card:hover
+.family-card-image-element {
+    transform: scale(1.05);
+}
+
+
+/* =========================================================
+   FAMILY BODY
+========================================================= */
+
+.family-card-body {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: space-between;
+
+    padding: 12px 16px 14px;
+}
+
+
+/* =========================================================
+   FAMILY TITLE
+========================================================= */
+
+.family-card-title {
+    width: 100%;
+
+    margin: 0;
+
+    color: #111827;
+
+    font-size: 13px;
+    line-height: 1.4;
+
+    font-weight: 800;
+
+    text-transform: none;
+    letter-spacing: 0;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+
+    overflow: hidden;
+
+    transition:
+        color .2s ease;
+}
+
+
+.family-card:hover
+.family-card-title {
+    color: #00479b;
+}
+
+
+/* =========================================================
+   FAMILY FOOTER
+========================================================= */
+
+.family-card-footer {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-top: 8px;
+}
+
+
+/* SKU COUNT */
+
+.family-card-count {
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 4px 8px;
+
+    border-radius: 5px;
+
+    background: #f3f4f6;
+
+    color: #9ca3af;
+
+    font-size: 10px;
+
+    line-height: 1;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    transition:
+        background-color .2s ease,
+        color .2s ease;
+}
+
+
+.family-card:hover
+.family-card-count {
+    background: #fff7ed;
+
+    color: #ff5e00;
+}
+
+
+/* EXPLORE */
+
+.family-card-link {
+    color: #9ca3af;
+
+    font-size: 10px;
+
+    line-height: 1;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+
+    transition:
+        color .2s ease,
+        transform .2s ease;
+}
+
+
+.family-card:hover
+.family-card-link {
+    color: #ff5e00;
+
+    transform: translateX(2px);
+}
+
+
+/* =========================================================
+   FAMILY SKELETON
+========================================================= */
+
+.family-skeleton-card {
+    height: 142px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 12px;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+
+    background: #fff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 9px;
+
+    animation:
+        catalog-pulse 1.6s ease-in-out infinite;
+}
+
+
+.family-skeleton-title {
+    width: 65%;
+    height: 13px;
+
+    border-radius: 4px;
+
+    background: #e5e7eb;
+}
+
+
+.family-skeleton-text {
+    width: 45%;
+    height: 10px;
+
+    border-radius: 4px;
+
+    background: #e5e7eb;
+}
+
+
+/* =========================================================
+   FAMILY RESPONSIVE
+========================================================= */
+
+@media (max-width: 1199px) {
+
+    .family-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 900px) {
+
+    .family-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .family-section-header {
+        justify-content: stretch;
+    }
+
+    .family-tools {
+        width: 100%;
+
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .family-counter-wrapper {
+        display: flex;
+
+        justify-content: flex-start;
+    }
+
+    .family-counter-wrapper .catalog-counter {
+        align-self: flex-start;
+    }
+
+    .family-search-wrapper {
+        width: 100%;
+    }
+
+    .family-search-wrapper .catalog-search-box {
+        width: 100%;
+    }
+
+    .family-grid {
+        grid-template-columns: 1fr;
+
+        gap: 14px;
+    }
+
+    .family-card {
+        min-height: 142px;
+    }
+
 }
