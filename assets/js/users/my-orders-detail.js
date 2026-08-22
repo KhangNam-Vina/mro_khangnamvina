@@ -7,6 +7,30 @@
 let currentUser = null;
 let currentOrderItems = [];
 
+const ORDER_DETAIL_IMAGE_CDN_BASE =
+    "https://mrokhangnam-image.khangnamvn.workers.dev";
+
+function buildOrderDetailImageUrl(imagePath) {
+
+    if (!imagePath) {
+        return "../assets/images/no-image.png";
+    }
+
+    const cleanPath =
+        String(imagePath).trim();
+
+    if (!cleanPath) {
+        return "../assets/images/no-image.png";
+    }
+
+    // Giữ an toàn nếu dữ liệu cũ còn URL đầy đủ
+    if (/^https?:\/\//i.test(cleanPath)) {
+        return cleanPath;
+    }
+
+    return `${ORDER_DETAIL_IMAGE_CDN_BASE}/${cleanPath.replace(/^\/+/, "")}`;
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         currentUser = await getCurrentCustomer();
@@ -76,7 +100,10 @@ async function loadOrderDetail() {
     }
 
     const { data: items, error: itemsError } = await window.supabaseClient
-        .from("order_items").select(`*, products (image_url)`).eq("order_id", orderId).order("id", { ascending: true });
+        .from("order_items")
+        .select(`*, products (image_path)`)
+        .eq("order_id", orderId)
+        .order("id", { ascending: true });
 
     if (itemsError) throw itemsError;
 
@@ -156,7 +183,10 @@ function renderOrderItems(items) {
         const quantity = escapeHtml(String(item.quantity ?? item.qty ?? 0));
         const unitPrice = Number(item.unit_price ?? item.price ?? 0);
         const subtotal = Number(item.subtotal ?? item.total ?? (unitPrice * Number(quantity)));
-        const imageUrl = item.products?.image_url || item.image_url || item.image || "../assets/images/no-image.png";
+        const imageUrl =
+    buildOrderDetailImageUrl(
+        item.products?.image_path
+    );
 
         return `
             <tr style="border-bottom: 1px solid #f3f4f6; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f9fafb'" onmouseout="this.style.backgroundColor='transparent'">
@@ -220,7 +250,9 @@ window.reorderCurrentItems = function () {
                 sku: item.sku || "",
                 name: cleanName,
                 price: Number(item.unit_price || item.price || 0),
-                image: item.image_url || item.products?.image_url || "../assets/images/no-image.png",
+                image: buildOrderDetailImageUrl(
+    item.products?.image_path
+),
                 unit: item.unit || "Cái",
                 size: size,
                 qty: qty

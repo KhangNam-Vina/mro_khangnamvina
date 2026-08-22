@@ -19,6 +19,29 @@
 const CART_STORAGE_KEY =
     "mro_shopping_cart";
 
+    const CART_IMAGE_CDN_BASE =
+    "https://mrokhangnam-image.khangnamvn.workers.dev";
+
+function buildCartImageUrl(imagePath) {
+
+    if (!imagePath) {
+        return "../assets/images/no-image.png";
+    }
+
+    const cleanPath =
+        String(imagePath).trim();
+
+    if (!cleanPath) {
+        return "../assets/images/no-image.png";
+    }
+
+    // Giữ an toàn nếu localStorage cũ còn URL đầy đủ
+    if (/^https?:\/\//i.test(cleanPath)) {
+        return cleanPath;
+    }
+
+    return `${CART_IMAGE_CDN_BASE}/${cleanPath.replace(/^\/+/, "")}`;
+}
 
 function getSelectedProductSize(product) {
 
@@ -355,7 +378,9 @@ function () {
                 ) || 0,
 
             image:
-                product.image_url,
+    buildCartImageUrl(
+        product.image_path
+    ),
 
             unit:
                 product.unit ||

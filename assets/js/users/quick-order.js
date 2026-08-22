@@ -515,6 +515,28 @@ function resetButton(
     );
 }
 
+const QUICK_ORDER_IMAGE_CDN_BASE =
+    "https://mrokhangnam-image.khangnamvn.workers.dev";
+
+function buildQuickOrderImageUrl(imagePath) {
+
+    if (!imagePath) {
+        return "../assets/images/world mark.png";
+    }
+
+    const cleanPath =
+        String(imagePath).trim();
+
+    if (!cleanPath) {
+        return "../assets/images/world mark.png";
+    }
+
+    if (/^https?:\/\//i.test(cleanPath)) {
+        return cleanPath;
+    }
+
+    return `${QUICK_ORDER_IMAGE_CDN_BASE}/${cleanPath.replace(/^\/+/, "")}`;
+}
 
 /* ========================================================
    5. SMART SEARCH
@@ -566,8 +588,8 @@ async function smartSearchAndRenderTable(
                 await window.supabaseClient
                     .from("products")
                     .select(
-                        "id, sku, name, image_url, brand_id, brands(name), unit"
-                    )
+    "id, sku, name, image_path, brand_id, brands(name), unit"
+)
                     .eq(
                         "sku",
                         query
@@ -597,8 +619,8 @@ async function smartSearchAndRenderTable(
                     await window.supabaseClient
                         .from("products")
                         .select(
-                            "id, sku, name, image_url, brand_id, brands(name), unit"
-                        )
+    "id, sku, name, image_path, brand_id, brands(name), unit"
+)
                         .ilike(
                             "name",
                             `%${query}%`
@@ -903,7 +925,9 @@ async function smartSearchAndRenderTable(
                         "OEM",
 
                     image:
-                        product.image_url,
+    buildQuickOrderImageUrl(
+        product.image_path
+    ),
 
                     unit:
                         product.unit ||

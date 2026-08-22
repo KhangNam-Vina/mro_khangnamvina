@@ -3,35 +3,76 @@
 // ========================================================
 
 window.RfqService = {
-    // 1. Lấy chi tiết 1 đơn RFQ (Bao gồm cả thông tin khách & danh sách sản phẩm)
+
+    // 1. Lấy chi tiết 1 đơn RFQ
+    // Bao gồm thông tin khách & danh sách sản phẩm
     async getById(id) {
-        // Giả sử bảng của bro tên là 'rfqs' và có bảng trung gian 'rfq_items' nối với 'products'
+
         return await window.supabaseClient
-            .from('rfqs')
+
+            .from("rfqs")
+
             .select(`
                 *,
                 rfq_items (
-                    id, quantity, note,
-                    products ( id, name, sku, image_url, price )
+                    id,
+                    quantity,
+                    note,
+                    products (
+                        id,
+                        name,
+                        sku,
+                        image_path,
+                        price
+                    )
                 )
             `)
-            .eq('id', id)
+
+            .eq(
+                "id",
+                id
+            )
+
             .single();
     },
 
-    // 2. Cập nhật trạng thái báo giá (VD: 'pending', 'processing', 'completed')
-    async updateStatus(id, newStatus) {
+
+    // 2. Cập nhật trạng thái báo giá
+    async updateStatus(
+        id,
+        newStatus
+    ) {
+
         return await window.supabaseClient
-            .from('rfqs')
-            .update({ status: newStatus })
-            .eq('id', id);
+
+            .from("rfqs")
+
+            .update({
+                status: newStatus
+            })
+
+            .eq(
+                "id",
+                id
+            );
     },
 
-    // 3. Xóa đơn yêu cầu (Nếu cần)
-    async delete(id) {
+
+    // 3. Xóa đơn yêu cầu
+    async delete(
+        id
+    ) {
+
         return await window.supabaseClient
-            .from('rfqs')
+
+            .from("rfqs")
+
             .delete()
-            .eq('id', id);
+
+            .eq(
+                "id",
+                id
+            );
     }
+
 };

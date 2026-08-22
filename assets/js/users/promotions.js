@@ -7,6 +7,29 @@ const ITEMS_PER_PAGE = 24;
 
 let currentSort = 'newest';
 
+const PROMOTION_IMAGE_CDN_BASE =
+    "https://mrokhangnam-image.khangnamvn.workers.dev";
+
+function buildPromotionImageUrl(imagePath) {
+
+    if (!imagePath) {
+        return "../assets/images/world mark.png";
+    }
+
+    const cleanPath =
+        String(imagePath).trim();
+
+    if (!cleanPath) {
+        return "../assets/images/world mark.png";
+    }
+
+    // An toàn trong giai đoạn chuyển đổi
+    if (/^https?:\/\//i.test(cleanPath)) {
+        return cleanPath;
+    }
+
+    return `${PROMOTION_IMAGE_CDN_BASE}/${cleanPath.replace(/^\/+/, "")}`;
+}
 
 // ========================================================
 // UTILITY
@@ -177,18 +200,18 @@ async function fetchFilteredProducts() {
         // ==================================================
 
         let query =
-            window.supabaseClient
-                .from('products')
-                .select(
-                    '*, brands(name)',
-                    {
-                        count: 'exact'
-                    }
-                )
-                .gt(
-                    'discount_price',
-                    0
-                );
+    window.supabaseClient
+        .from('products')
+        .select(
+            'id, sku, name, price, discount_price, image_path, unit, badge, category_id, sub_category_id, brand_id, created_at, brands(name)',
+            {
+                count: 'exact'
+            }
+        )
+        .gt(
+            'discount_price',
+            0
+        );
 
 
         // ==================================================
@@ -572,7 +595,7 @@ async function fetchFilteredProducts() {
 
 
                             <img
-                                src="${escapePromotionHTML(item.image_url || '')}"
+                                src="${escapePromotionHTML(buildPromotionImageUrl(item.image_path))}"
                                 alt="${escapePromotionHTML(item.name || '')}"
                                 loading="lazy"
                                 onerror="this.onerror=null;this.src='../assets/images/world mark.png';"

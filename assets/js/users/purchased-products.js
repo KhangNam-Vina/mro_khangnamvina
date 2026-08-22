@@ -5,6 +5,30 @@
 
 let allPurchasedProducts = [];
 
+const PURCHASED_IMAGE_CDN_BASE =
+    "https://mrokhangnam-image.khangnamvn.workers.dev";
+
+function buildPurchasedImageUrl(imagePath) {
+
+    if (!imagePath) {
+        return "../assets/images/no-image.png";
+    }
+
+    const cleanPath =
+        String(imagePath).trim();
+
+    if (!cleanPath) {
+        return "../assets/images/no-image.png";
+    }
+
+    // Giữ an toàn cho dữ liệu cũ nếu còn URL đầy đủ
+    if (/^https?:\/\//i.test(cleanPath)) {
+        return cleanPath;
+    }
+
+    return `${PURCHASED_IMAGE_CDN_BASE}/${cleanPath.replace(/^\/+/, "")}`;
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         let user = null;
@@ -74,7 +98,7 @@ async function fetchPurchasedHistory(userId) {
 
         const { data: products, error: productError } = await window.supabaseClient
             .from("products")
-            .select("id, sku, name, price, discount_price, image_url, unit, brands(name)")
+            .select("id, sku, name, price, discount_price, image_path, unit, brands(name)")
             .in("sku", uniqueSkus);
         if (productError) throw productError;
 
@@ -111,7 +135,9 @@ function renderProductGrid(products) {
 
         const productForCart = { id: item.id, sku: item.sku, name: item.name, brand: brandName, unit: item.unit || "Cái", qty: 1 };
         const productJSON = JSON.stringify(productForCart).replace(/'/g, "&#39;");
-        const safeImage = escapeHTML(item.image_url || "../assets/images/no-image.png");
+        const safeImage = escapeHTML(
+    buildPurchasedImageUrl(item.image_path)
+);
         const safeSku = escapeHTML(item.sku || "");
         const safeName = escapeHTML(item.name || "Sản phẩm");
         const safeBrand = escapeHTML(brandName);

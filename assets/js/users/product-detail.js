@@ -34,6 +34,36 @@ const pdFormatCurrency = (value) => {
     return new Intl.NumberFormat("vi-VN").format(value) + " đ";
 };
 
+const PD_IMAGE_CDN_BASE =
+    "https://mrokhangnam-image.khangnamvn.workers.dev";
+
+const pdBuildImageUrl = (imagePath) => {
+
+    let cleanPath = pdCleanUrl(imagePath);
+
+    if (!cleanPath) {
+        return "../assets/images/world mark.png";
+    }
+
+    // Nếu đã là CDN Worker URL thì giữ nguyên
+    if (cleanPath.startsWith(PD_IMAGE_CDN_BASE)) {
+        return cleanPath;
+    }
+
+    // Nếu dữ liệu cũ vẫn còn Supabase Public URL
+    // thì lấy phần path phía sau bucket product-images
+    const supabasePrefix =
+        "https://wnhrkziiujbswnrfnlly.supabase.co/storage/v1/object/public/product-images/";
+
+    if (cleanPath.startsWith(supabasePrefix)) {
+        cleanPath = cleanPath.slice(supabasePrefix.length);
+    }
+
+    // Xóa slash dư ở đầu
+    cleanPath = cleanPath.replace(/^\/+/, "");
+
+    return `${PD_IMAGE_CDN_BASE}/${cleanPath}`;
+};
 
 /* ========================================================
    1. LOAD PRODUCT DETAIL
@@ -256,47 +286,129 @@ if (sizeWrapper && sizeList) {
             if (moqNote) moqNote.classList.remove("is-hidden");
         }
 
-        /* IMAGE GALLERY */
-        let allValidImages = [];
-        const safeMainImg = pdCleanUrl(item.image_url);
-        if (safeMainImg) allValidImages.push(safeMainImg);
+        /* ========================================================
+   IMAGE GALLERY - CDN
+======================================================== */
 
-        if (item.images) {
-            let rawExtraImgs = [];
-            if (Array.isArray(item.images)) rawExtraImgs = item.images;
-            else if (typeof item.images === "string") rawExtraImgs = item.images.split(/[\n,]+/);
+let allImagePaths = [];
 
-            rawExtraImgs.forEach((rawUrl) => {
-                const safeUrl = pdCleanUrl(rawUrl);
-                if (safeUrl && safeUrl !== safeMainImg && !allValidImages.includes(safeUrl)) {
-                    allValidImages.push(safeUrl);
-                }
-            });
+/* Ảnh MAIN */
+const mainImagePath = pdCleanUrl(item.image_path);
+
+if (mainImagePath) {
+    allImagePaths.push(mainImagePath);
+}
+
+/* Ảnh GALLERY */
+if (item.images) {
+
+    let rawExtraImages = [];
+
+    if (Array.isArray(item.images)) {
+        rawExtraImages = item.images;
+    } else if (typeof item.images === "string") {
+        try {
+            const parsedImages = JSON.parse(item.images);
+
+            if (Array.isArray(parsedImages)) {
+                rawExtraImages = parsedImages;
+            } else {
+                rawExtraImages = item.images.split(/[\n,]+/);
+            }
+
+        } catch {
+            rawExtraImages = item.images.split(/[\n,]+/);
+        }
+    }
+
+    rawExtraImages.forEach((rawPath) => {
+
+        const cleanPath = pdCleanUrl(rawPath);
+
+        if (
+            cleanPath &&
+            !allImagePaths.includes(cleanPath)
+        ) {
+            allImagePaths.push(cleanPath);
         }
 
-        const domMainImg = document.getElementById("mainImage");
-        const domThumbList = document.getElementById("thumbnailList");
+    });
+}
 
-        if (allValidImages.length > 0) {
-            if (domMainImg) {
-                domMainImg.src = allValidImages[0];
-                domMainImg.onerror = function () { this.onerror = null; this.src = "../assets/images/world mark.png"; };
+
+const allValidImages =
+    allImagePaths.map(pdBuildImageUrl);
+
+
+const domMainImg =
+    document.getElementById("mainImage");
+
+const domThumbList =
+    document.getElementById("thumbnailList");
+
+
+if (allValidImages.length > 0) {
+
+    /* MAIN IMAGE */
+
+    if (domMainImg) {
+
+        domMainImg.src =
+            allValidImages[0];
+
+        domMainImg.onerror =
+            function () {
+
+                this.onerror = null;
+
+                this.src =
+                    "../assets/images/world mark.png";
+
+            };
+    }
+
+
+    /* THUMBNAILS */
+
+    if (domThumbList) {
+
+        domThumbList.innerHTML = "";
+
+        allValidImages.forEach(
+            (url, index) => {
+
+                const activeClass =
+                    index === 0
+                        ? "is-active"
+                        : "";
+
+                domThumbList.innerHTML += `
+                    <div
+                        class="thumbnail-item ${activeClass}"
+                        onclick="changeMainImage('${pdEscapeHTML(url)}', this)"
+                    >
+                        <img
+                            src="${pdEscapeHTML(url)}"
+                            alt="Ảnh sản phẩm"
+                            loading="lazy"
+                        >
+                    </div>
+                `;
             }
-            if (domThumbList) {
-                domThumbList.innerHTML = "";
-                allValidImages.forEach((url, index) => {
-                    const activeClass = index === 0 ? "is-active" : "";
-                    domThumbList.innerHTML += `
-                        <div class="thumbnail-item ${activeClass}" onclick="changeMainImage('${pdEscapeHTML(url)}', this)">
-                            <img src="${pdEscapeHTML(url)}" alt="Ảnh sản phẩm">
-                        </div>
-                    `;
-                });
-            }
-        } else {
-            if (domMainImg) domMainImg.src = "../assets/images/world mark.png";
-            if (domThumbList) domThumbList.innerHTML = "";
-        }
+        );
+    }
+
+} else {
+
+    if (domMainImg) {
+        domMainImg.src =
+            "../assets/images/world mark.png";
+    }
+
+    if (domThumbList) {
+        domThumbList.innerHTML = "";
+    }
+}
 
         /* TABS CONTENT */
         const descText = item.description || "Đang cập nhật mô tả chi tiết.";
@@ -676,7 +788,8 @@ async function loadRelatedProducts(currentItem) {
         grid.innerHTML = "";
         data.forEach((item) => {
             const brandName = item.brands?.name || "OEM";
-            const img = item.image_url || "../assets/images/world mark.png";
+            const img =
+    pdBuildImageUrl(item.image_path);
 
             grid.innerHTML += `
                 <div class="related-product-card">
@@ -723,7 +836,8 @@ async function loadSaleProductsSidebar(currentProductId) {
         let html = "";
         randomPicks.forEach((item) => {
             const brandName = item.brands?.name || "OEM";
-            const img = item.image_url || "../assets/images/world mark.png";
+           const img =
+    pdBuildImageUrl(item.image_path);
             const originalPrice = item.price ? pdFormatCurrency(item.price) : "";
             const discountPrice = item.discount_price ? pdFormatCurrency(item.discount_price) : "Liên hệ";
 

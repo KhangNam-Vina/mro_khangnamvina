@@ -9,7 +9,7 @@
    - Gallery: thêm / xóa từng ảnh
    - Hỗ trợ sản phẩm cũ dùng URL ngoài
    - Không xóa URL ngoài Supabase
-   - Đồng bộ products.image_url / products.images
+   - Đồng bộ products.image_path / products.images
    - Rollback upload nếu database update thất bại
 
    STORAGE:
@@ -22,7 +22,7 @@
 
    DATABASE:
 
-   image_url
+   image_path
    images
 
    SIZE:
@@ -41,6 +41,10 @@ const STORAGE_BUCKET =
 
 const STORAGE_PRODUCT_PREFIX =
     "products";
+
+
+const PRODUCT_IMAGE_CDN_BASE =
+    "https://mrokhangnam-image.khangnamvn.workers.dev";
 
 
 const MAX_IMAGE_SIZE =
@@ -100,6 +104,8 @@ const state = {
     ------------------------------------------ */
 
     mediaDraft: {
+
+        mainPath: null,
 
         mainUrl: null,
 
@@ -998,6 +1004,59 @@ function createStorageFileName(
 
 
 /* =========================================================
+   BUILD PRODUCT IMAGE URL
+   ---------------------------------------------------------
+   Database lưu image_path.
+   UI cần URL để render ảnh.
+========================================================= */
+
+function buildProductImageUrl(
+    imagePath
+) {
+
+    if (
+        !imagePath ||
+        typeof imagePath !==
+        "string"
+    ) {
+
+        return "";
+
+    }
+
+
+    const cleanPath =
+        imagePath.trim();
+
+
+    if (
+        !cleanPath
+    ) {
+
+        return "";
+
+    }
+
+
+    if (
+        /^https?:\/\//i.test(
+            cleanPath
+        )
+    ) {
+
+        return cleanPath;
+
+    }
+
+
+    return (
+        `${PRODUCT_IMAGE_CDN_BASE}/${cleanPath.replace(/^\/+/, "")}`
+    );
+
+}
+
+
+/* =========================================================
    GET PUBLIC URL
 ========================================================= */
 
@@ -1246,6 +1305,9 @@ function resetMediaDraft() {
 
     state.mediaDraft = {
 
+        mainPath:
+            null,
+
         mainUrl:
             null,
 
@@ -1340,9 +1402,9 @@ function renderMainImagePreview(
                     bg-white
                 "
                 onerror="
-                    this.onerror=null;
-                    this.parentElement.innerHTML='<div class=&quot;w-full h-full flex items-center justify-center text-[10px] text-gray-400&quot;>Ảnh lỗi</div>';
-                "
+    this.onerror=null;
+    this.style.display='none';
+"
             >
 
 
@@ -1641,8 +1703,7 @@ function renderPendingExtraFiles() {
                             text-sm
                             font-black
                             shadow-md
-                            opacity-0
-                            group-hover:opacity-100
+                            opacity-100
                             transition
                             hover:bg-red-600
                         "
@@ -1670,6 +1731,72 @@ function renderPendingExtraFiles() {
                     </span>
 
                 `;
+
+
+                const galleryImg =
+                    wrapper.querySelector(
+                        "img"
+                    );
+
+
+                if (
+                    galleryImg
+                ) {
+
+                    galleryImg.addEventListener(
+                        "error",
+                        () => {
+
+                            galleryImg.style.display =
+                                "none";
+
+
+                            let errorLabel =
+                                wrapper.querySelector(
+                                    "[data-image-error]"
+                                );
+
+
+                            if (
+                                !errorLabel
+                            ) {
+
+                                errorLabel =
+                                    document.createElement(
+                                        "div"
+                                    );
+
+
+                                errorLabel.dataset.imageError =
+                                    "true";
+
+
+                                errorLabel.className = `
+                                    absolute
+                                    inset-0
+                                    flex
+                                    items-center
+                                    justify-center
+                                    text-[10px]
+                                    text-gray-400
+                                    pointer-events-none
+                                `;
+
+
+                                errorLabel.textContent =
+                                    "Ảnh lỗi";
+
+
+                                wrapper.appendChild(
+                                    errorLabel
+                                );
+
+                            }
+
+                        }
+                    );
+
+                }
 
 
                 DOM.extraImagesPreview.appendChild(
@@ -1733,11 +1860,24 @@ function renderCompleteGalleryPreview() {
                     url;
 
 
+                /*
+                 * Gallery trong DB lưu PATH:
+                 * products/ID/gallery/xxx.webp
+                 *
+                 * Khi render phải đổi PATH -> CDN URL.
+                 * Nếu dữ liệu cũ vẫn là URL thì giữ nguyên URL.
+                 */
+                const galleryImageUrl =
+                    buildProductImageUrl(
+                        url
+                    );
+
+
                 wrapper.innerHTML = `
 
                     <img
                         src="${escapeAttribute(
-                            url
+                            galleryImageUrl
                         )}"
                         alt="Ảnh phụ ${index + 1}"
                         class="
@@ -1745,10 +1885,6 @@ function renderCompleteGalleryPreview() {
                             h-full
                             object-contain
                             bg-white
-                        "
-                        onerror="
-                            this.onerror=null;
-                            this.parentElement.innerHTML='<div class=&quot;w-full h-full flex items-center justify-center text-[10px] text-gray-400&quot;>Ảnh lỗi</div>';
                         "
                     >
 
@@ -1829,9 +1965,22 @@ function loadExistingMedia(
     resetMediaDraft();
 
 
-    state.mediaDraft.mainUrl =
-        item?.image_url ||
+    const mainPathRaw =
+        item?.image_path ||
         null;
+
+
+    state.mediaDraft.mainPath =
+        getStoragePathFromUrl(
+            mainPathRaw
+        ) ||
+        mainPathRaw;
+
+
+    state.mediaDraft.mainUrl =
+        buildProductImageUrl(
+            state.mediaDraft.mainPath
+        );
 
 
     state.mediaDraft.existingGallery =
@@ -1906,6 +2055,9 @@ function markMainImageRemoved() {
         !state.editingId
     ) {
 
+        state.mediaDraft.mainPath =
+            null;
+
         state.mediaDraft.mainUrl =
             null;
 
@@ -1947,6 +2099,10 @@ function markMainImageRemoved() {
 
     state.mediaDraft.mainRemoved =
         true;
+
+
+    state.mediaDraft.mainPath =
+        null;
 
 
     state.mediaDraft.mainUrl =
@@ -3468,8 +3624,9 @@ function renderProducts() {
 
 
                     const imageUrl =
-                        item.image_url ||
-                        "";
+                        buildProductImageUrl(
+                            item.image_path
+                        );
 
 
                     const imageHTML =
@@ -4910,15 +5067,25 @@ function buildProductPayload(
    BUILD FINAL MEDIA
 ========================================================= */
 
-function buildFinalGalleryUrls(
+function buildFinalGalleryPaths(
     newExtraUploads
 ) {
 
-    const uploadedUrls =
+    /*
+     * DB luôn ưu tiên lưu Storage PATH cho ảnh mới.
+     *
+     * Ví dụ:
+     * products/PRODUCT_ID/gallery/gallery-xxx.webp
+     *
+     * Ảnh cũ dùng URL ngoài/Supabase URL vẫn được giữ nguyên
+     * để không làm hỏng dữ liệu legacy.
+     */
+
+    const uploadedPaths =
         (newExtraUploads || [])
             .map(
                 item =>
-                    item.url
+                    item.path
             )
             .filter(
                 Boolean
@@ -4931,7 +5098,7 @@ function buildFinalGalleryUrls(
                 ...state.mediaDraft
                     .existingGallery,
 
-                ...uploadedUrls
+                ...uploadedPaths
             ]
         )
     ];
@@ -4945,10 +5112,10 @@ function buildFinalGalleryUrls(
 
 async function cleanupRemovedMedia(
     productId,
-    oldMainUrl,
-    oldGalleryUrls,
-    finalMainUrl,
-    finalGalleryUrls
+    oldMainPath,
+    oldGalleryPaths,
+    finalMainPath,
+    finalGalleryPaths
 ) {
 
     const pathsToDelete =
@@ -4957,33 +5124,22 @@ async function cleanupRemovedMedia(
 
     /* -----------------------------------------
        MAIN
+       ------------------------------------------------
+       image_path đã là path Storage.
     ------------------------------------------ */
 
     if (
-        oldMainUrl &&
-        oldMainUrl !==
-        finalMainUrl &&
-        isOwnProductStorageUrl(
-            oldMainUrl,
-            productId
+        oldMainPath &&
+        oldMainPath !==
+        finalMainPath &&
+        oldMainPath.startsWith(
+            `${STORAGE_PRODUCT_PREFIX}/${productId}/`
         )
     ) {
 
-        const path =
-            getStoragePathFromUrl(
-                oldMainUrl
-            );
-
-
-        if (
-            path
-        ) {
-
-            pathsToDelete.push(
-                path
-            );
-
-        }
+        pathsToDelete.push(
+            oldMainPath
+        );
 
     }
 
@@ -4994,18 +5150,18 @@ async function cleanupRemovedMedia(
 
     const finalSet =
         new Set(
-            finalGalleryUrls
+            finalGalleryPaths
         );
 
 
     for (
-        const oldUrl of
-        oldGalleryUrls
+        const oldGalleryItem of
+        oldGalleryPaths
     ) {
 
         if (
             finalSet.has(
-                oldUrl
+                oldGalleryItem
             )
         ) {
 
@@ -5014,33 +5170,34 @@ async function cleanupRemovedMedia(
         }
 
 
-        if (
-            !isOwnProductStorageUrl(
-                oldUrl,
-                productId
-            )
-        ) {
-
-            continue;
-
-        }
-
+        /*
+         * Gallery mới chuẩn là Storage PATH.
+         * Gallery cũ có thể vẫn là Supabase URL.
+         * Hỗ trợ cả hai để cleanup an toàn.
+         */
 
         const path =
             getStoragePathFromUrl(
-                oldUrl
-            );
+                oldGalleryItem
+            ) ||
+            oldGalleryItem;
 
 
         if (
-            path
+            !path ||
+            !path.startsWith(
+                `${STORAGE_PRODUCT_PREFIX}/${productId}/`
+            )
         ) {
 
-            pathsToDelete.push(
-                path
-            );
+            continue;
 
         }
+
+
+        pathsToDelete.push(
+            path
+        );
 
     }
 
@@ -5364,8 +5521,8 @@ async function saveProduct(
 
             const mediaPayload = {
 
-                image_url:
-                    mainUpload?.url ||
+                image_path:
+                    mainUpload?.path ||
                     null,
 
                 images:
@@ -5374,7 +5531,7 @@ async function saveProduct(
                         ? JSON.stringify(
                             extraUploads.map(
                                 item =>
-                                    item.url
+                                    item.path
                             )
                         )
 
@@ -5384,7 +5541,7 @@ async function saveProduct(
 
 
             if (
-                mediaPayload.image_url ||
+                mediaPayload.image_path ||
                 mediaPayload.images
             ) {
 
@@ -5468,12 +5625,19 @@ async function saveProduct(
             }
 
 
-            const oldMainUrl =
-                currentItem.image_url ||
+            const oldMainPathRaw =
+                currentItem.image_path ||
                 null;
 
 
-            const oldGalleryUrls =
+            const oldMainPath =
+                getStoragePathFromUrl(
+                    oldMainPathRaw
+                ) ||
+                oldMainPathRaw;
+
+
+            const oldGalleryPaths =
                 normalizeImageList(
                     currentItem.images
                 );
@@ -5538,17 +5702,17 @@ async function saveProduct(
                FINAL MAIN
             ------------------------------------------ */
 
-            let finalMainUrl =
+            let finalMainPath =
                 state.mediaDraft
-                    .mainUrl;
+                    .mainPath;
 
 
             if (
                 newMainUpload
             ) {
 
-                finalMainUrl =
-                    newMainUpload.url;
+                finalMainPath =
+                    newMainUpload.path;
 
             }
 
@@ -5559,18 +5723,24 @@ async function saveProduct(
                 !newMainUpload
             ) {
 
-                finalMainUrl =
+                finalMainPath =
                     null;
 
             }
+
+
+            const finalMainUrl =
+                buildProductImageUrl(
+                    finalMainPath
+                );
 
 
             /* -----------------------------------------
                FINAL GALLERY
             ------------------------------------------ */
 
-            const finalGalleryUrls =
-                buildFinalGalleryUrls(
+            const finalGalleryPaths =
+                buildFinalGalleryPaths(
                     newExtraUploads
                 );
 
@@ -5579,16 +5749,16 @@ async function saveProduct(
                PAYLOAD
             ------------------------------------------ */
 
-            payload.image_url =
-                finalMainUrl ||
+            payload.image_path =
+                finalMainPath ||
                 null;
 
 
             payload.images =
-                finalGalleryUrls.length > 0
+                finalGalleryPaths.length > 0
 
                     ? JSON.stringify(
-                        finalGalleryUrls
+                        finalGalleryPaths
                     )
 
                     : null;
@@ -5642,13 +5812,13 @@ async function saveProduct(
 
                 productId,
 
-                oldMainUrl,
+                oldMainPath,
 
-                oldGalleryUrls,
+                oldGalleryPaths,
 
-                finalMainUrl,
+                finalMainPath,
 
-                finalGalleryUrls
+                finalGalleryPaths
 
             );
 
@@ -5773,7 +5943,7 @@ async function saveProduct(
 /* =========================================================
    DELETE PRODUCT
    ---------------------------------------------------------
-   CHƯA XÓA STORAGE Ở BƯỚC NÀY.
+   Xóa sản phẩm + toàn bộ ảnh main/gallery trong Storage.
 ========================================================= */
 
 async function deleteProduct(
@@ -5806,7 +5976,7 @@ async function deleteProduct(
 
     const confirmed =
         window.confirm(
-            `Xóa vĩnh viễn sản phẩm "${item.name}"?\n\nSKU: ${item.sku}`
+            `Xóa vĩnh viễn sản phẩm "${item.name}"?\n\nSKU: ${item.sku}\n\nToàn bộ ảnh main và gallery của sản phẩm trong Storage cũng sẽ bị xóa.`
         );
 
 
@@ -5821,8 +5991,148 @@ async function deleteProduct(
 
     try {
 
+        /* =====================================================
+           1. XÁC ĐỊNH THƯ MỤC SẢN PHẨM
+        ===================================================== */
+
+        const productFolder =
+            `products/${id}`;
+
+
+        const storagePaths = [];
+
+
+        /* =====================================================
+           2. HÀM LẤY FILE TRONG MỘT FOLDER
+        ===================================================== */
+
+        async function collectStorageFiles(
+            folder
+        ) {
+
+            const {
+                data,
+                error
+            } =
+                await window.supabaseClient
+
+                    .storage
+
+                    .from(
+                        "product-images"
+                    )
+
+                    .list(
+                        folder,
+                        {
+                            limit: 1000,
+                            offset: 0
+                        }
+                    );
+
+
+            if (
+                error
+            ) {
+
+                throw error;
+
+            }
+
+
+            (
+                data || []
+            ).forEach(
+                file => {
+
+                    /*
+                       Supabase Storage .list()
+                       trả về file có id.
+
+                       Folder con thường có
+                       metadata khác với file.
+                    */
+
+                    if (
+                        file &&
+                        file.name &&
+                        file.id
+                    ) {
+
+                        storagePaths.push(
+                            `${folder}/${file.name}`
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           3. QUÉT MAIN
+        ===================================================== */
+
+        await collectStorageFiles(
+            `${productFolder}/main`
+        );
+
+
+        /* =====================================================
+           4. QUÉT GALLERY
+        ===================================================== */
+
+        await collectStorageFiles(
+            `${productFolder}/gallery`
+        );
+
+
+        /* =====================================================
+           5. XÓA TOÀN BỘ ẢNH
+        ===================================================== */
+
+        if (
+            storagePaths.length >
+            0
+        ) {
+
+            const {
+                error:
+                    storageError
+            } =
+                await window.supabaseClient
+
+                    .storage
+
+                    .from(
+                        "product-images"
+                    )
+
+                    .remove(
+                        storagePaths
+                    );
+
+
+            if (
+                storageError
+            ) {
+
+                throw storageError;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           6. XÓA RECORD PRODUCT
+        ===================================================== */
+
         const {
-            error
+            error:
+                deleteError
         } =
             await window.supabaseClient
 
@@ -5839,24 +6149,17 @@ async function deleteProduct(
 
 
         if (
-            error
+            deleteError
         ) {
 
-            throw error;
+            throw deleteError;
 
         }
 
 
-        /*
-           Chưa xóa Storage.
-
-           Lý do:
-           - Có sản phẩm cũ dùng URL ngoài.
-           - Không muốn xóa nhầm ảnh.
-           - Cleanup product folder sẽ làm
-             thành một bước riêng sau.
-        */
-
+        /* =====================================================
+           7. ĐIỀU CHỈNH TRANG
+        ===================================================== */
 
         if (
             state.products.length ===
@@ -5870,11 +6173,19 @@ async function deleteProduct(
         }
 
 
+        /* =====================================================
+           8. THÔNG BÁO
+        ===================================================== */
+
         showToast(
-            "Đã xóa sản phẩm.",
+            `Đã xóa sản phẩm và ${storagePaths.length} ảnh trong Storage.`,
             "success"
         );
 
+
+        /* =====================================================
+           9. LOAD LẠI DANH SÁCH
+        ===================================================== */
 
         await fetchProducts();
 

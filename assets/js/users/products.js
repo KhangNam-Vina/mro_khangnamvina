@@ -15,6 +15,40 @@ const ITEMS_PER_PAGE = 16;
 
 let currentSort = 'newest';
 
+const IMAGE_CDN_BASE =
+    'https://mrokhangnam-image.khangnamvn.workers.dev';
+
+function buildProductImageUrl(imagePath) {
+
+    if (!imagePath) {
+        return '../assets/images/world mark.png';
+    }
+
+    let path = String(imagePath)
+        .trim()
+        .replace(/^['"\[\]\n\r]+|['"\[\]\n\r]+$/g, '');
+
+    if (!path) {
+        return '../assets/images/world mark.png';
+    }
+
+    // Đã là CDN Worker URL
+    if (path.startsWith(IMAGE_CDN_BASE)) {
+        return path;
+    }
+
+    // Nếu database còn URL Supabase cũ
+    const supabasePrefix =
+        'https://wnhrkziiujbswnrfnlly.supabase.co/storage/v1/object/public/product-images/';
+
+    if (path.startsWith(supabasePrefix)) {
+        path = path.slice(supabasePrefix.length);
+    }
+
+    path = path.replace(/^\/+/, '');
+
+    return `${IMAGE_CDN_BASE}/${path}`;
+}
 
 // ========================================================
 // 1. UTILITY
@@ -772,13 +806,12 @@ async function fetchFilteredProducts() {
 
                             ${rightBadgeHtml}
 
-                            <img
-                                src="${escapeProductsHTML(item.image_url || '')}"
+                           <img
+                                src="${escapeProductsHTML(buildProductImageUrl(item.image_path))}"
                                 alt="${escapeProductsHTML(item.name || '')}"
                                 loading="lazy"
                                 onerror="this.onerror=null;this.src='../assets/images/world mark.png';"
                             >
-
                         </a>
 
 

@@ -3,6 +3,8 @@
 // XỬ LÝ LOGIC TRANG CHỦ - STATIC CSS
 // ========================================================
 
+
+
 // ----------------------------------------------------
 // 1. TẢI DANH MỤC GỐC & DANH MỤC CON
 // ----------------------------------------------------
@@ -107,6 +109,35 @@ async function loadBrandsToMarquee() {
     }
 }
 
+/* ----------------------------------------------------
+   PRODUCT IMAGE CDN
+---------------------------------------------------- */
+
+const INDEX_IMAGE_CDN_BASE =
+    "https://mrokhangnam-image.khangnamvn.workers.dev";
+
+function buildIndexImageUrl(imagePath) {
+
+    if (!imagePath) {
+        return "../assets/images/world mark.png";
+    }
+
+    const cleanPath =
+        String(imagePath).trim();
+
+    if (!cleanPath) {
+        return "../assets/images/world mark.png";
+    }
+
+    // Nếu dữ liệu cũ còn URL đầy đủ thì giữ nguyên,
+    // tránh làm hỏng ảnh trong giai đoạn chuyển đổi.
+    if (/^https?:\/\//i.test(cleanPath)) {
+        return cleanPath;
+    }
+
+    return `${INDEX_IMAGE_CDN_BASE}/${cleanPath.replace(/^\/+/, "")}`;
+}
+
 // ----------------------------------------------------
 // 3. KÉO SẢN PHẨM BÁN CHẠY
 // ----------------------------------------------------
@@ -125,7 +156,7 @@ async function loadBestSellers(filterKeyword = 'ALL') {
     try {
         let query = window.supabaseClient
             .from('products')
-            .select('*, brands(name)')
+            .select('id, sku, name, image_path, unit, category_id, brands(name)')
             .order('created_at', { ascending: false });
 
         // ĐÃ FIX: Lọc chính xác theo category_id thay vì tìm trong tên sản phẩm
@@ -143,37 +174,100 @@ async function loadBestSellers(filterKeyword = 'ALL') {
 
         let productItemsHTML = '';
         
-        data.forEach(item => {
-            const brandName = item.brands ? item.brands.name : 'OEM';
-            const safeSku = item.sku ? item.sku.replace(/'/g, "\\'").replace(/"/g, '&quot;') : 'NO-SKU';
-            const safeName = item.name ? item.name.replace(/'/g, "\\'").replace(/"/g, '&quot;') : 'Sản phẩm';
-            const safeBrand = brandName.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-            const safeUnit = item.unit ? item.unit.replace(/'/g, "\\'").replace(/"/g, '&quot;') : 'Cái';
-            
-            productItemsHTML += `
-                <div class="product-card">
-                    <a href="pages/product-detail.html?id=${item.id}" class="product-image-link">
-                        <span class="product-badge-stock">In Stock</span>
-                        <img src="${item.image_url}" alt="${item.name}" class="product-img">
-                    </a>
-                    
-                    <div class="product-info">
-                        <div class="product-brand">${brandName}</div>
-                        <a href="pages/product-detail.html?id=${item.id}" class="product-name" title="${item.name}">
-                            ${item.name}
-                        </a>
-                        <div class="product-meta">
-                            <div class="product-sku">SKU: ${item.sku}</div><br>
-                            <div class="product-unit">${item.unit || 'Cái'}</div>
-                        </div>
-                    </div>
-                    
-                    <button onclick="addToRFQCartFromIndex('${safeSku}', '${safeName}', '${safeBrand}', '${safeUnit}')" class="product-btn-add">
-                        Thêm vào Yêu cầu
-                    </button>
+       data.forEach(item => {
+
+    const brandName =
+        item.brands
+            ? item.brands.name
+            : 'OEM';
+
+    const safeSku =
+        item.sku
+            ? item.sku.replace(/'/g, "\\'").replace(/"/g, '&quot;')
+            : 'NO-SKU';
+
+    const safeName =
+        item.name
+            ? item.name.replace(/'/g, "\\'").replace(/"/g, '&quot;')
+            : 'Sản phẩm';
+
+    const safeBrand =
+        brandName
+            .replace(/'/g, "\\'")
+            .replace(/"/g, '&quot;');
+
+    const safeUnit =
+        item.unit
+            ? item.unit.replace(/'/g, "\\'").replace(/"/g, '&quot;')
+            : 'Cái';
+
+    const productImage =
+        buildIndexImageUrl(item.image_path);
+
+    productItemsHTML += `
+        <div class="product-card">
+
+            <a
+                href="pages/product-detail.html?id=${item.id}"
+                class="product-image-link"
+            >
+                <span class="product-badge-stock">
+                    In Stock
+                </span>
+
+                <img
+                    src="${productImage}"
+                    alt="${item.name}"
+                    class="product-img"
+                    loading="lazy"
+                >
+            </a>
+
+            <div class="product-info">
+
+                <div class="product-brand">
+                    ${brandName}
                 </div>
-            `;
-        });
+
+                <a
+                    href="pages/product-detail.html?id=${item.id}"
+                    class="product-name"
+                    title="${item.name}"
+                >
+                    ${item.name}
+                </a>
+
+                <div class="product-meta">
+
+                    <div class="product-sku">
+                        SKU: ${item.sku}
+                    </div>
+
+                    <br>
+
+                    <div class="product-unit">
+                        ${item.unit || 'Cái'}
+                    </div>
+
+                </div>
+
+            </div>
+
+            <button
+                onclick="addToRFQCartFromIndex(
+                    '${safeSku}',
+                    '${safeName}',
+                    '${safeBrand}',
+                    '${safeUnit}'
+                )"
+                class="product-btn-add"
+            >
+                Thêm vào Yêu cầu
+            </button>
+
+        </div>
+    `;
+});
 
         container.innerHTML = `
             <div class="product-slider-track">${productItemsHTML}</div>
