@@ -415,8 +415,11 @@ if (allValidImages.length > 0) {
         const tabDescContent = document.getElementById("tabDescContent");
         if (tabDescContent) tabDescContent.innerHTML = descText;
 
-        const techDetails = document.getElementById("techDetails");
-        if (techDetails) techDetails.innerHTML = item.specifications || "Chưa có dữ liệu.";
+       const techDetails = document.getElementById("techDetails");
+            if (techDetails) {
+                techDetails.textContent =
+                    item.specifications || "Chưa có dữ liệu.";
+            }
 
         const tabDocsContent = document.getElementById("tabDocsContent");
         if (tabDocsContent) {

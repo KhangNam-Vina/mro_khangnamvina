@@ -1138,6 +1138,18 @@
         1px solid #e5e7eb;
 
     border-radius: 8px;
+
+    /*
+       GIỮ NGUYÊN XUỐNG DÒNG
+       TỪ TEXTAREA / DATABASE
+    */
+    white-space: pre-wrap;
+
+    overflow-wrap: break-word;
+
+    word-break: break-word;
+
+    line-height: 1.75;
 }
 
 .product-docs-empty {
@@ -2346,6 +2358,7 @@
     .product-detail-main-card {
         padding:
             14px;
+
         gap:
             18px;
     }
@@ -2439,24 +2452,28 @@
     }
 }
 
+
 /* =========================================================
-   FIX LỖI GẠCH CHÂN TÊN SẢN PHẨM CÙNG DÒNG
+   23. RELATED LINK FIX
 ========================================================= */
+
 .product-related-section a,
 .product-related-grid a,
 .product-related-section a:hover,
 .product-related-grid a:hover {
-    text-decoration: none !important;
+    text-decoration:
+        none !important;
 }
 
-/* Thêm tí hiệu ứng đổi màu xịn xò khi rê chuột vào tên */
 .product-related-section a:hover,
 .product-related-grid a:hover {
-    color: #00479b !important; 
+    color:
+        #00479b !important;
 }
 
+
 /* =========================================================
-   RFQ - SIZE
+   24. RFQ - SIZE
 ========================================================= */
 
 .rfq-cart-size {
@@ -2468,96 +2485,191 @@
 
     margin-top: 5px;
 
-    padding: 3px 7px;
+    padding:
+        3px 7px;
 
-    background: #fff7ed;
+    background:
+        #fff7ed;
 
-    border: 1px solid #ffedd5;
+    border:
+        1px solid #ffedd5;
 
-    border-radius: 4px;
+    border-radius:
+        4px;
 
-    color: #9a3412;
+    color:
+        #9a3412;
 
-    font-size: 11px;
+    font-size:
+        11px;
 
-    line-height: 1.3;
+    line-height:
+        1.3;
 
-    font-weight: 600;
+    font-weight:
+        600;
 }
 
 .rfq-cart-size strong {
-    color: #ff5e00;
+    color:
+        #ff5e00;
 
-    font-weight: 800;
+    font-weight:
+        800;
 }
 
 
 /* =========================================================
-   23. SIZE SELECTOR - ĐỒNG BỘ PRODUCT DETAIL
-   Đồng bộ với style MRO Khang Nam:
-   - xanh #00479b
-   - cam #ff5e00
-   - bo góc nhỏ, gọn
-   - không dùng style mặc định của browser
+   25. SIZE SELECTOR
+   CĂN TOÀN BỘ SANG PHẢI TRÊN DESKTOP
+   HỖ TRỢ MARKUP CŨ + MARKUP MỚI
 ========================================================= */
 
 .product-size-section {
-    margin: 0 0 14px;
+    width:
+        100%;
+
+    margin:
+        2px 0 16px;
+
+    padding:
+        0;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        flex-end;
 }
 
 .product-size-label {
-    display: block;
+    display:
+        flex;
 
-    margin: 0 0 7px;
+    align-items:
+        center;
 
-    color: #374151;
+    justify-content:
+        flex-end;
 
-    font-size: 14px;
-    line-height: 1.4;
+    gap:
+        7px;
 
-    font-weight: 600;
+    margin:
+        0 0 8px;
+
+    color:
+        #6b7280;
+
+    font-size:
+        11px;
+
+    line-height:
+        1.4;
+
+    font-weight:
+        800;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        .06em;
+
+    text-align:
+        right;
 }
 
 .product-size-value {
-    color: #00479b;
-    font-weight: 800;
+    color:
+        #00479b;
+
+    font-weight:
+        900;
 }
 
-.product-size-options {
-    display: flex;
+.product-size-options,
+.product-size-list,
+.size-options {
+    width:
+        auto;
 
-    flex-wrap: wrap;
+    display:
+        flex;
 
-    align-items: center;
+    align-items:
+        center;
 
-    gap: 7px;
+    justify-content:
+        flex-end;
 
-    margin: 0;
+    flex-wrap:
+        wrap;
+
+    gap:
+        7px;
+
+    margin-left:
+        auto;
 }
 
-.product-size-option {
-    min-width: 34px;
-    height: 34px;
 
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+/* ---------------------------------------------------------
+   SIZE BUTTON
+--------------------------------------------------------- */
 
-    padding: 0 10px;
+.product-size-option,
+.product-size-btn,
+.product-size-options button,
+.product-size-list button,
+.size-options button {
+    min-width:
+        46px;
 
-    background: #fff;
+    height:
+        36px;
 
-    border: 1px solid #d1d5db;
-    border-radius: 5px;
+    display:
+        inline-flex;
 
-    color: #374151;
+    align-items:
+        center;
 
-    font-size: 12px;
-    line-height: 1;
+    justify-content:
+        center;
 
-    font-weight: 800;
+    padding:
+        0 13px;
 
-    cursor: pointer;
+    background:
+        #fff;
+
+    border:
+        1px solid #d1d5db;
+
+    border-radius:
+        6px;
+
+    color:
+        #374151;
+
+    font-family:
+        inherit;
+
+    font-size:
+        12px;
+
+    line-height:
+        1;
+
+    font-weight:
+        800;
+
+    cursor:
+        pointer;
 
     transition:
         color .18s ease,
@@ -2567,178 +2679,287 @@
         transform .18s ease;
 }
 
-.product-size-option:hover {
-    border-color: #00479b;
-    color: #00479b;
-    background: #eff6ff;
+.product-size-option:hover,
+.product-size-btn:hover,
+.product-size-options button:hover,
+.product-size-list button:hover,
+.size-options button:hover {
+    color:
+        #00479b;
+
+    background:
+        #eff6ff;
+
+    border-color:
+        #93c5fd;
+
+    transform:
+        translateY(-1px);
 }
+
+
+/* ---------------------------------------------------------
+   ACTIVE SIZE
+--------------------------------------------------------- */
 
 .product-size-option.is-active,
 .product-size-option.active,
 .product-size-option.selected,
-.product-size-option[aria-pressed="true"] {
-    background: #00479b;
-    border-color: #00479b;
-    color: #fff;
+.product-size-option[aria-pressed="true"],
 
-    box-shadow:
-        0 2px 6px rgba(0, 71, 155, .16);
-}
-
-.product-size-option:focus-visible {
-    outline: 2px solid rgba(0, 71, 155, .25);
-    outline-offset: 2px;
-}
-
-.product-size-option:disabled,
-.product-size-option.is-disabled {
-    opacity: .45;
-
-    background: #f3f4f6;
-
-    border-color: #e5e7eb;
-
-    color: #9ca3af;
-
-    cursor: not-allowed;
-
-    box-shadow: none;
-}
-
-.product-size-note {
-    margin: 7px 0 0;
-
-    color: #9ca3af;
-
-    font-size: 11px;
-    line-height: 1.45;
-}
-
-
-/* Hỗ trợ luôn markup dạng phổ biến:
-   .product-size-options button
-   .product-size-list button
-   .size-options button
-*/
-
-.product-size-options button,
-.product-size-list button,
-.size-options button {
-    min-width: 34px;
-    height: 34px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 0 10px;
-
-    background: #fff;
-
-    border: 1px solid #d1d5db;
-    border-radius: 5px;
-
-    color: #374151;
-
-    font-size: 12px;
-    line-height: 1;
-
-    font-weight: 800;
-
-    cursor: pointer;
-
-    transition:
-        color .18s ease,
-        background-color .18s ease,
-        border-color .18s ease,
-        box-shadow .18s ease;
-}
-
-.product-size-options button:hover,
-.product-size-list button:hover,
-.size-options button:hover {
-    color: #00479b;
-    background: #eff6ff;
-    border-color: #00479b;
-}
+.product-size-btn.is-active,
+.product-size-btn.active,
+.product-size-btn.selected,
+.product-size-btn[aria-pressed="true"],
 
 .product-size-options button.is-active,
 .product-size-options button.active,
 .product-size-options button.selected,
 .product-size-options button[aria-pressed="true"],
+
 .product-size-list button.is-active,
 .product-size-list button.active,
 .product-size-list button.selected,
 .product-size-list button[aria-pressed="true"],
+
 .size-options button.is-active,
 .size-options button.active,
 .size-options button.selected,
 .size-options button[aria-pressed="true"] {
-    color: #fff;
-    background: #00479b;
-    border-color: #00479b;
+    color:
+        #fff;
+
+    background:
+        #00479b;
+
+    border-color:
+        #00479b;
 
     box-shadow:
-        0 2px 6px rgba(0, 71, 155, .16);
+        0 3px 8px rgba(0, 71, 155, .18);
+}
+
+
+/* ---------------------------------------------------------
+   FOCUS
+--------------------------------------------------------- */
+
+.product-size-option:focus-visible,
+.product-size-btn:focus-visible,
+.product-size-options button:focus-visible,
+.product-size-list button:focus-visible,
+.size-options button:focus-visible {
+    outline:
+        2px solid rgba(0, 71, 155, .25);
+
+    outline-offset:
+        2px;
+}
+
+
+/* ---------------------------------------------------------
+   DISABLED
+--------------------------------------------------------- */
+
+.product-size-option:disabled,
+.product-size-btn:disabled,
+.product-size-options button:disabled,
+.product-size-list button:disabled,
+.size-options button:disabled,
+
+.product-size-option.is-disabled,
+.product-size-btn.is-disabled {
+    opacity:
+        .45;
+
+    background:
+        #f3f4f6;
+
+    border-color:
+        #e5e7eb;
+
+    color:
+        #9ca3af;
+
+    cursor:
+        not-allowed;
+
+    transform:
+        none;
+
+    box-shadow:
+        none;
+}
+
+.product-size-note {
+    margin:
+        7px 0 0;
+
+    color:
+        #9ca3af;
+
+    font-size:
+        11px;
+
+    line-height:
+        1.45;
 }
 
 
 /* =========================================================
-   24. FIX MARKUP CŨ
-   Nếu JS hiện tại đang render trực tiếp:
-   <div class="product-size">...</div>
-   hoặc:
-   <div class="size-selector">...</div>
+   26. MARKUP CŨ
 ========================================================= */
 
 .product-size,
 .size-selector {
-    margin: 0 0 14px;
+    width:
+        100%;
+
+    margin:
+        2px 0 16px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        flex-end;
 }
 
 .product-size > label,
 .size-selector > label {
-    display: block;
+    display:
+        block;
 
-    margin-bottom: 7px;
+    margin:
+        0 0 8px;
 
-    color: #374151;
+    color:
+        #6b7280;
 
-    font-size: 14px;
+    font-size:
+        11px;
 
-    font-weight: 600;
+    line-height:
+        1.4;
+
+    font-weight:
+        800;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        .06em;
+
+    text-align:
+        right;
 }
 
 .product-size > div,
 .size-selector > div {
-    display: flex;
+    width:
+        auto;
 
-    flex-wrap: wrap;
+    margin-left:
+        auto;
 
-    align-items: center;
+    display:
+        flex;
 
-    gap: 7px;
+    align-items:
+        center;
+
+    justify-content:
+        flex-end;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        7px;
 }
 
 
 /* =========================================================
-   25. RESPONSIVE SIZE
+   27. RESPONSIVE SIZE
 ========================================================= */
 
 @media (max-width: 768px) {
 
-    .product-size-label {
-        font-size: 13px;
+    .product-size-section,
+    .product-size,
+    .size-selector {
+        align-items:
+            flex-start;
+    }
+
+    .product-size-label,
+    .product-size > label,
+    .size-selector > label {
+        justify-content:
+            flex-start;
+
+        text-align:
+            left;
+    }
+
+    .product-size-options,
+    .product-size-list,
+    .size-options,
+    .product-size > div,
+    .size-selector > div {
+        width:
+            100%;
+
+        margin-left:
+            0;
+
+        justify-content:
+            flex-start;
     }
 
     .product-size-option,
+    .product-size-btn,
     .product-size-options button,
     .product-size-list button,
     .size-options button {
-        min-width: 36px;
-        height: 36px;
+        min-width:
+            36px;
 
-        padding: 0 11px;
+        height:
+            36px;
+
+        padding:
+            0 11px;
+    }
+}
+
+
+/* =========================================================
+   28. PRINT SIZE
+========================================================= */
+
+@media print {
+
+    .product-size-section,
+    .product-size,
+    .size-selector {
+        align-items:
+            flex-start;
     }
 
+    .product-size-options,
+    .product-size-list,
+    .size-options,
+    .product-size > div,
+    .size-selector > div {
+        margin-left:
+            0;
+
+        justify-content:
+            flex-start;
+    }
 }
