@@ -248,23 +248,30 @@
    NÚT "+ XEM TẤT CẢ" BÊN TRONG THẺ DANH MỤC
 ========================================================= */
 .category-view-all {
-    display: inline-block;
-    font-size: 13px; /* Nhỏ hơn tên danh mục một chút */
-    text-transform: uppercase; 
-    font-weight: 800; /* In đậm chuẩn B2B */
-    color: #ff5e00; /* Màu cam đặc trưng */
-    font-style: italic; /* Ép in nghiêng giống ảnh */
+    display: inline-flex;
+    align-items: center;
+
+    margin-top: 8px;
+
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.375;
+
+    color: #00479b;
+
+    text-transform: uppercase;
     text-decoration: none;
-    transition: color 0.3s ease, transform 0.2s ease;
-    margin-top: 4px;
+    font-style: normal;
+
+    transition: color 0.2s ease;
 }
 
-/* Hiệu ứng khi khách hơ chuột vào */
-.category-view-all:hover { 
-    color: #c2410c; 
-    text-decoration: underline; 
-    transform: translateX(4px); /* Nhích nhẹ sang phải cho mượt */
-}   
+.category-view-all:hover {
+    color: #ff5e00;
+    text-decoration: none;
+    transform: none;
+}
+
 .cat-empty { font-size: 14px; color: #9ca3af; font-style: italic; }
 .home-grid-message {
     grid-column: 1 / -1;

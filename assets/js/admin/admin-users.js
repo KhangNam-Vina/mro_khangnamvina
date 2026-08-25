@@ -28,8 +28,12 @@
 // - admins.id = profiles.id
 // - Không tạo ID mới.
 // - Không đổi schema.
-// - Không xóa Auth.
-// - Không migration.
+// - Không xóa Auth từ màn hình này.
+// - Không xóa profiles trực tiếp từ màn hình này.
+// - Cấp Admin = INSERT admins.
+// - Thu hồi Admin = DELETE admins.
+// - Không chỉnh sửa Admin để tránh phá liên kết id.
+// - Admin list lấy thông tin người dùng từ profiles bằng admins.id.
 // ========================================================
 
 
@@ -617,62 +621,25 @@ function bindEvents() {
     DOM.tbody?.addEventListener(
         "click",
         event => {
+            const button = event.target.closest("button[data-action]");
 
-            const button =
-                event.target.closest(
-                    "button[data-action]"
-                );
-
-
-            if (
-                !button
-            ) {
-
+            if (!button) {
                 return;
-
             }
 
+            const action = button.dataset.action;
+            const id = button.dataset.id;
 
-            const action =
-                button.dataset.action;
-
-
-            const id =
-                button.dataset.id;
-
-
-            if (
-                action === "edit-admin"
-            ) {
-
-                openAdminModal(
-                    id
-                );
-
+            // Sự kiện Thu hồi quyền Admin (Tab Admin)
+            if (action === "delete-admin") {
+                deleteAdmin(id);
             }
-
-
-            if (
-                action === "delete-admin"
-            ) {
-
-                deleteAdmin(
-                    id
-                );
-
+            
+            // 💡 SỰ KIỆN MỚI: Khóa / Mở khóa người dùng (Tab Người dùng)
+            if (action === "toggle-status") {
+                const status = button.dataset.status;
+                toggleUserStatus(id, status);
             }
-
-
-            if (
-                action === "delete-user"
-            ) {
-
-                deleteCustomer(
-                    id
-                );
-
-            }
-
         }
     );
 
@@ -950,87 +917,31 @@ function updateTabUI() {
 /* ========================================================
    TABLE HEADER
 ======================================================== */
-
 function renderTableHeader() {
+    if (!DOM.thead) return;
 
-    if (
-        !DOM.thead
-    ) {
-
-        return;
-
-    }
-
-
-    if (
-        state.currentTab ===
-        "user"
-    ) {
-
+    if (state.currentTab === "user") {
         DOM.thead.innerHTML = `
-
-            <th class="px-4 py-3.5 w-14 text-center">
-                #
-            </th>
-
-            <th class="px-4 py-3.5 w-16 text-center">
-                Avatar
-            </th>
-
-            <th class="px-4 py-3.5 min-w-[280px]">
-                Người dùng
-            </th>
-
-            <th class="px-4 py-3.5 min-w-[220px]">
-                Liên hệ
-            </th>
-
-            <th class="px-4 py-3.5 w-40">
-                Công ty
-            </th>
-
-            <th class="px-4 py-3.5 w-36">
-                Ngày đăng ký
-            </th>
-
-            <th class="px-4 py-3.5 w-24 text-right">
-                Thao tác
-            </th>
-
+            <th class="px-4 py-3.5 w-14 text-center">#</th>
+            <th class="px-4 py-3.5 w-16 text-center">Avatar</th>
+            <th class="px-4 py-3.5 min-w-[220px]">Người dùng</th>
+            <th class="px-4 py-3.5 min-w-[180px]">Liên hệ</th>
+            <th class="px-4 py-3.5 w-32">Công ty</th>
+            <th class="px-4 py-3.5 w-28 text-center">Trạng thái</th>
+            <th class="px-4 py-3.5 w-32">Ngày đăng ký</th>
+            <th class="px-4 py-3.5 w-24 text-right">Thao tác</th>
         `;
-
     } else {
-
         DOM.thead.innerHTML = `
-
-            <th class="px-4 py-3.5 w-14 text-center">
-                #
-            </th>
-
-            <th class="px-4 py-3.5 w-16 text-center">
-                Avatar
-            </th>
-
-            <th class="px-4 py-3.5 min-w-[350px]">
-                Tài khoản Admin
-            </th>
-
-            <th class="px-4 py-3.5 w-36">
-                Quyền
-            </th>
-
-            <th class="px-4 py-3.5 w-40">
-                Ngày cấp
-            </th>
-
-            <th class="px-4 py-3.5 w-28 text-right">
-                Thao tác
-            </th>
-
+            <th class="px-4 py-3.5 w-14 text-center">#</th>
+            <th class="px-4 py-3.5 w-16 text-center">Avatar</th>
+            <th class="px-4 py-3.5 min-w-[280px]">Quản trị viên</th>
+            <th class="px-4 py-3.5 min-w-[180px]">Liên hệ</th>
+            <th class="px-4 py-3.5 w-36">Quyền</th>
+            <th class="px-4 py-3.5 w-40">Ngày cấp</th>
+            <th class="px-4 py-3.5 w-28 text-right">Thao tác</th>
         `;
-
     }
-
 }
 
 
@@ -1189,168 +1100,37 @@ function updateStatisticsUI() {
 
 async function fetchData() {
 
-    if (
-        DOM.tbody
-    ) {
-
+    if (DOM.tbody) {
         renderLoading();
-
     }
-
-
-    const from =
-        (
-            state.currentPage -
-            1
-        ) *
-        state.itemsPerPage;
-
-
-    const to =
-        from +
-        state.itemsPerPage -
-        1;
-
-
-    const table =
-        state.currentTab ===
-        "user"
-
-            ? "profiles"
-
-            : "admins";
-
 
     try {
 
-        let query =
-            window.supabaseClient
-
-                .from(
-                    table
-                )
-
-                .select(
-                    "*",
-                    {
-                        count: "exact"
-                    }
-                );
-
-
-        if (
-            state.searchQuery
-        ) {
-
-            const keyword =
-                state.searchQuery
-                    .replace(
-                        /[%_,]/g,
-                        ""
-                    );
-
-
-            if (
-                keyword
-            ) {
-
-                if (
-                    state.currentTab ===
-                    "user"
-                ) {
-
-                    query =
-                        query.or(
-                            [
-                                `email.ilike.%${keyword}%`,
-                                `full_name.ilike.%${keyword}%`,
-                                `phone.ilike.%${keyword}%`,
-                                `company.ilike.%${keyword}%`,
-                                `company_name.ilike.%${keyword}%`
-                            ].join(",")
-                        );
-
-                } else {
-
-                    query =
-                        query.ilike(
-                            "email",
-                            `%${keyword}%`
-                        );
-
-                }
-
-            }
-
+        if (state.currentTab === "user") {
+            await fetchUsersData();
+        } else {
+            await fetchAdminsData();
         }
 
-
-        query =
-            query
-                .order(
-                    "created_at",
-                    {
-                        ascending: false
-                    }
-                )
-                .range(
-                    from,
-                    to
-                );
-
-
-        const {
-            data,
-            count,
-            error
-        } =
-            await query;
-
-
-        if (
-            error
-        ) {
-
-            throw error;
-
-        }
-
-
-        state.users =
-            data || [];
-
-
-        state.totalItems =
-            count || 0;
-
-
-        renderUsers();
-
-        renderPagination();
-
-        updateStatisticsUI();
-
-
-    } catch (
-        error
-    ) {
+    } catch (error) {
 
         console.error(
             "Lỗi tải dữ liệu:",
             error
         );
 
-
-        if (
-            DOM.tbody
-        ) {
+        if (DOM.tbody) {
 
             DOM.tbody.innerHTML = `
 
                 <tr>
 
                     <td
-                        colspan="7"
+                        colspan="${
+                            state.currentTab === "admin"
+                                ? 7
+                                : 6
+                        }"
                         class="text-center py-12 text-red-500 font-bold"
                     >
 
@@ -1372,7 +1152,6 @@ async function fetchData() {
 
         }
 
-
         utils.showToast(
             `Lỗi tải dữ liệu: ${error.message}`,
             "error"
@@ -1384,16 +1163,302 @@ async function fetchData() {
 
 
 /* ========================================================
+   FETCH USERS
+======================================================== */
+
+async function fetchUsersData() {
+
+    const from =
+        (state.currentPage - 1) *
+        state.itemsPerPage;
+
+    const to =
+        from +
+        state.itemsPerPage -
+        1;
+
+    let query =
+        window.supabaseClient
+            .from("profiles")
+            .select(
+                "*",
+                {
+                    count: "exact"
+                }
+            );
+
+    if (state.searchQuery) {
+
+        const keyword =
+            state.searchQuery
+                .replace(/[%_,]/g, "");
+
+        if (keyword) {
+
+            query =
+                query.or(
+                    [
+                        `email.ilike.%${keyword}%`,
+                        `full_name.ilike.%${keyword}%`,
+                        `phone.ilike.%${keyword}%`,
+                        `company.ilike.%${keyword}%`,
+                        `company_name.ilike.%${keyword}%`
+                    ].join(",")
+                );
+
+        }
+
+    }
+
+    const {
+        data,
+        count,
+        error
+    } =
+        await query
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            )
+            .range(
+                from,
+                to
+            );
+
+    if (error) {
+        throw error;
+    }
+
+    state.users =
+        data || [];
+
+    state.totalItems =
+        count || 0;
+
+    renderUsers();
+    renderPagination();
+    updateStatisticsUI();
+
+}
+
+
+/* ========================================================
+   FETCH ADMINS
+======================================================== */
+
+async function fetchAdminsData() {
+
+    const from =
+        (state.currentPage - 1) *
+        state.itemsPerPage;
+
+    const to =
+        from +
+        state.itemsPerPage -
+        1;
+
+    const keyword =
+        state.searchQuery
+            .replace(/[%_,]/g, "");
+
+    let matchingProfileIds = [];
+
+
+    /*
+     * Search Admin theo:
+     * email + tên + SĐT + công ty.
+     * profiles.id chính là admins.id.
+     */
+
+    if (keyword) {
+
+        const {
+            data: profiles,
+            error: profileSearchError
+        } =
+            await window.supabaseClient
+                .from("profiles")
+                .select("id")
+                .or(
+                    [
+                        `email.ilike.%${keyword}%`,
+                        `full_name.ilike.%${keyword}%`,
+                        `phone.ilike.%${keyword}%`,
+                        `company.ilike.%${keyword}%`,
+                        `company_name.ilike.%${keyword}%`
+                    ].join(",")
+                );
+
+        if (profileSearchError) {
+            throw profileSearchError;
+        }
+
+        matchingProfileIds =
+            (profiles || [])
+                .map(
+                    item => item.id
+                )
+                .filter(Boolean);
+
+    }
+
+
+    let query =
+        window.supabaseClient
+            .from("admins")
+            .select(
+                "*",
+                {
+                    count: "exact"
+                }
+            );
+
+
+    if (keyword) {
+
+        const safeIds =
+            matchingProfileIds
+                .map(
+                    id =>
+                        String(id)
+                            .replace(
+                                /[^a-zA-Z0-9_-]/g,
+                                ""
+                            )
+                )
+                .filter(Boolean);
+
+
+        if (safeIds.length > 0) {
+
+            query =
+                query.or(
+                    [
+                        `email.ilike.%${keyword}%`,
+                        `id.in.(${safeIds.join(",")})`
+                    ].join(",")
+                );
+
+        } else {
+
+            query =
+                query.ilike(
+                    "email",
+                    `%${keyword}%`
+                );
+
+        }
+
+    }
+
+
+    const {
+        data: admins,
+        count,
+        error
+    } =
+        await query
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            )
+            .range(
+                from,
+                to
+            );
+
+    if (error) {
+        throw error;
+    }
+
+
+    const adminRows =
+        admins || [];
+
+
+    /*
+     * Không cần FK.
+     * Dùng admins.id -> profiles.id.
+     */
+
+    const profileIds =
+        adminRows
+            .map(
+                item => item.id
+            )
+            .filter(Boolean);
+
+
+    let profileMap =
+        new Map();
+
+
+    if (profileIds.length > 0) {
+
+        const {
+            data: profiles,
+            error: profilesError
+        } =
+            await window.supabaseClient
+                .from("profiles")
+                .select(
+                    "id,email,full_name,phone,company,company_name"
+                )
+                .in(
+                    "id",
+                    profileIds
+                );
+
+        if (profilesError) {
+            throw profilesError;
+        }
+
+        profileMap =
+            new Map(
+                (profiles || []).map(
+                    profile => [
+                        String(profile.id),
+                        profile
+                    ]
+                )
+            );
+
+    }
+
+
+    state.users =
+        adminRows.map(
+            admin => ({
+                ...admin,
+                profile:
+                    profileMap.get(
+                        String(admin.id)
+                    ) || null
+            })
+        );
+
+
+    state.totalItems =
+        count || 0;
+
+
+    renderUsers();
+    renderPagination();
+    updateStatisticsUI();
+
+}
+
+/* ========================================================
    LOADING
 ======================================================== */
 
 function renderLoading() {
 
-    const colspan =
-        state.currentTab ===
-        "user"
-            ? 7
-            : 6;
+    const colspan = 6;
 
 
     DOM.tbody.innerHTML = `
@@ -1450,11 +1515,7 @@ function renderUsers() {
         state.users.length === 0
     ) {
 
-        const colspan =
-            state.currentTab ===
-            "user"
-                ? 7
-                : 6;
+        const colspan = 6;
 
 
         DOM.tbody.innerHTML = `
@@ -1548,193 +1609,61 @@ function renderUsers() {
 /* ========================================================
    RENDER CUSTOMERS
 ======================================================== */
+function renderCustomers(from) {
+    DOM.tbody.innerHTML = state.users.map((item, index) => {
+        const email = utils.escapeHTML(item.email || "Chưa cập nhật");
+        const name = utils.escapeHTML(item.full_name || "Chưa cập nhật");
+        const phone = utils.escapeHTML(item.phone || "Chưa cập nhật");
+        const company = utils.escapeHTML(item.company_name || item.company || "Cá nhân");
+        const date = formatDate(item.created_at);
+        const avatar = utils.getInitial(item.full_name || item.email);
+        
+        // Logic kiểm tra trạng thái
+        const status = item.status || 'active';
+        const isLocked = status === 'locked';
+        
+        const statusBadge = isLocked 
+            ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-50 border border-red-100 text-red-600 text-[10px] font-black uppercase"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Đã khóa</span>`
+            : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-green-50 border border-green-100 text-green-600 text-[10px] font-black uppercase"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Hoạt động</span>`;
+        
+        const actionIcon = isLocked 
+            ? `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>` // Nút mở khóa
+            : `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>`; // Nút khóa
 
-function renderCustomers(
-    from
-) {
+        const actionTitle = isLocked ? "Mở khóa tài khoản" : "Khóa tài khoản";
+        const actionColor = isLocked ? "text-green-600 hover:bg-green-50" : "text-amber-500 hover:bg-amber-50";
 
-    DOM.tbody.innerHTML =
-        state.users
-            .map(
-                (
-                    item,
-                    index
-                ) => {
-
-                    const email =
-                        utils.escapeHTML(
-                            item.email ||
-                            "Chưa cập nhật"
-                        );
-
-
-                    const name =
-                        utils.escapeHTML(
-                            item.full_name ||
-                            "Chưa cập nhật"
-                        );
-
-
-                    const phone =
-                        utils.escapeHTML(
-                            item.phone ||
-                            "Chưa cập nhật"
-                        );
-
-
-                    const company =
-                        utils.escapeHTML(
-                            item.company_name ||
-                            item.company ||
-                            "Cá nhân"
-                        );
-
-
-                    const date =
-                        formatDate(
-                            item.created_at
-                        );
-
-
-                    const avatar =
-                        utils.getInitial(
-                            item.full_name ||
-                            item.email
-                        );
-
-
-                    return `
-
-                        <tr class="group hover:bg-blue-50/40 transition-colors">
-
-                            <td class="px-4 py-4 text-center text-xs font-mono font-bold text-gray-400">
-                                ${from + index + 1}
-                            </td>
-
-
-                            <td class="px-4 py-4 text-center">
-
-                                <div
-                                    class="
-                                        w-10
-                                        h-10
-                                        mx-auto
-                                        rounded-full
-                                        bg-kn-blue
-                                        text-white
-                                        flex
-                                        items-center
-                                        justify-center
-                                        font-black
-                                        text-sm
-                                        shadow-sm
-                                    "
-                                >
-                                    ${avatar}
-                                </div>
-
-                            </td>
-
-
-                            <td class="px-4 py-4">
-
-                                <div class="font-black text-gray-900 leading-5">
-                                    ${name}
-                                </div>
-
-                                <div class="mt-1 text-xs text-gray-500 break-all">
-                                    ${email}
-                                </div>
-
-                            </td>
-
-
-                            <td class="px-4 py-4">
-
-                                <div class="text-xs font-bold text-gray-800">
-                                    ${phone}
-                                </div>
-
-                                <div class="text-[11px] text-gray-400 mt-1">
-                                    Tài khoản website
-                                </div>
-
-                            </td>
-
-
-                            <td class="px-4 py-4">
-
-                                <span
-                                    class="
-                                        inline-flex
-                                        max-w-full
-                                        px-2.5
-                                        py-1.5
-                                        rounded-lg
-                                        bg-gray-100
-                                        border
-                                        border-gray-200
-                                        text-gray-600
-                                        text-[10px]
-                                        font-bold
-                                    "
-                                >
-                                    ${company}
-                                </span>
-
-                            </td>
-
-
-                            <td class="px-4 py-4 text-xs text-gray-500 font-medium whitespace-nowrap">
-                                ${date}
-                            </td>
-
-
-                            <td class="px-4 py-4 text-right">
-
-                                <button
-                                    type="button"
-                                    data-action="delete-user"
-                                    data-id="${utils.escapeHTML(
-                                        item.id
-                                    )}"
-                                    class="
-                                        p-2
-                                        rounded-lg
-                                        text-gray-400
-                                        hover:text-red-500
-                                        hover:bg-red-50
-                                        transition
-                                    "
-                                    title="Xóa hồ sơ"
-                                >
-
-                                    <svg
-                                        class="w-4 h-4"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                        />
-                                    </svg>
-
-                                </button>
-
-                            </td>
-
-                        </tr>
-
-                    `;
-
-                }
-            )
-            .join("");
-
+        return `
+            <tr class="group hover:bg-blue-50/40 transition-colors ${isLocked ? 'bg-gray-50 opacity-75' : ''}">
+                <td class="px-4 py-4 text-center text-xs font-mono font-bold text-gray-400">${from + index + 1}</td>
+                <td class="px-4 py-4 text-center">
+                    <div class="w-10 h-10 mx-auto rounded-full ${isLocked ? 'bg-gray-400' : 'bg-kn-blue'} text-white flex items-center justify-center font-black text-sm shadow-sm">
+                        ${avatar}
+                    </div>
+                </td>
+                <td class="px-4 py-4">
+                    <div class="font-black ${isLocked ? 'text-gray-500 line-through' : 'text-gray-900'} leading-5">${name}</div>
+                    <div class="mt-1 text-xs text-gray-500 break-all">${email}</div>
+                </td>
+                <td class="px-4 py-4">
+                    <div class="text-xs font-bold text-gray-800">${phone}</div>
+                    <div class="text-[11px] text-gray-400 mt-1">Tài khoản website</div>
+                </td>
+                <td class="px-4 py-4">
+                    <span class="inline-flex max-w-full px-2.5 py-1.5 rounded-lg bg-gray-100 border border-gray-200 text-gray-600 text-[10px] font-bold">${company}</span>
+                </td>
+                <td class="px-4 py-4 text-center">
+                    ${statusBadge}
+                </td>
+                <td class="px-4 py-4 text-xs text-gray-500 font-medium whitespace-nowrap">${date}</td>
+                <td class="px-4 py-4 text-right">
+                    <button type="button" data-action="toggle-status" data-id="${utils.escapeHTML(item.id)}" data-status="${status}" class="p-2 rounded-lg ${actionColor} transition" title="${actionTitle}">
+                        ${actionIcon}
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join("");
 }
 
 
@@ -1754,15 +1683,44 @@ function renderAdmins(
                     index
                 ) => {
 
+                    const profile =
+                        item.profile;
+
+
                     const email =
                         utils.escapeHTML(
+                            profile?.email ||
                             item.email ||
                             "Chưa cập nhật"
                         );
 
 
+                    const name =
+                        utils.escapeHTML(
+                            profile?.full_name ||
+                            "Chưa cập nhật"
+                        );
+
+
+                    const phone =
+                        utils.escapeHTML(
+                            profile?.phone ||
+                            "Chưa cập nhật"
+                        );
+
+
+                    const company =
+                        utils.escapeHTML(
+                            profile?.company_name ||
+                            profile?.company ||
+                            "Cá nhân"
+                        );
+
+
                     const avatar =
                         utils.getInitial(
+                            profile?.full_name ||
+                            profile?.email ||
                             item.email
                         );
 
@@ -1771,6 +1729,23 @@ function renderAdmins(
                         formatDate(
                             item.created_at
                         );
+
+
+                    const profileStatus =
+                        profile
+                            ? ""
+                            : `
+                                <div
+                                    class="
+                                        mt-1
+                                        text-[10px]
+                                        text-red-500
+                                        font-bold
+                                    "
+                                >
+                                    Hồ sơ profiles không tồn tại
+                                </div>
+                            `;
 
 
                     return `
@@ -1808,15 +1783,27 @@ function renderAdmins(
 
                             <td class="px-4 py-4">
 
-                                <div class="font-black text-gray-900 break-all">
+                                <div class="font-black text-gray-900 leading-5">
+                                    ${name}
+                                </div>
+
+                                <div class="mt-1 text-xs text-gray-500 break-all">
                                     ${email}
                                 </div>
 
+                                ${profileStatus}
 
-                                <div class="text-[10px] text-gray-400 mt-1 font-mono">
-                                    ID #${utils.escapeHTML(
-                                        item.id
-                                    )}
+                            </td>
+
+
+                            <td class="px-4 py-4">
+
+                                <div class="text-xs font-bold text-gray-800">
+                                    ${phone}
+                                </div>
+
+                                <div class="text-[10px] text-gray-400 mt-1">
+                                    ${company}
                                 </div>
 
                             </td>
@@ -1865,74 +1852,37 @@ function renderAdmins(
 
                             <td class="px-4 py-4 text-right">
 
-                                <div class="flex justify-end items-center gap-1">
+                                <button
+                                    type="button"
+                                    data-action="delete-admin"
+                                    data-id="${utils.escapeHTML(
+                                        item.id
+                                    )}"
+                                    class="
+                                        p-2
+                                        rounded-lg
+                                        text-red-500
+                                        hover:bg-red-50
+                                        transition
+                                    "
+                                    title="Thu hồi Admin"
+                                >
 
-                                    <button
-                                        type="button"
-                                        data-action="edit-admin"
-                                        data-id="${utils.escapeHTML(
-                                            item.id
-                                        )}"
-                                        class="
-                                            p-2
-                                            rounded-lg
-                                            text-blue-600
-                                            hover:bg-blue-50
-                                            transition
-                                        "
-                                        title="Chỉnh sửa Admin"
+                                    <svg
+                                        class="w-4 h-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
                                     >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1 1v3M4 7h16"
+                                        />
+                                    </svg>
 
-                                        <svg
-                                            class="w-4 h-4"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652l-9.193 9.193a4.5 4.5 0 01-1.897 1.13l-2.052-2.052a4.5 4.5 0 011.13-1.897l9.193-9.193z"
-                                            />
-                                        </svg>
-
-                                    </button>
-
-
-                                    <button
-                                        type="button"
-                                        data-action="delete-admin"
-                                        data-id="${utils.escapeHTML(
-                                            item.id
-                                        )}"
-                                        class="
-                                            p-2
-                                            rounded-lg
-                                            text-red-500
-                                            hover:bg-red-50
-                                            transition
-                                        "
-                                        title="Thu hồi Admin"
-                                    >
-
-                                        <svg
-                                            class="w-4 h-4"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 0 1-1 1v3M4 7h16"
-                                            />
-                                        </svg>
-
-                                    </button>
-
-                                </div>
+                                </button>
 
                             </td>
 
@@ -1945,7 +1895,6 @@ function renderAdmins(
             .join("");
 
 }
-
 
 /* ========================================================
    DATE
@@ -2320,9 +2269,7 @@ function buildPageList(
    ADMIN MODAL
 ======================================================== */
 
-function openAdminModal(
-    id = null
-) {
+function openAdminModal() {
 
     if (
         !DOM.modal ||
@@ -2336,57 +2283,10 @@ function openAdminModal(
 
     DOM.form.reset();
 
+    DOM.inUserId.value = "";
 
-    DOM.inUserId.value =
-        "";
-
-
-    if (
-        id
-    ) {
-
-        const admin =
-            state.users.find(
-                item =>
-                    String(
-                        item.id
-                    ) ===
-                    String(id)
-            );
-
-
-        if (
-            !admin
-        ) {
-
-            utils.showToast(
-                "Không tìm thấy Admin.",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-        DOM.inUserId.value =
-            admin.id;
-
-
-        DOM.inUserEmail.value =
-            admin.email ||
-            "";
-
-
-        DOM.modalTitle.textContent =
-            "Chỉnh sửa Admin";
-
-    } else {
-
-        DOM.modalTitle.textContent =
-            "Cấp quyền Admin";
-
-    }
+    DOM.modalTitle.textContent =
+        "Cấp quyền Admin";
 
 
     DOM.modal.classList.remove(
@@ -2417,12 +2317,8 @@ function openAdminModal(
 
 function closeAdminModal() {
 
-    if (
-        !DOM.modal
-    ) {
-
+    if (!DOM.modal) {
         return;
-
     }
 
 
@@ -2449,12 +2345,8 @@ async function saveAdmin(
     event
 ) {
 
-    if (
-        event
-    ) {
-
+    if (event) {
         event.preventDefault();
-
     }
 
 
@@ -2464,13 +2356,7 @@ async function saveAdmin(
             .toLowerCase();
 
 
-    const editId =
-        DOM.inUserId.value;
-
-
-    if (
-        !email
-    ) {
+    if (!email) {
 
         utils.showToast(
             "Vui lòng nhập Email!",
@@ -2487,129 +2373,38 @@ async function saveAdmin(
     utils.setButtonLoading(
         DOM.btnSave,
         true,
-        editId
-            ? "Cập nhật Admin"
-            : "Lưu Admin"
+        "Lưu Admin"
     );
 
 
     try {
 
-        /* =================================================
-           1. KIỂM TRA ADMIN TRÙNG EMAIL
-        ================================================= */
-
-        let duplicateQuery =
-            window.supabaseClient
-
-                .from(
-                    "admins"
-                )
-
-                .select(
-                    "id,email"
-                )
-
-                .eq(
-                    "email",
-                    email
-                );
-
-
-        if (
-            editId
-        ) {
-
-            duplicateQuery =
-                duplicateQuery.neq(
-                    "id",
-                    editId
-                );
-
-        }
-
-
-        const {
-            data: existing,
-            error: duplicateError
-        } =
-            await duplicateQuery;
-
-
-        if (
-            duplicateError
-        ) {
-
-            throw duplicateError;
-
-        }
-
-
-        if (
-            existing &&
-            existing.length > 0
-        ) {
-
-            utils.showToast(
-                "Email này đã là Admin.",
-                "warning"
-            );
-
-            return;
-
-        }
-
-
-        /* =================================================
-           2. TÌM PROFILE THEO EMAIL
-           
-           Đây là phần QUAN TRỌNG nhất.
-           
-           admins.id phải dùng đúng profiles.id.
-           
-           Không tự generate UUID.
-           Không dùng email làm id.
-           Không insert id = null.
-        ================================================= */
+        /*
+         * Người dùng phải tồn tại trong profiles.
+         */
 
         const {
             data: profile,
             error: profileError
         } =
             await window.supabaseClient
-
-                .from(
-                    "profiles"
-                )
-
+                .from("profiles")
                 .select(
-                    "id,email"
+                    "id,email,full_name"
                 )
-
                 .eq(
                     "email",
                     email
                 )
-
                 .maybeSingle();
 
 
-        if (
-            profileError
-        ) {
-
+        if (profileError) {
             throw profileError;
-
         }
 
 
-        /* -----------------------------------------------
-           Không tìm thấy tài khoản
-        ------------------------------------------------ */
-
-        if (
-            !profile
-        ) {
+        if (!profile) {
 
             utils.showToast(
                 "Không tìm thấy tài khoản với Email này. Người dùng phải đăng ký trên website trước.",
@@ -2621,13 +2416,7 @@ async function saveAdmin(
         }
 
 
-        /* =================================================
-           3. KIỂM TRA ID PROFILE
-        ================================================= */
-
-        if (
-            !profile.id
-        ) {
+        if (!profile.id) {
 
             throw new Error(
                 "Tài khoản tồn tại nhưng profiles.id đang bị thiếu."
@@ -2636,136 +2425,159 @@ async function saveAdmin(
         }
 
 
-        /* =================================================
-           4. UPDATE ADMIN
-        ================================================= */
+        /*
+         * Người này đã là Admin?
+         */
+
+        const {
+            data: existingAdmin,
+            error: existingAdminError
+        } =
+            await window.supabaseClient
+                .from("admins")
+                .select(
+                    "id,email"
+                )
+                .eq(
+                    "id",
+                    profile.id
+                )
+                .maybeSingle();
+
+
+        if (existingAdminError) {
+            throw existingAdminError;
+        }
+
+
+        if (existingAdmin) {
+
+            utils.showToast(
+                "Tài khoản này đã là Admin.",
+                "warning"
+            );
+
+            return;
+
+        }
+
+
+        /*
+         * Bảo vệ thêm email trùng trong admins,
+         * kể cả dữ liệu cũ đang bị lệch id.
+         */
+
+        const {
+            data: duplicateEmail,
+            error: duplicateEmailError
+        } =
+            await window.supabaseClient
+                .from("admins")
+                .select(
+                    "id,email"
+                )
+                .eq(
+                    "email",
+                    profile.email || email
+                );
+
+
+        if (duplicateEmailError) {
+            throw duplicateEmailError;
+        }
+
 
         if (
-            editId
+            duplicateEmail &&
+            duplicateEmail.length > 0
         ) {
 
-            /*
-             * Khi chỉnh sửa Admin, vẫn giữ nguyên
-             * admins.id hiện tại.
-             *
-             * Chỉ cập nhật email.
-             */
-
-            const {
-                error
-            } =
-                await window.supabaseClient
-
-                    .from(
-                        "admins"
-                    )
-
-                    .update({
-
-                        email: profile.email || email,
-
-                        role: "admin"
-
-                    })
-
-                    .eq(
-                        "id",
-                        editId
-                    );
-
-
-            if (
-                error
-            ) {
-
-                throw error;
-
-            }
-
-
             utils.showToast(
-                "Cập nhật Admin thành công!",
-                "success"
+                "Email này đã có trong danh sách Admin.",
+                "warning"
             );
+
+            return;
 
         }
 
 
-        /* =================================================
-           5. INSERT ADMIN
-           
-           admins.id = profiles.id
-        ================================================= */
+        /*
+         * Cấp quyền:
+         * admins.id = profiles.id
+         */
 
-        else {
+        const {
+            error: insertError
+        } =
+            await window.supabaseClient
+                .from("admins")
+                .insert([
+                    {
+                        id:
+                            profile.id,
 
-            const payload = {
+                        email:
+                            profile.email ||
+                            email,
 
-                id: profile.id,
-
-                email: profile.email || email,
-
-                role: "admin"
-
-            };
-
-
-            const {
-                error
-            } =
-                await window.supabaseClient
-
-                    .from(
-                        "admins"
-                    )
-
-                    .insert([
-                        payload
-                    ]);
+                        role:
+                            "admin"
+                    }
+                ]);
 
 
-            if (
-                error
-            ) {
-
-                throw error;
-
-            }
-
-
-            utils.showToast(
-                "Đã cấp quyền Admin thành công!",
-                "success"
-            );
-
+        if (insertError) {
+            throw insertError;
         }
 
 
-        /* =================================================
-           6. REFRESH
-        ================================================= */
+        utils.showToast(
+            "Đã cấp quyền Admin thành công!",
+            "success"
+        );
+
 
         closeAdminModal();
-
 
         await loadStatistics();
 
 
+        /*
+         * Cấp xong chuyển sang tab Admin
+         * để kiểm tra ngay.
+         */
+
+        state.currentTab =
+            "admin";
+
+        state.currentPage =
+            1;
+
+        state.searchQuery =
+            "";
+
+
+        if (DOM.searchInput) {
+            DOM.searchInput.value = "";
+        }
+
+
+        updateTabUI();
+
         await fetchData();
 
 
-    } catch (
-        error
-    ) {
+    } catch (error) {
 
         console.error(
-            "Lỗi lưu Admin:",
+            "Lỗi cấp Admin:",
             error
         );
 
 
         utils.showToast(
-            `Lỗi: ${error.message}`,
+            `Lỗi cấp Admin: ${error.message}`,
             "error"
         );
 
@@ -2774,121 +2586,50 @@ async function saveAdmin(
         utils.setButtonLoading(
             DOM.btnSave,
             false,
-            editId
-                ? "Cập nhật Admin"
-                : "Lưu Admin"
+            "Lưu Admin"
         );
 
     }
 
 }
 
-
 /* ========================================================
-   DELETE ADMIN
+   DELETE ADMIN (Đã thêm khiên bảo vệ Admin Gốc)
 ======================================================== */
+async function deleteAdmin(id) {
+    const admin = state.users.find(item => String(item.id) === String(id));
+    const email = admin?.profile?.email || admin?.email || "";
 
-async function deleteAdmin(
-    id
-) {
-
-    const admin =
-        state.users.find(
-            item =>
-                String(
-                    item.id
-                ) ===
-                String(id)
-        );
-
-
-    const email =
-        admin?.email ||
-        "tài khoản này";
-
-
-    const confirmed =
-        window.confirm(
-            `Thu hồi toàn bộ quyền Admin của:\n${email}?\n\nTài khoản đăng nhập không bị xóa khỏi Auth.`
-        );
-
-
-    if (
-        !confirmed
-    ) {
-
+    // BƯỚC BẢO VỆ 1: Không ai được đụng vào Admin Gốc
+    if (email.toLowerCase() === 'admin@khangnam.com') {
+        utils.showToast("Bạo chúa! Không thể thu hồi quyền của Admin Gốc!", "error");
         return;
-
     }
 
+    // BƯỚC BẢO VỆ 2: Không cho tự sát
+    const { data: authData } = await window.supabaseClient.auth.getUser();
+    if (authData?.user?.id === String(id)) {
+        utils.showToast("Khoan đã bro! Không thể tự thu hồi quyền Admin của chính mình.", "warning");
+        return;
+    }
+
+    const confirmed = window.confirm(`Thu hồi toàn bộ quyền Admin của:\n${email || "tài khoản này"}?\n\nTài khoản đăng nhập không bị xóa khỏi Auth.`);
+    if (!confirmed) return;
 
     try {
+        const { error } = await window.supabaseClient.from("admins").delete().eq("id", id);
+        if (error) throw error;
 
-        const {
-            error
-        } =
-            await window.supabaseClient
+        if (state.users.length === 1 && state.currentPage > 1) state.currentPage--;
 
-                .from(
-                    "admins"
-                )
-
-                .delete()
-
-                .eq(
-                    "id",
-                    id
-                );
-
-
-        if (
-            error
-        ) {
-
-            throw error;
-
-        }
-
-
-        if (
-            state.users.length === 1 &&
-            state.currentPage > 1
-        ) {
-
-            state.currentPage--;
-
-        }
-
-
-        utils.showToast(
-            "Đã thu hồi quyền Admin.",
-            "success"
-        );
-
-
+        utils.showToast("Đã thu hồi quyền Admin.", "success");
         await loadStatistics();
-
-
         await fetchData();
 
-
-    } catch (
-        error
-    ) {
-
-        console.error(
-            "Lỗi thu hồi Admin:",
-            error
-        );
-
-
-        utils.showToast(
-            `Lỗi thu hồi: ${error.message}`,
-            "error"
-        );
-
+    } catch (error) {
+        console.error("Lỗi thu hồi Admin:", error);
+        utils.showToast(`Lỗi thu hồi: ${error.message}`, "error");
     }
-
 }
 
 
@@ -2896,108 +2637,6 @@ async function deleteAdmin(
    DELETE CUSTOMER PROFILE
 ======================================================== */
 
-async function deleteCustomer(
-    id
-) {
-
-    const customer =
-        state.users.find(
-            item =>
-                String(
-                    item.id
-                ) ===
-                String(id)
-        );
-
-
-    const email =
-        customer?.email ||
-        "tài khoản này";
-
-
-    const confirmed =
-        window.confirm(
-            `Xóa hồ sơ người dùng:\n${email}?\n\nLưu ý: thao tác này chỉ xóa record trong profiles. Tài khoản gốc trong Supabase Auth không bị xóa.`
-        );
-
-
-    if (
-        !confirmed
-    ) {
-
-        return;
-
-    }
-
-
-    try {
-
-        const {
-            error
-        } =
-            await window.supabaseClient
-
-                .from(
-                    "profiles"
-                )
-
-                .delete()
-
-                .eq(
-                    "id",
-                    id
-                );
-
-
-        if (
-            error
-        ) {
-
-            throw error;
-
-        }
-
-
-        if (
-            state.users.length === 1 &&
-            state.currentPage > 1
-        ) {
-
-            state.currentPage--;
-
-        }
-
-
-        utils.showToast(
-            "Đã xóa hồ sơ người dùng.",
-            "success"
-        );
-
-
-        await loadStatistics();
-
-
-        await fetchData();
-
-
-    } catch (
-        error
-    ) {
-
-        console.error(
-            "Lỗi xóa người dùng:",
-            error
-        );
-
-
-        utils.showToast(
-            `Lỗi xóa: ${error.message}`,
-            "error"
-        );
-
-    }
-
-}
 
 
 /* ========================================================
@@ -3024,9 +2663,52 @@ window.deleteStaff =
     deleteAdmin;
 
 
-window.deleteCustomer =
-    deleteCustomer;
+// Không expose deleteCustomer.
+// profiles không bị xóa trực tiếp từ màn hình quản trị.
 
 
 window.fetchData =
     fetchData;
+
+/* ========================================================
+   TOGGLE USER STATUS (LOCK/UNLOCK) - Bảo vệ Admin Gốc
+======================================================== */
+async function toggleUserStatus(id, currentStatus) {
+    const user = state.users.find(item => String(item.id) === String(id));
+    const email = user?.email || "";
+    
+    const newStatus = currentStatus === 'locked' ? 'active' : 'locked';
+    const actionText = newStatus === 'locked' ? 'Khóa' : 'Mở khóa';
+
+    // BƯỚC BẢO VỆ 1: Khóa Admin Gốc? Nằm mơ đi!
+    if (email.toLowerCase() === 'admin@khangnam.com' && newStatus === 'locked') {
+        utils.showToast("Toang! Ai lại đi khóa tài khoản của Sếp tổng bao giờ!", "error");
+        return;
+    }
+
+    // BƯỚC BẢO VỆ 2: Không cho tự khóa mình
+    const { data: authData } = await window.supabaseClient.auth.getUser();
+    if (authData?.user?.id === String(id) && newStatus === 'locked') {
+        utils.showToast("Khoan đã! Không thể tự khóa tài khoản của chính mình.", "warning");
+        return;
+    }
+
+    const confirmed = window.confirm(`Bạn có chắc muốn ${actionText} hồ sơ của:\n${email || "tài khoản này"}?`);
+    if (!confirmed) return;
+
+    try {
+        const { error } = await window.supabaseClient
+            .from("profiles")
+            .update({ status: newStatus })
+            .eq("id", id);
+
+        if (error) throw error;
+
+        utils.showToast(`Đã ${actionText.toLowerCase()} tài khoản thành công.`, "success");
+        await fetchData(); 
+
+    } catch (error) {
+        console.error(`Lỗi ${actionText.toLowerCase()} tài khoản:`, error);
+        utils.showToast(`Lỗi thao tác: ${error.message}`, "error");
+    }
+}
