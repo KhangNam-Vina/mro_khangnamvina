@@ -2057,58 +2057,63 @@ function bindEvents() {
 
     DOM.close?.addEventListener(
         "click",
-        closeModal
+        event => {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            closeModal();
+
+        }
     );
 
 
     DOM.cancel?.addEventListener(
         "click",
-        closeModal
+        event => {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            closeModal();
+
+        }
     );
 
 
     /* -----------------------------------------
-       BACKDROP
+       MODAL BACKDROP
+
+       QUAN TRỌNG:
+       Không cho click ra vùng đen đóng modal.
+
+       Chỉ click vào các nút X / Hủy
+       mới được phép gọi closeModal().
     ------------------------------------------ */
 
     DOM.modal?.addEventListener(
         "click",
         event => {
 
+            /*
+             * Nếu click trực tiếp vào backdrop
+             * thì chặn hoàn toàn.
+             */
+
             if (
-                event.target ===
-                DOM.modal
+                event.target === DOM.modal
             ) {
 
-                closeModal();
+                event.preventDefault();
+
+                event.stopPropagation();
+
+                return;
 
             }
 
-        }
-    );
-
-
-    /* -----------------------------------------
-       ESC
-    ------------------------------------------ */
-
-    document.addEventListener(
-        "keydown",
-        event => {
-
-            if (
-                event.key === "Escape" &&
-                DOM.modal &&
-                !DOM.modal.classList.contains(
-                    "hidden"
-                )
-            ) {
-
-                closeModal();
-
-            }
-
-        }
+        },
+        true
     );
 
 
@@ -2195,8 +2200,8 @@ function bindEvents() {
         event => {
 
             /*
-               Khi edit thì không tự ghi đè slug.
-            */
+             * Khi edit thì không tự ghi đè slug.
+             */
 
             if (
                 DOM.id.value

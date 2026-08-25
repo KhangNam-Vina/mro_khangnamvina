@@ -3,15 +3,109 @@
 // Luồng:
 // Category -> Subcategory -> Family -> Products
 //
+// IMAGE FLOW:
+// DB lưu Storage Path
+//      ↓
+// buildFamilyImageUrl()
+//      ↓
+// Cloudflare Worker CDN
+//      ↓
+// Browser
+//
 // Nâng cấp:
 // - Promise.all
 // - Dynamic SEO
 // - Product Count
 // - Breadcrumb
 // - Client-side Search
+// - Cloudflare CDN cho Family thumbnail
 // ========================================================
 
+
 let allFamilies = [];
+
+
+// ========================================================
+// CONFIG - CLOUDFLARE IMAGE CDN
+// ========================================================
+
+const FAMILY_IMAGE_CDN_BASE =
+    'https://mrokhangnam-image.khangnamvn.workers.dev';
+
+
+// ========================================================
+// BUILD FAMILY IMAGE URL
+// ========================================================
+//
+// DB:
+//
+// families/36/thumbnail/thumbnail-xxx.webp
+//
+// CDN:
+//
+// https://mrokhangnam-image.khangnamvn.workers.dev/
+// families/36/thumbnail/thumbnail-xxx.webp
+//
+// Nếu sau này DB đã chứa URL hoàn chỉnh thì giữ nguyên.
+// ========================================================
+
+function buildFamilyImageUrl(imagePath) {
+
+    if (
+        !imagePath ||
+        typeof imagePath !== 'string'
+    ) {
+
+        return '';
+
+    }
+
+
+    const cleanPath =
+        imagePath.trim();
+
+
+    if (!cleanPath) {
+
+        return '';
+
+    }
+
+
+    // ----------------------------------------------------
+    // Compatibility:
+    // Nếu dữ liệu đã là URL hoàn chỉnh
+    // thì giữ nguyên.
+    // ----------------------------------------------------
+
+    if (
+        /^https?:\/\//i.test(
+            cleanPath
+        )
+    ) {
+
+        return cleanPath;
+
+    }
+
+
+    // ----------------------------------------------------
+    // Storage Path -> Cloudflare CDN
+    // ----------------------------------------------------
+
+    return (
+        `${FAMILY_IMAGE_CDN_BASE}/${cleanPath.replace(/^\/+/, '')}`
+    );
+
+}
+
+
+// ========================================================
+// FALLBACK IMAGE
+// ========================================================
+
+const FAMILY_FALLBACK_IMAGE =
+    'https://placehold.co/150x100/f5f6f8/a0aec0?text=No+Image';
 
 
 // ========================================================
@@ -24,9 +118,11 @@ async function fetchFamilies() {
         typeof supabaseClient === 'undefined' ||
         !supabaseClient
     ) {
+
         throw new Error(
             'Supabase chưa khởi tạo.'
         );
+
     }
 
 
@@ -35,10 +131,12 @@ async function fetchFamilies() {
             'familyContainer'
         );
 
+
     const title =
         document.getElementById(
             'pageTitle'
         );
+
 
     const emptyState =
         document.getElementById(
@@ -50,6 +148,7 @@ async function fetchFamilies() {
         new URLSearchParams(
             window.location.search
         );
+
 
     const subCatId =
         urlParams.get(
@@ -64,15 +163,20 @@ async function fetchFamilies() {
     if (!subCatId) {
 
         if (title) {
+
             title.textContent =
                 'Lỗi đường dẫn';
+
         }
+
 
         emptyState?.classList.remove(
             'is-hidden'
         );
 
+
         return;
+
     }
 
 
@@ -82,18 +186,29 @@ async function fetchFamilies() {
 
     if (container) {
 
-        container.innerHTML = Array(4)
-            .fill(null)
-            .map(() => `
-                <div class="family-skeleton-card">
+        container.innerHTML =
+            Array(4)
+                .fill(null)
+                .map(
+                    () => `
 
-                    <div class="family-skeleton-title"></div>
+                        <div
+                            class="family-skeleton-card"
+                        >
 
-                    <div class="family-skeleton-text"></div>
+                            <div
+                                class="family-skeleton-title"
+                            ></div>
 
-                </div>
-            `)
-            .join('');
+                            <div
+                                class="family-skeleton-text"
+                            ></div>
+
+                        </div>
+
+                    `
+                )
+                .join('');
 
     }
 
@@ -107,57 +222,84 @@ async function fetchFamilies() {
         const [
             subCatRes,
             familiesRes
-        ] = await Promise.all([
+        ] =
+            await Promise.all([
 
-            supabaseClient
-                .from('sub_categories')
-                .select(
-                    'name, category_id, categories(name)'
-                )
-                .eq(
-                    'id',
-                    subCatId
-                )
-                .single(),
+                supabaseClient
 
-            supabaseClient
-                .from('families')
-                .select(
-                    '*, products(id)'
-                )
-                .eq(
-                    'sub_category_id',
-                    subCatId
-                )
-                .order(
-                    'name',
-                    {
-                        ascending: true
-                    }
-                )
+                    .from(
+                        'sub_categories'
+                    )
 
-        ]);
+                    .select(
+                        'name, category_id, categories(name)'
+                    )
+
+                    .eq(
+                        'id',
+                        subCatId
+                    )
+
+                    .single(),
 
 
-        if (subCatRes.error) {
+                supabaseClient
+
+                    .from(
+                        'families'
+                    )
+
+                    .select(
+                        '*, products(id)'
+                    )
+
+                    .eq(
+                        'sub_category_id',
+                        subCatId
+                    )
+
+                    .order(
+                        'name',
+                        {
+                            ascending:
+                                true
+                        }
+                    )
+
+            ]);
+
+
+        if (
+            subCatRes.error
+        ) {
+
             throw subCatRes.error;
+
         }
 
-        if (familiesRes.error) {
+
+        if (
+            familiesRes.error
+        ) {
+
             throw familiesRes.error;
+
         }
 
 
         const subCatInfo =
             subCatRes.data;
 
+
         allFamilies =
             familiesRes.data || [];
+
 
         const familyCount =
             document.getElementById(
                 'familyCount'
             );
+
 
         if (familyCount) {
 
@@ -165,6 +307,7 @@ async function fetchFamilies() {
                 allFamilies.length;
 
         }
+
 
         // ==================================================
         // SEO + BREADCRUMB
@@ -177,18 +320,23 @@ async function fetchFamilies() {
                     ? subCatInfo.categories.name
                     : 'Danh mục';
 
+
             const catId =
                 subCatInfo.category_id;
 
+
             const subName =
                 subCatInfo.name;
+
 
             const currentUrl =
                 window.location.href
                     .split('#')[0];
 
+
             const seoTitle =
                 `${subName} | ${catName} | MRO Khang Nam`;
+
 
             const seoDesc =
                 `MRO Khang Nam phân phối đầy đủ dòng sản phẩm ${subName} thuộc nhóm ${catName} chính hãng với giá tốt nhất.`;
@@ -257,8 +405,10 @@ async function fetchFamilies() {
             // ==================================================
 
             if (title) {
+
                 title.textContent =
                     subName;
+
             }
 
 
@@ -271,10 +421,12 @@ async function fetchFamilies() {
                     'bcParentCategory'
                 );
 
+
             const bcSeparator =
                 document.getElementById(
                     'bcSeparator'
                 );
+
 
             const bcCurrent =
                 document.getElementById(
@@ -290,8 +442,10 @@ async function fetchFamilies() {
                 bcParent.href =
                     `subcategory.html?category_id=${encodeURIComponent(catId)}`;
 
+
                 bcParent.textContent =
                     catName;
+
 
                 bcParent.classList.remove(
                     'is-hidden'
@@ -314,6 +468,7 @@ async function fetchFamilies() {
                 bcCurrent.textContent =
                     subName;
 
+
                 bcCurrent.classList.remove(
                     'catalog-breadcrumb-loading'
                 );
@@ -333,68 +488,83 @@ async function fetchFamilies() {
                 '@graph': [
 
                     {
+
                         '@type':
                             'BreadcrumbList',
 
                         itemListElement: [
 
                             {
+
                                 '@type':
                                     'ListItem',
 
-                                position: 1,
+                                position:
+                                    1,
 
                                 name:
                                     'Home',
 
                                 item:
                                     window.location.origin
+
                             },
 
                             {
+
                                 '@type':
                                     'ListItem',
 
-                                position: 2,
+                                position:
+                                    2,
 
                                 name:
                                     'Danh Mục',
 
                                 item:
                                     `${window.location.origin}/pages/category.html`
+
                             },
 
                             {
+
                                 '@type':
                                     'ListItem',
 
-                                position: 3,
+                                position:
+                                    3,
 
                                 name:
                                     catName,
 
                                 item:
                                     `${window.location.origin}/pages/subcategory.html?category_id=${catId}`
+
                             },
 
                             {
+
                                 '@type':
                                     'ListItem',
 
-                                position: 4,
+                                position:
+                                    4,
 
                                 name:
                                     subName,
 
                                 item:
                                     currentUrl
+
                             }
 
                         ]
 
                     },
 
+
                     {
+
                         '@type':
                             'CollectionPage',
 
@@ -403,6 +573,7 @@ async function fetchFamilies() {
 
                         description:
                             seoDesc
+
                     }
 
                 ]
@@ -448,12 +619,16 @@ async function fetchFamilies() {
         if (container) {
 
             container.innerHTML = `
-                <div class="catalog-error">
+
+                <div
+                    class="catalog-error"
+                >
                     Lỗi hệ thống:
                     ${escapeFamilyHTML(
                         error.message
                     )}
                 </div>
+
             `;
 
         }
@@ -476,6 +651,7 @@ function renderFamilies(
             'familyContainer'
         );
 
+
     const emptyState =
         document.getElementById(
             'emptyState'
@@ -486,7 +662,9 @@ function renderFamilies(
         !container ||
         !emptyState
     ) {
+
         return;
+
     }
 
 
@@ -498,13 +676,17 @@ function renderFamilies(
         dataList.length === 0
     ) {
 
-        container.innerHTML = '';
+        container.innerHTML =
+            '';
+
 
         emptyState.classList.remove(
             'is-hidden'
         );
 
+
         return;
+
     }
 
 
@@ -513,7 +695,8 @@ function renderFamilies(
     );
 
 
-    let html = '';
+    let html =
+        '';
 
 
     dataList.forEach(
@@ -534,8 +717,9 @@ function renderFamilies(
             // ==================================================
 
             const thumbUrl =
-                family.thumbnail_url ||
-                'https://placehold.co/150x100/f5f6f8/a0aec0?text=No+Image';
+                buildFamilyImageUrl(
+                    family.thumbnail_url
+                );
 
 
             const familyName =
@@ -543,43 +727,79 @@ function renderFamilies(
 
 
             // ==================================================
+            // IMAGE SOURCE
+            // ==================================================
+
+            const imageSrc =
+                thumbUrl ||
+                FAMILY_FALLBACK_IMAGE;
+
+
+            // ==================================================
             // CARD
             // ==================================================
 
             html += `
+
                 <a
-                    href="products.html?family_id=${encodeURIComponent(family.id)}"
-                    aria-label="Xem dòng sản phẩm ${escapeFamilyHTML(familyName)}"
+                    href="products.html?family_id=${encodeURIComponent(
+                        family.id
+                    )}"
+                    aria-label="Xem dòng sản phẩm ${escapeFamilyHTML(
+                        familyName
+                    )}"
                     class="family-card"
                 >
 
-                    <div class="family-card-image">
+                    <div
+                        class="family-card-image"
+                    >
 
                         <img
-                            src="${escapeFamilyHTML(thumbUrl)}"
-                            alt="${escapeFamilyHTML(familyName)}"
+                            src="${escapeFamilyHTML(
+                                imageSrc
+                            )}"
+                            alt="${escapeFamilyHTML(
+                                familyName
+                            )}"
                             class="family-card-image-element"
                             loading="lazy"
-                            onerror="this.onerror=null;this.src='https://placehold.co/150x100/f5f6f8/a0aec0?text=No+Image';"
+                            onerror="
+                                this.onerror=null;
+                                this.src='${FAMILY_FALLBACK_IMAGE}';
+                            "
                         >
 
                     </div>
 
 
-                    <div class="family-card-body">
+                    <div
+                        class="family-card-body"
+                    >
 
-                        <h2 class="family-card-title">
-                            ${escapeFamilyHTML(familyName)}
+                        <h2
+                            class="family-card-title"
+                        >
+                            ${escapeFamilyHTML(
+                                familyName
+                            )}
                         </h2>
 
 
-                        <div class="family-card-footer">
+                        <div
+                            class="family-card-footer"
+                        >
 
-                            <span class="family-card-count">
+                            <span
+                                class="family-card-count"
+                            >
                                 ${skuCount} SKU
                             </span>
 
-                            <span class="family-card-link">
+
+                            <span
+                                class="family-card-link"
+                            >
                                 Khám phá →
                             </span>
 
@@ -588,6 +808,7 @@ function renderFamilies(
                     </div>
 
                 </a>
+
             `;
 
         }
@@ -596,6 +817,7 @@ function renderFamilies(
 
     container.innerHTML =
         html;
+
 }
 
 
@@ -604,7 +826,9 @@ function renderFamilies(
 // ========================================================
 
 document
-    .getElementById('searchFamily')
+    .getElementById(
+        'searchFamily'
+    )
     ?.addEventListener(
         'input',
         function (event) {
@@ -622,6 +846,7 @@ document
                 );
 
                 return;
+
             }
 
 
@@ -726,7 +951,9 @@ function escapeFamilyHTML(
         value === null ||
         value === undefined
     ) {
+
         return '';
+
     }
 
 
@@ -741,4 +968,5 @@ function escapeFamilyHTML(
 
 
     return div.innerHTML;
+
 }

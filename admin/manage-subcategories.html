@@ -596,187 +596,256 @@
 
 
     <!-- =====================================================
-         MODAL
-    ====================================================== -->
+     MODAL
+====================================================== -->
+
+<div
+    id="formModal"
+    class="
+        fixed
+        inset-0
+        z-50
+        hidden
+        items-center
+        justify-center
+        bg-black/50
+        backdrop-blur-sm
+        p-4
+        pointer-events-none
+    "
+>
 
     <div
-        id="formModal"
         class="
-            fixed
-            inset-0
-            z-50
-            hidden
-            items-center
-            justify-center
-            bg-black/50
-            backdrop-blur-sm
-            p-4
+            bg-white
+            rounded-2xl
+            shadow-2xl
+            w-full
+            max-w-2xl
+            max-h-[90vh]
+            overflow-hidden
+            flex
+            flex-col
+            pointer-events-auto
         "
     >
 
+
+        <!-- =================================================
+             MODAL HEADER
+        ================================================== -->
+
         <div
             class="
-                bg-white
-                rounded-2xl
-                shadow-2xl
-                w-full
-                max-w-2xl
-                max-h-[90vh]
-                overflow-hidden
+                px-6
+                py-4
+                border-b
+                border-gray-200
                 flex
-                flex-col
+                items-center
+                justify-between
             "
         >
 
+            <div>
 
-            <!-- MODAL HEADER -->
-
-            <div
-                class="
-                    px-6
-                    py-4
-                    border-b
-                    border-gray-200
-                    flex
-                    items-center
-                    justify-between
-                "
-            >
-
-                <div>
-
-                    <h2
-                        id="modalTitle"
-                        class="
-                            text-lg
-                            font-black
-                            text-gray-900
-                        "
-                    >
-                        Thêm nhóm hàng
-                    </h2>
-
-                    <p
-                        class="
-                            text-xs
-                            text-gray-500
-                            mt-1
-                        "
-                    >
-                        Khai báo nhóm hàng thuộc danh mục gốc
-                    </p>
-
-                </div>
-
-
-                <button
-                    type="button"
-                    id="btnCloseModal"
+                <h2
+                    id="modalTitle"
                     class="
-                        w-9
-                        h-9
-                        rounded-lg
-                        flex
-                        items-center
-                        justify-center
-                        text-gray-400
-                        hover:text-gray-700
-                        hover:bg-gray-100
+                        text-lg
+                        font-black
+                        text-gray-900
                     "
                 >
+                    Thêm nhóm hàng
+                </h2>
 
-                    <svg
-                        class="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M6 18 18 6M6 6l12 12"
-                        />
-                    </svg>
-
-                </button>
+                <p
+                    class="
+                        text-xs
+                        text-gray-500
+                        mt-1
+                    "
+                >
+                    Khai báo nhóm hàng thuộc danh mục gốc
+                </p>
 
             </div>
 
 
-            <!-- FORM -->
-
-            <form
-                id="dataForm"
+            <button
+                type="button"
+                id="btnCloseModal"
                 class="
-                    overflow-y-auto
-                    p-6
-                    space-y-6
+                    w-9
+                    h-9
+                    rounded-lg
+                    flex
+                    items-center
+                    justify-center
+                    text-gray-400
+                    hover:text-gray-700
+                    hover:bg-gray-100
                 "
             >
 
-                <input
-                    type="hidden"
-                    id="subId"
+                <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                 >
 
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18 18 6M6 6l12 12"
+                    />
 
-                <!-- =================================================
-                     BASIC
-                ================================================== -->
+                </svg>
 
-                <section>
+            </button>
 
-                    <div
+        </div>
+
+
+        <!-- =================================================
+             FORM
+        ================================================== -->
+
+        <form
+            id="dataForm"
+            class="
+                overflow-y-auto
+                p-6
+                space-y-6
+            "
+        >
+
+            <input
+                type="hidden"
+                id="subId"
+            >
+
+
+            <!-- =================================================
+                 BASIC
+            ================================================== -->
+
+            <section>
+
+                <div
+                    class="
+                        flex
+                        items-center
+                        gap-2
+                        mb-4
+                    "
+                >
+
+                    <span
                         class="
+                            w-7
+                            h-7
+                            rounded-lg
+                            bg-blue-50
+                            text-kn-blue
                             flex
                             items-center
-                            gap-2
-                            mb-4
+                            justify-center
+                            text-xs
+                            font-black
                         "
                     >
+                        1
+                    </span>
 
-                        <span
+                    <h3
+                        class="
+                            text-sm
+                            font-black
+                            text-kn-blue
+                            uppercase
+                            tracking-wide
+                        "
+                    >
+                        Thông tin nhóm hàng
+                    </h3>
+
+                </div>
+
+
+                <div class="space-y-4">
+
+
+                    <!-- PARENT -->
+
+                    <div>
+
+                        <label
+                            for="parentCategory"
                             class="
-                                w-7
-                                h-7
-                                rounded-lg
-                                bg-blue-50
-                                text-kn-blue
-                                flex
-                                items-center
-                                justify-center
+                                block
                                 text-xs
-                                font-black
+                                font-bold
+                                text-gray-700
+                                mb-1.5
                             "
                         >
-                            1
-                        </span>
 
-                        <h3
+                            Danh mục gốc
+
+                            <span class="text-red-500">
+                                *
+                            </span>
+
+                        </label>
+
+
+                        <select
+                            id="parentCategory"
+                            required
                             class="
+                                w-full
+                                border
+                                border-gray-300
+                                rounded-lg
+                                px-3
+                                py-2.5
                                 text-sm
-                                font-black
-                                text-kn-blue
-                                uppercase
-                                tracking-wide
+                                bg-white
+                                outline-none
+                                focus:border-kn-blue
+                                focus:ring-2
+                                focus:ring-blue-100
                             "
                         >
-                            Thông tin nhóm hàng
-                        </h3>
+
+                            <option value="">
+                                -- Chọn danh mục gốc --
+                            </option>
+
+                        </select>
 
                     </div>
 
 
-                    <div class="space-y-4">
+                    <!-- NAME / SLUG -->
 
-
-                        <!-- PARENT -->
+                    <div
+                        class="
+                            grid
+                            grid-cols-1
+                            md:grid-cols-2
+                            gap-4
+                        "
+                    >
 
                         <div>
 
                             <label
-                                for="parentCategory"
+                                for="subName"
                                 class="
                                     block
                                     text-xs
@@ -785,13 +854,21 @@
                                     mb-1.5
                                 "
                             >
-                                Danh mục gốc
-                                <span class="text-red-500">*</span>
+
+                                Tên nhóm hàng
+
+                                <span class="text-red-500">
+                                    *
+                                </span>
+
                             </label>
 
-                            <select
-                                id="parentCategory"
+
+                            <input
+                                type="text"
+                                id="subName"
                                 required
+                                placeholder="Ví dụ: Máy khoan"
                                 class="
                                     w-full
                                     border
@@ -800,7 +877,6 @@
                                     px-3
                                     py-2.5
                                     text-sm
-                                    bg-white
                                     outline-none
                                     focus:border-kn-blue
                                     focus:ring-2
@@ -808,174 +884,13 @@
                                 "
                             >
 
-                                <option value="">
-                                    -- Chọn danh mục gốc --
-                                </option>
-
-                            </select>
-
                         </div>
 
-
-                        <!-- NAME / SLUG -->
-
-                        <div
-                            class="
-                                grid
-                                grid-cols-1
-                                md:grid-cols-2
-                                gap-4
-                            "
-                        >
-
-                            <div>
-
-                                <label
-                                    for="subName"
-                                    class="
-                                        block
-                                        text-xs
-                                        font-bold
-                                        text-gray-700
-                                        mb-1.5
-                                    "
-                                >
-                                    Tên nhóm hàng
-                                    <span class="text-red-500">*</span>
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="subName"
-                                    required
-                                    placeholder="Ví dụ: Máy khoan"
-                                    class="
-                                        w-full
-                                        border
-                                        border-gray-300
-                                        rounded-lg
-                                        px-3
-                                        py-2.5
-                                        text-sm
-                                        outline-none
-                                        focus:border-kn-blue
-                                        focus:ring-2
-                                        focus:ring-blue-100
-                                    "
-                                >
-
-                            </div>
-
-
-                            <div>
-
-                                <label
-                                    for="subSlug"
-                                    class="
-                                        block
-                                        text-xs
-                                        font-bold
-                                        text-gray-700
-                                        mb-1.5
-                                    "
-                                >
-                                    Slug
-                                    <span class="text-red-500">*</span>
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="subSlug"
-                                    required
-                                    placeholder="may-khoan"
-                                    class="
-                                        w-full
-                                        border
-                                        border-gray-300
-                                        rounded-lg
-                                        px-3
-                                        py-2.5
-                                        text-sm
-                                        font-mono
-                                        bg-gray-50
-                                        outline-none
-                                        focus:border-kn-blue
-                                        focus:ring-2
-                                        focus:ring-blue-100
-                                    "
-                                >
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </section>
-
-
-                <!-- =================================================
-                     SEO
-                ================================================== -->
-
-                <section
-                    class="
-                        border-t
-                        border-gray-100
-                        pt-6
-                    "
-                >
-
-                    <div
-                        class="
-                            flex
-                            items-center
-                            gap-2
-                            mb-4
-                        "
-                    >
-
-                        <span
-                            class="
-                                w-7
-                                h-7
-                                rounded-lg
-                                bg-orange-50
-                                text-kn-orange
-                                flex
-                                items-center
-                                justify-center
-                                text-xs
-                                font-black
-                            "
-                        >
-                            2
-                        </span>
-
-                        <h3
-                            class="
-                                text-sm
-                                font-black
-                                text-kn-blue
-                                uppercase
-                                tracking-wide
-                            "
-                        >
-                            SEO
-                        </h3>
-
-                    </div>
-
-
-                    <div class="space-y-4">
-
-
-                        <!-- META TITLE -->
 
                         <div>
 
                             <label
-                                for="subMetaTitle"
+                                for="subSlug"
                                 class="
                                     block
                                     text-xs
@@ -984,13 +899,21 @@
                                     mb-1.5
                                 "
                             >
-                                SEO Meta Title
+
+                                Slug
+
+                                <span class="text-red-500">
+                                    *
+                                </span>
+
                             </label>
+
 
                             <input
                                 type="text"
-                                id="subMetaTitle"
-                                placeholder="Tiêu đề hiển thị trên Google..."
+                                id="subSlug"
+                                required
+                                placeholder="may-khoan"
                                 class="
                                     w-full
                                     border
@@ -999,114 +922,219 @@
                                     px-3
                                     py-2.5
                                     text-sm
+                                    font-mono
+                                    bg-gray-50
                                     outline-none
                                     focus:border-kn-blue
+                                    focus:ring-2
+                                    focus:ring-blue-100
                                 "
                             >
-
-                        </div>
-
-
-                        <!-- META DESCRIPTION -->
-
-                        <div>
-
-                            <label
-                                for="subMetaDesc"
-                                class="
-                                    block
-                                    text-xs
-                                    font-bold
-                                    text-gray-700
-                                    mb-1.5
-                                "
-                            >
-                                SEO Meta Description
-                            </label>
-
-                            <textarea
-                                id="subMetaDesc"
-                                rows="3"
-                                placeholder="Mô tả hiển thị trên Google..."
-                                class="
-                                    w-full
-                                    border
-                                    border-gray-300
-                                    rounded-lg
-                                    px-3
-                                    py-2.5
-                                    text-sm
-                                    outline-none
-                                    resize-y
-                                    focus:border-kn-blue
-                                "
-                            ></textarea>
 
                         </div>
 
                     </div>
 
-                </section>
+                </div>
+
+            </section>
 
 
-                <!-- =================================================
-                     ACTIONS
-                ================================================== -->
+            <!-- =================================================
+                 SEO
+            ================================================== -->
+
+            <section
+                class="
+                    border-t
+                    border-gray-100
+                    pt-6
+                "
+            >
 
                 <div
                     class="
-                        border-t
-                        border-gray-200
-                        pt-4
                         flex
-                        justify-end
-                        gap-3
+                        items-center
+                        gap-2
+                        mb-4
                     "
                 >
 
-                    <button
-                        type="button"
-                        id="btnCancelModal"
+                    <span
                         class="
-                            px-5
-                            py-2.5
+                            w-7
+                            h-7
                             rounded-lg
-                            bg-gray-100
-                            hover:bg-gray-200
-                            text-gray-700
-                            font-bold
-                            text-sm
+                            bg-orange-50
+                            text-kn-orange
+                            flex
+                            items-center
+                            justify-center
+                            text-xs
+                            font-black
                         "
                     >
-                        Hủy
-                    </button>
+                        2
+                    </span>
 
-
-                    <button
-                        type="submit"
-                        id="btnSubmit"
+                    <h3
                         class="
-                            px-5
-                            py-2.5
-                            rounded-lg
-                            bg-kn-blue
-                            hover:bg-blue-800
-                            text-white
-                            font-bold
                             text-sm
-                            shadow-sm
+                            font-black
+                            text-kn-blue
+                            uppercase
+                            tracking-wide
                         "
                     >
-                        Lưu nhóm hàng
-                    </button>
+                        SEO
+                    </h3>
 
                 </div>
 
-            </form>
 
-        </div>
+                <div class="space-y-4">
+
+
+                    <!-- META TITLE -->
+
+                    <div>
+
+                        <label
+                            for="subMetaTitle"
+                            class="
+                                block
+                                text-xs
+                                font-bold
+                                text-gray-700
+                                mb-1.5
+                            "
+                        >
+                            SEO Meta Title
+                        </label>
+
+
+                        <input
+                            type="text"
+                            id="subMetaTitle"
+                            placeholder="Tiêu đề hiển thị trên Google..."
+                            class="
+                                w-full
+                                border
+                                border-gray-300
+                                rounded-lg
+                                px-3
+                                py-2.5
+                                text-sm
+                                outline-none
+                                focus:border-kn-blue
+                            "
+                        >
+
+                    </div>
+
+
+                    <!-- META DESCRIPTION -->
+
+                    <div>
+
+                        <label
+                            for="subMetaDesc"
+                            class="
+                                block
+                                text-xs
+                                font-bold
+                                text-gray-700
+                                mb-1.5
+                            "
+                        >
+                            SEO Meta Description
+                        </label>
+
+
+                        <textarea
+                            id="subMetaDesc"
+                            rows="3"
+                            placeholder="Mô tả hiển thị trên Google..."
+                            class="
+                                w-full
+                                border
+                                border-gray-300
+                                rounded-lg
+                                px-3
+                                py-2.5
+                                text-sm
+                                outline-none
+                                resize-y
+                                focus:border-kn-blue
+                            "
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 ACTIONS
+            ================================================== -->
+
+            <div
+                class="
+                    border-t
+                    border-gray-200
+                    pt-4
+                    flex
+                    justify-end
+                    gap-3
+                "
+            >
+
+                <button
+                    type="button"
+                    id="btnCancelModal"
+                    class="
+                        px-5
+                        py-2.5
+                        rounded-lg
+                        bg-gray-100
+                        hover:bg-gray-200
+                        text-gray-700
+                        font-bold
+                        text-sm
+                    "
+                >
+                    Hủy
+                </button>
+
+
+                <button
+                    type="submit"
+                    id="btnSubmit"
+                    class="
+                        px-5
+                        py-2.5
+                        rounded-lg
+                        bg-kn-blue
+                        hover:bg-blue-800
+                        text-white
+                        font-bold
+                        text-sm
+                        shadow-sm
+                    "
+                >
+                    Lưu nhóm hàng
+                </button>
+
+            </div>
+
+        </form>
 
     </div>
+
+</div>
 
 
     <!-- =====================================================

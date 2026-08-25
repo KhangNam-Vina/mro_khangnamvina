@@ -2,29 +2,72 @@
 <html lang="vi">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Quản lý Dòng sản phẩm - KN Admin</title>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Quản lý Dòng sản phẩm - KN Admin
+    </title>
+
+
+    <!-- =====================================================
+         TAILWIND
+    ====================================================== -->
 
     <script src="https://cdn.tailwindcss.com"></script>
 
+
     <script>
+
         tailwind.config = {
+
             theme: {
+
                 extend: {
+
                     colors: {
-                        "kn-blue": "#00479b",
-                        "kn-orange": "#ff5e00"
+
+                        "kn-blue":
+                            "#00479b",
+
+                        "kn-orange":
+                            "#ff5e00"
+
                     }
+
                 }
+
             }
+
         };
+
     </script>
+
+
+    <!-- =====================================================
+         CUSTOM CSS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="../assets/css/admin-families.css"
+    >
+
 </head>
 
 
-<body class="bg-gray-50 text-gray-800 font-sans">
+<body
+    class="
+        bg-gray-50
+        text-gray-800
+        font-sans
+    "
+>
 
 
     <!-- =====================================================
@@ -51,36 +94,52 @@
          ADMIN LAYOUT
     ====================================================== -->
 
-    <div class="min-h-screen flex">
+    <div
+        class="
+            min-h-screen
+            flex
+        "
+    >
 
 
-        <!-- SIDEBAR -->
+        <!-- =================================================
+             SIDEBAR
+        ================================================== -->
 
         <aside
-    id="adminSidebar"
-    class="
-        w-64
-        shrink-0
-        bg-gray-900
-        text-white
-        hidden
-        md:flex
-        flex-col
-        sticky
-        top-0
-        h-screen
-        self-start
-    "
-></aside>
+            id="adminSidebar"
+            class="
+                w-64
+                shrink-0
+                bg-gray-900
+                text-white
+                hidden
+                md:flex
+                flex-col
+                sticky
+                top-0
+                h-screen
+                self-start
+            "
+        ></aside>
 
 
-        <!-- MAIN -->
+        <!-- =================================================
+             MAIN AREA
+        ================================================== -->
 
-        <div class="flex-1 min-w-0 flex flex-col">
+        <div
+            class="
+                flex-1
+                min-w-0
+                flex
+                flex-col
+            "
+        >
 
 
             <!-- =================================================
-                 HEADER
+                 PAGE HEADER
             ================================================== -->
 
             <header
@@ -131,6 +190,7 @@
                     class="
                         inline-flex
                         items-center
+                        justify-center
                         gap-2
                         bg-kn-blue
                         hover:bg-blue-800
@@ -151,12 +211,14 @@
                         stroke="currentColor"
                         viewBox="0 0 24 24"
                     >
+
                         <path
                             stroke-linecap="round"
                             stroke-linejoin="round"
                             stroke-width="2"
                             d="M12 4v16m8-8H4"
                         />
+
                     </svg>
 
                     Thêm dòng sản phẩm
@@ -179,7 +241,12 @@
                 "
             >
 
-                <div class="max-w-[1600px] mx-auto">
+                <div
+                    class="
+                        max-w-[1600px]
+                        mx-auto
+                    "
+                >
 
 
                     <!-- =================================================
@@ -195,6 +262,7 @@
                             mb-6
                         "
                     >
+
 
                         <!-- TOTAL -->
 
@@ -258,7 +326,7 @@
                                     tracking-wider
                                 "
                             >
-                                Có nhóm hàng
+                                Đã liên kết nhóm hàng
                             </div>
 
                             <div
@@ -298,7 +366,7 @@
                                     tracking-wider
                                 "
                             >
-                                Mất liên kết
+                                Thiếu liên kết
                             </div>
 
                             <div
@@ -319,7 +387,7 @@
 
 
                     <!-- =================================================
-                         FILTER BAR
+                         FILTER / SEARCH
                     ================================================== -->
 
                     <div
@@ -340,18 +408,16 @@
                                 flex-col
                                 lg:flex-row
                                 gap-3
-                                lg:items-center
-                                lg:justify-between
                             "
                         >
+
 
                             <!-- SEARCH -->
 
                             <div
                                 class="
                                     relative
-                                    w-full
-                                    lg:max-w-md
+                                    flex-1
                                 "
                             >
 
@@ -369,13 +435,16 @@
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
                                 >
+
                                     <path
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
                                         stroke-width="2"
-                                        d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
+                                        d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1 16 0 8 8 0 0 1-16 0Z"
                                     />
+
                                 </svg>
+
 
                                 <input
                                     type="text"
@@ -401,7 +470,7 @@
                             </div>
 
 
-                            <!-- SUBCATEGORY FILTER -->
+                            <!-- FILTER -->
 
                             <select
                                 id="filterSubCategorySelect"
@@ -417,6 +486,8 @@
                                     bg-white
                                     outline-none
                                     focus:border-kn-blue
+                                    focus:ring-2
+                                    focus:ring-blue-100
                                 "
                             >
 
@@ -438,33 +509,41 @@
                     <div
                         class="
                             bg-white
+                            rounded-xl
                             border
                             border-gray-200
-                            rounded-xl
                             shadow-sm
                             overflow-hidden
                         "
                     >
 
-                        <div class="overflow-x-auto">
+
+                        <!-- TABLE -->
+
+                        <div
+                            class="
+                                overflow-x-auto
+                            "
+                        >
 
                             <table
                                 class="
                                     w-full
-                                    min-w-[900px]
-                                    text-sm
+                                    min-w-[850px]
                                     text-left
+                                    text-sm
+                                    text-gray-600
                                 "
                             >
 
                                 <thead
                                     class="
                                         bg-gray-50
+                                        text-gray-700
+                                        font-bold
                                         border-b
                                         border-gray-200
                                         text-xs
-                                        font-bold
-                                        text-gray-500
                                         uppercase
                                         tracking-wider
                                     "
@@ -474,19 +553,18 @@
 
                                         <th
                                             class="
-                                                px-4
-                                                py-3.5
-                                                w-16
+                                                p-4
                                                 text-center
+                                                w-12
                                             "
                                         >
-                                            ID
+                                            #
                                         </th>
+
 
                                         <th
                                             class="
-                                                px-4
-                                                py-3.5
+                                                p-4
                                                 w-20
                                                 text-center
                                             "
@@ -494,39 +572,29 @@
                                             Ảnh
                                         </th>
 
+
                                         <th
-                                            class="
-                                                px-4
-                                                py-3.5
-                                            "
+                                            class="p-4"
                                         >
                                             Dòng sản phẩm
                                         </th>
 
-                                        <th
-                                            class="
-                                                px-4
-                                                py-3.5
-                                            "
-                                        >
-                                            Nhóm hàng
-                                        </th>
 
                                         <th
                                             class="
-                                                px-4
-                                                py-3.5
+                                                p-4
+                                                w-56
                                             "
                                         >
-                                            Slug
+                                            Thuộc nhóm hàng
                                         </th>
+
 
                                         <th
                                             class="
-                                                px-4
-                                                py-3.5
-                                                w-36
-                                                text-right
+                                                p-4
+                                                w-32
+                                                text-center
                                             "
                                         >
                                             Thao tác
@@ -542,16 +610,17 @@
                                     class="
                                         divide-y
                                         divide-gray-100
+                                        bg-white
                                     "
                                 >
 
                                     <tr>
 
                                         <td
-                                            colspan="6"
+                                            colspan="5"
                                             class="
                                                 text-center
-                                                py-12
+                                                py-10
                                                 text-gray-400
                                             "
                                         >
@@ -567,7 +636,9 @@
                         </div>
 
 
-                        <!-- PAGINATION -->
+                        <!-- =================================================
+                             PAGINATION
+                        ================================================== -->
 
                         <div
                             id="paginationContainer"
@@ -598,7 +669,7 @@
 
 
     <!-- =====================================================
-         MODAL
+         FAMILY MODAL
     ====================================================== -->
 
     <div
@@ -623,7 +694,7 @@
                 shadow-2xl
                 w-full
                 max-w-2xl
-                max-h-[90vh]
+                max-h-[92vh]
                 overflow-hidden
                 flex
                 flex-col
@@ -631,7 +702,9 @@
         >
 
 
-            <!-- MODAL HEADER -->
+            <!-- =================================================
+                 MODAL HEADER
+            ================================================== -->
 
             <div
                 class="
@@ -642,10 +715,24 @@
                     flex
                     items-center
                     justify-between
+                    shrink-0
                 "
             >
 
                 <div>
+
+                    <div
+                        class="
+                            text-xs
+                            font-bold
+                            uppercase
+                            tracking-wider
+                            text-kn-orange
+                        "
+                    >
+                        DÒNG SẢN PHẨM
+                    </div>
+
 
                     <h2
                         id="modalTitle"
@@ -653,20 +740,11 @@
                             text-lg
                             font-black
                             text-gray-900
+                            mt-0.5
                         "
                     >
                         Thêm dòng sản phẩm
                     </h2>
-
-                    <p
-                        class="
-                            text-xs
-                            text-gray-500
-                            mt-1
-                        "
-                    >
-                        Khai báo dòng sản phẩm thuộc nhóm hàng
-                    </p>
 
                 </div>
 
@@ -684,7 +762,9 @@
                         text-gray-400
                         hover:text-gray-700
                         hover:bg-gray-100
+                        transition
                     "
+                    aria-label="Đóng"
                 >
 
                     <svg
@@ -693,12 +773,14 @@
                         stroke="currentColor"
                         viewBox="0 0 24 24"
                     >
+
                         <path
                             stroke-linecap="round"
                             stroke-linejoin="round"
                             stroke-width="2"
                             d="M6 18 18 6M6 6l12 12"
                         />
+
                     </svg>
 
                 </button>
@@ -706,14 +788,16 @@
             </div>
 
 
-            <!-- FORM -->
+            <!-- =================================================
+                 FORM
+            ================================================== -->
 
             <form
                 id="familyForm"
                 class="
+                    flex-1
                     overflow-y-auto
                     p-6
-                    space-y-6
                 "
             >
 
@@ -724,306 +808,878 @@
 
 
                 <!-- =================================================
-                     BASIC
+                     STEP 1 - CATEGORY
                 ================================================== -->
 
-                <section>
+                <div
+                    class="
+                        family-step
+                        mb-6
+                    "
+                >
 
                     <div
                         class="
                             flex
                             items-center
-                            gap-2
+                            gap-3
                             mb-4
                         "
                     >
 
-                        <span
+                        <div
                             class="
-                                w-7
-                                h-7
-                                rounded-lg
-                                bg-blue-50
-                                text-kn-blue
+                                family-step-number
+                                shrink-0
+                                w-8
+                                h-8
+                                rounded-full
+                                bg-kn-blue
+                                text-white
                                 flex
                                 items-center
                                 justify-center
-                                text-xs
-                                font-black
+                                font-extrabold
                             "
                         >
                             1
-                        </span>
+                        </div>
 
-                        <h3
-                            class="
-                                text-sm
-                                font-black
-                                text-kn-blue
-                                uppercase
-                                tracking-wide
-                            "
-                        >
-                            Thông tin dòng sản phẩm
-                        </h3>
+
+                        <div>
+
+                            <div
+                                class="
+                                    text-sm
+                                    font-black
+                                    text-gray-900
+                                "
+                            >
+                                Chọn danh mục
+                            </div>
+
+
+                            <div
+                                class="
+                                    text-xs
+                                    text-gray-500
+                                "
+                            >
+                                Chọn ngành hàng trước
+                            </div>
+
+                        </div>
 
                     </div>
 
 
-                    <div class="space-y-4">
+                    <!-- CATEGORY COMBOBOX -->
 
+                    <div
+                        id="categoryCombobox"
+                        class="
+                            family-combobox
+                            relative
+                        "
+                    >
 
-                        <!-- SUBCATEGORY -->
-
-                        <div>
-
-                            <label
-                                for="selSubCategory"
-                                class="
-                                    block
-                                    text-xs
-                                    font-bold
-                                    text-gray-700
-                                    mb-1.5
-                                "
-                            >
-                                Nhóm hàng
-                                <span class="text-red-500">*</span>
-                            </label>
-
-                            <select
-                                id="selSubCategory"
-                                required
-                                class="
-                                    w-full
-                                    border
-                                    border-gray-300
-                                    rounded-lg
-                                    px-3
-                                    py-2.5
-                                    text-sm
-                                    bg-white
-                                    outline-none
-                                    focus:border-kn-blue
-                                    focus:ring-2
-                                    focus:ring-blue-100
-                                "
-                            >
-
-                                <option value="">
-                                    -- Chọn nhóm hàng --
-                                </option>
-
-                            </select>
-
-                        </div>
-
-
-                        <!-- NAME / SLUG -->
-
-                        <div
+                        <button
+                            type="button"
+                            id="categoryTrigger"
                             class="
-                                grid
-                                grid-cols-1
-                                md:grid-cols-2
-                                gap-4
+                                w-full
+                                min-h-[46px]
+                                border
+                                border-gray-300
+                                rounded-lg
+                                bg-white
+                                px-3
+                                text-left
+                                flex
+                                items-center
+                                justify-between
+                                gap-3
+                                outline-none
+                                hover:border-gray-400
+                                focus:border-kn-blue
                             "
                         >
 
-                            <div>
-
-                                <label
-                                    for="inName"
-                                    class="
-                                        block
-                                        text-xs
-                                        font-bold
-                                        text-gray-700
-                                        mb-1.5
-                                    "
-                                >
-                                    Tên dòng sản phẩm
-                                    <span class="text-red-500">*</span>
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="inName"
-                                    required
-                                    placeholder="Ví dụ: Relay MY Series"
-                                    class="
-                                        w-full
-                                        border
-                                        border-gray-300
-                                        rounded-lg
-                                        px-3
-                                        py-2.5
-                                        text-sm
-                                        outline-none
-                                        focus:border-kn-blue
-                                        focus:ring-2
-                                        focus:ring-blue-100
-                                    "
-                                >
-
-                            </div>
-
-
-                            <div>
-
-                                <label
-                                    for="inSlug"
-                                    class="
-                                        block
-                                        text-xs
-                                        font-bold
-                                        text-gray-700
-                                        mb-1.5
-                                    "
-                                >
-                                    Slug
-                                    <span class="text-red-500">*</span>
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="inSlug"
-                                    required
-                                    placeholder="relay-my-series"
-                                    class="
-                                        w-full
-                                        border
-                                        border-gray-300
-                                        rounded-lg
-                                        px-3
-                                        py-2.5
-                                        text-sm
-                                        font-mono
-                                        bg-gray-50
-                                        outline-none
-                                        focus:border-kn-blue
-                                        focus:ring-2
-                                        focus:ring-blue-100
-                                    "
-                                >
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- THUMBNAIL -->
-
-                        <div>
-
-                            <label
-                                for="inThumbnail"
+                            <span
+                                id="categorySelectedText"
                                 class="
-                                    block
-                                    text-xs
-                                    font-bold
-                                    text-gray-700
-                                    mb-1.5
-                                "
-                            >
-                                Thumbnail URL
-                            </label>
-
-                            <input
-                                type="url"
-                                id="inThumbnail"
-                                placeholder="https://..."
-                                class="
-                                    w-full
-                                    border
-                                    border-gray-300
-                                    rounded-lg
-                                    px-3
-                                    py-2.5
                                     text-sm
-                                    outline-none
-                                    focus:border-kn-blue
-                                    focus:ring-2
-                                    focus:ring-blue-100
+                                    text-gray-500
                                 "
                             >
+                                -- Chọn danh mục --
+                            </span>
 
-                        </div>
 
+                            <svg
+                                class="
+                                    w-4
+                                    h-4
+                                    text-gray-400
+                                    shrink-0
+                                "
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
 
-                        <!-- PREVIEW -->
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="m6 9 6 6 6-6"
+                                />
+
+                            </svg>
+
+                        </button>
+
 
                         <div
-                            id="thumbnailPreview"
+                            id="categoryDropdown"
                             class="
+                                family-dropdown-panel
                                 hidden
-                                rounded-xl
+                                absolute
+                                z-30
+                                left-0
+                                right-0
+                                mt-2
+                                bg-white
                                 border
                                 border-gray-200
-                                bg-gray-50
-                                p-3
+                                rounded-xl
+                                shadow-xl
+                                overflow-hidden
                             "
-                        ></div>
+                        >
+
+                            <!-- SEARCH CATEGORY -->
+
+                            <div
+                                class="
+                                    p-3
+                                    border-b
+                                    border-gray-100
+                                "
+                            >
+
+                                <div
+                                    class="relative"
+                                >
+
+                                    <svg
+                                        class="
+                                            absolute
+                                            left-3
+                                            top-1/2
+                                            -translate-y-1/2
+                                            w-4
+                                            h-4
+                                            text-gray-400
+                                        "
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
+                                        />
+
+                                    </svg>
+
+
+                                    <input
+                                        type="text"
+                                        id="categorySearch"
+                                        placeholder="Tìm danh mục..."
+                                        autocomplete="off"
+                                        class="
+                                            w-full
+                                            pl-9
+                                            pr-3
+                                            py-2.5
+                                            border
+                                            border-gray-200
+                                            rounded-lg
+                                            text-sm
+                                            outline-none
+                                            focus:border-kn-blue
+                                        "
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- CATEGORY OPTIONS -->
+
+                            <div
+                                id="categoryOptions"
+                                class="
+                                    max-h-60
+                                    overflow-y-auto
+                                    p-2
+                                "
+                            ></div>
+
+                        </div>
 
                     </div>
 
-                </section>
+                </div>
 
 
                 <!-- =================================================
-                     ACTIONS
+                     STEP 2 - SUBCATEGORY
+                ================================================== -->
+
+                <div
+                    class="
+                        family-step
+                        mb-6
+                    "
+                >
+
+                    <div
+                        class="
+                            flex
+                            items-center
+                            gap-3
+                            mb-4
+                        "
+                    >
+
+                        <div
+                            class="
+                                shrink-0
+                                w-8
+                                h-8
+                                rounded-full
+                                bg-kn-blue
+                                text-white
+                                flex
+                                items-center
+                                justify-center
+                                font-extrabold
+                            "
+                        >
+                            2
+                        </div>
+
+
+                        <div>
+
+                            <div
+                                class="
+                                    text-sm
+                                    font-black
+                                    text-gray-900
+                                "
+                            >
+                                Chọn nhóm hàng
+                            </div>
+
+
+                            <div
+                                class="
+                                    text-xs
+                                    text-gray-500
+                                "
+                            >
+                                Chỉ hiển thị nhóm thuộc danh mục đã chọn
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SUBCATEGORY COMBOBOX -->
+
+                    <div
+                        id="subCategoryCombobox"
+                        class="
+                            family-combobox
+                            relative
+                        "
+                    >
+
+                        <button
+                            type="button"
+                            id="subCategoryTrigger"
+                            disabled
+                            class="
+                                w-full
+                                min-h-[46px]
+                                border
+                                border-gray-300
+                                rounded-lg
+                                bg-gray-50
+                                px-3
+                                text-left
+                                flex
+                                items-center
+                                justify-between
+                                gap-3
+                                outline-none
+                                disabled:cursor-not-allowed
+                                disabled:opacity-60
+                            "
+                        >
+
+                            <span
+                                id="subCategorySelectedText"
+                                class="
+                                    text-sm
+                                    text-gray-400
+                                "
+                            >
+                                Chọn danh mục trước...
+                            </span>
+
+
+                            <svg
+                                class="
+                                    w-4
+                                    h-4
+                                    text-gray-400
+                                    shrink-0
+                                "
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="m6 9 6 6 6-6"
+                                />
+
+                            </svg>
+
+                        </button>
+
+
+                        <div
+                            id="subCategoryDropdown"
+                            class="
+                                family-dropdown-panel
+                                hidden
+                                absolute
+                                z-20
+                                left-0
+                                right-0
+                                mt-2
+                                bg-white
+                                border
+                                border-gray-200
+                                rounded-xl
+                                shadow-xl
+                                overflow-hidden
+                            "
+                        >
+
+                            <!-- SEARCH SUBCATEGORY -->
+
+                            <div
+                                class="
+                                    p-3
+                                    border-b
+                                    border-gray-100
+                                "
+                            >
+
+                                <div
+                                    class="relative"
+                                >
+
+                                    <svg
+                                        class="
+                                            absolute
+                                            left-3
+                                            top-1/2
+                                            -translate-y-1/2
+                                            w-4
+                                            h-4
+                                            text-gray-400
+                                        "
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1 16 0 8 8 0 0 1-16 0Z"
+                                        />
+
+                                    </svg>
+
+
+                                    <input
+                                        type="text"
+                                        id="subCategorySearch"
+                                        placeholder="Tìm nhóm hàng..."
+                                        autocomplete="off"
+                                        class="
+                                            w-full
+                                            pl-9
+                                            pr-3
+                                            py-2.5
+                                            border
+                                            border-gray-200
+                                            rounded-lg
+                                            text-sm
+                                            outline-none
+                                            focus:border-kn-blue
+                                        "
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- SUBCATEGORY OPTIONS -->
+
+                            <div
+                                id="subCategoryOptions"
+                                class="
+                                    max-h-60
+                                    overflow-y-auto
+                                    p-2
+                                "
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- REAL VALUE -->
+
+                    <input
+                        type="hidden"
+                        id="selSubCategory"
+                        name="sub_category_id"
+                    >
+
+                </div>
+
+
+                <!-- =================================================
+                     STEP 3 - FAMILY INFO
                 ================================================== -->
 
                 <div
                     class="
                         border-t
-                        border-gray-200
-                        pt-4
-                        flex
-                        justify-end
-                        gap-3
+                        border-gray-100
+                        pt-6
                     "
                 >
 
-                    <button
-                        type="button"
-                        id="btnCancelEdit"
+                    <div
                         class="
-                            px-5
-                            py-2.5
-                            rounded-lg
-                            bg-gray-100
-                            hover:bg-gray-200
-                            text-gray-700
-                            font-bold
-                            text-sm
+                            flex
+                            items-center
+                            gap-3
+                            mb-5
                         "
                     >
-                        Hủy
-                    </button>
+
+                        <div
+                            class="
+                                shrink-0
+                                w-8
+                                h-8
+                                rounded-full
+                                bg-kn-orange
+                                text-white
+                                flex
+                                items-center
+                                justify-center
+                                font-extrabold
+                            "
+                        >
+                            3
+                        </div>
 
 
-                    <button
-                        type="submit"
-                        id="btnSaveFamily"
+                        <div>
+
+                            <div
+                                class="
+                                    text-sm
+                                    font-black
+                                    text-gray-900
+                                "
+                            >
+                                Thông tin dòng sản phẩm
+                            </div>
+
+
+                            <div
+                                class="
+                                    text-xs
+                                    text-gray-500
+                                "
+                            >
+                                Nhập thông tin Family
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- NAME + SLUG -->
+
+                    <div
                         class="
-                            px-5
-                            py-2.5
-                            rounded-lg
-                            bg-kn-blue
-                            hover:bg-blue-800
-                            text-white
-                            font-bold
-                            text-sm
-                            shadow-sm
+                            grid
+                            grid-cols-1
+                            md:grid-cols-2
+                            gap-4
                         "
                     >
-                        Lưu dòng sản phẩm
-                    </button>
+
+                        <!-- NAME -->
+
+                        <div>
+
+                            <label
+                                for="inName"
+                                class="
+                                    block
+                                    text-xs
+                                    font-bold
+                                    text-gray-700
+                                    mb-1.5
+                                "
+                            >
+
+                                Tên dòng sản phẩm
+
+                                <span
+                                    class="text-red-500"
+                                >
+                                    *
+                                </span>
+
+                            </label>
+
+
+                            <input
+                                type="text"
+                                id="inName"
+                                required
+                                placeholder="Ví dụ: Relay MY Series"
+                                class="
+                                    w-full
+                                    border
+                                    border-gray-300
+                                    rounded-lg
+                                    px-3
+                                    py-2.5
+                                    text-sm
+                                    outline-none
+                                    focus:border-kn-blue
+                                    focus:ring-2
+                                    focus:ring-blue-100
+                                "
+                            >
+
+                        </div>
+
+
+                        <!-- SLUG -->
+
+                        <div>
+
+                            <label
+                                for="inSlug"
+                                class="
+                                    block
+                                    text-xs
+                                    font-bold
+                                    text-gray-700
+                                    mb-1.5
+                                "
+                            >
+
+                                Slug
+
+                                <span
+                                    class="text-red-500"
+                                >
+                                    *
+                                </span>
+
+                            </label>
+
+
+                            <input
+                                type="text"
+                                id="inSlug"
+                                required
+                                placeholder="relay-my-series"
+                                class="
+                                    w-full
+                                    border
+                                    border-gray-300
+                                    rounded-lg
+                                    px-3
+                                    py-2.5
+                                    text-sm
+                                    bg-gray-50
+                                    outline-none
+                                    focus:border-kn-blue
+                                    focus:ring-2
+                                    focus:ring-blue-100
+                                "
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- THUMBNAIL -->
+
+<div class="mt-4">
+
+    <label
+        for="inThumbnailFile"
+        class="
+            block
+            text-xs
+            font-bold
+            text-gray-700
+            mb-1.5
+        "
+    >
+        Thumbnail
+    </label>
+
+
+    <div
+        class="
+            rounded-xl
+            border
+            border-gray-200
+            bg-gray-50
+            p-3
+        "
+    >
+
+        <div
+            class="
+                flex
+                flex-col
+                sm:flex-row
+                sm:items-center
+                gap-3
+            "
+        >
+
+            <label
+                for="inThumbnailFile"
+                class="
+                    inline-flex
+                    items-center
+                    justify-center
+                    gap-2
+                    px-4
+                    py-2.5
+                    rounded-lg
+                    bg-white
+                    border
+                    border-gray-300
+                    hover:border-kn-blue
+                    hover:text-kn-blue
+                    text-sm
+                    font-bold
+                    cursor-pointer
+                    transition
+                "
+            >
+
+                <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 16V4m0 0-4 4m4-4 4 4M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"
+                    />
+                </svg>
+
+                Chọn ảnh
+
+            </label>
+
+
+            <input
+                type="file"
+                id="inThumbnailFile"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                class="hidden"
+            >
+
+
+            <span
+                id="thumbnailFileName"
+                class="
+                    text-xs
+                    text-gray-500
+                    truncate
+                "
+            >
+                Chưa chọn ảnh
+            </span>
+
+
+            <button
+                type="button"
+                id="btnRemoveThumbnail"
+                class="
+                    hidden
+                    sm:ml-auto
+                    inline-flex
+                    items-center
+                    justify-center
+                    px-3
+                    py-2
+                    rounded-lg
+                    bg-red-50
+                    text-red-600
+                    hover:bg-red-100
+                    text-xs
+                    font-bold
+                    transition
+                "
+            >
+                Xóa ảnh
+            </button>
+
+        </div>
+
+
+        <p
+            class="
+                text-[11px]
+                text-gray-400
+                mt-2
+            "
+        >
+            JPG, PNG, WEBP, GIF · tối đa 10MB.
+            Ảnh mới sẽ được lưu vào Supabase Storage.
+            Ảnh được lưu vào Supabase Storage và khi hiển thị sẽ đi qua Cloudflare CDN.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- THUMBNAIL PREVIEW -->
+
+<div
+    id="thumbnailPreview"
+    class="hidden mt-4"
+></div>
+
+
+                    <!-- THUMBNAIL PREVIEW -->
+
+                    
 
                 </div>
 
             </form>
+
+
+            <!-- =================================================
+                 MODAL FOOTER
+            ================================================== -->
+
+            <div
+                class="
+                    px-6
+                    py-4
+                    border-t
+                    border-gray-200
+                    bg-gray-50
+                    flex
+                    justify-end
+                    gap-3
+                    shrink-0
+                "
+            >
+
+                <button
+                    type="button"
+                    id="btnCancelEdit"
+                    class="
+                        px-4
+                        py-2.5
+                        rounded-lg
+                        text-sm
+                        font-bold
+                        text-gray-700
+                        bg-white
+                        border
+                        border-gray-300
+                        hover:bg-gray-100
+                        transition
+                    "
+                >
+                    Hủy
+                </button>
+
+
+                <button
+                    type="submit"
+                    form="familyForm"
+                    id="btnSaveFamily"
+                    class="
+                        px-5
+                        py-2.5
+                        rounded-lg
+                        text-sm
+                        font-bold
+                        text-white
+                        bg-kn-blue
+                        hover:bg-blue-800
+                        disabled:opacity-60
+                        disabled:cursor-not-allowed
+                        transition
+                    "
+                >
+                    Lưu dòng sản phẩm
+                </button>
+
+            </div>
 
         </div>
 
@@ -1034,17 +1690,34 @@
          SCRIPTS
     ====================================================== -->
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
 
-    <script src="../assets/js/common/supabase.js"></script>
 
-    <script src="../assets/js/common/utils.js"></script>
+    <script
+        src="../assets/js/common/supabase.js"
+    ></script>
 
-    <script src="../assets/js/admin/admin-core.js"></script>
 
-    <script src="../assets/js/admin/admin-nav.js"></script>
+    <script
+        src="../assets/js/common/utils.js"
+    ></script>
 
-    <script src="../assets/js/admin/admin-families.js"></script>
+
+    <script
+        src="../assets/js/admin/admin-core.js"
+    ></script>
+
+
+    <script
+        src="../assets/js/admin/admin-nav.js"
+    ></script>
+
+
+    <script
+        src="../assets/js/admin/admin-families.js"
+    ></script>
 
 </body>
 

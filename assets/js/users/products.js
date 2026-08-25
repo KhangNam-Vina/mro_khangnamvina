@@ -279,21 +279,36 @@ async function fetchFilteredProducts() {
         // SEARCH
         // ==================================================
 
-        if (searchQuery) {
+       if (searchQuery) {
 
-            query =
-                query.or(
-                    `name.ilike.%${searchQuery}%,sku.ilike.%${searchQuery}%`
-                );
+    const normalizedSearch =
+        searchQuery
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/đ/g, 'd')
+            .replace(/Đ/g, 'D')
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, ' ');
 
-            pageTitleText =
-                `Kết quả tìm kiếm: "${searchQuery}"`;
 
-            breadcrumbText =
-                'Tìm kiếm';
+    if (normalizedSearch) {
 
-        }
+        query = query.or(
+            `search_name.ilike.%${normalizedSearch}%,search_sku.ilike.%${normalizedSearch}%`
+        );
 
+    }
+
+
+    pageTitleText =
+        `Kết quả tìm kiếm: "${searchQuery}"`;
+
+
+    breadcrumbText =
+        'Tìm kiếm';
+
+}
 
         // ==================================================
         // CATEGORY
