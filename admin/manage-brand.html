@@ -249,26 +249,12 @@
 
                 <div class="min-w-0">
 
-                    <p
-                        class="
-                            text-xs
-                            font-black
-                            uppercase
-                            tracking-wider
-                            text-kn-orange
-                            mb-0.5
-                        "
-                    >
-                        CATALOG
-                    </p>
-
-
                     <h1
                         class="
                             text-xl
                             sm:text-2xl
                             font-black
-                            text-kn-blue
+                            text-kn-black
                             truncate
                         "
                     >
@@ -375,6 +361,8 @@
             <div
                 class="
                     w-full
+                    max-w-8xl
+                    mx-auto
                     space-y-5
                     pb-10
                 "
@@ -395,104 +383,68 @@
 
 
                     <!-- ==================================================
-                         TOOLBAR
+                         TOOLBAR MỚI TRỰC QUAN HƠN
                     =================================================== -->
-
                     <div
                         class="
-                            p-4
-                            sm:p-5
+                            p-5
                             border-b
                             border-gray-100
                             flex
                             flex-col
-                            sm:flex-row
-                            gap-3
-                            sm:items-center
-                            sm:justify-between
+                            lg:flex-row
+                            gap-4
+                            items-start
+                            lg:items-center
+                            justify-between
+                            bg-white
                         "
                     >
-
                         <!-- TITLE -->
-
                         <div>
-
-                            <h3
-                                class="
-                                    text-sm
-                                    sm:text-base
-                                    font-black
-                                    text-gray-900
-                                "
-                            >
-                                Danh sách thương hiệu
-                            </h3>
-
-
-                            <p
-                                id="brandCount"
-                                class="
-                                    mt-0.5
-                                    text-xs
-                                    text-gray-400
-                                "
-                            >
-                                0 thương hiệu
-                            </p>
-
+                            <h3 class="text-lg font-black text-gray-900">Danh sách thương hiệu</h3>
+                            <p id="brandCount" class="mt-1 text-sm text-gray-500">0 thương hiệu</p>
                         </div>
 
-
-                        <!-- SEARCH -->
-
-                        <div
-                            class="
-                                relative
-                                w-full
-                                sm:w-72
-                                lg:w-80
-                            "
-                        >
-
-                            <svg
-                                class="
-                                    absolute
-                                    left-3
-                                    top-1/2
-                                    -translate-y-1/2
-                                    w-4
-                                    h-4
-                                    text-gray-400
-                                    pointer-events-none
-                                "
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="m21 21-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0Z"
-                                />
-
-                            </svg>
-
-
-                            <input
-                                id="searchBrand"
-                                type="search"
+                        <!-- BỘ LỌC VÀ TÌM KIẾM -->
+                        <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+                            
+                            <!-- SẮP XẾP -->
+                            <select
+                                id="sortBrand"
                                 class="
                                     form-input
-                                    pl-10
+                                    w-full
+                                    sm:w-40
+                                    py-2
+                                    text-sm
+                                    font-bold
+                                    text-gray-600
+                                    bg-gray-50
+                                    cursor-pointer
+                                    focus:bg-white
                                 "
-                                placeholder="Tìm thương hiệu..."
-                                autocomplete="off"
                             >
+                                <option value="newest">Mới nhất</option>
+                                <option value="az">Tên: A - Z</option>
+                                <option value="za">Tên: Z - A</option>
+                            </select>
+
+                            <!-- SEARCH -->
+                            <div class="relative w-full sm:w-80">
+                                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0Z" />
+                                </svg>
+                                <input
+                                    id="searchBrand"
+                                    type="search"
+                                    class="form-input pl-10 py-2 text-sm bg-gray-50 focus:bg-white transition-colors"
+                                    placeholder="Tìm thương hiệu..."
+                                    autocomplete="off"
+                                >
+                            </div>
 
                         </div>
-
                     </div>
 
 
@@ -622,6 +574,22 @@
                             overflow-x-auto
                         "
                     >
+                    
+                    <div
+                        id="paginationContainer"
+                        class="
+                            border-t
+                            border-gray-100
+                            px-5
+                            py-4
+                            flex
+                            flex-col
+                            sm:flex-row
+                            items-center
+                            justify-between
+                            gap-3
+                        "
+                    ></div>
 
                         <table
                             class="
@@ -631,8 +599,7 @@
                             "
                         >
 
-                            <!-- TABLE HEADER -->
-
+                            <!-- TABLE HEADER (CHUẨN UI QUỐC TẾ) -->
                             <thead
                                 class="
                                     bg-gray-50
@@ -640,66 +607,22 @@
                                     border-gray-200
                                 "
                             >
-
                                 <tr>
-
                                     <!-- ID -->
-
-                                    <th
-                                        class="
-                                            px-5
-                                            py-3.5
-                                            text-left
-                                            text-xs
-                                            font-black
-                                            uppercase
-                                            tracking-wider
-                                            text-gray-400
-                                            w-24
-                                        "
-                                    >
+                                    <th class="px-5 py-3.5 text-left text-xs font-black uppercase tracking-wider text-gray-400 w-24">
                                         ID
                                     </th>
 
-
-                                    <!-- BRAND -->
-
-                                    <th
-                                        class="
-                                            px-5
-                                            py-3.5
-                                            text-left
-                                            text-xs
-                                            font-black
-                                            uppercase
-                                            tracking-wider
-                                            text-gray-400
-                                        "
-                                    >
+                                    <!-- BRAND (Thả rông width để nó đẩy cột Thao tác ra sát mép phải) -->
+                                    <th class="px-5 py-3.5 text-left text-xs font-black uppercase tracking-wider text-gray-400">
                                         Tên thương hiệu
                                     </th>
 
-
-                                    <!-- ACTION -->
-
-                                    <th
-                                        class="
-                                            px-5
-                                            py-3.5
-                                            text-right
-                                            text-xs
-                                            font-black
-                                            uppercase
-                                            tracking-wider
-                                            text-gray-400
-                                            w-40
-                                        "
-                                    >
+                                    <!-- ACTION (Ghim cứng sát lề phải) -->
+                                    <th class="px-5 py-3.5 text-right text-xs font-black uppercase tracking-wider text-gray-400 w-40">
                                         Thao tác
                                     </th>
-
                                 </tr>
-
                             </thead>
 
 

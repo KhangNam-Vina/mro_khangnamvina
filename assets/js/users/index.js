@@ -400,14 +400,14 @@ function buildIndexImageUrl(
 
 
 // ========================================================
-// 4. KÉO SẢN PHẨM BÁN CHẠY (BIẾN TOÀN BỘ CARD THÀNH LINK)
+// 4. KÉO SẢN PHẨM BÁN CHẠY (FIX CLICK CARD & GIỚI HẠN TỐI ĐA 20 SP)
 // ========================================================
 
 async function loadBestSellers(filterKeyword = 'ALL') {
     const container = document.getElementById('bestSellingGrid');
     if (!container) return;
 
-    // SKELETON LOADING (Đã gỡ nút button ở dưới)
+    // SKELETON LOADING
     container.innerHTML = `
         <div class="product-slider-track">
             <div class="product-skeleton"><div class="skel-img"></div><div class="skel-line w-1-3 mb-2"></div><div class="skel-line w-full mb-2"></div><div class="skel-line w-2-3 mb-auto"></div></div>
@@ -423,11 +423,13 @@ async function loadBestSellers(filterKeyword = 'ALL') {
             .select('id, sku, name, image_path, unit, category_id, stock_quantity, price, discount_price, badge, brands(name)')
             .order('created_at', { ascending: false });
 
+        // Logic ALL lấy toàn bộ sản phẩm hợp lệ, Category lọc đúng theo danh mục hiện tại
         if (filterKeyword !== 'ALL') {
             query = query.eq('category_id', filterKeyword);
         }
 
-        const { data, error } = await query.limit(8);
+        // CHỈ LẤY TỐI ĐA 20 SẢN PHẨM (Nếu database có ít hơn 20 thì lấy tất cả)
+        const { data, error } = await query.limit(20);
 
         if (error) throw error;
 
@@ -470,11 +472,15 @@ async function loadBestSellers(filterKeyword = 'ALL') {
 
             const productImage = buildIndexImageUrl(item.image_path);
 
-            // ĐÃ FIX: Dùng thẻ <a> bọc toàn bộ thẻ card để trình duyệt tự hiểu đây là link đích thực
+            // Biến card thành phần tử có thể click hoàn toàn bằng div kết hợp hàm xử lý thông minh để không conflict drag & drop
             productItemsHTML += `
-                <a href="pages/product-detail.html?id=${encodeURIComponent(item.id)}" class="product-card" style="text-decoration: none; cursor: pointer;">
+               <div
+    class="product-card"
+    data-product-id="${escapeIndexHTML(item.id)}"
+    style="cursor: pointer;"
+>
                     
-                    <div class="product-image-link" style="border-bottom: 1px solid #eef0f3; pointer-events: none;">
+                    <div class="product-image-link" style="border-bottom: 1px solid #eef0f3;">
                         ${leftBadgeHTML}
                         ${rightBadgeHTML}
                         <img src="${escapeIndexHTML(productImage)}" alt="${escapeIndexHTML(item.name || '')}" class="product-img" loading="lazy" onerror="this.onerror=null;this.src='assets/images/world mark.png';">
@@ -492,22 +498,71 @@ async function loadBestSellers(filterKeyword = 'ALL') {
                             <div class="product-unit" style="display: inline-block; margin-top: 4px;">${escapeIndexHTML(item.unit || 'Cái')}</div>
                         </div>
                     </div>
-                </a>
+                </div>
             `;
         });
 
+        // Nhân đôi track để chạy infinite carousel vô tận
         container.innerHTML = `
             <div class="product-slider-track">${productItemsHTML}</div>
             <div class="product-slider-track" aria-hidden="true">${productItemsHTML}</div>
         `;
 
-        // Gọi lại hàm kéo thả
-        initDragAndScroll('bestSellingGrid', 2);
+        // Kích hoạt lại hiệu ứng kéo thả mượt mà
+if (typeof initDragAndScroll === 'function') {
+    initDragAndScroll('bestSellingGrid', 1.5);
+}
 
-    } catch (error) {
-        console.error("Lỗi tải Best Seller:", error);
-        container.innerHTML = `<p class="empty-msg" style="color:red;">Lỗi lấy dữ liệu: ${escapeIndexHTML(error.message)}</p>`;
-    }
+
+// Xử lý click sản phẩm bằng event delegation
+const bestSellerSlider = document.getElementById('bestSellingGrid');
+
+if (bestSellerSlider && !bestSellerSlider.dataset.clickBound) {
+
+    bestSellerSlider.dataset.clickBound = 'true';
+
+    bestSellerSlider.addEventListener('click', function (event) {
+
+        // Vừa kéo slider thì không mở sản phẩm
+        if (bestSellerSlider.isDraggingActive) {
+            return;
+        }
+
+        // Không can thiệp vào link/button bên trong card
+        if (
+            event.target.closest('a') ||
+            event.target.closest('button')
+        ) {
+            return;
+        }
+
+        const card = event.target.closest('.product-card');
+
+        if (!card) {
+            return;
+        }
+
+        const productId = card.dataset.productId;
+
+        if (!productId) {
+            console.warn('Best Seller: thiếu product ID');
+            return;
+        }
+
+        window.location.href =
+            `pages/product-detail.html?id=${encodeURIComponent(productId)}`;
+    });
+}
+
+} catch (error) {
+    console.error("Lỗi tải Best Seller:", error);
+
+    container.innerHTML = `
+        <p class="empty-msg" style="color:red;">
+            Lỗi lấy dữ liệu: ${escapeIndexHTML(error.message)}
+        </p>
+    `;
+}
 }
 
 
@@ -807,194 +862,112 @@ function addToRFQCartFromIndex(
 
 /* ========================================================
    HÀM KÉO THẢ + AUTO SCROLL INFINITE
-   BẢN TỐI ƯU - KHÔNG GÂY LOOP LAYOUT
+   CLICK / DRAG TÁCH RIÊNG
 ======================================================== */
 function initDragAndScroll(sliderId, speed = 1) {
+    const slider = document.getElementById(sliderId);
+    if (!slider) return;
 
-    const slider =
-        document.getElementById(sliderId);
-
-    if (!slider) {
-        return;
-    }
-
-
-    /* ====================================================
-       CLEANUP INSTANCE CŨ
-    ==================================================== */
-
+    // Cleanup instance cũ
     if (slider._cancelSlider) {
         slider._cancelSlider();
     }
 
+    slider.style.scrollBehavior = 'auto';
 
     let animationFrame = null;
+    let resizeObserver = null;
 
+    let isPointerDown = false;
     let isDragging = false;
-    let hasDragged = false;
     let isHovering = false;
 
     let startX = 0;
     let startScrollLeft = 0;
-
     let loopWidth = 0;
 
-    let resetTimer = null;
+    const DRAG_THRESHOLD = 8;
+    const DRAG_SPEED = 1.5;
 
+    // ====================================================
+    // TRẠNG THÁI CLICK / DRAG
+    // ====================================================
 
-    /* ====================================================
-       TÍNH WIDTH 1 TRACK
-       CHỈ TÍNH KHI CẦN
-    ==================================================== */
+    slider.isDraggingActive = false;
+
+    // ====================================================
+    // TÍNH CHIỀU RỘNG 1 VÒNG
+    // ====================================================
 
     const calculateLoopWidth = () => {
 
-        const tracks =
-    slider.querySelectorAll(
-        '.product-slider-track, .brand-track-group'
-    );
-
+        const tracks = slider.querySelectorAll(
+            '.product-slider-track, .brand-track-group'
+        );
 
         if (tracks.length < 2) {
-
             loopWidth = 0;
-
             return;
-
         }
 
+        const firstTrack = tracks[0];
+        const secondTrack = tracks[1];
 
-        const firstTrack =
-            tracks[0];
-
-        const secondTrack =
-            tracks[1];
-
-
-        /*
-           Vì 2 track nằm nối tiếp nhau
-           nên khoảng cách giữa chúng
-           chính là width của 1 loop.
-        */
-
-        const width =
+        loopWidth =
             secondTrack.offsetLeft -
             firstTrack.offsetLeft;
 
-
-        if (width > 0) {
-
-            loopWidth = width;
-
-        } else {
-
-            loopWidth =
-                firstTrack.scrollWidth;
-
+        if (loopWidth <= 0) {
+            loopWidth = firstTrack.scrollWidth;
         }
-
     };
 
-
-    /* ====================================================
-       NORMALIZE
-    ==================================================== */
+    // ====================================================
+    // NORMALIZE INFINITE SCROLL
+    // ====================================================
 
     const normalizeScroll = () => {
 
-        if (
-            !loopWidth ||
-            loopWidth <= 0
-        ) {
-
+        if (!loopWidth || loopWidth <= 0) {
             return;
-
         }
 
+        slider.style.scrollBehavior = 'auto';
 
-        /*
-           Chỉ cần 1 lần reset.
-           Không dùng while để tránh
-           loop vô hạn khi layout lỗi.
-        */
+        if (slider.scrollLeft >= loopWidth) {
 
-        if (
-            slider.scrollLeft >=
-            loopWidth
-        ) {
+            slider.scrollLeft -= loopWidth;
 
-            slider.scrollLeft -=
-                loopWidth;
+        } else if (slider.scrollLeft <= 0) {
 
+            slider.scrollLeft += loopWidth;
         }
-
-
-        else if (
-            slider.scrollLeft < 0
-        ) {
-
-            slider.scrollLeft +=
-                loopWidth;
-
-        }
-
     };
 
-
-    /* ====================================================
-       AUTO SCROLL
-    ==================================================== */
+    // ====================================================
+    // AUTO PLAY
+    // ====================================================
 
     const animate = () => {
 
         if (
-            !isDragging &&
+            !isPointerDown &&
             !isHovering &&
             loopWidth > 0
         ) {
 
-            slider.scrollLeft +=
-                speed;
+            slider.scrollLeft += speed;
 
-
-            if (
-                slider.scrollLeft >=
-                loopWidth
-            ) {
-
-                slider.scrollLeft -=
-                    loopWidth;
-
-            }
-
+            normalizeScroll();
         }
 
-
         animationFrame =
-            requestAnimationFrame(
-                animate
-            );
-
+            requestAnimationFrame(animate);
     };
 
-
-    /* ====================================================
-       INIT WIDTH
-       CHỈ TÍNH 1 LẦN BAN ĐẦU
-    ==================================================== */
-
-    calculateLoopWidth();
-
-
-    animationFrame =
-        requestAnimationFrame(
-            animate
-        );
-
-
-    /* ====================================================
-       POINTER DOWN
-    ==================================================== */
+    // ====================================================
+    // POINTER DOWN
+    // ====================================================
 
     const onPointerDown = (event) => {
 
@@ -1002,386 +975,290 @@ function initDragAndScroll(sliderId, speed = 1) {
             event.pointerType === 'mouse' &&
             event.button !== 0
         ) {
-
             return;
-
         }
 
+        isPointerDown = true;
+        isDragging = false;
 
-        isDragging = true;
+        slider.isDraggingActive = false;
 
-        hasDragged = false;
+        startX = event.clientX;
+        startScrollLeft = slider.scrollLeft;
 
+        slider.style.cursor = 'grabbing';
+        slider.style.scrollBehavior = 'auto';
 
-        startX =
-            event.clientX;
-
-
-        startScrollLeft =
-            slider.scrollLeft;
-
-
-        slider.setPointerCapture?.(
-            event.pointerId
-        );
-
-
-        slider.style.cursor =
-            'grabbing';
-
+        /*
+         * KHÔNG dùng setPointerCapture ngay lập tức.
+         *
+         * Chờ đến khi user thực sự kéo mới capture.
+         * Điều này giúp click card hoạt động bình thường.
+         */
     };
 
-
-    /* ====================================================
-       POINTER MOVE
-    ==================================================== */
+    // ====================================================
+    // POINTER MOVE
+    // ====================================================
 
     const onPointerMove = (event) => {
 
-        if (!isDragging) {
-
+        if (!isPointerDown) {
             return;
-
         }
 
-
-        event.preventDefault();
-
+        const distance =
+            event.clientX - startX;
 
         const walk =
-            (
-                event.clientX -
-                startX
-            ) * 1.5;
+            distance * DRAG_SPEED;
 
-
-        let targetScroll =
-            startScrollLeft -
-            walk;
-
-
-        if (
-            loopWidth > 0
-        ) {
+        // Chưa vượt ngưỡng → vẫn là CLICK
+        if (!isDragging) {
 
             if (
-                targetScroll >=
-                loopWidth
+                Math.abs(distance) <
+                DRAG_THRESHOLD
             ) {
-
-                targetScroll -=
-                    loopWidth;
-
-
-                startScrollLeft -=
-                    loopWidth;
-
+                return;
             }
 
+            // Chính thức trở thành DRAG
+            isDragging = true;
 
-            else if (
-                targetScroll < 0
-            ) {
+            slider.isDraggingActive = true;
 
-                targetScroll +=
-                    loopWidth;
-
-
-                startScrollLeft +=
-                    loopWidth;
-
-            }
-
+            // Chỉ capture khi đã thật sự drag
+            slider.setPointerCapture?.(
+                event.pointerId
+            );
         }
 
+        // Chỉ preventDefault khi thật sự drag
+        event.preventDefault();
 
         slider.scrollLeft =
-            targetScroll;
+            startScrollLeft - walk;
 
-
-        if (
-            Math.abs(walk) > 5
-        ) {
-
-            hasDragged = true;
-
-        }
-
+        normalizeScroll();
     };
 
-
-    /* ====================================================
-       STOP DRAG
-    ==================================================== */
+    // ====================================================
+    // POINTER UP
+    // ====================================================
 
     const stopDragging = (event) => {
 
-        if (!isDragging) {
-
+        if (!isPointerDown) {
             return;
-
         }
 
+        isPointerDown = false;
+
+        const wasDragging = isDragging;
 
         isDragging = false;
 
+        slider.style.cursor = 'grab';
 
-        slider.releasePointerCapture?.(
-            event?.pointerId
-        );
+        if (wasDragging) {
 
+            slider.isDraggingActive = true;
 
-        slider.style.cursor =
-            'grab';
+            try {
+                slider.releasePointerCapture?.(
+                    event?.pointerId
+                );
+            } catch (error) {
+                // Ignore
+            }
 
+            /*
+             * Giữ cờ một chút để browser không
+             * biến thao tác drag thành click.
+             */
+            setTimeout(() => {
 
-        if (resetTimer) {
+                slider.isDraggingActive = false;
 
-            clearTimeout(
-                resetTimer
-            );
+            }, 150);
 
+        } else {
+
+            // Click bình thường
+            slider.isDraggingActive = false;
         }
-
-
-        resetTimer =
-            setTimeout(
-                () => {
-
-                    hasDragged = false;
-
-                },
-                80
-            );
-
     };
 
+    // ====================================================
+    // POINTER CANCEL
+    // ====================================================
 
-    /* ====================================================
-       CLICK
-    ==================================================== */
+    const onPointerCancel = (event) => {
 
-    const onClick = (event) => {
+        isPointerDown = false;
+        isDragging = false;
 
-        if (
-            hasDragged
-        ) {
+        slider.isDraggingActive = false;
 
-            event.preventDefault();
-            event.stopPropagation();
+        slider.style.cursor = 'grab';
 
+        try {
+            slider.releasePointerCapture?.(
+                event?.pointerId
+            );
+        } catch (error) {
+            // Ignore
         }
-
     };
 
-
-    /* ====================================================
-       HOVER
-    ==================================================== */
+    // ====================================================
+    // HOVER
+    // ====================================================
 
     const onMouseEnter = () => {
-
         isHovering = true;
-
     };
-
 
     const onMouseLeave = () => {
 
         isHovering = false;
 
-        stopDragging();
-
+        /*
+         * Không gọi stopDragging() ở đây.
+         *
+         * Vì mouseleave không đồng nghĩa với pointerup.
+         */
     };
 
-
-    /* ====================================================
-       EVENTS
-    ==================================================== */
+    // ====================================================
+    // EVENT LISTENERS
+    // ====================================================
 
     slider.addEventListener(
         'pointerdown',
         onPointerDown
     );
 
-
     slider.addEventListener(
         'pointermove',
         onPointerMove,
-        {
-            passive: false
-        }
+        { passive: false }
     );
-
 
     slider.addEventListener(
         'pointerup',
         stopDragging
     );
 
-
     slider.addEventListener(
         'pointercancel',
-        stopDragging
+        onPointerCancel
     );
-
-
-    slider.addEventListener(
-        'click',
-        onClick,
-        true
-    );
-
 
     slider.addEventListener(
         'mouseenter',
         onMouseEnter
     );
 
-
     slider.addEventListener(
         'mouseleave',
         onMouseLeave
     );
 
-
-    /* ====================================================
-       CHỐNG GHOST DRAG
-    ==================================================== */
+    // ====================================================
+    // CHỐNG GHOST DRAG CỦA IMAGE / LINK
+    // ====================================================
 
     slider
-        .querySelectorAll(
-            'img, a'
-        )
-        .forEach(
-            element => {
+        .querySelectorAll('img')
+        .forEach(element => {
 
-                element.setAttribute(
-                    'draggable',
-                    'false'
-                );
+            element.setAttribute(
+                'draggable',
+                'false'
+            );
 
-                element.addEventListener(
-                    'dragstart',
-                    event =>
-                        event.preventDefault()
-                );
+            element.addEventListener(
+                'dragstart',
+                event => {
+                    event.preventDefault();
+                }
+            );
+        });
 
-            }
-        );
+    // ====================================================
+    // INIT
+    // ====================================================
 
+    calculateLoopWidth();
 
-    slider.style.cursor =
-        'grab';
+    animationFrame =
+        requestAnimationFrame(animate);
 
-    slider.style.userSelect =
-        'none';
+    slider.style.cursor = 'grab';
+    slider.style.userSelect = 'none';
 
+    // ====================================================
+    // RESIZE
+    // ====================================================
 
-    /* ====================================================
-       RESIZE
-       CHỈ RECALCULATE KHI KÍCH THƯỚC THAY ĐỔI
-    ==================================================== */
+    resizeObserver =
+        new ResizeObserver(() => {
 
-    const resizeObserver =
-        new ResizeObserver(
-            () => {
+            calculateLoopWidth();
+            normalizeScroll();
 
-                calculateLoopWidth();
+        });
 
-                normalizeScroll();
+    resizeObserver.observe(slider);
 
-            }
-        );
+    // ====================================================
+    // CLEANUP
+    // ====================================================
 
+    slider._cancelSlider = () => {
 
-    resizeObserver.observe(
-        slider
-    );
-
-
-    /* ====================================================
-       CLEANUP
-    ==================================================== */
-
-    slider._cancelSlider =
-        () => {
-
-            if (
+        if (animationFrame) {
+            cancelAnimationFrame(
                 animationFrame
-            ) {
+            );
+        }
 
-                cancelAnimationFrame(
-                    animationFrame
-                );
-
-                animationFrame =
-                    null;
-
-            }
-
-
-            if (
-                resetTimer
-            ) {
-
-                clearTimeout(
-                    resetTimer
-                );
-
-                resetTimer =
-                    null;
-
-            }
-
-
+        if (resizeObserver) {
             resizeObserver.disconnect();
+        }
 
+        slider.removeEventListener(
+            'pointerdown',
+            onPointerDown
+        );
 
-            slider.removeEventListener(
-                'pointerdown',
-                onPointerDown
-            );
+        slider.removeEventListener(
+            'pointermove',
+            onPointerMove
+        );
 
+        slider.removeEventListener(
+            'pointerup',
+            stopDragging
+        );
 
-            slider.removeEventListener(
-                'pointermove',
-                onPointerMove
-            );
+        slider.removeEventListener(
+            'pointercancel',
+            onPointerCancel
+        );
 
+        slider.removeEventListener(
+            'mouseenter',
+            onMouseEnter
+        );
 
-            slider.removeEventListener(
-                'pointerup',
-                stopDragging
-            );
-
-
-            slider.removeEventListener(
-                'pointercancel',
-                stopDragging
-            );
-
-
-            slider.removeEventListener(
-                'click',
-                onClick,
-                true
-            );
-
-
-            slider.removeEventListener(
-                'mouseenter',
-                onMouseEnter
-            );
-
-
-            slider.removeEventListener(
-                'mouseleave',
-                onMouseLeave
-            );
-
-        };
-
+        slider.removeEventListener(
+            'mouseleave',
+            onMouseLeave
+        );
+    };
 }
 
 
@@ -1712,70 +1589,19 @@ window.onload =
 
 
 // ========================================================
-// 12. NÚT CUỘN BEST SELLER
+// 12. NÚT CUỘN BÊN NGOÀI (BẤM MŨI TÊN TRÁI/PHẢI)
 // ========================================================
+window.scrollBestSellers = function (amount) {
+    const slider = document.getElementById('bestSellingGrid');
+    if (!slider) return;
 
-window.scrollBestSellers =
-    function (
-        amount
-    ) {
+    // 1. Cho phép cuộn smooth khi bấm nút
+    slider.style.scrollBehavior = 'smooth';
+    slider.scrollBy({ left: amount });
 
-        const slider =
-            document.getElementById(
-                'bestSellingGrid'
-            );
-
-
-        if (!slider) {
-            return;
-        }
-
-
-        if (
-            slider.scrollInterval
-        ) {
-
-            clearInterval(
-                slider.scrollInterval
-            );
-
-        }
-
-
-        if (
-            slider.resumeTimeout
-        ) {
-
-            clearTimeout(
-                slider.resumeTimeout
-            );
-
-        }
-
-
-        slider.scrollBy({
-
-            left:
-                amount,
-
-            behavior:
-                'smooth'
-
-        });
-
-
-        slider.resumeTimeout =
-            setTimeout(
-                () => {
-
-                    slider.dispatchEvent(
-                        new Event(
-                            'mouseleave'
-                        )
-                    );
-
-                },
-                600
-            );
-
-    };
+    // 2. Chờ cuộn xong thì trả về auto và kích hoạt lại vòng lặp
+    setTimeout(() => {
+        slider.style.scrollBehavior = 'auto';
+        slider.dispatchEvent(new Event('mouseleave'));
+    }, 400); 
+};
