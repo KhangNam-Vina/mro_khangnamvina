@@ -357,7 +357,8 @@
 
 .product-card {
     width: 288px;
-    flex-shrink: 0;
+    min-width: 288px;
+    flex: 0 0 288px;
 
     display: flex;
     flex-direction: column;
@@ -368,7 +369,7 @@
     margin: 0 12px;
     padding: 0;
 
-    background: #ffffff;
+    background: #fff;
 
     border: 1px solid #e5e7eb;
     border-radius: 8px;
@@ -393,30 +394,37 @@
 
 
 /* =========================================================
-   PRODUCT IMAGE
+   PRODUCT IMAGE AREA
 ========================================================= */
 
 .product-image-link {
-    width: 100%;
-    height: 205px;
+    position: relative !important;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 
-    position: relative;
+    width: 100% !important;
+    height: 205px !important;
 
-    margin: 0;
-    padding: 16px;
+    box-sizing: border-box;
 
-    background: #ffffff;
+    margin: 0 !important;
+    padding: 16px !important;
+
+    background: #fff;
 
     border-bottom: 1px solid #eef0f3;
 
-    overflow: hidden;
+    overflow: hidden !important;
 
     text-decoration: none;
 }
+
+
+/* =========================================================
+   PRODUCT IMAGE
+========================================================= */
 
 .product-img {
     display: block;
@@ -430,6 +438,11 @@
     object-fit: contain;
     object-position: center;
 
+    margin: 0 auto;
+
+    position: relative;
+    z-index: 1;
+
     transition:
         transform 0.35s ease,
         opacity 0.25s ease;
@@ -441,30 +454,75 @@
 
 
 /* =========================================================
-   STOCK BADGE
+   STOCK / PRE-ORDER BADGE
 ========================================================= */
 
-.product-badge-stock {
-    position: absolute;
+.product-badge-stock,
+.product-badge-preorder {
+    position: absolute !important;
 
-    top: 12px;
-    right: 12px;
+    top: 10px !important;
+    right: 10px !important;
+    left: auto !important;
+    bottom: auto !important;
 
-    z-index: 10;
+    z-index: 20 !important;
 
-    background: #22c55e;
-    color: #ffffff;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
 
-    font-size: 11px;
-    line-height: 1;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: calc(100% - 20px) !important;
+
+    height: auto !important;
+
+    margin: 0 !important;
+    padding: 5px 8px !important;
+
+    box-sizing: border-box;
+
+    color: #fff !important;
+
+    border: 0 !important;
+    border-radius: 4px;
+
+    font-family: inherit;
+    font-size: 10px;
+    line-height: 1.2;
 
     font-weight: 800;
 
-    padding: 6px 9px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
-    border-radius: 5px;
+    text-align: center;
+
+    text-decoration: none !important;
 
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   CÓ SẴN
+========================================================= */
+
+.product-badge-stock {
+    background: #22c55e !important;
+}
+
+
+/* =========================================================
+   PRE-ORDER
+========================================================= */
+
+.product-badge-preorder {
+    background: #64748b !important;
 }
 
 
@@ -477,13 +535,18 @@
     flex-direction: column;
 
     flex: 1;
-
     min-height: 190px;
 
     margin: 0;
-
     padding: 16px;
+
+    box-sizing: border-box;
 }
+
+
+/* =========================================================
+   BRAND
+========================================================= */
 
 .product-brand {
     margin: 0 0 7px;
@@ -499,7 +562,14 @@
     letter-spacing: 0.05em;
 }
 
+
+/* =========================================================
+   PRODUCT NAME
+========================================================= */
+
 .product-name {
+    display: -webkit-box;
+
     margin: 0 0 12px;
 
     color: #00479b;
@@ -511,11 +581,12 @@
 
     text-decoration: none;
 
-    display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
 
     overflow: hidden;
+
+    min-height: 42px;
 
     transition: color 0.2s ease;
 }
@@ -537,6 +608,11 @@
     border-top: 1px solid #eef0f3;
 }
 
+
+/* =========================================================
+   SKU + UNIT
+========================================================= */
+
 .product-sku,
 .product-unit {
     display: inline-block;
@@ -551,17 +627,63 @@
     padding: 4px 8px;
 
     border-radius: 4px;
+
+    box-sizing: border-box;
 }
 
 .product-sku {
     margin-bottom: 4px;
 
     font-family: monospace;
+
     font-weight: 700;
 }
 
 .product-unit {
     font-weight: 600;
+}
+
+
+/* =========================================================
+   ADD TO RFQ BUTTON
+========================================================= */
+
+.product-btn-add {
+    display: block;
+
+    width: calc(100% - 32px);
+
+    min-height: 44px;
+
+    margin: 0 16px 16px;
+
+    padding: 10px 14px;
+
+    box-sizing: border-box;
+
+    background: #fff;
+
+    color: #ff5e00;
+
+    border: 1px solid #ff5e00;
+
+    font-size: 12px;
+    line-height: 1.2;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.product-btn-add:hover {
+    background: #ff5e00;
+    color: #fff;
 }
 
 
@@ -752,4 +874,13 @@ body {
     width: min(1536px, calc(100% - 32px));
     max-width: 100%;
     box-sizing: border-box;
+}
+
+.category-title-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.category-title-link:hover {
+    color: inherit;
 }

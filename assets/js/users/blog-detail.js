@@ -491,79 +491,61 @@ function updateSEO(data) {
 
 
 // ========================================================
-// 3. GENERATE TOC
+// 3. GENERATE TOC (ĐÃ FIX: TỰ ĐỘNG ẨN NẾU KHÔNG CÓ TIÊU ĐỀ)
 // ========================================================
-
-function generateTOC(
-    container
-) {
+function generateTOC(container) {
 
     const tocContainer =
-        document.getElementById(
-            'blogTOC'
-        );
+        document.getElementById('blogTOC');
 
+    const tocCard =
+        document.querySelector('.blog-detail-toc-card');
 
-    if (!tocContainer) {
-
-        return;
-    }
-
+    if (!tocContainer) return;
 
     const headings =
-        container.querySelectorAll(
-            'h2, h3'
-        );
+        container.querySelectorAll('h2, h3');
 
+    /*
+     * Nếu không có heading:
+     * vẫn giữ card mục lục,
+     * nhưng hiển thị thông báo nhẹ.
+     */
+    if (headings.length === 0) {
+    tocContainer.innerHTML = `
+        <p class="toc-empty">
+            Nội dung bài viết chưa có mục lục.
+        </p>
+    `;
 
-    if (
-        headings.length === 0
-    ) {
+    return;
+}
 
-        tocContainer.innerHTML =
-            `
-                <p class="toc-empty">
-                    Bài viết ngắn không có mục lục.
-                </p>
-            `;
-
-        return;
+    if (tocCard) {
+        tocCard.style.display = 'block';
     }
-
 
     let tocHTML =
         '<ul class="toc-list">';
 
-
     headings.forEach(
-        (
-            heading,
-            index
-        ) => {
+        (heading, index) => {
 
             const id =
                 `heading-${index}`;
 
-
-            heading.id =
-                id;
-
+            heading.id = id;
 
             const isH3 =
-                heading.tagName.toLowerCase() ===
-                'h3';
-
+                heading.tagName.toLowerCase() === 'h3';
 
             const itemClass =
                 isH3
                     ? 'toc-item-sub'
                     : 'toc-item-main';
 
-
             tocHTML += `
-
                 <li class="${itemClass}">
-
                     <a
                         href="#${id}"
                         class="toc-link"
@@ -571,26 +553,17 @@ function generateTOC(
                             heading.innerText
                         )}"
                     >
-                        ${
-                            isH3
-                                ? '- '
-                                : ''
-                        }
-
+                        ${isH3 ? '- ' : ''}
                         ${utils.escapeHTML(
                             heading.innerText
                         )}
                     </a>
-
                 </li>
             `;
         }
     );
 
-
-    tocHTML +=
-        '</ul>';
-
+    tocHTML += '</ul>';
 
     tocContainer.innerHTML =
         tocHTML;
@@ -1153,6 +1126,7 @@ async function initAuthUI() {
         );
     }
 }
+
 
 
 // ========================================================

@@ -208,14 +208,27 @@
 
     <div id="app-footer"></div>
 
-    <!-- SCRIPTS -->
+    <!-- =====================================================
+         JAVASCRIPT (ĐÃ FIX CHUẨN ĐƯỜNG DẪN CHO TRANG CHỦ)
+    ====================================================== -->
+    
+    <!-- 1. Thư viện Supabase gốc -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- 2. Cấu hình & Tiện ích chung (QUAN TRỌNG NHẤT: Tạo ra window.supabaseClient) -->
     <script src="assets/js/common/supabase.js"></script>
     <script src="assets/js/common/utils.js"></script>
     <script src="assets/js/common/auth.js"></script>
+
+    <!-- 3. Giao diện Header/Footer -->
     <script src="assets/components/header.js"></script>
     <script src="assets/components/footer.js"></script>
+
+    <!-- 4. Logic riêng của trang -->
     <script src="assets/js/users/auth-ui.js"></script>
     <script src="assets/js/users/index.js"></script>
+
+</body>
+</html>
 </body>
 </html>

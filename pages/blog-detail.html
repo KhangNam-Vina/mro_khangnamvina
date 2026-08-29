@@ -103,406 +103,210 @@
     <div id="app-header"></div>
 
 
-    <!-- MAIN -->
+    <!-- THANH TIẾN ĐỘ ĐỌC BÀI -->
+    <div class="reading-progress-container">
+        <div id="readingProgressBar" class="reading-progress-bar"></div>
+    </div>
+
+    <!-- =====================================================
+         HERO BANNER XANH DƯƠNG (ĐỒNG BỘ B2B)
+    ====================================================== -->
+    <section class="blog-detail-hero">
+        <div class="blog-detail-hero-overlay"></div>
+        <div class="blog-detail-container relative-z">
+            
+            <!-- BREADCRUMB -->
+            <nav class="blog-detail-breadcrumb" aria-label="Breadcrumb">
+                <a href="../index.html" class="blog-detail-breadcrumb-link">Trang chủ</a>
+                <span class="blog-detail-breadcrumb-separator">/</span>
+                <a href="blog.html" class="blog-detail-breadcrumb-link">Tin tức MRO</a>
+                <span class="blog-detail-breadcrumb-separator">/</span>
+                <span id="breadcrumbTitle" class="blog-detail-breadcrumb-current">Đang tải...</span>
+            </nav>
+
+            <!-- HEADER NỘI DUNG CHÍNH -->
+            <div class="blog-detail-header-inner">
+                <a id="blogCategoryBadge" href="blog.html" class="blog-detail-category-badge">Tin Tức & Công Nghệ</a>
+                <h1 id="blogTitle" class="blog-detail-hero-title">Đang tải dữ liệu bài viết...</h1>
+                
+                <div class="blog-detail-meta-hero">
+                    <span class="meta-item"><span id="blogDate"></span></span>
+                    <span class="meta-divider">·</span>
+                    <span class="meta-item"><span id="readTime"></span></span>
+                    <span class="meta-divider">·</span>
+                    <span class="meta-item"><span id="viewCount">0</span> lượt xem</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
     <main class="blog-detail-main">
 
-        <!-- BREADCRUMB -->
-        <nav
-            class="blog-detail-breadcrumb"
-            aria-label="Breadcrumb"
-        >
+        <!-- LOADING & ERROR STATES (Giữ nguyên) -->
+        <div id="loadingState" class="blog-detail-loading">
+            <div class="blog-detail-loading-image" style="margin-top: 20px;"></div>
+            <div class="blog-detail-loading-lines"><div></div><div></div><div class="short"></div></div>
+        </div>
+        <div id="errorState" class="blog-detail-error is-hidden">
+            <h1 class="blog-detail-error-code">404</h1>
+            <p class="blog-detail-error-text">Bài viết không tồn tại hoặc đã bị gỡ bỏ.</p>
+            <a href="blog.html" class="blog-detail-error-button">Quay lại Blog</a>
+        </div>
 
-            <a
-                href="../index.html"
-                class="blog-detail-breadcrumb-link"
+        <!-- BLOG ARTICLE (ĐÃ FIX TRÀN VIỀN) -->
+        <article id="blogArticle" class="blog-detail-layout is-hidden">
+
+            <!-- CỘT TRÁI: NỘI DUNG (100% CHIỀU RỘNG CÒN LẠI) -->
+            <div class="blog-detail-content-column">
+
+                <!-- HERO IMAGE -->
+                <div class="blog-detail-thumb-wrapper">
+                    <img id="blogThumb" src="" alt="" class="blog-detail-thumb">
+                </div>
+                
+                <!-- NỘI DUNG BÀI VIẾT -->
+<div id="blogContent" class="blog-detail-content"></div>
+
+
+<!-- CTA CHUYỂN ĐỔI B2B -->
+<div class="blog-cta-block">
+    <h4>CẦN GIẢI PHÁP CHO DOANH NGHIỆP?</h4>
+
+    <p>
+        Khám phá các sản phẩm và giải pháp MRO phù hợp
+        với nhu cầu của hệ thống nhà máy.
+    </p>
+
+    <a href="products.html" class="blog-cta-btn">
+        TÌM SẢN PHẨM MRO →
+    </a>
+</div>
+
+
+<!-- SẢN PHẨM LIÊN QUAN -->
+<div class="blog-related-products-wrapper">
+
+    <h3 class="blog-related-products-title">
+
+    </h3>
+
+    <div
+        id="blogRelatedProductsGrid"
+        class="blog-related-products-grid"
+    ></div>
+
+</div>
+
+</div>
+<!-- END .blog-detail-content-column -->
+
+
+<!-- =====================================================
+     SIDEBAR
+====================================================== -->
+<aside class="blog-detail-sidebar">
+
+    <div class="blog-detail-sidebar-sticky">
+
+        <!-- MỤC LỤC -->
+        <div class="blog-detail-toc-card">
+
+            <h4 class="blog-detail-sidebar-title">
+                MỤC LỤC BÀI VIẾT
+            </h4>
+
+            <div
+                id="blogTOC"
+                class="blog-detail-toc"
+            ></div>
+
+        </div>
+
+
+        <!-- CHIA SẺ -->
+        <div class="blog-detail-share">
+
+            <h4
+                class="blog-detail-sidebar-title"
+                style="margin-top:24px;"
             >
-                Trang chủ
-            </a>
+                CHIA SẺ
+            </h4>
 
-            <span class="blog-detail-breadcrumb-separator">
-                /
-            </span>
+            <div class="blog-detail-share-buttons">
 
-            <a
-                href="blog.html"
-                class="blog-detail-breadcrumb-link"
-            >
-                Tin tức MRO
-            </a>
-
-            <span class="blog-detail-breadcrumb-separator">
-                /
-            </span>
-
-            <span
-                id="breadcrumbTitle"
-                class="blog-detail-breadcrumb-current"
-            >
-                Đang tải...
-            </span>
-
-        </nav>
+                <button
+                    type="button"
+                    id="shareFacebook"
+                    class="blog-detail-share-button facebook"
+                >
+                    <svg
+                        class="blog-detail-share-icon"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path>
+                    </svg>
+                </button>
 
 
-        <!-- LOADING -->
-        <div
-            id="loadingState"
-            class="blog-detail-loading"
-        >
+                <button
+                    type="button"
+                    id="shareLinkedIn"
+                    class="blog-detail-share-button linkedin"
+                >
+                    <svg
+                        class="blog-detail-share-icon"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"></path>
+                        <circle cx="4" cy="4" r="2"></circle>
+                    </svg>
+                </button>
 
-            <div class="blog-detail-loading-image"></div>
 
-            <div class="blog-detail-loading-title"></div>
-
-            <div class="blog-detail-loading-subtitle"></div>
-
-            <div class="blog-detail-loading-lines">
-
-                <div></div>
-                <div></div>
-                <div class="short"></div>
+                <button
+                    type="button"
+                    id="copyArticleLink"
+                    class="blog-detail-share-button copy"
+                >
+                    <svg
+                        class="blog-detail-share-icon"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 104.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                        ></path>
+                    </svg>
+                </button>
 
             </div>
 
         </div>
 
 
-        <!-- ERROR -->
-        <div
-            id="errorState"
-            class="blog-detail-error is-hidden"
-        >
-
-            <h1 class="blog-detail-error-code">
-                404
-            </h1>
-
-            <p class="blog-detail-error-text">
-                Bài viết không tồn tại hoặc đã bị gỡ bỏ.
-            </p>
-
-            <a
-                href="blog.html"
-                class="blog-detail-error-button"
-            >
-                Quay lại Blog
-            </a>
-
-        </div>
-
-
-        <!-- BLOG ARTICLE -->
-        <article
-            id="blogArticle"
-            class="blog-detail-article is-hidden"
-        >
-
-            <!-- THUMBNAIL -->
-            <div class="blog-detail-thumb-wrapper">
-
-                <img
-                    id="blogThumb"
-                    src=""
-                    alt=""
-                    class="blog-detail-thumb"
-                >
-
-            </div>
-
-
-            <!-- ARTICLE HEADER -->
-            <header class="blog-detail-header">
-
-                <!-- CATEGORY -->
-                <a
-                    id="blogCategoryBadge"
-                    href="blog.html"
-                    class="blog-detail-category"
-                >
-                    Tin Tức MRO
-                </a>
-
-
-                <!-- TITLE -->
-                <h1
-                    id="blogTitle"
-                    class="blog-detail-title"
-                ></h1>
-
-
-                <!-- META -->
-                <div class="blog-detail-meta">
-
-                    <!-- DATE -->
-                    <span class="blog-detail-meta-item">
-
-                        <svg
-                            class="blog-detail-meta-icon"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                            ></path>
-                        </svg>
-
-                        <span id="blogDate"></span>
-
-                    </span>
-
-
-                    <!-- READ TIME -->
-                    <span class="blog-detail-meta-item">
-
-                        <svg
-                            class="blog-detail-meta-icon"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                            ></path>
-                        </svg>
-
-                        <span id="readTime"></span>
-
-                    </span>
-
-
-                    <!-- VIEWS -->
-                    <span class="blog-detail-meta-item">
-
-                        <svg
-                            class="blog-detail-meta-icon"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                            ></path>
-
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                            ></path>
-                        </svg>
-
-                        <span id="viewCount"></span>
-                        lượt xem
-
-                    </span>
-
-                </div>
-
-            </header>
-
-
-            <!-- ARTICLE BODY -->
-            <div class="blog-detail-layout">
-
-                <!-- LEFT SIDEBAR -->
-                <aside class="blog-detail-sidebar">
-
-                    <div class="blog-detail-sidebar-sticky">
-
-                        <!-- TABLE OF CONTENTS -->
-                        <div class="blog-detail-toc-card">
-
-                            <h4 class="blog-detail-sidebar-title">
-                                Mục lục
-                            </h4>
-
-                            <div
-                                id="blogTOC"
-                                class="blog-detail-toc"
-                            ></div>
-
-                        </div>
-
-
-                        <!-- SHARE -->
-                        <div class="blog-detail-share">
-
-                            <h4 class="blog-detail-share-title">
-                                Chia sẻ bài viết
-                            </h4>
-
-
-                            <div class="blog-detail-share-buttons">
-
-                                <!-- Facebook -->
-                                <button
-                                    type="button"
-                                    id="shareFacebook"
-                                    class="blog-detail-share-button facebook"
-                                    aria-label="Chia sẻ Facebook"
-                                >
-                                    <svg
-                                        class="blog-detail-share-icon"
-                                        fill="currentColor"
-                                        viewBox="0 0 24 24"
-                                        aria-hidden="true"
-                                    >
-                                        <path
-                                            d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"
-                                        ></path>
-                                    </svg>
-                                </button>
-
-
-                                <!-- LinkedIn -->
-                                <button
-                                    type="button"
-                                    id="shareLinkedIn"
-                                    class="blog-detail-share-button linkedin"
-                                    aria-label="Chia sẻ LinkedIn"
-                                >
-                                    <svg
-                                        class="blog-detail-share-icon"
-                                        fill="currentColor"
-                                        viewBox="0 0 24 24"
-                                        aria-hidden="true"
-                                    >
-                                        <path
-                                            d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"
-                                        ></path>
-
-                                        <circle
-                                            cx="4"
-                                            cy="4"
-                                            r="2"
-                                        ></circle>
-                                    </svg>
-                                </button>
-
-
-                                <!-- Copy -->
-                                <button
-                                    type="button"
-                                    id="copyArticleLink"
-                                    class="blog-detail-share-button copy"
-                                    aria-label="Sao chép liên kết"
-                                >
-                                    <svg
-                                        class="blog-detail-share-icon"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                        aria-hidden="true"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                                        ></path>
-                                    </svg>
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </aside>
-
-
-                <!-- ARTICLE CONTENT -->
-                <div class="blog-detail-content-column">
-
-                    <!-- CONTENT -->
-                    <div
-                        id="blogContent"
-                        class="blog-detail-content"
-                    ></div>
-
-
-                    <!-- UPDATE DATE -->
-                    <div class="blog-detail-update">
-
-                        <span>
-                            Cập nhật lần cuối:
-                        </span>
-
-                        <span id="updateDate"></span>
-
-                    </div>
-
-
-                    <!-- PREV / NEXT -->
-                    <nav class="blog-detail-navigation">
-
-                        <a
-                            id="prevPost"
-                            href="#"
-                            class="blog-detail-nav-item blog-detail-nav-prev is-hidden"
-                        >
-
-                            <span class="blog-detail-nav-label">
-                                ← Bài trước
-                            </span>
-
-                            <span
-                                id="prevTitle"
-                                class="blog-detail-nav-title"
-                            ></span>
-
-                        </a>
-
-
-                        <a
-                            id="nextPost"
-                            href="#"
-                            class="blog-detail-nav-item blog-detail-nav-next is-hidden"
-                        >
-
-                            <span class="blog-detail-nav-label">
-                                Bài tiếp theo →
-                            </span>
-
-                            <span
-                                id="nextTitle"
-                                class="blog-detail-nav-title"
-                            ></span>
-
-                        </a>
-
-                    </nav>
-
-                </div>
-
-            </div>
-
-        </article>
-
-
-        <!-- RELATED -->
+        <!-- BÀI VIẾT LIÊN QUAN -->
         <section
             id="relatedSection"
             class="blog-detail-related is-hidden"
         >
 
-            <h3 class="blog-detail-related-title">
-                Bài Viết Liên Quan
-            </h3>
+            <h4
+                class="blog-detail-sidebar-title"
+                style="margin-top:32px;"
+            >
+                BÀI VIẾT KHÁC
+            </h4>
 
             <div
                 id="relatedGrid"
@@ -511,30 +315,37 @@
 
         </section>
 
-    </main>
+    </div>
+
+</aside>
+
+</article>
+<!-- END .blog-detail-layout -->
+
+</main>
 
 
-    <!-- FOOTER -->
-    <div id="app-footer"></div>
+<!-- FOOTER -->
+<div id="app-footer"></div>
 
 
     <!-- SUPABASE -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- COMMON -->
-    <script src="../assets/js/common/supabase.js"></script>
-    <script src="../assets/js/common/utils.js"></script>
-    <script src="../assets/js/common/auth.js"></script>
+<!-- COMMON -->
+<script src="../assets/js/common/supabase.js"></script>
+<script src="../assets/js/common/utils.js"></script>
+<script src="../assets/js/common/auth.js"></script>
 
-    <!-- COMPONENTS -->
-    <script src="../assets/components/header.js"></script>
-    <script src="../assets/components/footer.js"></script>
+<!-- COMPONENTS -->
+<script src="../assets/components/header.js"></script>
+<script src="../assets/components/footer.js"></script>
 
-    <!-- AUTH -->
-    <script src="../assets/js/users/auth-ui.js"></script>
+<!-- AUTH -->
+<script src="../assets/js/users/auth-ui.js"></script>
 
-    <!-- PAGE -->
-    <script src="../assets/js/users/blog-detail.js"></script>
+<!-- PAGE -->
+<script src="../assets/js/users/blog-detail.js"></script>
 
 </body>
 </html>

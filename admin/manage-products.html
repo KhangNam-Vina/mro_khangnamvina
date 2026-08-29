@@ -1107,94 +1107,183 @@
 
                                 <!-- BRAND + ORIGIN -->
 
-                                <div
-                                    class="
-                                        grid
-                                        grid-cols-1
-                                        lg:grid-cols-2
-                                        gap-5
-                                    "
-                                >
+<div
+    class="
+        grid
+        grid-cols-1
+        lg:grid-cols-2
+        gap-5
+    "
+>
 
-                                    <div>
+    <!-- THƯƠNG HIỆU -->
+    <div>
 
-                                        <label
-                                            for="brand_input"
-                                            class="
-                                                block
-                                                text-xs
-                                                font-bold
-                                                text-gray-700
-                                                mb-1.5
-                                            "
-                                        >
-                                            Thương hiệu
-                                        </label>
+        <label
+            for="brand_input"
+            class="
+                block
+                text-xs
+                font-bold
+                text-gray-700
+                mb-1.5
+            "
+        >
+            Thương hiệu
+        </label>
 
-                                        <input
-                                            type="text"
-                                            id="brand_input"
-                                            list="brandList"
-                                            class="
-                                                w-full
-                                                border
-                                                border-gray-300
-                                                rounded-lg
-                                                px-3
-                                                py-2.5
-                                                text-sm
-                                                outline-none
-                                                focus:border-kn-blue
-                                            "
-                                            placeholder="Gõ để tìm hoặc thêm mới..."
-                                        >
+        <div
+            id="brandSelect"
+            class="relative"
+        >
 
-                                        <datalist
-                                            id="brandList"
-                                        ></datalist>
+            <input
+                type="text"
+                id="brand_input"
+                class="
+                    w-full
+                    border
+                    border-gray-300
+                    rounded-lg
+                    px-3
+                    py-2.5
+                    pr-10
+                    text-sm
+                    outline-none
+                    focus:border-kn-blue
+                "
+                placeholder="-- Chọn thương hiệu --"
+                autocomplete="off"
+            >
 
-                                    </div>
+            <span
+                id="brandArrow"
+                class="
+                    absolute
+                    right-3
+                    top-1/2
+                    -translate-y-1/2
+                    text-gray-700
+                    text-xs
+                    pointer-events-none
+                "
+            >
+                ▼
+            </span>
+
+            <div
+                id="brandDropdown"
+                class="
+                    hidden
+                    absolute
+                    left-0
+                    right-0
+                    top-full
+                    z-50
+                    bg-white
+                    border
+                    border-gray-400
+                    shadow-sm
+                    max-h-64
+                    overflow-y-auto
+                "
+            >
+                <div
+                    id="brandOptions"
+                ></div>
+            </div>
+
+        </div>
+
+    </div>
 
 
-                                    <div>
+    <!-- XUẤT XỨ -->
+    <div>
 
-                                        <label
-                                            for="origin"
-                                            class="
-                                                block
-                                                text-xs
-                                                font-bold
-                                                text-gray-700
-                                                mb-1.5
-                                            "
-                                        >
-                                            Xuất xứ
-                                        </label>
+        <label
+            for="origin"
+            class="
+                block
+                text-xs
+                font-bold
+                text-gray-700
+                mb-1.5
+            "
+        >
+            Xuất xứ
+        </label>
 
-                                        <input
-                                            type="text"
-                                            id="origin"
-                                            class="
-                                                w-full
-                                                border
-                                                border-gray-300
-                                                rounded-lg
-                                                px-3
-                                                py-2.5
-                                                text-sm
-                                                outline-none
-                                                focus:border-kn-blue
-                                            "
-                                            placeholder="Japan, Germany, Vietnam..."
-                                        >
+        <div
+            id="originSelect"
+            class="relative"
+        >
 
-                                    </div>
+            <input
+                type="text"
+                id="origin"
+                class="
+                    w-full
+                    border
+                    border-gray-300
+                    rounded-lg
+                    px-3
+                    py-2.5
+                    pr-10
+                    text-sm
+                    outline-none
+                    focus:border-kn-blue
+                "
+                placeholder="-- Chọn xuất xứ --"
+                autocomplete="off"
+    autocorrect="off"
+    autocapitalize="off"
+    spellcheck="false"
+    readonly
+            >
 
-                                </div>
+            <span
+                id="originArrow"
+                class="
+                    absolute
+                    right-3
+                    top-1/2
+                    -translate-y-1/2
+                    text-gray-700
+                    text-xs
+                    pointer-events-none
+                "
+            >
+                ▼
+            </span>
 
-                            </div>
+            <div
+                id="originDropdown"
+                class="
+                    hidden
+                    absolute
+                    left-0
+                    right-0
+                    top-full
+                    z-50
+                    bg-white
+                    border
+                    border-gray-400
+                    shadow-sm
+                    max-h-64
+                    overflow-y-auto
+                "
+            >
+                <div
+                    id="originOptions"
+                ></div>
+            </div>
 
-                        </div>
+        </div>
+
+    </div>
+
+</div>
 
 
                         <!-- =================================================
@@ -2094,14 +2183,17 @@
 
                         <!-- ACTIONS -->
 
-                        <div
-                            class="
-                                flex
-                                justify-end
-                                gap-3
-                                pb-5
-                            "
-                        >
+                        <div class="
+    flex
+    flex-col-reverse
+    sm:flex-row
+    justify-end
+    gap-3
+    pt-2
+    pb-5
+    border-t
+    border-gray-200
+">
 
                             <button
                                 type="button"

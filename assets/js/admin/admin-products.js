@@ -2594,6 +2594,15 @@ async function uploadPendingGallery(
 
 }
 
+/* =========================================================
+   REFRESH BRAND (ĐÃ FIX: KẾT NỐI VỚI CUSTOM DROPDOWN MỚI)
+========================================================= */
+function refreshBrandDatalist() {
+    const brandInput = document.getElementById("brand_input");
+    if (brandInput) {
+        renderBrandOptions(brandInput.value);
+    }
+}
 
 /* =========================================================
    LOAD DROPDOWNS
@@ -2877,40 +2886,497 @@ function populateSelect(
 
 
 /* =========================================================
-   BRAND
+   BRAND + ORIGIN SEARCH DROPDOWN
 ========================================================= */
 
-function refreshBrandDatalist() {
+const ORIGIN_OPTIONS = [
 
-    const brandList =
+    "Việt Nam",
+    "Nhật Bản",
+    "Đức",
+    "Mỹ",
+    "Trung Quốc",
+    "Hàn Quốc",
+    "Đài Loan",
+    "Thái Lan",
+    "Malaysia",
+    "Singapore",
+    "Indonesia",
+    "Ấn Độ",
+    "Pháp",
+    "Ý",
+    "Anh",
+    "Tây Ban Nha"
+
+];
+
+
+/* =========================================================
+   ESCAPE
+========================================================= */
+
+function escapeDropdownHTML(
+    value
+) {
+
+    return String(
+        value ?? ""
+    ).replace(
+        /[&<>"']/g,
+        character => ({
+
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+
+        })[character]
+    );
+
+}
+
+
+/* =========================================================
+   RENDER BRAND
+========================================================= */
+
+function renderBrandOptions(
+    keyword = ""
+) {
+
+    const container =
         document.getElementById(
-            "brandList"
+            "brandOptions"
         );
 
-
-    if (
-        !brandList
-    ) {
-
+    if (!container) {
         return;
-
     }
 
 
-    brandList.innerHTML =
-        state.brands
+    const search =
+        keyword
+            .trim()
+            .toLowerCase();
+
+
+    const brands =
+        state.brands.filter(
+            brand =>
+                String(
+                    brand.name
+                )
+                    .toLowerCase()
+                    .includes(search)
+        );
+
+
+    if (!brands.length) {
+
+        container.innerHTML = `
+            <div
+                class="px-3 py-2.5 text-sm text-gray-400"
+            >
+                Không tìm thấy thương hiệu
+            </div>
+        `;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        brands
             .map(
                 brand => `
 
-                    <option
-                        value="${escapeAttribute(
+                    <button
+                        type="button"
+                        class="
+                            block
+                            w-full
+                            px-3
+                            py-2
+                            text-left
+                            text-sm
+                            text-gray-800
+                            hover:bg-gray-100
+                        "
+                        data-brand-id="${escapeDropdownHTML(
+                            brand.id
+                        )}"
+                        data-brand-name="${escapeDropdownHTML(
                             brand.name
                         )}"
-                    ></option>
+                    >
+                        ${escapeDropdownHTML(
+                            brand.name
+                        )}
+                    </button>
 
                 `
             )
             .join("");
+
+
+    container
+        .querySelectorAll(
+            "[data-brand-id]"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        const input =
+                            document.getElementById(
+                                "brand_input"
+                            );
+
+
+                        if (input) {
+
+                            input.value =
+                                button.dataset.brandName;
+
+                        }
+
+
+                        closeBrandDropdown();
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   RENDER ORIGIN
+========================================================= */
+
+function renderOriginOptions(
+    keyword = ""
+) {
+
+    const container =
+        document.getElementById(
+            "originOptions"
+        );
+
+    if (!container) {
+        return;
+    }
+
+
+    const search =
+        keyword
+            .trim()
+            .toLowerCase();
+
+
+    const origins =
+        ORIGIN_OPTIONS.filter(
+            origin =>
+                origin
+                    .toLowerCase()
+                    .includes(search)
+        );
+
+
+    if (!origins.length) {
+
+        container.innerHTML = `
+            <div
+                class="px-3 py-2.5 text-sm text-gray-400"
+            >
+                Không tìm thấy xuất xứ
+            </div>
+        `;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        origins
+            .map(
+                origin => `
+
+                    <button
+                        type="button"
+                        class="
+                            block
+                            w-full
+                            px-3
+                            py-2
+                            text-left
+                            text-sm
+                            text-gray-800
+                            hover:bg-gray-100
+                        "
+                        data-origin="${escapeDropdownHTML(
+                            origin
+                        )}"
+                    >
+                        ${escapeDropdownHTML(
+                            origin
+                        )}
+                    </button>
+
+                `
+            )
+            .join("");
+
+
+    container
+        .querySelectorAll(
+            "[data-origin]"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        const input =
+                            document.getElementById(
+                                "origin"
+                            );
+
+
+                        if (input) {
+
+                            input.value =
+                                button.dataset.origin;
+
+                        }
+
+
+                        closeOriginDropdown();
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   BRAND OPEN / CLOSE
+========================================================= */
+
+function openBrandDropdown() {
+
+    const dropdown =
+        document.getElementById(
+            "brandDropdown"
+        );
+
+    if (!dropdown) {
+        return;
+    }
+
+
+    dropdown.classList.remove(
+        "hidden"
+    );
+
+
+    renderBrandOptions(
+        document.getElementById(
+            "brand_input"
+        )?.value || ""
+    );
+
+}
+
+
+function closeBrandDropdown() {
+
+    document
+        .getElementById(
+            "brandDropdown"
+        )
+        ?.classList.add(
+            "hidden"
+        );
+
+}
+
+
+/* =========================================================
+   ORIGIN OPEN / CLOSE
+========================================================= */
+
+function openOriginDropdown() {
+
+    const dropdown =
+        document.getElementById(
+            "originDropdown"
+        );
+
+    if (!dropdown) {
+        return;
+    }
+
+
+    dropdown.classList.remove(
+        "hidden"
+    );
+
+
+    renderOriginOptions(
+        document.getElementById(
+            "origin"
+        )?.value || ""
+    );
+
+}
+
+
+function closeOriginDropdown() {
+
+    document
+        .getElementById(
+            "originDropdown"
+        )
+        ?.classList.add(
+            "hidden"
+        );
+
+}
+
+
+/* =========================================================
+   INIT SEARCH DROPDOWNS
+========================================================= */
+
+function initBrandOriginDropdowns() {
+
+    const brandInput =
+        document.getElementById(
+            "brand_input"
+        );
+
+
+    const originInput =
+        document.getElementById(
+            "origin"
+        );
+
+
+    if (brandInput) {
+
+        brandInput.addEventListener(
+            "focus",
+            () => {
+
+                openBrandDropdown();
+
+            }
+        );
+
+
+        brandInput.addEventListener(
+            "click",
+            () => {
+
+                openBrandDropdown();
+
+            }
+        );
+
+
+        brandInput.addEventListener(
+            "input",
+            () => {
+
+                openBrandDropdown();
+
+                renderBrandOptions(
+                    brandInput.value
+                );
+
+            }
+        );
+
+    }
+
+
+    if (originInput) {
+
+        originInput.addEventListener(
+            "focus",
+            () => {
+
+                openOriginDropdown();
+
+            }
+        );
+
+
+        originInput.addEventListener(
+            "click",
+            () => {
+
+                openOriginDropdown();
+
+            }
+        );
+
+
+        originInput.addEventListener(
+            "input",
+            () => {
+
+                openOriginDropdown();
+
+                renderOriginOptions(
+                    originInput.value
+                );
+
+            }
+        );
+
+    }
+
+
+    document.addEventListener(
+        "click",
+        event => {
+
+            if (
+                !event.target.closest(
+                    "#brandSelect"
+                )
+            ) {
+
+                closeBrandDropdown();
+
+            }
+
+
+            if (
+                !event.target.closest(
+                    "#originSelect"
+                )
+            ) {
+
+                closeOriginDropdown();
+
+            }
+
+        }
+    );
 
 }
 
@@ -6725,6 +7191,8 @@ document.addEventListener(
 
         initCKEditor();
 
+        initBrandOriginDropdowns();
+
         bindEvents();
 
         bindMediaPreviewEvents();
@@ -6732,6 +7200,8 @@ document.addEventListener(
         await loadAllDropdowns();
 
         await fetchProducts();
+
+        await loadAllDropdowns();
 
     }
 );

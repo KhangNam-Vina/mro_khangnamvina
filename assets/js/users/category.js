@@ -1,9 +1,11 @@
+
 // ========================================================
 // FILE: assets/js/users/category.js
 // QUẢN LÝ DANH MỤC GỐC
 // Luồng:
 // Category -> Subcategory -> Family -> Products
 // ========================================================
+
 
 async function loadCategories() {
 
@@ -16,8 +18,11 @@ async function loadCategories() {
     const emptyState =
         document.getElementById('emptyState');
 
-    const counter =
+    const categoryCounter =
         document.getElementById('totalCategoriesCount');
+
+    const productCounter =
+        document.getElementById('totalProductsCount');
 
 
     // Không có grid thì dừng
@@ -33,8 +38,8 @@ async function loadCategories() {
         // ==================================================
 
         const {
-            data,
-            error
+            data: categories,
+            error: categoryError
         } = await window.supabaseClient
             .from('categories')
             .select('id, name')
@@ -43,21 +48,98 @@ async function loadCategories() {
             });
 
 
-        if (error) {
-            throw error;
+        if (categoryError) {
+            throw categoryError;
         }
 
 
         // ==================================================
-        // CẬP NHẬT TỔNG SỐ DANH MỤC
+        // LẤY PRODUCT CATEGORY ID
+        //
+        // Chỉ lấy category_id để:
+        // - tính tổng sản phẩm
+        // - đếm sản phẩm theo từng Category
         // ==================================================
 
-        if (counter) {
+        const {
+            data: products,
+            error: productError
+        } = await window.supabaseClient
+            .from('products')
+            .select('category_id');
 
-            counter.textContent =
-                Array.isArray(data)
-                    ? data.length
+
+        if (productError) {
+            throw productError;
+        }
+
+
+        // ==================================================
+        // TÍNH SỐ PRODUCT THEO CATEGORY
+        // ==================================================
+
+        const productCountByCategory =
+            new Map();
+
+        let totalProducts = 0;
+
+
+        if (Array.isArray(products)) {
+
+            totalProducts =
+                products.length;
+
+
+            products.forEach(
+                (product) => {
+
+                    const categoryId =
+                        product?.category_id;
+
+
+                    if (
+                        categoryId === null ||
+                        categoryId === undefined
+                    ) {
+                        return;
+                    }
+
+
+                    const currentCount =
+                        productCountByCategory.get(
+                            categoryId
+                        ) || 0;
+
+
+                    productCountByCategory.set(
+                        categoryId,
+                        currentCount + 1
+                    );
+
+                }
+            );
+
+        }
+
+
+        // ==================================================
+        // CẬP NHẬT TỔNG SỐ
+        // ==================================================
+
+        if (categoryCounter) {
+
+            categoryCounter.textContent =
+                Array.isArray(categories)
+                    ? categories.length
                     : 0;
+
+        }
+
+
+        if (productCounter) {
+
+            productCounter.textContent =
+                totalProducts;
 
         }
 
@@ -72,12 +154,12 @@ async function loadCategories() {
 
 
         // ==================================================
-        // KHÔNG CÓ DỮ LIỆU
+        // KHÔNG CÓ CATEGORY
         // ==================================================
 
         if (
-            !Array.isArray(data) ||
-            data.length === 0
+            !Array.isArray(categories) ||
+            categories.length === 0
         ) {
 
             grid.classList.add(
@@ -93,7 +175,7 @@ async function loadCategories() {
 
 
         // ==================================================
-        // CÓ DỮ LIỆU
+        // CÓ CATEGORY
         // ==================================================
 
         emptyState?.classList.add(
@@ -170,7 +252,7 @@ async function loadCategories() {
         let html = '';
 
 
-        data.forEach(
+        categories.forEach(
             (category, index) => {
 
                 const categoryName =
@@ -216,6 +298,22 @@ async function loadCategories() {
 
 
                 // ------------------------------------------
+                // SỐ PRODUCT CỦA CATEGORY
+                // ------------------------------------------
+
+                const categoryProductCount =
+                    productCountByCategory.get(
+                        category.id
+                    ) || 0;
+
+
+                const productCountText =
+                    categoryProductCount > 0
+                        ? `${categoryProductCount} sản phẩm`
+                        : 'Chưa có sản phẩm';
+
+
+                // ------------------------------------------
                 // CARD
                 // ------------------------------------------
 
@@ -244,6 +342,19 @@ async function loadCategories() {
 
 
                         <span
+                            class="catalog-category-count ${
+                                categoryProductCount === 0
+                                    ? 'is-empty'
+                                    : ''
+                            }"
+                        >
+                            ${escapeCategoryHTML(
+                                productCountText
+                            )}
+                        </span>
+
+
+                        <span
                             class="catalog-category-link"
                         >
                             Xem danh mục
@@ -262,7 +373,8 @@ async function loadCategories() {
         // ĐƯA HTML RA GRID
         // ==================================================
 
-        grid.innerHTML = html;
+        grid.innerHTML =
+            html;
 
 
     } catch (error) {
@@ -406,7 +518,7 @@ document.addEventListener(
     'DOMContentLoaded',
     async () => {
 
-        // 1. Load danh mục
+        // 1. Load danh mục + số sản phẩm
         await loadCategories();
 
 
