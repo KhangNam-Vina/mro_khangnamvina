@@ -178,9 +178,14 @@ function normalizeProductSizes(product) {
 
 function renderProductSizes(product) {
     const sizes = normalizeProductSizes(product);
-    if (sizes.length === 0) return `<span class="text-xs text-gray-400 italic">—</span>`;
-    return `<div class="flex flex-wrap items-center gap-1 max-w-[180px]">
-        ${sizes.map(s => `<span class="inline-flex items-center px-2 py-1 rounded-md bg-blue-50 border border-blue-100 text-kn-blue text-[10px] font-black leading-none">${escapeHTML(s)}</span>`).join("")}
+    if (sizes.length === 0) return `<span class="text-sm text-gray-400 italic">—</span>`;
+    
+    return `<div class="flex flex-wrap items-center gap-1.5">
+        ${sizes.map(s => `
+            <span class="inline-flex items-center px-2.5 py-1.5 rounded-md bg-blue-50 border border-blue-200 text-kn-blue text-xs font-bold whitespace-nowrap shadow-sm">
+                ${escapeHTML(s)}
+            </span>
+        `).join("")}
     </div>`;
 }
 
@@ -1504,7 +1509,7 @@ const missingInformation =
 }
 
 /* =========================================================
-   RENDER PRODUCTS
+   RENDER PRODUCTS (ĐÃ FIX LỆCH CỘT GIÁ)
 ========================================================= */
 function renderProducts() {
     if (!DOM.tableBody) return;
@@ -1529,14 +1534,22 @@ function renderProducts() {
                 <td class="px-4 py-3 font-mono font-bold text-kn-blue text-xs whitespace-nowrap">${escapeHTML(item.sku)}</td>
                 <td class="px-4 py-3 font-bold text-gray-800 text-sm line-clamp-2" title="${escapeHTML(item.name)}">${escapeHTML(item.name)}</td>
                 <td class="px-4 py-3 text-gray-600 text-xs font-bold">${escapeHTML(brandName)}</td>
+                
+                <!-- Cột Size -->
                 <td class="px-4 py-3">${renderProductSizes(item)}</td>
-                <td class="px-4 py-3 text-gray-800 font-bold text-sm whitespace-nowrap">${formatCurrency(item.price)}</td>
+                
+                <!-- FIX CỘT GIÁ: Thêm class text-right vào đây -->
+                <td class="px-4 py-3 text-gray-800 font-bold text-sm whitespace-nowrap text-right">${formatCurrency(item.price)}</td>
+                
+                <!-- Cột Tồn kho -->
                 <td class="px-4 py-3 text-center">
                     <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold ${Number(item.stock_quantity) > 0 ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'}">
                         ${Number(item.stock_quantity) > 0 ? Number(item.stock_quantity) : "Hết hàng"}
                     </span>
                 </td>
-                <td class="px-4 py-3 text-center whitespace-nowrap">
+                
+                <!-- Cột Thao tác -->
+                <td class="px-4 py-3 text-right whitespace-nowrap">
                     <button type="button" data-action="edit" data-id="${escapeAttribute(item.id)}" class="p-1.5 text-blue-600 hover:bg-blue-100 rounded-lg transition font-bold text-xs uppercase">Sửa</button>
                     <button type="button" data-action="delete" data-id="${escapeAttribute(item.id)}" class="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition font-bold text-xs uppercase">Xóa</button>
                 </td>

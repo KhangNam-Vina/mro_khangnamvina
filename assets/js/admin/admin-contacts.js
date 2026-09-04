@@ -189,7 +189,7 @@ window.markAsProcessed = async function(id) {
         utils.showToast("Lỗi cập nhật: " + error.message, "error");
         if (btn) {
             btn.disabled = false;
-            btn.innerHTML = '✔ Xong';
+            btn.innerHTML = 'Xong';
             btn.classList.remove('opacity-50', 'cursor-not-allowed');
         }
     }
@@ -233,11 +233,11 @@ function renderContacts() {
         const safeMessage = utils.escapeHTML(item.message);
         const dateStr = utils.formatDate(item.created_at);
         
-        // Logic kiểm tra trạng thái
+        // Logic kiểm tra trạng thái - ĐÃ BỎ ICON
         const isProcessed = item.status === 'processed';
         const statusBadge = isProcessed 
-            ? `<span class="inline-block mt-2 px-2 py-0.5 bg-green-100 text-green-700 text-[10px] rounded border border-green-200 font-bold uppercase tracking-wider">✔ Đã xử lý</span>`
-            : `<span class="inline-block mt-2 px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] rounded border border-orange-200 font-bold uppercase tracking-wider">⏳ Chờ xử lý</span>`;
+            ? `<span class="inline-block mt-2 px-2 py-0.5 bg-green-100 text-green-700 text-[10px] rounded border border-green-200 font-bold uppercase tracking-wider">Đã xử lý</span>`
+            : `<span class="inline-block mt-2 px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] rounded border border-orange-200 font-bold uppercase tracking-wider">Chờ xử lý</span>`;
 
         return `
             <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
@@ -250,19 +250,22 @@ function renderContacts() {
                 <td class="p-4 text-sm">
                     <div class="flex items-center space-x-2 group">
                         <a href="mailto:${safeEmail}" class="text-kn-blue hover:underline line-clamp-1">${safeEmail}</a>
-                        <button onclick="utils.copyText('${item.email}')" class="text-gray-300 hover:text-kn-orange opacity-0 group-hover:opacity-100 transition" title="Copy Email">📋</button>
+                        <!-- NÚT COPY THÀNH CHỮ -->
+                        <button onclick="utils.copyText('${item.email}')" class="text-gray-500 bg-gray-200 hover:bg-gray-300 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase opacity-0 group-hover:opacity-100 transition" title="Copy Email">Copy</button>
                     </div>
                     <div class="flex items-center space-x-2 mt-1 group">
                         <a href="tel:${safePhone}" class="text-gray-600 font-bold hover:text-kn-blue">${safePhone}</a>
-                        <button onclick="utils.copyText('${item.phone}')" class="text-gray-300 hover:text-kn-orange opacity-0 group-hover:opacity-100 transition" title="Copy SĐT">📋</button>
+                        <!-- NÚT COPY THÀNH CHỮ -->
+                        <button onclick="utils.copyText('${item.phone}')" class="text-gray-500 bg-gray-200 hover:bg-gray-300 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase opacity-0 group-hover:opacity-100 transition" title="Copy SĐT">Copy</button>
                     </div>
                 </td>
                 <td class="p-4 text-sm text-gray-600 break-words max-w-xs leading-relaxed">${safeMessage}</td>
                 <td class="p-4 text-xs text-gray-500 font-medium">${dateStr}</td>
                 <td class="p-4 text-right">
                     <div class="flex justify-end space-x-2">
-                        ${!isProcessed ? `<button id="btnProcess_${item.id}" onclick="markAsProcessed('${item.id}')" class="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded font-bold hover:bg-green-200 transition shadow-sm whitespace-nowrap">✔ Xong</button>` : ''}
-                        <button id="btnDelete_${item.id}" onclick="deleteContact('${item.id}')" class="text-xs bg-red-100 text-red-700 px-3 py-1.5 rounded font-bold hover:bg-red-200 transition shadow-sm whitespace-nowrap">🗑 Xóa</button>
+                        <!-- NÚT XONG VÀ XÓA ĐÃ BỎ ICON -->
+                        ${!isProcessed ? `<button id="btnProcess_${item.id}" onclick="markAsProcessed('${item.id}')" class="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded font-bold hover:bg-green-200 transition shadow-sm whitespace-nowrap">Xong</button>` : ''}
+                        <button id="btnDelete_${item.id}" onclick="deleteContact('${item.id}')" class="text-xs bg-red-100 text-red-700 px-3 py-1.5 rounded font-bold hover:bg-red-200 transition shadow-sm whitespace-nowrap">Xóa</button>
                     </div>
                 </td>
             </tr>
@@ -270,8 +273,13 @@ function renderContacts() {
     }).join('');
 }
 
-function renderEmpty() { DOM.tbody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-gray-500"><div class="text-4xl mb-3">📭</div><div class="font-bold">Không tìm thấy liên hệ nào!</div></td></tr>`; }
-function renderError(msg) { DOM.tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-red-500 font-bold">Lỗi: ${msg}</td></tr>`; }
+function renderEmpty() { 
+    // Bỏ icon hòm thư trống
+    DOM.tbody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-gray-500"><div class="font-bold">Không tìm thấy liên hệ nào!</div></td></tr>`; 
+}
+function renderError(msg) { 
+    DOM.tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-red-500 font-bold">Lỗi: ${msg}</td></tr>`; 
+}
 
 function renderPagination() {
     if (!DOM.pagination) return;
@@ -380,14 +388,14 @@ window.addProofRow = function(value = '') {
     const row = document.createElement('div');
     row.className = 'flex items-center space-x-3 proof-row';
     
-    // Nút kéo thả (chỉ để trang trí) + Ô Input + Nút Xóa
+    // Nút Xóa ở Tab 2 cũng được chuyển thành chữ
     row.innerHTML = `
         <span class="bg-green-100 text-green-700 p-1.5 rounded-full cursor-move">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         </span>
         <input type="text" value="${utils.escapeHTML(value)}" class="proof-input flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kn-blue outline-none text-sm" placeholder="VD: Hợp tác 1000+ nhà máy FDI...">
-        <button type="button" onclick="this.parentElement.remove(); checkEmptyProofs();" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition" title="Xóa dòng này">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+        <button type="button" onclick="this.parentElement.remove(); checkEmptyProofs();" class="text-red-500 text-xs font-bold hover:bg-red-50 px-3 py-2 rounded-lg transition" title="Xóa dòng này">
+            XÓA
         </button>
     `;
     container.appendChild(row);

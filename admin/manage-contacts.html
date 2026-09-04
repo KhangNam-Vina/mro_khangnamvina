@@ -1,154 +1,226 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý Liên hệ - KN Admin</title>
+
+    <!-- TAILWIND -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = { theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00' } } } }
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "kn-blue": "#00479b",
+                        "kn-orange": "#ff5e00"
+                    }
+                }
+            }
+        };
     </script>
-    <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #00479b; border-radius: 10px; }
+
+    <!-- CUSTOM CSS -->
+    <style type="text/tailwindcss">
+        .admin-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .admin-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .admin-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
+        .admin-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+        .admin-card { @apply bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden; }
+        .form-label { @apply block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2; }
+
+        .form-input { 
+            @apply w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white text-sm text-gray-800 outline-none shadow-sm transition; 
+        }
+        .form-input:focus { @apply border-kn-blue ring-2 ring-blue-100; }
+        .form-input::placeholder { @apply text-gray-400; }
+
+        /* ÉP TẤT CẢ CÁC Ô TRONG BẢNG DÀN NGANG, KHÔNG XUỐNG DÒNG */
+        #contactTableBody td {
+            @apply whitespace-nowrap;
+        }
     </style>
 </head>
-<body class="bg-gray-50 font-sans text-gray-800 flex h-screen overflow-hidden relative">
 
-    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none"></div>
+<body class="bg-gray-50 text-gray-800 font-sans flex h-screen overflow-hidden">
 
-    <aside
-    id="adminSidebar"
-    class="
-        w-64
-        bg-gray-900
-        text-white
-        flex
-        flex-col
-        hidden
-        md:flex
-        shrink-0
-    "
-></aside>
+    <!-- TOAST -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-2 pointer-events-none"></div>
 
-    <div class="flex-1 flex flex-col h-screen overflow-hidden">
-        <header class="bg-white shadow-sm px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center">
-            <div>
-                <h2 class="text-xl font-bold text-gray-900">Quản lý Phản hồi & Liên hệ</h2>
-                <p class="text-xs text-gray-500 mt-1">Tin nhắn tư vấn, yêu cầu hỗ trợ kỹ thuật từ khách hàng</p>
-            </div>
-            
-            <!-- NHÓM TÌM KIẾM/LỌC (Sẽ ẩn khi ở Tab Cài đặt) -->
-            <div id="headerFilters" class="flex space-x-3 w-full md:w-auto mt-3 md:mt-0 transition-opacity duration-300">
-                <select id="filterDateSelect" class="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue">
-                    <option value="all">Tất cả thời gian</option>
-                    <option value="today">Hôm nay</option>
-                    <option value="7days">7 ngày qua</option>
-                    <option value="30days">30 ngày qua</option>
-                </select>
-                <div class="flex items-center space-x-2 bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 focus-within:border-kn-blue transition flex-1 md:flex-none w-full md:w-64">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" id="searchContactInput" placeholder="Tìm người gửi, email..." class="bg-transparent border-none outline-none text-sm text-gray-700 w-full">
+    <!-- MOBILE BACKDROP -->
+    <div id="sidebarBackdrop" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden backdrop-blur-sm transition-opacity" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="adminSidebar" class="fixed md:static inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white flex flex-col shrink-0 -translate-x-full md:translate-x-0 transition-transform duration-300"></aside>
+
+    <!-- MAIN -->
+    <div class="flex-1 min-w-0 flex flex-col h-screen overflow-hidden">
+
+        <!-- HEADER (STICKY) -->
+        <header class="sticky top-0 z-30 bg-white border-b border-gray-200 shrink-0 shadow-sm">
+            <div class="px-4 sm:px-6 h-16 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+
+                <div class="flex items-center gap-3 min-w-0 mt-2 sm:mt-0">
+                    <button type="button" onclick="toggleSidebar()" class="md:hidden p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition shrink-0" aria-label="Mở menu">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    </button>
+                    <div class="min-w-0">
+                        <div class="hidden sm:flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
+                        </div>
+                        <h1 class="text-lg sm:text-xl font-black text-gray-900 truncate">Quản lý Phản hồi</h1>
+                    </div>
                 </div>
+
+                <!-- TÌM KIẾM/LỌC -->
+                <div id="headerFilters" class="flex items-center gap-3 w-full sm:w-auto transition-opacity duration-300 mb-2 sm:mb-0">
+                    <select id="filterDateSelect" class="form-input py-2 bg-gray-50 border-transparent hover:border-gray-300 cursor-pointer w-auto min-w-[140px]">
+                        <option value="all">Tất cả thời gian</option>
+                        <option value="today">Hôm nay</option>
+                        <option value="7days">7 ngày qua</option>
+                        <option value="30days">30 ngày qua</option>
+                    </select>
+                    <div class="relative w-full sm:w-64">
+                        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0Z"/></svg>
+                        <input type="text" id="searchContactInput" class="form-input pl-10 py-2 bg-gray-50 border-transparent hover:border-gray-300" placeholder="Tìm người gửi, email..." autocomplete="off">
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABS -->
+            <div class="px-4 sm:px-6 flex gap-6 mt-1">
+                <button id="tabInboxBtn" onclick="switchTab('inbox')" class="py-3 text-kn-blue border-b-2 border-kn-blue font-bold text-sm transition">Hộp Thư Đến</button>
+                <button id="tabConfigBtn" onclick="switchTab('config')" class="py-3 text-gray-500 border-b-2 border-transparent hover:text-kn-blue font-bold text-sm transition">Cài Đặt Hiển Thị</button>
             </div>
         </header>
 
-        <!-- THANH ĐIỀU HƯỚNG TABS -->
-        <div class="bg-white border-b border-gray-200 px-6 flex space-x-8 z-10 shadow-sm relative">
-            <button id="tabInboxBtn" onclick="switchTab('inbox')" class="py-3 text-kn-blue border-b-2 border-kn-blue font-bold text-sm transition">Hộp Thư Đến</button>
-            <button id="tabConfigBtn" onclick="switchTab('config')" class="py-3 text-gray-500 border-b-2 border-transparent hover:text-kn-blue font-bold text-sm transition">Cài Đặt Hiển Thị</button>
-        </div>
+        <!-- CONTENT -->
+        <main class="flex-1 overflow-y-auto admin-scrollbar bg-gray-50 p-4 sm:p-6 lg:p-8">
 
-        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6 custom-scrollbar">
-            
-            <!-- TAB 1: DANH SÁCH TIN NHẮN (Mặc định hiển thị) -->
-            <div id="tabInbox" class="block h-full flex flex-col">
-                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6 flex-1">
-                    <table class="w-full text-left text-sm text-gray-600">
-                        <thead class="bg-gray-50 text-gray-700 font-bold border-b border-gray-200 text-xs uppercase tracking-wider sticky top-0">
-                            <tr>
-                                <th class="p-4 text-center w-12">#</th>
-                                <th class="p-4 w-48">Khách hàng</th>
-                                <th class="p-4 w-52">Liên hệ</th>
-                                <th class="p-4">Nội dung tin nhắn</th>
-                                <th class="p-4 w-36">Ngày gửi</th>
-                                <th class="p-4 text-right w-32">Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody id="contactTableBody" class="divide-y divide-gray-100 bg-white">
-                            <tr><td colspan="6" class="text-center py-8 text-gray-400">Đang tải danh sách liên hệ...</td></tr>
-                        </tbody>
-                    </table>
+            <!-- ==================================================
+                 TAB 1: DANH SÁCH TIN NHẮN (INBOX)
+            =================================================== -->
+            <div id="tabInbox" class="block w-full max-w-[1600px] mx-auto h-full flex flex-col">
+                <div class="admin-card flex-1 flex flex-col">
+                    <div class="overflow-x-auto admin-scrollbar">
+                        <!-- ĐÃ FIX: Thay đổi min-w-[1000px] thành min-w-max để bảng tự giãn hết cỡ -->
+                        <table class="w-full min-w-max text-left">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wider text-center whitespace-nowrap">#</th>
+                                    <th class="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wider whitespace-nowrap">Khách hàng</th>
+                                    <th class="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wider whitespace-nowrap">Liên hệ</th>
+                                    <th class="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wider whitespace-nowrap">Nội dung tin nhắn</th>
+                                    <th class="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wider whitespace-nowrap">Ngày gửi</th>
+                                    <th class="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wider text-right whitespace-nowrap">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contactTableBody" class="divide-y divide-gray-100 text-sm">
+                                <tr><td colspan="6" class="text-center py-16 text-gray-400 font-medium">Đang tải danh sách liên hệ...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="paginationContainer" class="border-t border-gray-100 px-5 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 bg-white"></div>
                 </div>
-                <div id="paginationContainer" class="flex justify-between items-center text-sm py-2"></div>
             </div>
 
-            <!-- TAB 2: FORM CẤU HÌNH GIAO DIỆN TRANG LIÊN HỆ -->
-            <div id="tabConfig" class="hidden max-w-4xl mx-auto space-y-6 pb-10">
-                <div class="flex justify-between items-center mb-2">
-                    <h3 class="text-lg font-black text-gray-800">Cấu hình trang "Liên Hệ" (Khách hàng)</h3>
-                    <button id="btnSaveConfig" onclick="saveContactConfig()" class="px-6 py-2 bg-kn-blue text-white font-bold rounded-lg hover:bg-blue-800 transition shadow-sm text-sm">
-                        Lưu Thay Đổi
-                    </button>
-                </div>
+            <!-- ==================================================
+                 TAB 2: FORM CẤU HÌNH HIỂN THỊ
+            =================================================== -->
+            <div id="tabConfig" class="hidden w-full max-w-[1600px] mx-auto space-y-6 pb-10">
 
-                <!-- Section 1: Thông tin liên hệ nhanh -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                    <h4 class="text-md font-bold text-gray-900 mb-4 border-b pb-2">1. Thông tin liên hệ chung</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Hotline B2B</label>
-                            <input type="text" id="cfgHotline" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none text-sm" placeholder="VD: 0919 699 942">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Email Báo Giá</label>
-                            <input type="email" id="cfgEmail" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none text-sm" placeholder="VD: khangnam2022@gmail.com">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Địa chỉ kho / văn phòng</label>
-                            <input type="text" id="cfgAddress" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none text-sm" placeholder="VD: Khu CNC, TP.Thủ Đức">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Thời gian hỗ trợ</label>
-                            <input type="text" id="cfgSupportTime" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none text-sm" placeholder="VD: 8:00 - 17:00 (T2-T7)">
-                        </div>
+                <!-- INTRO CARD -->
+                <div class="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 shadow-sm flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-kn-blue flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/></svg>
+                    </div>
+                    <div class="min-w-0 mt-1">
+                        <h2 class="text-base sm:text-lg font-black text-gray-900">Cấu hình trang "Liên Hệ"</h2>
+                        <p class="text-sm text-gray-500 mt-1">Quản lý thông tin hiển thị tại trang liên hệ (Contact) dành cho khách hàng truy cập website.</p>
                     </div>
                 </div>
 
-                <!-- Section 2: Bản đồ Map -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                    <h4 class="text-md font-bold text-gray-900 mb-2 border-b pb-2">2. Bản đồ Google Maps</h4>
-                    <p class="text-xs text-gray-500 mb-4">Vào Google Maps > Chia sẻ > Nhúng bản đồ > Copy đoạn link bên trong thuộc tính <code class="bg-gray-100 text-red-500 px-1 rounded">src="..."</code></p>
-                    <div>
-                        <textarea id="cfgMapUrl" rows="3" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-kn-blue outline-none text-sm font-mono text-gray-600" placeholder="https://www.google.com/maps/embed?pb=..."></textarea>
+                <!-- 01: INFO -->
+                <section class="admin-card">
+                    <div class="px-5 sm:px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-blue-100 text-kn-blue flex items-center justify-center text-xs font-black shrink-0">1</span>
+                        <div>
+                            <h3 class="text-sm sm:text-base font-black text-kn-blue uppercase tracking-wide">Thông tin liên hệ chung</h3>
+                        </div>
                     </div>
-                </div>
+                    <div class="p-5 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="form-label">Hotline B2B</label>
+                            <input type="text" id="cfgHotline" class="form-input" placeholder="VD: 0919 699 942">
+                        </div>
+                        <div>
+                            <label class="form-label">Email Báo Giá</label>
+                            <input type="email" id="cfgEmail" class="form-input" placeholder="VD: khangnam2022@gmail.com">
+                        </div>
+                        <div>
+                            <label class="form-label">Địa chỉ kho / văn phòng</label>
+                            <input type="text" id="cfgAddress" class="form-input" placeholder="VD: Khu CNC, TP.Thủ Đức">
+                        </div>
+                        <div>
+                            <label class="form-label">Thời gian hỗ trợ</label>
+                            <input type="text" id="cfgSupportTime" class="form-input" placeholder="VD: 8:00 - 17:00 (T2-T7)">
+                        </div>
+                    </div>
+                </section>
 
-                <!-- Section 3: Uy tín (Social Proof) (ĐÃ ĐỔI THÀNH DYNAMIC LIST) -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                    <div class="flex justify-between items-center mb-4 border-b pb-2">
-                        <h4 class="text-md font-bold text-gray-900">3. Các điểm uy tín (Social Proof)</h4>
-                        <button type="button" onclick="addProofRow()" class="text-xs bg-kn-blue text-white px-3 py-1.5 rounded-lg font-bold hover:bg-blue-800 transition shadow-sm">
-                            + Thêm điểm uy tín
+                <!-- 02: MAPS -->
+                <section class="admin-card">
+                    <div class="px-5 sm:px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-orange-100 text-kn-orange flex items-center justify-center text-xs font-black shrink-0">2</span>
+                        <div>
+                            <h3 class="text-sm sm:text-base font-black text-kn-orange uppercase tracking-wide">Bản đồ Google Maps</h3>
+                        </div>
+                    </div>
+                    <div class="p-5 sm:p-6 space-y-4">
+                        <p class="text-xs text-gray-500 bg-orange-50 border border-orange-100 px-4 py-3 rounded-xl">
+                            <strong>Hướng dẫn:</strong> Vào Google Maps > Chia sẻ > Nhúng bản đồ > Copy đoạn link bên trong thuộc tính <code class="font-bold text-red-500">src="..."</code> dán vào đây.
+                        </p>
+                        <textarea id="cfgMapUrl" rows="3" class="form-input font-mono text-gray-600 resize-y" placeholder="https://www.google.com/maps/embed?pb=..."></textarea>
+                    </div>
+                </section>
+
+                <!-- 03: SOCIAL PROOF -->
+                <section class="admin-card">
+                    <div class="px-5 sm:px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center gap-4">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-xs font-black shrink-0">3</span>
+                            <div><h3 class="text-sm sm:text-base font-black text-green-700 uppercase tracking-wide">Các điểm uy tín</h3></div>
+                        </div>
+                        <button type="button" onclick="addProofRow()" class="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-green-200 text-green-700 text-xs font-bold hover:bg-green-50 transition shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Thêm điểm
                         </button>
                     </div>
-                    
-                    <!-- Container chứa danh sách động -->
-                    <div id="proofsContainer" class="space-y-3">
-                        <!-- JS sẽ tự động bơm các dòng input vào đây -->
+                    <div class="p-5 sm:p-6 bg-gray-50/50">
+                        <div id="proofsContainer" class="space-y-3">
+                            <!-- JS Render Dynamic Inputs -->
+                        </div>
+                        <div id="emptyProofMsg" class="hidden text-center py-8">
+                            <span class="text-4xl block mb-2">🏆</span>
+                            <p class="text-xs text-gray-500 font-bold uppercase tracking-wide">Chưa có điểm uy tín nào.</p>
+                        </div>
                     </div>
+                </section>
 
-                    <!-- Hiển thị khi danh sách trống -->
-                    <p id="emptyProofMsg" class="text-xs text-gray-400 italic mt-3 hidden">
-                        Chưa có điểm uy tín nào. Bấm "+ Thêm điểm uy tín" để tạo mới.
-                    </p>
+                <!-- BOTTOM SAVE -->
+                <div class="flex justify-end pt-4 pb-8">
+                    <button type="button" id="btnSaveConfig" onclick="saveContactConfig()" class="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-kn-blue text-white text-sm font-black shadow-md hover:bg-blue-800 active:scale-[0.98] transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Lưu toàn bộ thay đổi
+                    </button>
                 </div>
 
             </div>
         </main>
     </div>
 
+    <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../assets/js/common/supabase.js"></script>
     <script src="../assets/js/common/utils.js"></script>

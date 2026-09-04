@@ -2,914 +2,192 @@
 <html lang="vi">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý Thương hiệu - KN Admin</title>
 
-    <!-- ==================================================
-         TAILWIND
-    =================================================== -->
-
+    <!-- TAILWIND -->
     <script src="https://cdn.tailwindcss.com"></script>
-
     <script>
-
         tailwind.config = {
-
             theme: {
-
                 extend: {
-
                     colors: {
-
                         "kn-blue": "#00479b",
-
                         "kn-orange": "#ff5e00"
-
                     }
-
                 }
-
             }
-
         };
-
     </script>
 
-
-    <!-- ==================================================
-         CUSTOM CSS
-    =================================================== -->
-
-    <style type="text/tailwindcss">
-
-        .admin-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        .admin-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .admin-scrollbar::-webkit-scrollbar-thumb {
-            background: #d1d5db;
-            border-radius: 999px;
-        }
-
-        .admin-card {
-            @apply bg-white border border-gray-200 rounded-2xl shadow-sm;
-        }
-
-        .form-label {
-            @apply block text-sm font-bold text-gray-700 mb-1.5;
-        }
-
-        .form-input {
-            @apply w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-800 outline-none transition;
-        }
-
-        .form-input:focus {
-            @apply border-kn-blue ring-2 ring-blue-100;
-        }
-
+    <!-- CUSTOM SCROLLBAR -->
+    <style>
+        .admin-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .admin-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .admin-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
+        .admin-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
     </style>
-
 </head>
 
+<body class="bg-gray-50 text-gray-800 font-sans flex h-screen overflow-hidden">
 
-<body
-    class="
-        bg-gray-50
-        text-gray-800
-        font-sans
-        flex
-        h-screen
-        overflow-hidden
-    "
->
+    <!-- TOAST NOTIFICATION -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-2 pointer-events-none"></div>
 
+    <!-- SIDEBAR BACKDROP (MOBILE) -->
+    <div id="sidebarBackdrop" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden backdrop-blur-sm transition-opacity" onclick="toggleSidebar()"></div>
 
-    <!-- ==================================================
-         TOAST
-    =================================================== -->
+    <!-- SIDEBAR -->
+    <aside id="adminSidebar" class="fixed md:static inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white flex flex-col shrink-0 -translate-x-full md:translate-x-0 transition-transform duration-300"></aside>
 
-    <div
-        id="toastContainer"
-        class="
-            fixed
-            bottom-6
-            right-6
-            z-[100]
-            flex
-            flex-col
-            items-end
-            gap-2
-            pointer-events-none
-        "
-    ></div>
+    <!-- MAIN AREA -->
+    <div class="flex-1 min-w-0 flex flex-col h-screen overflow-hidden">
 
-
-    <!-- ==================================================
-         SIDEBAR BACKDROP
-    =================================================== -->
-
-    <div
-        id="sidebarBackdrop"
-        class="
-            fixed
-            inset-0
-            bg-black/50
-            z-40
-            hidden
-            md:hidden
-        "
-        onclick="toggleSidebar()"
-    ></div>
-
-
-    <!-- ==================================================
-         SIDEBAR
-    =================================================== -->
-
-    <aside
-        id="adminSidebar"
-        class="
-            fixed
-            md:static
-            inset-y-0
-            left-0
-            z-50
-            w-64
-            bg-gray-900
-            text-white
-            flex
-            flex-col
-            shrink-0
-            -translate-x-full
-            md:translate-x-0
-            transition-transform
-            duration-300
-        "
-    ></aside>
-
-
-    <!-- ==================================================
-         MAIN AREA
-    =================================================== -->
-
-    <div
-        class="
-            flex-1
-            min-w-0
-            flex
-            flex-col
-            h-screen
-            overflow-hidden
-        "
-    >
-
-
-        <!-- ==================================================
-             HEADER
-        =================================================== -->
-
-        <header
-            class="
-                shrink-0
-                bg-white
-                border-b
-                border-gray-200
-                px-4
-                sm:px-6
-                lg:px-7
-                py-3.5
-                flex
-                items-center
-                justify-between
-                gap-4
-                z-30
-            "
-        >
-
-            <!-- LEFT -->
-
-            <div
-                class="
-                    flex
-                    items-center
-                    gap-3
-                    min-w-0
-                "
-            >
-
-                <!-- MOBILE MENU -->
-
-                <button
-                    type="button"
-                    onclick="toggleSidebar()"
-                    class="
-                        md:hidden
-                        p-2
-                        rounded-xl
-                        text-gray-600
-                        hover:bg-gray-100
-                        transition
-                        shrink-0
-                    "
-                    aria-label="Mở menu"
-                >
-
-                    <svg
-                        class="w-6 h-6"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M4 6h16M4 12h16M4 18h16"
-                        />
-
-                    </svg>
-
+        <!-- HEADER (STICKY) -->
+        <header class="sticky top-0 z-30 h-16 bg-white border-b border-gray-200 px-6 flex items-center justify-between shrink-0 shadow-sm">
+            
+            <!-- LEFT: Title & Mobile Toggle -->
+            <div class="flex items-center gap-3 min-w-0">
+                <button type="button" onclick="toggleSidebar()" class="md:hidden p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition shrink-0" aria-label="Mở menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
-
-
-                <!-- PAGE TITLE -->
-
                 <div class="min-w-0">
-
-                    <h1
-                        class="
-                            text-xl
-                            sm:text-2xl
-                            font-black
-                            text-kn-black
-                            truncate
-                        "
-                    >
-                        Quản lý Thương hiệu
-                    </h1>
-
-
-                    <p
-                        class="
-                            text-xs
-                            sm:text-sm
-                            text-gray-500
-                            mt-0.5
-                            truncate
-                        "
-                    >
-                        Quản lý danh sách thương hiệu được sử dụng cho sản phẩm
-                    </p>
-
+                    <h1 class="text-lg sm:text-xl font-black text-gray-900 truncate">Quản lý Thương hiệu</h1>
+                    <p class="text-xs text-gray-500 mt-0.5 truncate hidden sm:block">Quản lý danh sách thương hiệu của hệ thống</p>
                 </div>
-
             </div>
 
-
-            <!-- ADD BUTTON -->
-
-            <button
-                type="button"
-                onclick="openBrandModal()"
-                class="
-                    shrink-0
-                    inline-flex
-                    items-center
-                    justify-center
-                    gap-2
-                    px-4
-                    sm:px-5
-                    py-2.5
-                    rounded-xl
-                    bg-kn-blue
-                    text-white
-                    text-sm
-                    font-black
-                    shadow-sm
-                    hover:bg-blue-800
-                    active:scale-[0.98]
-                    transition
-                "
-            >
-
-                <svg
-                    class="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 4v16m8-8H4"
-                    />
-
-                </svg>
-
-
-                <span class="hidden sm:inline">
-                    Thêm thương hiệu
-                </span>
-
-
-                <span class="sm:hidden">
-                    Thêm
-                </span>
-
+            <!-- RIGHT: Add Button -->
+            <button type="button" onclick="openBrandModal()" class="shrink-0 inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-lg bg-kn-blue text-white text-sm font-bold shadow-sm hover:bg-blue-800 transition active:scale-[0.98]">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                <span class="hidden sm:inline">Thêm thương hiệu</span>
+                <span class="sm:hidden">Thêm</span>
             </button>
-
         </header>
 
+        <!-- CONTENT SCROLL AREA -->
+        <main class="flex-1 overflow-y-auto admin-scrollbar bg-gray-50 p-4 sm:p-6 relative">
+            <div class="w-full max-w-[1600px] mx-auto space-y-6 pb-10">
 
-        <!-- ==================================================
-             CONTENT
-        =================================================== -->
+                <!-- TOOLBAR: SEARCH & FILTER -->
+                <section class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between relative z-20">
+                    <div>
+                        <h3 class="text-lg font-black text-gray-900">Danh sách</h3>
+                        <p id="brandCount" class="mt-1 text-xs font-bold text-gray-500">Đang tải...</p>
+                    </div>
 
-        <main
-            class="
-                flex-1
-                overflow-y-auto
-                admin-scrollbar
-                bg-gray-50
-                p-4
-                sm:p-5
-                lg:p-6
-            "
-        >
-
-            <!--
-                QUAN TRỌNG:
-                Không dùng max-w-6xl / mx-auto ở đây.
-                Nội dung sẽ trải full phần bên phải sidebar.
-            -->
-
-            <div
-                class="
-                    w-full
-                    max-w-8xl
-                    mx-auto
-                    space-y-5
-                    pb-10
-                "
-            >
-
-
-                <!-- ==================================================
-                     LIST CARD
-                =================================================== -->
-
-                <section
-                    class="
-                        admin-card
-                        overflow-hidden
-                        w-full
-                    "
-                >
-
-
-                    <!-- ==================================================
-                         TOOLBAR MỚI TRỰC QUAN HƠN
-                    =================================================== -->
-                    <div
-                        class="
-                            p-5
-                            border-b
-                            border-gray-100
-                            flex
-                            flex-col
-                            lg:flex-row
-                            gap-4
-                            items-start
-                            lg:items-center
-                            justify-between
-                            bg-white
-                        "
-                    >
-                        <!-- TITLE -->
-                        <div>
-                            <h3 class="text-lg font-black text-gray-900">Danh sách thương hiệu</h3>
-                            <p id="brandCount" class="mt-1 text-sm text-gray-500">0 thương hiệu</p>
-                        </div>
-
-                        <!-- BỘ LỌC VÀ TÌM KIẾM -->
-                        <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
-                            
-                            <!-- SẮP XẾP -->
-                            <select
-                                id="sortBrand"
-                                class="
-                                    form-input
-                                    w-full
-                                    sm:w-40
-                                    py-2
-                                    text-sm
-                                    font-bold
-                                    text-gray-600
-                                    bg-gray-50
-                                    cursor-pointer
-                                    focus:bg-white
-                                "
-                            >
+                    <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                        <!-- SORT -->
+                        <div class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 w-full sm:w-auto">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider shrink-0">Sắp xếp:</span>
+                            <select id="sortBrand" class="w-full sm:w-auto text-sm font-bold text-kn-blue bg-transparent outline-none cursor-pointer">
                                 <option value="newest">Mới nhất</option>
                                 <option value="az">Tên: A - Z</option>
                                 <option value="za">Tên: Z - A</option>
                             </select>
-
-                            <!-- SEARCH -->
-                            <div class="relative w-full sm:w-80">
-                                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0Z" />
-                                </svg>
-                                <input
-                                    id="searchBrand"
-                                    type="search"
-                                    class="form-input pl-10 py-2 text-sm bg-gray-50 focus:bg-white transition-colors"
-                                    placeholder="Tìm thương hiệu..."
-                                    autocomplete="off"
-                                >
-                            </div>
-
-                        </div>
-                    </div>
-
-
-                    <!-- ==================================================
-                         LOADING
-                    =================================================== -->
-
-                    <div
-                        id="loadingState"
-                        class="
-                            hidden
-                            px-6
-                            py-16
-                            text-center
-                        "
-                    >
-
-                        <div
-                            class="
-                                inline-block
-                                w-8
-                                h-8
-                                border-[3px]
-                                border-kn-blue
-                                border-t-transparent
-                                rounded-full
-                                animate-spin
-                            "
-                        ></div>
-
-
-                        <p
-                            class="
-                                mt-3
-                                text-sm
-                                font-bold
-                                text-gray-500
-                            "
-                        >
-                            Đang tải thương hiệu...
-                        </p>
-
-                    </div>
-
-
-                    <!-- ==================================================
-                         EMPTY STATE
-                    =================================================== -->
-
-                    <div
-                        id="emptyState"
-                        class="
-                            hidden
-                            px-6
-                            py-16
-                            text-center
-                        "
-                    >
-
-                        <div
-                            class="
-                                mx-auto
-                                w-14
-                                h-14
-                                rounded-2xl
-                                bg-gray-100
-                                text-gray-400
-                                flex
-                                items-center
-                                justify-center
-                            "
-                        >
-
-                            <svg
-                                class="w-6 h-6"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.8"
-                                    d="M4 6h16M4 12h16M4 18h16"
-                                />
-
-                            </svg>
-
                         </div>
 
-
-                        <h3
-                            class="
-                                mt-4
-                                text-sm
-                                font-black
-                                text-gray-800
-                            "
-                        >
-                            Không có thương hiệu
-                        </h3>
-
-
-                        <p
-                            id="emptyMessage"
-                            class="
-                                mt-1
-                                text-sm
-                                text-gray-400
-                            "
-                        >
-                            Hãy thêm thương hiệu đầu tiên.
-                        </p>
-
+                        <!-- SEARCH -->
+                        <div class="relative w-full sm:w-72">
+                            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0Z"/></svg>
+                            <input id="searchBrand" type="search" class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 outline-none focus:bg-white focus:border-kn-blue focus:ring-2 focus:ring-blue-100 transition" placeholder="Tìm thương hiệu..." autocomplete="off">
+                        </div>
                     </div>
-
-
-                    <!-- ==================================================
-                         TABLE
-                    =================================================== -->
-
-                    <div
-                        id="tableWrapper"
-                        class="
-                            hidden
-                            overflow-x-auto
-                        "
-                    >
-                    
-                    <div
-                        id="paginationContainer"
-                        class="
-                            border-t
-                            border-gray-100
-                            px-5
-                            py-4
-                            flex
-                            flex-col
-                            sm:flex-row
-                            items-center
-                            justify-between
-                            gap-3
-                        "
-                    ></div>
-
-                        <table
-                            class="
-                                w-full
-                                min-w-[650px]
-                                text-sm
-                            "
-                        >
-
-                            <!-- TABLE HEADER (CHUẨN UI QUỐC TẾ) -->
-                            <thead
-                                class="
-                                    bg-gray-50
-                                    border-b
-                                    border-gray-200
-                                "
-                            >
-                                <tr>
-                                    <!-- ID -->
-                                    <th class="px-5 py-3.5 text-left text-xs font-black uppercase tracking-wider text-gray-400 w-24">
-                                        ID
-                                    </th>
-
-                                    <!-- BRAND (Thả rông width để nó đẩy cột Thao tác ra sát mép phải) -->
-                                    <th class="px-5 py-3.5 text-left text-xs font-black uppercase tracking-wider text-gray-400">
-                                        Tên thương hiệu
-                                    </th>
-
-                                    <!-- ACTION (Ghim cứng sát lề phải) -->
-                                    <th class="px-5 py-3.5 text-right text-xs font-black uppercase tracking-wider text-gray-400 w-40">
-                                        Thao tác
-                                    </th>
-                                </tr>
-                            </thead>
-
-
-                            <!-- TABLE BODY -->
-
-                            <tbody
-                                id="brandTableBody"
-                                class="
-                                    divide-y
-                                    divide-gray-100
-                                "
-                            ></tbody>
-
-                        </table>
-
-                    </div>
-
                 </section>
 
+                <!-- LOADING STATE -->
+                <div id="loadingState" class="hidden py-16 text-center">
+                    <div class="inline-block w-8 h-8 border-[3px] border-kn-blue border-t-transparent rounded-full animate-spin"></div>
+                    <p class="mt-3 text-sm font-bold text-gray-500">Đang tải thương hiệu...</p>
+                </div>
+
+                <!-- EMPTY STATE -->
+                <div id="emptyState" class="hidden bg-white border border-gray-200 rounded-xl shadow-sm py-16 text-center">
+                    <div class="mx-auto w-16 h-16 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    </div>
+                    <h3 class="text-base font-black text-gray-800">Không có thương hiệu</h3>
+                    <p id="emptyMessage" class="mt-1 text-sm text-gray-500">Hãy bấm "Thêm thương hiệu" để bắt đầu.</p>
+                </div>
+
+                <!-- TABLE CARD -->
+                <section id="tableWrapper" class="hidden bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden relative z-10">
+                    <div class="overflow-x-auto admin-scrollbar">
+                        <table class="w-full min-w-[600px] text-left">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-5 py-4 text-xs font-black text-gray-500 uppercase tracking-wider w-24 text-center">ID</th>
+                                    <th class="px-5 py-4 text-xs font-black text-gray-500 uppercase tracking-wider">Tên thương hiệu</th>
+                                    <th class="px-5 py-4 text-xs font-black text-gray-500 uppercase tracking-wider w-36 text-right">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="brandTableBody" class="divide-y divide-gray-100 text-sm">
+                                <!-- JS Render -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- PAGINATION -->
+                    <div id="paginationContainer" class="border-t border-gray-100 px-5 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 bg-white"></div>
+                </section>
 
             </div>
-
         </main>
-
     </div>
-
 
     <!-- ==================================================
          BRAND MODAL
     =================================================== -->
-
-    <div
-        id="brandModal"
-        class="
-            fixed
-            inset-0
-            z-[90]
-            hidden
-            items-center
-            justify-center
-            p-4
-        "
-    >
-
+    <div id="brandModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
         <!-- BACKDROP -->
-
-        <div
-            class="
-                absolute
-                inset-0
-                bg-black/50
-            "
-            onclick="closeBrandModal()"
-        ></div>
-
-
-        <!-- MODAL -->
-
-        <div
-            class="
-                relative
-                w-full
-                max-w-md
-                bg-white
-                rounded-2xl
-                shadow-2xl
-                overflow-hidden
-            "
-        >
-
-
-            <!-- ==================================================
-                 MODAL HEADER
-            =================================================== -->
-
-            <div
-                class="
-                    px-5
-                    py-4
-                    border-b
-                    border-gray-100
-                    flex
-                    items-center
-                    justify-between
-                    gap-4
-                "
-            >
-
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="closeBrandModal()"></div>
+        
+        <!-- MODAL CONTENT -->
+        <div class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col transform transition-all">
+            
+            <!-- HEADER -->
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
                 <div>
-
-                    <p
-                        class="
-                            text-xs
-                            font-black
-                            uppercase
-                            tracking-wider
-                            text-gray-400
-                        "
-                    >
-                        Thương hiệu
-                    </p>
-
-
-                    <h3
-                        id="modalTitle"
-                        class="
-                            mt-0.5
-                            text-lg
-                            font-black
-                            text-gray-900
-                        "
-                    >
-                        Thêm thương hiệu
-                    </h3>
-
+                    <h3 id="modalTitle" class="text-lg font-black text-kn-blue">Thêm thương hiệu</h3>
+                    <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">Khai báo danh mục</p>
                 </div>
-
-
-                <!-- CLOSE -->
-
-                <button
-                    type="button"
-                    onclick="closeBrandModal()"
-                    class="
-                        p-2
-                        rounded-xl
-                        text-gray-400
-                        hover:bg-gray-100
-                        hover:text-gray-700
-                        transition
-                    "
-                    aria-label="Đóng"
-                >
-
-                    <svg
-                        class="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="m6 6 12 12M6 18 18 6"
-                        />
-
-                    </svg>
-
+                <button type="button" onclick="closeBrandModal()" class="p-2 rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-500 transition" aria-label="Đóng">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 6 12 12M6 18 18 6"/></svg>
                 </button>
-
             </div>
 
-
-            <!-- ==================================================
-                 FORM
-            =================================================== -->
-
-            <form
-                id="brandForm"
-                class="p-5 space-y-5"
-            >
-
-                <!-- HIDDEN ID -->
-
-                <input
-                    type="hidden"
-                    id="brandId"
-                >
-
-
-                <!-- BRAND NAME -->
-
+            <!-- FORM -->
+            <form id="brandForm" class="p-6 space-y-6">
+                <input type="hidden" id="brandId">
+                
                 <div>
-
-                    <label
-                        for="brandName"
-                        class="form-label"
-                    >
-                        Tên thương hiệu
+                    <label for="brandName" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                        Tên thương hiệu <span class="text-red-500">*</span>
                     </label>
-
-
-                    <input
-                        type="text"
-                        id="brandName"
-                        maxlength="100"
-                        class="form-input"
-                        placeholder="VD: Bosch"
-                        autocomplete="off"
-                        required
-                    >
-
-
-                    <p
-                        class="
-                            mt-1.5
-                            text-xs
-                            text-gray-400
-                        "
-                    >
-                        Tối đa 100 ký tự.
-                    </p>
-
+                    <input type="text" id="brandName" maxlength="100" required placeholder="VD: Bosch, Makita..." autocomplete="off"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm outline-none focus:border-kn-blue focus:ring-2 focus:ring-blue-100 shadow-sm transition">
+                    <p class="mt-2 text-[11px] text-gray-400 italic">Tối đa 100 ký tự.</p>
                 </div>
 
-
-                <!-- BUTTONS -->
-
-                <div
-                    class="
-                        flex
-                        justify-end
-                        gap-3
-                        pt-1
-                    "
-                >
-
-                    <!-- CANCEL -->
-
-                    <button
-                        type="button"
-                        onclick="closeBrandModal()"
-                        class="
-                            px-4
-                            py-2.5
-                            rounded-xl
-                            border
-                            border-gray-200
-                            text-sm
-                            font-bold
-                            text-gray-600
-                            hover:bg-gray-50
-                            transition
-                        "
-                    >
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeBrandModal()" class="px-5 py-2.5 rounded-xl border border-gray-300 text-sm font-bold text-gray-700 hover:bg-gray-50 transition shadow-sm">
                         Hủy
                     </button>
-
-
-                    <!-- SAVE -->
-
-                    <button
-                        type="submit"
-                        id="btnSaveBrand"
-                        class="
-                            px-5
-                            py-2.5
-                            rounded-xl
-                            bg-kn-blue
-                            text-white
-                            text-sm
-                            font-black
-                            hover:bg-blue-800
-                            transition
-                        "
-                    >
+                    <button type="submit" id="btnSaveBrand" class="px-6 py-2.5 rounded-xl bg-kn-blue text-white text-sm font-black hover:bg-blue-800 transition shadow-md">
                         Lưu thương hiệu
                     </button>
-
                 </div>
-
             </form>
-
         </div>
-
     </div>
 
-
-    <!-- ==================================================
-         SCRIPTS
-    =================================================== -->
-
+    <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <script src="../assets/js/common/supabase.js"></script>
-
     <script src="../assets/js/common/utils.js"></script>
-
     <script src="../assets/js/admin/admin-core.js"></script>
-
     <script src="../assets/js/admin/admin-nav.js"></script>
-
     <script src="../assets/js/admin/admin-brand.js"></script>
-
-
 </body>
-
 </html>
