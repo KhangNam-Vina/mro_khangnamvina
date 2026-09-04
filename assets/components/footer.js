@@ -8,7 +8,7 @@ const COMPANY_CONFIG = {
     hotline: "0919 699 942",
     hotlineDisplay: "0919 699 942",
     zalo: "0919 699 942",
-    email: "sales@khangnamvina.com",
+    email: "khangnam2022@gmail.com",
     address: "Khu Công Nghệ Cao, TP. Thủ Đức, TP. Hồ Chí Minh",
     map: "https://www.google.com/maps/place/KhangNam+Vina/@10.8532605,106.7953513,21z",
     name: "Công ty TNHH TM-DV Khang Nam Vi Na",

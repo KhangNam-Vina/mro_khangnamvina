@@ -131,12 +131,44 @@ async function loadContactConfig() {
         // SOCIAL PROOF
         // ------------------------------------------------
 
-        const proofMap = {
-            proof_1: "txtProof1",
-            proof_2: "txtProof2",
-            proof_3: "txtProof3",
-            proof_4: "txtProof4"
-        };
+        const proofList = document.getElementById("contactProofList");
+
+if (proofList) {
+    proofList.innerHTML = "";
+
+    const proofs = Array.isArray(data.proofs)
+        ? data.proofs
+        : [];
+
+    proofs
+        .filter(proof => typeof proof === "string" && proof.trim())
+        .forEach(proof => {
+            const li = document.createElement("li");
+            li.className = "contact-proof-item";
+
+            li.innerHTML = `
+                <svg
+                    class="contact-proof-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                </svg>
+
+                <span></span>
+            `;
+
+            li.querySelector("span").textContent = proof;
+            proofList.appendChild(li);
+        });
+}
 
         Object.entries(proofMap).forEach(
             ([field, elementId]) => {

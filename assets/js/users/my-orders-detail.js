@@ -191,14 +191,7 @@ function renderOrderItems(items) {
         return `
             <tr style="border-bottom: 1px solid #f3f4f6; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f9fafb'" onmouseout="this.style.backgroundColor='transparent'">
                 <td style="padding: 16px;">
-                    <div style="display: flex; align-items: center; gap: 16px;">
-                        <div style="width: 56px; height: 56px; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 4px; flex-shrink: 0;">
-                            <img src="${escapeHtml(imageUrl)}" alt="${productName}" style="width:100%; height:100%; object-fit:contain;" onerror="this.onerror=null; this.src='../assets/images/world mark.png';">
-                        </div>
-                        <div>
-                            <strong style="color: #00479b; display: block; font-size: 14px;">${productName}</strong>
-                        </div>
-                    </div>
+                    <strong style="color: #00479b; display: block; font-size: 14px;">${productName}</strong>
                 </td>
                 <td style="padding: 16px;">
                     <span style="font-family: monospace; font-weight: 900; color: #4b5563; font-size: 12px; background: #f3f4f6; padding: 4px 8px; border-radius: 4px;">${sku}</span>

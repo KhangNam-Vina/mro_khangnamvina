@@ -53,6 +53,160 @@ function buildProductImageUrl(imagePath) {
     return `${IMAGE_CDN_BASE}/${path}`;
 }
 
+// ========================================================
+// SEARCH HELPERS (ĐÃ FIX LỖI GIẤY / GIẦY)
+// ========================================================
+
+async function findProductIdsBySearch(searchText) {
+
+    const trimmedSearch = String(searchText || '').trim().replace(/\s+/g, ' ');
+
+    if (!trimmedSearch) {
+        return null;
+    }
+
+    // 1. Smart Search: Kiểm tra xem từ khóa có chứa dấu tiếng Việt hay không?
+    const hasAccents = /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(trimmedSearch);
+
+    // 2. Tạo tokens (băm từ khóa ra thành từng mảnh)
+    let tokens = [];
+    
+    if (hasAccents) {
+        // TRƯỜNG HỢP CÓ DẤU: Giữ nguyên từng chữ, chỉ viết thường
+        tokens = trimmedSearch.toLowerCase().split(' ').filter(Boolean);
+    } else {
+        // TRƯỜNG HỢP KHÔNG DẤU: Lột sạch dấu phòng hờ để tìm tương đối
+        const normalizedSearch = trimmedSearch
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/đ/g, 'd')
+            .replace(/Đ/g, 'D')
+            .toLowerCase();
+        tokens = normalizedSearch.split(' ').filter(Boolean);
+    }
+
+    if (tokens.length === 0) {
+        return null;
+    }
+
+    let matchedProductIds = null;
+
+    for (const token of tokens) {
+
+        // ------------------------------------------------
+        // 1. Tìm theo tên / search_name / SKU
+        // ------------------------------------------------
+        
+        // Điều kiện BỌC THÉP: 
+        // - CÓ DẤU -> Ép tìm ở cột 'name' gốc (Giấy != Giầy)
+        // - KHÔNG DẤU -> Cho phép tìm ở cột 'search_name' (giay == giay)
+        const orCondition = hasAccents 
+            ? `name.ilike.%${token}%,sku.ilike.%${token}%` 
+            : `search_name.ilike.%${token}%,search_sku.ilike.%${token}%`;
+
+        const {
+            data: productMatches,
+            error: productError
+        } = await window.supabaseClient
+            .from('products')
+            .select('id')
+            .or(orCondition);
+
+        if (productError) {
+            throw productError;
+        }
+
+        let tokenProductIds =
+            new Set(
+                (productMatches || [])
+                    .map(product => product.id)
+                    .filter(Boolean)
+            );
+
+
+        // ------------------------------------------------
+        // 2. Tìm theo BRAND
+        // ------------------------------------------------
+
+        const {
+            data: brandMatches,
+            error: brandError
+        } = await window.supabaseClient
+            .from('brands')
+            .select('id, name')
+            .ilike(
+                'name',
+                `%${token}%`
+            );
+
+        if (brandError) {
+            throw brandError;
+        }
+
+        const brandIds =
+            (brandMatches || [])
+                .map(brand => brand.id)
+                .filter(Boolean);
+
+
+        if (brandIds.length > 0) {
+
+            const {
+                data: brandProducts,
+                error: brandProductError
+            } = await window.supabaseClient
+                .from('products')
+                .select('id')
+                .in(
+                    'brand_id',
+                    brandIds
+                );
+
+            if (brandProductError) {
+                throw brandProductError;
+            }
+
+            (brandProducts || []).forEach(
+                product => {
+                    if (product.id) {
+                        tokenProductIds.add(
+                            product.id
+                        );
+                    }
+                }
+            );
+        }
+
+
+        // ------------------------------------------------
+        // 3. INTERSECTION giữa các token
+        // ------------------------------------------------
+
+        if (matchedProductIds === null) {
+
+            matchedProductIds =
+                tokenProductIds;
+
+        } else {
+
+            matchedProductIds =
+                new Set(
+                    [...matchedProductIds]
+                        .filter(
+                            id =>
+                                tokenProductIds.has(id)
+                        )
+                );
+        }
+
+        // Không còn sản phẩm nào
+        if (matchedProductIds.size === 0) {
+            return [];
+        }
+    }
+
+    return [...matchedProductIds];
+}
 
 // ========================================================
 // 1. UTILITY
@@ -277,37 +431,64 @@ async function fetchFilteredProducts() {
 
         // ==================================================
         // SEARCH
-        // ==================================================
+        // ========================================================
 
-       if (searchQuery) {
+if (searchQuery) {
 
-    const normalizedSearch =
+    const trimmedSearch =
         searchQuery
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/đ/g, 'd')
-            .replace(/Đ/g, 'D')
-            .toLowerCase()
             .trim()
             .replace(/\s+/g, ' ');
 
 
-    if (normalizedSearch) {
+    if (trimmedSearch) {
 
-        query = query.or(
-            `search_name.ilike.%${normalizedSearch}%,search_sku.ilike.%${normalizedSearch}%`
-        );
+        const searchProductIds =
+            await findProductIdsBySearch(
+                trimmedSearch
+            );
 
+
+        /*
+         * Không có kết quả:
+         *
+         * .in('id', [])
+         *
+         * không nên gửi xuống Supabase.
+         *
+         * Dùng một ID chắc chắn không tồn tại
+         * để trả về 0 sản phẩm.
+         */
+        if (
+            Array.isArray(searchProductIds) &&
+            searchProductIds.length === 0
+        ) {
+
+            query =
+                query.eq(
+                    'id',
+                    '__NO_SEARCH_RESULT__'
+                );
+
+        } else if (
+            Array.isArray(searchProductIds)
+        ) {
+
+            query =
+                query.in(
+                    'id',
+                    searchProductIds
+                );
+
+        }
     }
 
 
     pageTitleText =
         `Kết quả tìm kiếm: "${searchQuery}"`;
 
-
     breadcrumbText =
         'Tìm kiếm';
-
 }
 
         // ==================================================

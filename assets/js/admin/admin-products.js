@@ -46,8 +46,15 @@ const state = {
         origin: "all",
         priceMin: "",
         priceMax: "",
-        moqMin: "", moqMax: "", hasImage: "all", hasDatasheet: "all"
-        
+        moqMin: "",
+        moqMax: "",
+        hasImage: "all",
+        hasDatasheet: "all",
+        hasInfo: "all",
+        hasBrand: "all",
+        hasOrigin: "all", 
+        hasDesc: "all", 
+        hasSpecs: "all"
     },
 
     mediaDraft: {
@@ -113,6 +120,14 @@ const DOM = {
     outOfStock: document.getElementById("productOutOfStock"),
     onSale: document.getElementById("productOnSale"),
     toast: document.getElementById("toastContainer"),
+    dataQualityDashboard:
+        document.getElementById("dataQualityDashboard"),
+
+    dataQualityTotal:
+        document.getElementById("dataQualityTotal"),
+
+    dataQualityGrid:
+        document.getElementById("dataQualityGrid"),
 
     // Media
     mainImageFile: document.getElementById("image_file"),
@@ -124,6 +139,7 @@ const DOM = {
     filterHasImage: document.getElementById("filterHasImage"),
     filterHasDatasheet: document.getElementById("filterHasDatasheet"),
     filterHasInfo: document.getElementById("filterHasInfo"),
+    
 };
 
 /* =========================================================
@@ -626,7 +642,6 @@ function syncFiltersToDOM() {
 // Render chuỗi TAG cho những thuộc tính đang được Lọc
 function renderActiveFilters() {
     if (!DOM.activeFiltersContainer) return;
-    
     const tags = [];
     
     if (state.filters.search) tags.push({ key: 'search', label: `Từ khóa: ${state.filters.search}` });
@@ -652,7 +667,13 @@ function renderActiveFilters() {
         const max = state.filters.moqMax ? `đến ${state.filters.moqMax}` : 'trở lên';
         tags.push({ key: 'moq', label: `MOQ: ${min} ${max}` });
     }
-   // Kiểm tra dữ liệu (Đã fix logic, rào chắn giá trị rỗng/undefined)
+
+    // 7 TIÊU CHÍ DATA QUALITY
+    if (state.filters.hasBrand === 'no') tags.push({ key: 'hasBrand', label: 'Thiếu Brand' });
+    if (state.filters.hasOrigin === 'no') tags.push({ key: 'hasOrigin', label: 'Thiếu Xuất xứ' });
+    if (state.filters.hasDesc === 'no') tags.push({ key: 'hasDesc', label: 'Thiếu Mô tả' });
+    if (state.filters.hasSpecs === 'no') tags.push({ key: 'hasSpecs', label: 'Thiếu Thông số' });
+
     if (state.filters.hasImage === 'yes') tags.push({ key: 'hasImage', label: 'Có ảnh' });
     else if (state.filters.hasImage === 'no') tags.push({ key: 'hasImage', label: 'Thiếu ảnh' });
 
@@ -697,12 +718,12 @@ function renderActiveFilters() {
 // Xóa 1 Filter Tag cụ thể hoặc Xóa Tất Cả
 window.removeFilter = function(key, value) {
     if (key === 'all') {
-        // Reset ĐỒNG BỘ NGUỒN STATE DUY NHẤT
         state.filters = { 
             search: "", category: "all", industry: "all", stock: "all", sort: "newest", 
             subCategory: "all", family: "all", brands: [], origin: "all", 
             priceMin: "", priceMax: "", moqMin: "", moqMax: "", 
-            hasImage: "all", hasDatasheet: "all", hasInfo: "all" 
+            hasImage: "all", hasDatasheet: "all", hasInfo: "all",
+            hasBrand: "all", hasOrigin: "all", hasDesc: "all", hasSpecs: "all"
         };
     } else if (key === 'brand') {
         state.filters.brands = state.filters.brands.filter(b => String(b) !== String(value));
@@ -710,7 +731,7 @@ window.removeFilter = function(key, value) {
         state.filters.priceMin = ""; state.filters.priceMax = "";
     } else if (key === 'moq') {
         state.filters.moqMin = ""; state.filters.moqMax = "";
-    } else if (['hasImage', 'hasDatasheet', 'hasInfo'].includes(key)) {
+    } else if (['hasImage', 'hasDatasheet', 'hasInfo', 'hasBrand', 'hasOrigin', 'hasDesc', 'hasSpecs'].includes(key)) {
         state.filters[key] = "all";
     } else {
         state.filters[key] = (key === 'search') ? "" : "all";
@@ -940,11 +961,36 @@ async function fetchProducts() {
             query = query.or('image_path.is.null,image_path.eq.""');
         }
         
-        // Check Datasheet
-        if (state.filters.hasDatasheet === 'yes') {
-            query = query.not('datasheet_url', 'is', null).neq('datasheet_url', '');
-        } else if (state.filters.hasDatasheet === 'no') {
-            query = query.or('datasheet_url.is.null,datasheet_url.eq.""');
+        // =====================================================
+        // CHECK THÔNG TIN
+        // Rule:
+        // Tên + SKU + Brand + Xuất xứ + Mô tả +
+        // Thông số + Hình ảnh
+        // =====================================================
+
+        // =====================================================
+        // CHECK DATA QUALITY (7 TIÊU CHÍ MỞ RỘNG)
+        // =====================================================
+        if (state.filters.hasBrand === 'no') query = query.is('brand_id', null);
+        if (state.filters.hasOrigin === 'no') query = query.or('origin.is.null,origin.eq.""');
+        if (state.filters.hasDesc === 'no') query = query.or('description.is.null,description.eq.""');
+        if (state.filters.hasSpecs === 'no') query = query.or('specifications.is.null,specifications.eq.""');
+
+        if (state.filters.hasInfo === 'yes') {
+            query = query
+                .not('name', 'is', null).neq('name', '')
+                .not('sku', 'is', null).neq('sku', '')
+                .not('brand_id', 'is', null)
+                .not('origin', 'is', null).neq('origin', '')
+                .not('description', 'is', null).neq('description', '')
+                .not('specifications', 'is', null).neq('specifications', '')
+                .not('image_path', 'is', null).neq('image_path', '');
+        } else if (state.filters.hasInfo === 'no') {
+            query = query.or(
+                ['name.is.null', 'name.eq.""', 'sku.is.null', 'sku.eq.""', 'brand_id.is.null', 
+                 'origin.is.null', 'origin.eq.""', 'description.is.null', 'description.eq.""', 
+                 'specifications.is.null', 'specifications.eq.""', 'image_path.is.null', 'image_path.eq.""'].join(',')
+            );
         }
         
         // 4. Sort
@@ -1021,6 +1067,441 @@ async function updateStatistics() {
     }
 }
 
+/* =========================================================
+   PHASE 3.2 — DATA QUALITY DASHBOARD
+========================================================= */
+
+async function updateDataQuality() {
+
+    if (!DOM.dataQualityGrid) return;
+
+    DOM.dataQualityGrid.innerHTML = `
+        <div class="col-span-full text-center py-6 text-gray-400">
+            <i class="fas fa-spinner fa-spin mr-2"></i>
+            Đang kiểm tra chất lượng dữ liệu...
+        </div>
+    `;
+
+    try {
+
+        /*
+         * Lấy toàn bộ catalog.
+         *
+         * KHÔNG phụ thuộc:
+         * - pagination
+         * - search
+         * - category
+         * - stock filter
+         * - advanced filter
+         */
+
+        const {
+            data,
+            error
+        } = await window.supabaseClient
+            .from("products")
+            .select(`
+                id,
+                name,
+                sku,
+                brand_id,
+                origin,
+                description,
+                specifications,
+                image_path,
+                datasheet_url
+            `);
+
+        if (error) {
+            throw error;
+        }
+
+        const products = data || [];
+        const total = products.length;
+
+        /*
+         * Helper kiểm tra field có dữ liệu hay không.
+         */
+        const hasValue = value => {
+
+            if (
+                value === null ||
+                value === undefined
+            ) {
+                return false;
+            }
+
+            if (
+                typeof value === "string"
+            ) {
+                return value.trim() !== "";
+            }
+
+            return true;
+        };
+
+
+        /*
+         * 1. TÊN
+         */
+        const completeName =
+            products.filter(
+                product =>
+                    hasValue(product.name)
+            ).length;
+
+
+        /*
+         * 2. SKU
+         */
+        const completeSku =
+            products.filter(
+                product =>
+                    hasValue(product.sku)
+            ).length;
+
+
+        /*
+         * 3. BRAND
+         */
+        const completeBrand =
+            products.filter(
+                product =>
+                    product.brand_id !== null &&
+                    product.brand_id !== undefined
+            ).length;
+
+
+        /*
+         * 4. ORIGIN
+         */
+        const completeOrigin =
+            products.filter(
+                product =>
+                    hasValue(product.origin)
+            ).length;
+
+
+        /*
+         * 5. DESCRIPTION
+         */
+        const completeDescription =
+            products.filter(
+                product =>
+                    hasValue(product.description)
+            ).length;
+
+
+        /*
+         * 6. SPECIFICATIONS
+         */
+        const completeSpecifications =
+            products.filter(
+                product =>
+                    hasValue(product.specifications)
+            ).length;
+
+
+        /*
+         * 7. IMAGE
+         */
+        const completeImage =
+            products.filter(
+                product =>
+                    hasValue(product.image_path)
+            ).length;
+
+
+        /*
+         * 8. DATASHEET
+         *
+         * Datasheet KHÔNG nằm trong rule
+         * "Đủ thông tin", nhưng vẫn thống kê
+         * riêng để Admin biết tình trạng catalog.
+         */
+        const completeDatasheet =
+            products.filter(
+                product =>
+                    hasValue(product.datasheet_url)
+            ).length;
+
+
+        /*
+         * RULE "ĐỦ THÔNG TIN"
+         *
+         * Bắt buộc:
+         * - name
+         * - sku
+         * - brand
+         * - origin
+         * - description
+         * - specifications
+         * - image
+         *
+         * Không bắt buộc:
+         * - datasheet
+         * - short_description
+         */
+
+        const completeInformation =
+    products.filter(product => {
+
+        return (
+            product.brand_id !== null &&
+            product.brand_id !== undefined &&
+            hasValue(product.origin) &&
+            hasValue(product.description) &&
+            hasValue(product.specifications) &&
+            hasValue(product.image_path)
+        );
+
+    }).length;
+
+const missingInformation =
+    total - completeInformation;
+
+
+        /*
+         * Render KPI
+         */
+
+        const metrics = [
+
+    {
+        key: "brand",
+        label: "Thương hiệu",
+        complete: completeBrand,
+        missing: total - completeBrand,
+        icon: "fa-copyright"
+    },
+
+    {
+        key: "origin",
+        label: "Xuất xứ",
+        complete: completeOrigin,
+        missing: total - completeOrigin,
+        icon: "fa-globe-asia"
+    },
+
+    {
+        key: "description",
+        label: "Mô tả",
+        complete: completeDescription,
+        missing: total - completeDescription,
+        icon: "fa-align-left"
+    },
+
+    {
+        key: "specifications",
+        label: "Thông số",
+        complete: completeSpecifications,
+        missing: total - completeSpecifications,
+        icon: "fa-list-check"
+    },
+
+    {
+        key: "image",
+        label: "Hình ảnh",
+        complete: completeImage,
+        missing: total - completeImage,
+        icon: "fa-image"
+    },
+
+    {
+        key: "datasheet",
+        label: "Datasheet",
+        complete: completeDatasheet,
+        missing: total - completeDatasheet,
+        icon: "fa-file-pdf"
+    },
+
+    {
+        key: "information",
+        label: "Thông tin tổng thể",
+        complete: completeInformation,
+        missing: missingInformation,
+        icon: "fa-clipboard-check"
+    }
+
+];
+
+
+        DOM.dataQualityTotal.textContent =
+            `${formatNumber(total)} sản phẩm`;
+
+
+        DOM.dataQualityGrid.innerHTML =
+            metrics.map(metric => {
+
+                const percentage =
+                    total > 0
+                        ? Math.round(
+                            (metric.complete / total) * 100
+                        )
+                        : 0;
+
+                const isComplete =
+                    metric.missing === 0;
+
+                return `
+                    <button
+                        type="button"
+                        class="
+                            data-quality-card
+                            text-left
+                            border
+                            rounded-lg
+                            p-4
+                            transition
+                            hover:shadow-md
+                            hover:border-kn-blue
+                            bg-white
+                        "
+                        data-quality-key="${metric.key}"
+                    >
+
+                        <div class="flex items-center justify-between">
+
+                            <div class="flex items-center gap-2">
+
+                                <div
+                                    class="
+                                        w-8
+                                        h-8
+                                        rounded-lg
+                                        flex
+                                        items-center
+                                        justify-center
+                                        ${isComplete
+                                            ? "bg-green-50 text-green-600"
+                                            : "bg-orange-50 text-orange-500"}
+                                    "
+                                >
+                                    <i class="fas ${metric.icon} text-sm"></i>
+                                </div>
+
+                                <span class="text-sm font-semibold text-gray-700">
+                                    ${metric.label}
+                                </span>
+
+                            </div>
+
+                            <span
+                                class="
+                                    text-xs
+                                    font-bold
+                                    ${isComplete
+                                        ? "text-green-600"
+                                        : "text-orange-500"}
+                                "
+                            >
+                                ${percentage}%
+                            </span>
+
+                        </div>
+
+
+                        <div class="mt-3 flex items-end justify-between">
+
+                            <div>
+
+                                <div class="text-xl font-bold text-gray-800">
+                                    ${formatNumber(metric.complete)}
+                                    <span class="text-xs font-normal text-gray-400">
+                                        / ${formatNumber(total)}
+                                    </span>
+                                </div>
+
+                                <div class="text-xs text-gray-500 mt-1">
+
+                                    ${
+                                        isComplete
+                                            ? "Đầy đủ"
+                                            : `Thiếu ${formatNumber(metric.missing)}`
+                                    }
+
+                                </div>
+
+                            </div>
+
+                            <i
+                                class="
+                                    fas
+                                    fa-chevron-right
+                                    text-xs
+                                    text-gray-300
+                                "
+                            ></i>
+
+                        </div>
+
+
+                        <div class="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+
+                            <div
+                                class="
+                                    h-full
+                                    rounded-full
+                                    ${isComplete
+                                        ? "bg-green-500"
+                                        : "bg-orange-400"}
+                                "
+                                style="width:${percentage}%"
+                            ></div>
+
+                        </div>
+
+                    </button>
+                `;
+
+            }).join("");
+
+
+        /*
+         * Click KPI
+         */
+        DOM.dataQualityGrid
+            .querySelectorAll(".data-quality-card")
+            .forEach(card => {
+
+                card.addEventListener(
+                    "click",
+                    () => {
+
+                        handleDataQualityClick(
+                            card.dataset.qualityKey
+                        );
+
+                    }
+                );
+
+            });
+
+
+    } catch (error) {
+
+        console.error(
+            "Lỗi Data Quality:",
+            error
+        );
+
+        DOM.dataQualityTotal.textContent =
+            "Không thể tải dữ liệu";
+
+        DOM.dataQualityGrid.innerHTML = `
+            <div
+                class="
+                    col-span-full
+                    text-center
+                    py-6
+                    text-red-500
+                "
+            >
+                Không thể kiểm tra chất lượng dữ liệu.
+            </div>
+        `;
+    }
+}
 
 /* =========================================================
    RENDER PRODUCTS
@@ -1168,19 +1649,100 @@ function getDescriptionValue() {
 }
 
 async function resolveBrandId() {
-    const brandInput = document.getElementById("brand_input");
-    const name = brandInput ? brandInput.value.trim() : "";
-    if (!name) return null;
-    
-    const found = state.brands.find(b => b.name.toLowerCase() === name.toLowerCase());
-    if (found) return found.id;
-    
-    const { data, error } = await window.supabaseClient.from("brands").insert([{ name }]).select("id, name").single();
-    if (error) throw new Error("Lỗi khi tạo thương hiệu mới: " + error.message);
-    
-    state.brands.push(data);
+
+    const brandInput =
+        document.getElementById(
+            "brand_input"
+        );
+
+    const name =
+        brandInput
+            ? brandInput.value.trim()
+            : "";
+
+    /*
+       BRAND MẶC ĐỊNH:
+       Nếu người dùng bỏ trống Brand
+       → tự động dùng Brand "OEM"
+    */
+    const brandName =
+        name || "OEM";
+
+
+    const found =
+        state.brands.find(
+            brand =>
+                brand.name
+                    .trim()
+                    .toLowerCase() ===
+                brandName.toLowerCase()
+        );
+
+
+    /*
+       Đã có OEM / brand người dùng nhập
+       → dùng lại ID hiện tại
+    */
+    if (
+        found
+    ) {
+
+        return found.id;
+
+    }
+
+
+    /*
+       Nếu chưa có Brand trong database
+       → tạo mới
+       Trường hợp này chủ yếu dành cho OEM
+       nếu database chưa có OEM.
+    */
+    const {
+        data,
+        error
+    } =
+        await window.supabaseClient
+
+            .from(
+                "brands"
+            )
+
+            .insert([
+                {
+                    name: brandName
+                }
+            ])
+
+            .select(
+                "id, name"
+            )
+
+            .single();
+
+
+    if (
+        error
+    ) {
+
+        throw new Error(
+            "Lỗi khi tạo thương hiệu mới: " +
+            error.message
+        );
+
+    }
+
+
+    state.brands.push(
+        data
+    );
+
+
     refreshBrandDatalist();
+
+
     return data.id;
+
 }
 
 function getAvailableSizes() {
@@ -1342,6 +1904,7 @@ async function saveProduct(event) {
 
         cancelForm();
         await fetchProducts();
+        await updateDataQuality();
 
     } catch (error) {
         console.error("Lỗi lưu sản phẩm:", error);
@@ -1392,6 +1955,7 @@ async function deleteProduct(id) {
         if (state.products.length === 1 && state.currentPage > 1) state.currentPage--;
         showToast(`Đã xóa sản phẩm và ${storagePaths.length} ảnh.`, "success");
         await fetchProducts();
+        await updateDataQuality();
 
     } catch (error) {
         console.error("Lỗi xóa sản phẩm:", error);
@@ -1543,6 +2107,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     await loadAllDropdowns();
     await fetchProducts();
+    await updateDataQuality();
 });
 
 /* GLOBAL EXPORTS */
@@ -1552,3 +2117,52 @@ window.saveProduct = saveProduct;
 window.editProduct = editProduct;
 window.deleteProduct = deleteProduct;
 window.fetchProducts = fetchProducts;
+
+/* =========================================================
+   DATA QUALITY → KÍCH HOẠT BỘ LỌC ẨN
+========================================================= */
+function handleDataQualityClick(key) {
+    state.currentPage = 1;
+
+    switch (key) {
+        case "image":
+            state.filters.hasImage = "no";
+            if (DOM.filterHasImage) DOM.filterHasImage.value = "no";
+            break;
+        case "datasheet":
+            state.filters.hasDatasheet = "no";
+            if (DOM.filterHasDatasheet) DOM.filterHasDatasheet.value = "no";
+            break;
+        case "information":
+            state.filters.hasInfo = "no";
+            if (DOM.filterHasInfo) DOM.filterHasInfo.value = "no";
+            break;
+        case "brand":
+            state.filters.hasBrand = "no";
+            break;
+        case "origin":
+            state.filters.hasOrigin = "no";
+            break;
+        case "description":
+            state.filters.hasDesc = "no";
+            break;
+        case "specifications":
+            state.filters.hasSpecs = "no";
+            break;
+        default:
+            return;
+    }
+
+    if (DOM.advancedPanel && DOM.advancedPanel.classList.contains("hidden")) {
+        DOM.advancedPanel.classList.remove("hidden");
+    }
+
+    renderActiveFilters(); // In Tag ra để Admin biết đang lọc cái gì
+    fetchProducts(); // Kéo sản phẩm từ DB về
+}
+
+function formatNumber(value) {
+    return new Intl.NumberFormat("vi-VN").format(
+        Number(value || 0)
+    );
+}

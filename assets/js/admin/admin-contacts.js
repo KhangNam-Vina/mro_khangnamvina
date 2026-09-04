@@ -308,10 +308,10 @@ async function loadContactConfig() {
             document.getElementById('cfgAddress').value = data.address || '';
             document.getElementById('cfgSupportTime').value = data.support_time || '';
             document.getElementById('cfgMapUrl').value = data.map_iframe_url || '';
-            document.getElementById('cfgProof1').value = data.proof_1 || '';
-            document.getElementById('cfgProof2').value = data.proof_2 || '';
-            document.getElementById('cfgProof3').value = data.proof_3 || '';
-            document.getElementById('cfgProof4').value = data.proof_4 || '';
+            
+            // XỬ LÝ DYNAMIC PROOFS (Mảng JSON)
+            const proofs = data.proofs || [];
+            renderProofs(proofs);
         }
         state.isConfigLoaded = true;
     } catch (err) {
@@ -324,6 +324,12 @@ window.saveContactConfig = async function() {
     btn.disabled = true;
     btn.innerHTML = "Đang lưu...";
 
+    // THU THẬP MẢNG PROOFS (Bỏ qua các input để trống)
+    const proofInputs = document.querySelectorAll('.proof-input');
+    const proofsArray = Array.from(proofInputs)
+        .map(input => input.value.trim())
+        .filter(val => val !== '');
+
     const payload = {
         id: 1,
         hotline: document.getElementById('cfgHotline').value.trim(),
@@ -331,10 +337,7 @@ window.saveContactConfig = async function() {
         address: document.getElementById('cfgAddress').value.trim(),
         support_time: document.getElementById('cfgSupportTime').value.trim(),
         map_iframe_url: document.getElementById('cfgMapUrl').value.trim(),
-        proof_1: document.getElementById('cfgProof1').value.trim(),
-        proof_2: document.getElementById('cfgProof2').value.trim(),
-        proof_3: document.getElementById('cfgProof3').value.trim(),
-        proof_4: document.getElementById('cfgProof4').value.trim(),
+        proofs: proofsArray, // <--- Bơm mảng JSON vào database
         updated_at: new Date().toISOString()
     };
 
@@ -350,5 +353,51 @@ window.saveContactConfig = async function() {
     } finally {
         btn.disabled = false;
         btn.innerHTML = "Lưu Thay Đổi";
+    }
+}
+
+// ==========================================
+// CÁC HÀM HỖ TRỢ XỬ LÝ DYNAMIC PROOFS
+// ==========================================
+
+function renderProofs(proofsArray) {
+    const container = document.getElementById('proofsContainer');
+    if (!container) return;
+    
+    container.innerHTML = ''; // Xóa rỗng trước khi render
+    if (proofsArray.length === 0) {
+        checkEmptyProofs();
+    } else {
+        proofsArray.forEach(proof => addProofRow(proof));
+    }
+}
+
+window.addProofRow = function(value = '') {
+    const container = document.getElementById('proofsContainer');
+    const emptyMsg = document.getElementById('emptyProofMsg');
+    if (emptyMsg) emptyMsg.classList.add('hidden');
+
+    const row = document.createElement('div');
+    row.className = 'flex items-center space-x-3 proof-row';
+    
+    // Nút kéo thả (chỉ để trang trí) + Ô Input + Nút Xóa
+    row.innerHTML = `
+        <span class="bg-green-100 text-green-700 p-1.5 rounded-full cursor-move">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </span>
+        <input type="text" value="${utils.escapeHTML(value)}" class="proof-input flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-kn-blue outline-none text-sm" placeholder="VD: Hợp tác 1000+ nhà máy FDI...">
+        <button type="button" onclick="this.parentElement.remove(); checkEmptyProofs();" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition" title="Xóa dòng này">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+        </button>
+    `;
+    container.appendChild(row);
+}
+
+window.checkEmptyProofs = function() {
+    const container = document.getElementById('proofsContainer');
+    const emptyMsg = document.getElementById('emptyProofMsg');
+    // Nếu không còn thẻ con nào -> Hiện thông báo "Chưa có điểm uy tín"
+    if (container && container.children.length === 0 && emptyMsg) {
+        emptyMsg.classList.remove('hidden');
     }
 }
