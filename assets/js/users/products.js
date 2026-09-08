@@ -53,6 +53,22 @@ function buildProductImageUrl(imagePath) {
     return `${IMAGE_CDN_BASE}/${path}`;
 }
 
+const isLocal =
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname === 'localhost';
+
+function buildProductDetailUrl(item) {
+    if (!item?.slug) {
+        return isLocal
+            ? `product-detail.html?id=${encodeURIComponent(item?.id || '')}`
+            : `/pages/product-detail.html?id=${encodeURIComponent(item?.id || '')}`;
+    }
+
+    return isLocal
+        ? `/pages/product-detail.html?slug=${encodeURIComponent(item.slug)}`
+        : `/${encodeURIComponent(item.slug)}.html`;
+}
+
 // ========================================================
 // SEARCH HELPERS (ĐÃ FIX LỖI GIẤY / GIẦY)
 // ========================================================
@@ -248,6 +264,150 @@ function formatCurrency(value) {
     );
 }
 
+// ========================================================
+// SEO META
+// ========================================================
+
+function updateProductsSEO({
+    title,
+    description,
+    h1,
+    canonicalUrl
+}) {
+
+    // ==============================
+    // TITLE
+    // ==============================
+
+    if (title) {
+
+        document.title =
+            title;
+
+        const ogTitle =
+            document.getElementById(
+                'ogTitle'
+            );
+
+        if (ogTitle) {
+
+            ogTitle.setAttribute(
+                'content',
+                title
+            );
+
+        }
+
+    }
+
+
+    // ==============================
+    // DESCRIPTION
+    // ==============================
+
+    if (description) {
+
+        const metaDescription =
+            document.getElementById(
+                'metaDescription'
+            );
+
+        if (metaDescription) {
+
+            metaDescription.setAttribute(
+                'content',
+                description
+            );
+
+        }
+
+
+        const ogDescription =
+            document.getElementById(
+                'ogDescription'
+            );
+
+        if (ogDescription) {
+
+            ogDescription.setAttribute(
+                'content',
+                description
+            );
+
+        }
+
+    }
+
+
+    // ==============================
+    // CANONICAL
+    // ==============================
+
+    if (canonicalUrl) {
+
+        let canonicalEl =
+            document.querySelector(
+                'link[rel="canonical"]'
+            );
+
+        if (!canonicalEl) {
+
+            canonicalEl =
+                document.createElement(
+                    'link'
+                );
+
+            canonicalEl.rel =
+                'canonical';
+
+            document.head.appendChild(
+                canonicalEl
+            );
+
+        }
+
+        canonicalEl.href =
+            canonicalUrl;
+
+
+        const ogUrl =
+            document.getElementById(
+                'ogUrl'
+            );
+
+        if (ogUrl) {
+
+            ogUrl.setAttribute(
+                'content',
+                canonicalUrl
+            );
+
+        }
+
+    }
+
+
+    // ==============================
+    // H1
+    // ==============================
+
+    if (h1) {
+
+        const heroTitle =
+            document.getElementById(
+                'catalogHeroTitle'
+            );
+
+        if (heroTitle) {
+
+            heroTitle.textContent =
+                h1;
+
+        }
+
+    }
+
+}
 
 // ========================================================
 // 2. FETCH PRODUCT
@@ -316,9 +476,16 @@ async function fetchFilteredProducts() {
         );
 
     const familyId =
-        urlParams.get(
-            'family_id'
-        );
+    urlParams.get(
+        'family_id'
+    );
+
+const familySlug =
+    urlParams.get(
+        'slug'
+    );
+
+
 
     const industryId =
         urlParams.get(
@@ -421,6 +588,49 @@ async function fetchFilteredProducts() {
                     }
                 );
 
+        // ==================================================
+        // FAMILY SLUG → FAMILY ID
+        // ==================================================
+
+        let resolvedFamilyId =
+            familyId || null;
+
+        let familyInfo =
+            null;
+
+        if (familySlug) {
+
+            const {
+                data,
+                error
+            } = await window.supabaseClient
+                .from('families')
+                .select(
+                    'id, name, slug, sub_category_id, sub_categories(name, slug, category_id, categories(name, slug))'
+                )
+                .eq(
+                    'slug',
+                    familySlug
+                )
+                .single();
+
+            if (error) {
+                throw error;
+            }
+
+            if (!data) {
+                throw new Error(
+                    'Không tìm thấy dòng sản phẩm.'
+                );
+            }
+
+            familyInfo =
+                data;
+
+            resolvedFamilyId =
+                data.id;
+
+        }
 
         let pageTitleText =
             'Tất cả sản phẩm';
@@ -428,6 +638,55 @@ async function fetchFilteredProducts() {
         let breadcrumbText =
             'Danh sách sản phẩm';
 
+        let seoTitle =
+            'Sản phẩm | MRO Khang Nam';
+
+        let seoDescription =
+            'Khám phá danh mục sản phẩm vật tư công nghiệp chính hãng tại MRO Khang Nam.';
+
+        let seoH1 =
+            'Sản phẩm';
+
+
+        // ==================================================
+        // FAMILY SEO URL
+        // ==================================================
+
+        const familyCanonicalUrl =
+            familyInfo?.slug
+                ? new URL(
+                    `/${encodeURIComponent(
+                        String(familyInfo.slug).trim()
+                    )}.html`,
+                    window.location.origin
+                ).href
+                : window.location.href.split('#')[0];
+
+        const familySubCategory =
+            familyInfo?.sub_categories || null;
+
+        const familyCategory =
+            familySubCategory?.categories || null;
+
+                const familyName =
+            familyInfo?.name ||
+            'Dòng sản phẩm';
+
+        const subCategoryName =
+            familySubCategory?.name ||
+            'Nhóm hàng';
+
+        const categoryName =
+            familyCategory?.name ||
+            'Danh mục';
+
+        const categorySlug =
+            familyCategory?.slug ||
+            '';
+
+        const subCategorySlug =
+            familySubCategory?.slug ||
+            '';
 
         // ==================================================
         // SEARCH
@@ -653,28 +912,41 @@ if (searchQuery) {
         // FAMILY
         // ==================================================
 
-        if (familyId) {
+        if (resolvedFamilyId) {
 
-            query =
-                query.eq(
-                    'family_id',
-                    familyId
-                );
+    query =
+        query.eq(
+            'family_id',
+            resolvedFamilyId
+        );
+
+    if (
+        !searchQuery
+    ) {
+
+        pageTitleText =
+            familyInfo?.name ||
+            'Sản phẩm cùng Dòng';
+
+        breadcrumbText =
+            familyInfo?.name ||
+            'Family';
 
 
-            if (
-                !searchQuery
-            ) {
+        seoH1 =
+            familyName;
 
-                pageTitleText =
-                    'Sản phẩm cùng Dòng';
 
-                breadcrumbText =
-                    'Family';
+        seoTitle =
+            `${familyName} | MRO Khang Nam`;
 
-            }
 
-        }
+        seoDescription =
+            `Khám phá các sản phẩm ${familyName} chính hãng tại MRO Khang Nam. Thông tin kỹ thuật, mã SKU và giải pháp vật tư công nghiệp cho doanh nghiệp.`;
+
+    }
+
+}
 
 
         // ==================================================
@@ -785,6 +1057,210 @@ if (searchQuery) {
                 breadcrumbText;
         }
 
+        updateProductsSEO({
+        title: seoTitle,
+        description: seoDescription,
+        h1: seoH1,
+        canonicalUrl: familyInfo
+            ? familyCanonicalUrl
+            : new URL(
+                '/pages/products.html',
+                window.location.origin
+            ).href
+    });
+
+        // ==================================================
+        // FAMILY BREADCRUMB + SEO
+        // ==================================================
+
+        if (familyInfo) {
+
+        const existingJsonLd =
+        document.getElementById(
+            'familyBreadcrumbJsonLd'
+        );
+
+        if (existingJsonLd) {
+            existingJsonLd.remove();
+        }
+
+
+        const breadcrumbItems = [
+
+    {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Trang chủ',
+        item:
+            `${window.location.origin}/`
+    }
+
+];
+
+
+if (categorySlug) {
+
+    breadcrumbItems.push({
+
+        '@type': 'ListItem',
+
+        position:
+            breadcrumbItems.length + 1,
+
+        name:
+            categoryName,
+
+        item:
+            `${window.location.origin}/${encodeURIComponent(categorySlug)}.html`
+
+    });
+
+}
+
+
+if (subCategorySlug) {
+
+    breadcrumbItems.push({
+
+        '@type': 'ListItem',
+
+        position:
+            breadcrumbItems.length + 1,
+
+        name:
+            subCategoryName,
+
+        item:
+            `${window.location.origin}/${encodeURIComponent(subCategorySlug)}.html`
+
+    });
+
+}
+
+
+if (familyInfo?.slug) {
+
+    breadcrumbItems.push({
+
+        '@type': 'ListItem',
+
+        position:
+            breadcrumbItems.length + 1,
+
+        name:
+            familyName,
+
+        item:
+            familyCanonicalUrl
+
+    });
+
+}
+
+
+const jsonLd =
+    document.createElement('script');
+
+jsonLd.type =
+    'application/ld+json';
+
+jsonLd.id =
+    'familyBreadcrumbJsonLd';
+
+jsonLd.textContent =
+    JSON.stringify({
+
+        '@context':
+            'https://schema.org',
+
+        '@type':
+            'BreadcrumbList',
+
+        itemListElement:
+            breadcrumbItems
+
+    });
+
+
+document.head.appendChild(
+    jsonLd
+);
+
+    // ------------------------------------------------
+    // FAMILY BREADCRUMB
+    // ------------------------------------------------
+
+    const bcCategorySeparator =
+    document.getElementById(
+        'breadcrumbCategorySeparator'
+    );
+
+const bcSubCategorySeparator =
+    document.getElementById(
+        'breadcrumbSubCategorySeparator'
+    );
+
+const bcCategory =
+    document.getElementById(
+        'breadcrumbCategory'
+    );
+
+const bcSubCategory =
+    document.getElementById(
+        'breadcrumbSubCategory'
+    );
+
+const bcFamily =
+    document.getElementById(
+        'breadcrumbCurrent'
+    );
+
+
+   if (bcCategory && categorySlug) {
+
+    bcCategory.textContent =
+        categoryName;
+
+    bcCategory.href =
+        isLocal
+            ? `/pages/subcategory.html?slug=${encodeURIComponent(categorySlug)}`
+            : `/${encodeURIComponent(categorySlug)}.html`;
+
+    bcCategory.classList.remove('is-hidden');
+
+    if (bcCategorySeparator) {
+        bcCategorySeparator.classList.remove('is-hidden');
+    }
+
+}
+
+if (bcSubCategory && subCategorySlug) {
+
+    bcSubCategory.textContent =
+        subCategoryName;
+
+    bcSubCategory.href =
+    isLocal
+        ? `/pages/family.html?slug=${encodeURIComponent(subCategorySlug)}`
+        : `/${encodeURIComponent(subCategorySlug)}.html`;
+
+    bcSubCategory.classList.remove('is-hidden');
+
+    if (bcSubCategorySeparator) {
+        bcSubCategorySeparator.classList.remove('is-hidden');
+    }
+
+}
+
+
+    if (bcFamily) {
+
+        bcFamily.textContent =
+            familyName;
+
+    }
+
+}
 
         // ==================================================
         // EXECUTE
@@ -1019,7 +1495,7 @@ if (searchQuery) {
                     <article class="product-card">
 
                         <a
-                            href="product-detail.html?id=${encodeURIComponent(item.id)}"
+                            href="${buildProductDetailUrl(item)}"
                             class="product-card-image"
                         >
 
@@ -1063,7 +1539,7 @@ if (searchQuery) {
 
 
                             <a
-                                href="product-detail.html?id=${encodeURIComponent(item.id)}"
+                               href="${buildProductDetailUrl(item)}"
                                 class="product-card-name-link"
                             >
 
@@ -1348,9 +1824,14 @@ async function loadSidebar() {
 
 
     const familyId =
-        urlParams.get(
-            'family_id'
-        );
+    urlParams.get(
+        'family_id'
+    );
+
+const familySlug =
+    urlParams.get(
+        'slug'
+    );
 
     const subCategoryId =
         urlParams.get(
@@ -1393,9 +1874,48 @@ async function loadSidebar() {
 
     try {
 
-        // ==================================================
-        // PRODUCT DATA FOR COUNTS
-        // ==================================================
+    // ==================================================
+    // RESOLVE FAMILY SLUG → FAMILY ID
+    // ==================================================
+
+    let resolvedSidebarFamilyId =
+        familyId || null;
+
+    if (familySlug) {
+
+        const {
+            data: familyInfo,
+            error: familyError
+        } = await window.supabaseClient
+            .from('families')
+            .select(
+                'id'
+            )
+            .eq(
+                'slug',
+                familySlug
+            )
+            .single();
+
+        if (familyError) {
+            throw familyError;
+        }
+
+        if (!familyInfo) {
+            throw new Error(
+                'Không tìm thấy dòng sản phẩm.'
+            );
+        }
+
+        resolvedSidebarFamilyId =
+            familyInfo.id;
+
+    }
+
+
+    // ==================================================
+    // PRODUCT DATA FOR COUNTS
+    // ==================================================
 
         let prodQuery =
             window.supabaseClient
@@ -1405,13 +1925,13 @@ async function loadSidebar() {
                 );
 
 
-        if (familyId) {
+        if (resolvedSidebarFamilyId) {
 
-            prodQuery =
-                prodQuery.eq(
-                    'family_id',
-                    familyId
-                );
+    prodQuery =
+        prodQuery.eq(
+            'family_id',
+            resolvedSidebarFamilyId
+        );
 
         } else if (
             subCategoryId
@@ -1660,13 +2180,13 @@ async function loadSidebar() {
         // SUBCATEGORY RENDER
         // ==================================================
 
-        if (familyId) {
+        if (resolvedSidebarFamilyId) {
 
-            filterCategoryBlock?.classList.add(
-                'is-hidden'
-            );
+                filterCategoryBlock?.classList.add(
+                    'is-hidden'
+                );
 
-        } else {
+            } else {
 
             filterCategoryBlock?.classList.remove(
                 'is-hidden'

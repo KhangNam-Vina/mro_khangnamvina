@@ -145,14 +145,13 @@ async function fetchFamilies() {
 
 
     const urlParams =
-        new URLSearchParams(
-            window.location.search
-        );
+    new URLSearchParams(
+        window.location.search
+    );
 
-
-    const subCatId =
+    const subCategorySlug =
         urlParams.get(
-            'sub_category_id'
+            'slug'
         );
 
 
@@ -160,24 +159,22 @@ async function fetchFamilies() {
     // KIỂM TRA URL
     // ====================================================
 
-    if (!subCatId) {
+    if (!subCategorySlug) {
 
-        if (title) {
+    if (title) {
 
-            title.textContent =
-                'Lỗi đường dẫn';
-
-        }
-
-
-        emptyState?.classList.remove(
-            'is-hidden'
-        );
-
-
-        return;
+        title.textContent =
+            'Lỗi đường dẫn';
 
     }
+
+    emptyState?.classList.remove(
+        'is-hidden'
+    );
+
+    return;
+
+}
 
 
     // ====================================================
@@ -219,81 +216,63 @@ async function fetchFamilies() {
         // QUERY SONG SONG
         // ==================================================
 
-        const [
-            subCatRes,
-            familiesRes
-        ] =
-            await Promise.all([
+        // ==================================================
+// TÌM SUBCATEGORY BẰNG SLUG
+// ==================================================
 
-                supabaseClient
+const { data: subCatInfo, error: subCategoryError } =
+    await supabaseClient
+        .from('sub_categories')
+        .select(
+            'id, name, slug, category_id, categories(name, slug)'
+        )
+        .eq(
+            'slug',
+            subCategorySlug
+        )
+        .single();
 
-                    .from(
-                        'sub_categories'
-                    )
+if (subCategoryError) {
+    throw subCategoryError;
+}
 
-                    .select(
-                        'name, category_id, categories(name)'
-                    )
+if (!subCatInfo) {
+    throw new Error(
+        'Không tìm thấy nhóm hàng.'
+    );
+}
 
-                    .eq(
-                        'id',
-                        subCatId
-                    )
-
-                    .single(),
-
-
-                supabaseClient
-
-                    .from(
-                        'families'
-                    )
-
-                    .select(
-                        '*, products(id)'
-                    )
-
-                    .eq(
-                        'sub_category_id',
-                        subCatId
-                    )
-
-                    .order(
-                        'name',
-                        {
-                            ascending:
-                                true
-                        }
-                    )
-
-            ]);
+const subCategoryId =
+    subCatInfo.id;
 
 
-        if (
-            subCatRes.error
-        ) {
+// ==================================================
+// SAU KHI CÓ SUBCATEGORY ID → LOAD FAMILY
+// ==================================================
 
-            throw subCatRes.error;
+const { data: families, error: familiesError } =
+    await supabaseClient
+        .from('families')
+        .select(
+            '*, products(id)'
+        )
+        .eq(
+            'sub_category_id',
+            subCategoryId
+        )
+        .order(
+            'name',
+            {
+                ascending: true
+            }
+        );
 
-        }
+if (familiesError) {
+    throw familiesError;
+}
 
-
-        if (
-            familiesRes.error
-        ) {
-
-            throw familiesRes.error;
-
-        }
-
-
-        const subCatInfo =
-            subCatRes.data;
-
-
-        allFamilies =
-            familiesRes.data || [];
-
+allFamilies =
+    families || [];
 
         const familyCount =
             document.getElementById(
@@ -325,13 +304,25 @@ async function fetchFamilies() {
                 subCatInfo.category_id;
 
 
+            const categorySlug =
+                subCatInfo.categories?.slug || '';
+
+            const isLocal =
+            window.location.hostname === '127.0.0.1' ||
+            window.location.hostname === 'localhost';
+
+
             const subName =
                 subCatInfo.name;
 
 
-            const currentUrl =
-                window.location.href
-                    .split('#')[0];
+            const subcategoryUrl =
+                    subCatInfo.slug
+                        ? new URL(
+                            `/${encodeURIComponent(String(subCatInfo.slug).trim())}.html`,
+                            window.location.origin
+                        ).href
+                        : window.location.href.split('#')[0];
 
 
             const seoTitle =
@@ -366,7 +357,7 @@ async function fetchFamilies() {
                 )
                 ?.setAttribute(
                     'href',
-                    currentUrl
+                    subcategoryUrl
                 );
 
 
@@ -376,7 +367,7 @@ async function fetchFamilies() {
                 )
                 ?.setAttribute(
                     'content',
-                    currentUrl
+                    subcategoryUrl
                 );
 
 
@@ -440,7 +431,13 @@ async function fetchFamilies() {
             ) {
 
                 bcParent.href =
-                    `subcategory.html?category_id=${encodeURIComponent(catId)}`;
+                    categorySlug
+                        ? (
+                            isLocal
+                                ? `/pages/subcategory.html?slug=${encodeURIComponent(categorySlug)}`
+                                : `/${encodeURIComponent(categorySlug)}.html`
+                        )
+                        : '#';
 
 
                 bcParent.textContent =
@@ -482,103 +479,59 @@ async function fetchFamilies() {
 
             const schemaData = {
 
-                '@context':
-                    'https://schema.org',
+            '@context': 'https://schema.org',
 
-                '@graph': [
+            '@type':
+                'BreadcrumbList',
 
-                    {
+            itemListElement: [
 
-                        '@type':
-                            'BreadcrumbList',
+                {
+                    '@type':
+                        'ListItem',
 
-                        itemListElement: [
+                    position:
+                        1,
 
-                            {
+                    name:
+                        'Trang chủ',
 
-                                '@type':
-                                    'ListItem',
+                    item:
+                        window.location.origin
+                },
 
-                                position:
-                                    1,
+                {
+                    '@type':
+                        'ListItem',
 
-                                name:
-                                    'Home',
+                    position:
+                        2,
 
-                                item:
-                                    window.location.origin
+                    name:
+                        catName,
 
-                            },
+                    item:
+                        categorySlug
+                            ? `${window.location.origin}/${encodeURIComponent(categorySlug)}.html`
+                            : `${window.location.origin}/pages/category.html`
+                },
 
-                            {
+                {
+                    '@type':
+                        'ListItem',
 
-                                '@type':
-                                    'ListItem',
+                    position:
+                        3,
 
-                                position:
-                                    2,
+                    name:
+                        subName,
 
-                                name:
-                                    'Danh Mục',
+                    item:
+                        subcategoryUrl
+                }
 
-                                item:
-                                    `${window.location.origin}/pages/category.html`
-
-                            },
-
-                            {
-
-                                '@type':
-                                    'ListItem',
-
-                                position:
-                                    3,
-
-                                name:
-                                    catName,
-
-                                item:
-                                    `${window.location.origin}/pages/subcategory.html?category_id=${catId}`
-
-                            },
-
-                            {
-
-                                '@type':
-                                    'ListItem',
-
-                                position:
-                                    4,
-
-                                name:
-                                    subName,
-
-                                item:
-                                    currentUrl
-
-                            }
-
-                        ]
-
-                    },
-
-
-                    {
-
-                        '@type':
-                            'CollectionPage',
-
-                        name:
-                            seoTitle,
-
-                        description:
-                            seoDesc
-
-                    }
-
-                ]
-
-            };
+            ]
+        }
 
 
             const schemaElement =
@@ -698,6 +651,10 @@ function renderFamilies(
     let html =
         '';
 
+    const isLocal =
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname === 'localhost';
+
 
     dataList.forEach(
         family => {
@@ -742,9 +699,13 @@ function renderFamilies(
             html += `
 
                 <a
-                    href="products.html?family_id=${encodeURIComponent(
-                        family.id
-                    )}"
+                    href="${family.slug
+                        ? (
+                            isLocal
+                                ? `/pages/products.html?slug=${encodeURIComponent(String(family.slug).trim())}`
+                                : `/${encodeURIComponent(String(family.slug).trim())}.html` 
+                        )
+                        : '#'}"
                     aria-label="Xem dòng sản phẩm ${escapeFamilyHTML(
                         familyName
                     )}"

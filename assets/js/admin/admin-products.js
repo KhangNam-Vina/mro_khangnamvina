@@ -21,6 +21,9 @@ const ORIGIN_OPTIONS = [
 /* =========================================================
    STATE & CẤU TRÚC BỘ LỌC
 ========================================================= */
+let autoSlugTimer = null;
+let autoSlugRequestId = 0;
+
 const state = {
     products: [],
     categories: [],
@@ -29,6 +32,7 @@ const state = {
     industries: [],
     brands: [],
     editingId: null,
+    editingSlugSource: "auto",
     currentPage: 1,
     itemsPerPage: 20,
     totalItems: 0,
@@ -129,6 +133,21 @@ const DOM = {
     dataQualityGrid:
         document.getElementById("dataQualityGrid"),
 
+    // SEO
+    slug: document.getElementById("slug"),
+    slugSourceLabel: document.getElementById("slugSourceLabel"),
+    metaTitle: document.getElementById("meta_title"),
+    metaDescription: document.getElementById("meta_description"),
+    seoPreview: document.getElementById("seoPreview"),
+    seoPreviewTitle: document.getElementById("seoPreviewTitle"),
+    seoPreviewUrl: document.getElementById("seoPreviewUrl"),
+    seoPreviewDescription: document.getElementById("seoPreviewDescription"),
+    isH1: document.getElementById("is_h1"),
+    btnCopySlug: document.getElementById("btnCopySlug"),
+    btnViewSlug: document.getElementById("btnViewSlug"),
+    metaTitleCount: document.getElementById("metaTitleCount"),
+    metaDescriptionCount: document.getElementById("metaDescriptionCount"),
+
     // Media
     mainImageFile: document.getElementById("image_file"),
     mainImagePreview: document.getElementById("mainImagePreview"),
@@ -156,6 +175,189 @@ function formatCurrency(value) {
     const number = Number(value);
     if (!number) return "Liên hệ";
     return new Intl.NumberFormat("vi-VN").format(number) + " đ";
+}
+
+/* =========================================================
+   SEO SLUG HELPERS
+========================================================= */
+function slugify(value) {
+    return String(value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "D")
+        .toLowerCase()
+        .replace(/[^a-z0-9-]+/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-+|-+$/g, "");
+}
+
+function getSlugSource() {
+    return state.editingSlugSource === "manual" ? "manual" : "auto";
+}
+
+async function ensureUniqueSlug(baseSlug, productId = null) {
+    const cleanSlug = slugify(baseSlug);
+    if (!cleanSlug) return "";
+
+    let candidate = cleanSlug;
+    let suffix = 2;
+
+    while (true) {
+        let query = window.supabaseClient
+            .from("products")
+            .select("id")
+            .eq("slug", candidate)
+            .limit(1);
+
+        if (productId) query = query.neq("id", productId);
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        if (!data || data.length === 0) return candidate;
+
+        candidate = `${cleanSlug}-${suffix++}`;
+    }
+}
+
+async function updateAutoSlug({ force = false } = {}) {
+    if (!DOM.slug) return;
+
+    const name = document.getElementById("name")?.value?.trim() || "";
+    if (!name) {
+        DOM.slug.value = "";
+        updateSlugSourceUI();
+        return;
+    }
+
+    if (!force && getSlugSource() !== "auto") return;
+
+    const requestId = ++autoSlugRequestId;
+
+    try {
+        const slug = await ensureUniqueSlug(slugify(name), state.editingId);
+
+        // Bỏ qua kết quả cũ nếu admin đã gõ/đổi tên tiếp trong lúc chờ DB.
+        if (requestId !== autoSlugRequestId) return;
+        if (!force && getSlugSource() !== "auto") return;
+
+        DOM.slug.value = slug;
+        state.editingSlugSource = "auto";
+        updateSlugSourceUI();
+    } catch (error) {
+        console.error("Lỗi tạo slug:", error);
+    }
+}
+
+function scheduleAutoSlug() {
+    clearTimeout(autoSlugTimer);
+
+    if (getSlugSource() !== "auto") return;
+
+    autoSlugTimer = setTimeout(() => {
+        updateAutoSlug();
+    }, 350);
+}
+
+function updateSlugSourceUI() {
+    if (!DOM.slugSourceLabel) return;
+    DOM.slugSourceLabel.textContent =
+        getSlugSource() === "manual" ? "Thủ công" : "Tự động";
+}
+
+function markSlugManual() {
+    if (!DOM.slug) return;
+    state.editingSlugSource = "manual";
+    updateSlugSourceUI();
+}
+
+function handleSlugInput() {
+    if (!DOM.slug) return;
+
+    let value = DOM.slug.value;
+
+    // Cho phép nhập slug tự nhiên:
+    // - chữ cái a-z
+    // - số 0-9
+    // - dấu gạch ngang "-"
+    value = value
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "D")
+        .toLowerCase()
+        .replace(/[^a-z0-9-]/g, "")
+        .replace(/-+/g, "-");
+
+    DOM.slug.value = value;
+
+    // Có nội dung => người dùng đang chỉnh slug thủ công
+    if (value) {
+        state.editingSlugSource = "manual";
+        ++autoSlugRequestId;
+        clearTimeout(autoSlugTimer);
+    } else {
+        // Xóa hết slug => quay lại Auto
+        state.editingSlugSource = "auto";
+        scheduleAutoSlug();
+    }
+
+    updateSlugSourceUI();
+}
+
+async function copyCurrentSlug() {
+    const slug = DOM.slug?.value?.trim() || "";
+    if (!slug) {
+        showToast("Chưa có slug để sao chép.", "error");
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(slug);
+        showToast("Đã sao chép slug.", "success");
+    } catch (error) {
+        const temp = document.createElement("textarea");
+        temp.value = slug;
+        temp.style.position = "fixed";
+        temp.style.opacity = "0";
+        document.body.appendChild(temp);
+        temp.select();
+
+        try {
+            document.execCommand("copy");
+            showToast("Đã sao chép slug.", "success");
+        } catch (copyError) {
+            showToast("Không thể sao chép slug.", "error");
+        } finally {
+            temp.remove();
+        }
+    }
+}
+
+function getProductSlugUrl() {
+    const slug = DOM.slug?.value?.trim() || "";
+    if (!slug) return "";
+
+    const productId = state.editingId;
+
+    if (!productId) {
+        showToast("Sản phẩm chưa được lưu nên chưa có trang để xem.", "error");
+        return "";
+    }
+
+    return `${window.location.origin}/product-detail.html?id=${encodeURIComponent(productId)}`;
+}
+
+function viewCurrentSlug() {
+    const url = getProductSlugUrl();
+
+    if (!url) {
+        showToast("Chưa có slug để xem.", "error");
+        return;
+    }
+
+    window.open(url, "_blank", "noopener,noreferrer");
 }
 
 /* =========================================================
@@ -475,38 +677,90 @@ function escapeDropdownHTML(value) {
 ========================================================= */
 
 // Cập nhật Cấp 2 (SubCategory) dựa vào Cấp 1
-function updateFilterSubCategories(categoryId) {
+function updateFilterSubCategories(categoryId, preserveSelection = false) {
     if (!DOM.filterSubCategory || !DOM.filterFamily) return;
-    
+
+    const previousSubCategory = preserveSelection
+        ? state.filters.subCategory
+        : "all";
+    const previousFamily = preserveSelection
+        ? state.filters.family
+        : "all";
+
     if (categoryId && categoryId !== "all") {
-        const filtered = state.subCategories.filter(item => String(item.category_id) === String(categoryId));
+        const filtered = state.subCategories.filter(
+            item => String(item.category_id) === String(categoryId)
+        );
         populateSelect(DOM.filterSubCategory, filtered, "-- Tất cả nhóm hàng --", "all");
         DOM.filterSubCategory.disabled = false;
     } else {
         populateSelect(DOM.filterSubCategory, [], "-- Chọn danh mục gốc trước --", "all");
         DOM.filterSubCategory.disabled = true;
     }
-    
-    // Khóa luôn cấp 3
-    populateSelect(DOM.filterFamily, [], "-- Chọn nhóm hàng trước --", "all");
-    DOM.filterFamily.disabled = true;
-    state.filters.subCategory = "all";
-    state.filters.family = "all";
+
+    const hasSubSelection =
+        previousSubCategory !== "all" &&
+        Array.from(DOM.filterSubCategory.options).some(
+            option => String(option.value) === String(previousSubCategory)
+        );
+
+    if (hasSubSelection) {
+        DOM.filterSubCategory.value = previousSubCategory;
+        state.filters.subCategory = previousSubCategory;
+        updateFilterFamilies(previousSubCategory, true);
+
+        const hasFamilySelection =
+            previousFamily !== "all" &&
+            Array.from(DOM.filterFamily.options).some(
+                option => String(option.value) === String(previousFamily)
+            );
+
+        if (hasFamilySelection) {
+            DOM.filterFamily.value = previousFamily;
+            state.filters.family = previousFamily;
+        } else {
+            state.filters.family = "all";
+        }
+    } else {
+        populateSelect(DOM.filterFamily, [], "-- Chọn nhóm hàng trước --", "all");
+        DOM.filterFamily.disabled = true;
+        state.filters.subCategory = "all";
+        state.filters.family = "all";
+    }
 }
 
 // Cập nhật Cấp 3 (Family) dựa vào Cấp 2
-function updateFilterFamilies(subCategoryId) {
+function updateFilterFamilies(subCategoryId, preserveSelection = false) {
     if (!DOM.filterFamily) return;
-    
+
+    const previousFamily = preserveSelection
+        ? state.filters.family
+        : "all";
+
     if (subCategoryId && subCategoryId !== "all") {
-        const filtered = state.families.filter(item => String(item.sub_category_id) === String(subCategoryId));
+        const filtered = state.families.filter(
+            item => String(item.sub_category_id) === String(subCategoryId)
+        );
         populateSelect(DOM.filterFamily, filtered, "-- Tất cả dòng sản phẩm --", "all");
         DOM.filterFamily.disabled = false;
     } else {
         populateSelect(DOM.filterFamily, [], "-- Chọn nhóm hàng trước --", "all");
         DOM.filterFamily.disabled = true;
     }
-    state.filters.family = "all";
+
+    const hasFamilySelection =
+        preserveSelection &&
+        previousFamily !== "all" &&
+        Array.from(DOM.filterFamily.options).some(
+            option => String(option.value) === String(previousFamily)
+        );
+
+    if (hasFamilySelection) {
+        DOM.filterFamily.value = previousFamily;
+        state.filters.family = previousFamily;
+    } else {
+        state.filters.family = "all";
+    }
 }
 
 /* =========================================================
@@ -621,26 +875,23 @@ function renderBrandsForFilter(keyword = "") {
 
 // Cập nhật State từ DOM (dùng khi Clear Filter)
 function syncFiltersToDOM() {
-    if(DOM.search) DOM.search.value = state.filters.search;
-    if(DOM.filterCategory) DOM.filterCategory.value = state.filters.category;
-    if(DOM.filterIndustry) DOM.filterIndustry.value = state.filters.industry;
-    if(DOM.filterStock) DOM.filterStock.value = state.filters.stock;
-    if(DOM.filterSort) DOM.filterSort.value = state.filters.sort;
-    if(DOM.filterOrigin) DOM.filterOrigin.value = state.filters.origin;
-    if(DOM.filterPriceMin) DOM.filterPriceMin.value = state.filters.priceMin;
-    if(DOM.filterPriceMax) DOM.filterPriceMax.value = state.filters.priceMax;
-    if(DOM.filterMoqMin) DOM.filterMoqMin.value = state.filters.moqMin;
-    if(DOM.filterMoqMax) DOM.filterMoqMax.value = state.filters.moqMax;
-    if(DOM.filterHasImage) DOM.filterHasImage.value = state.filters.hasImage;
-    if(DOM.filterHasDatasheet) DOM.filterHasDatasheet.value = state.filters.hasDatasheet;
-    if(DOM.filterHasInfo) DOM.filterHasInfo.value = state.filters.hasInfo || "all";
-    
-    updateFilterSubCategories(state.filters.category);
-    if(DOM.filterSubCategory) DOM.filterSubCategory.value = state.filters.subCategory;
-    
-    updateFilterFamilies(state.filters.subCategory);
-    if(DOM.filterFamily) DOM.filterFamily.value = state.filters.family;
-    
+    if (DOM.search) DOM.search.value = state.filters.search;
+    if (DOM.filterCategory) DOM.filterCategory.value = state.filters.category;
+    if (DOM.filterIndustry) DOM.filterIndustry.value = state.filters.industry;
+    if (DOM.filterStock) DOM.filterStock.value = state.filters.stock;
+    if (DOM.filterSort) DOM.filterSort.value = state.filters.sort;
+    if (DOM.filterOrigin) DOM.filterOrigin.value = state.filters.origin;
+    if (DOM.filterPriceMin) DOM.filterPriceMin.value = state.filters.priceMin;
+    if (DOM.filterPriceMax) DOM.filterPriceMax.value = state.filters.priceMax;
+    if (DOM.filterMoqMin) DOM.filterMoqMin.value = state.filters.moqMin;
+    if (DOM.filterMoqMax) DOM.filterMoqMax.value = state.filters.moqMax;
+    if (DOM.filterHasImage) DOM.filterHasImage.value = state.filters.hasImage;
+    if (DOM.filterHasDatasheet) DOM.filterHasDatasheet.value = state.filters.hasDatasheet;
+    if (DOM.filterHasInfo) DOM.filterHasInfo.value = state.filters.hasInfo || "all";
+
+    // Rebuild cascade nhưng giữ SubCategory/Family hiện tại nếu còn hợp lệ.
+    updateFilterSubCategories(state.filters.category, true);
+
     renderBrandsForFilter(DOM.filterBrandSearch?.value || "");
 }
 
@@ -860,9 +1111,16 @@ function renderOriginOptions(keyword = "") {
     if (!origins.length) {
         container.innerHTML = `
             <div class="px-3 py-2 border-b text-sm text-gray-500">Không có sẵn.</div>
-            <button type="button" class="w-full text-left px-3 py-2 text-sm font-bold text-kn-blue hover:bg-blue-50 transition" onclick="useCustomOrigin('${escapeDropdownHTML(keyword)}')">
-                + Thêm mới: "${escapeDropdownHTML(keyword)}"
+            <button
+                type="button"
+                class="w-full text-left px-3 py-2 text-sm font-bold text-kn-blue hover:bg-blue-50 transition"
+                data-custom-origin="${escapeAttribute(keyword)}">
+                + Thêm mới: "${escapeHTML(keyword)}"
             </button>`;
+
+        container.querySelector("[data-custom-origin]")?.addEventListener("click", event => {
+            useCustomOrigin(event.currentTarget.dataset.customOrigin || "");
+        });
         return;
     }
 
@@ -924,6 +1182,21 @@ function initBrandOriginDropdowns() {
 /* =========================================================
    FETCH & RENDER PRODUCTS BẰNG FILTER MỚI
 ========================================================= */
+function addPostgrestLogicFilter(query, expression) {
+    if (!expression) return query;
+
+    /*
+     * Supabase/PostgREST hỗ trợ logic tree:
+     * and=(or(...),or(...))
+     *
+     * Dùng URL parameter `and` để giữ đúng:
+     * Search AND Missing/Quality conditions.
+     * Như vậy không còn hiện tượng .or() sau ghi đè .or() trước.
+     */
+    query.url.searchParams.set("and", expression);
+    return query;
+}
+
 async function fetchProducts() {
     if (!DOM.tableBody) return;
     renderTableLoading();
@@ -932,93 +1205,213 @@ async function fetchProducts() {
         const from = (state.currentPage - 1) * state.itemsPerPage;
         const to = from + state.itemsPerPage - 1;
 
-        let query = window.supabaseClient.from("products").select("*, brands(name)", { count: "exact" });
+        let query = window.supabaseClient
+            .from("products")
+            .select("*, brands(name)", { count: "exact" });
 
-        // 1. Keyword search (OR logic cho tên và SKU)
+        const logicGroups = [];
+
+        // Keyword search: SKU OR Name
         if (state.filters.search) {
-            const keyword = state.filters.search.replace(/[%_,]/g, "");
+            // Lọc luôn cả ngoặc kép và dấu phẩy khách lỡ tay gõ vào để chống gãy chuỗi
+            const keyword = state.filters.search
+                .replace(/[%_",()]/g, "")
+                .trim();
+
             if (keyword) {
-                query = query.or(`sku.ilike.%${keyword}%,name.ilike.%${keyword}%`);
+                // FIX BẪY SỐ 2: Bọc thêm ngoặc kép vào "%...%" để an toàn tuyệt đối với khoảng trắng
+                logicGroups.push(
+                    `or(sku.ilike."%${keyword}%",name.ilike."%${keyword}%")`
+                );
             }
         }
 
-        // 2. Quick Filters
-        if (state.filters.category !== "all") query = query.eq("category_id", state.filters.category);
-        if (state.filters.industry !== "all") query = query.eq("industry_id", state.filters.industry);
-        if (state.filters.stock === "in_stock") query = query.gt("stock_quantity", 0);
-        if (state.filters.stock === "out_of_stock") query = query.lte("stock_quantity", 0);
-
-        // 3. Advanced Filters
-        if (state.filters.subCategory !== "all") query = query.eq("sub_category_id", state.filters.subCategory);
-        if (state.filters.family !== "all") query = query.eq("family_id", state.filters.family);
-        if (state.filters.origin !== "all") query = query.eq("origin", state.filters.origin);
-        if (state.filters.priceMin) query = query.gte("price", state.filters.priceMin);
-        if (state.filters.priceMax) query = query.lte("price", state.filters.priceMax);
-        if (state.filters.brands.length > 0) query = query.in("brand_id", state.filters.brands);
-
-        if (state.filters.moqMin) query = query.gte("min_order_quantity", state.filters.moqMin);
-        if (state.filters.moqMax) query = query.lte("min_order_quantity", state.filters.moqMax);
-        
-        // Check Ảnh
-        if (state.filters.hasImage === 'yes') {
-            query = query.not('image_path', 'is', null).neq('image_path', '');
-        } else if (state.filters.hasImage === 'no') {
-            query = query.or('image_path.is.null,image_path.eq.""');
-        }
-        
-        // =====================================================
-        // CHECK THÔNG TIN
-        // Rule:
-        // Tên + SKU + Brand + Xuất xứ + Mô tả +
-        // Thông số + Hình ảnh
-        // =====================================================
-
-        // =====================================================
-        // CHECK DATA QUALITY (7 TIÊU CHÍ MỞ RỘNG)
-        // =====================================================
-        if (state.filters.hasBrand === 'no') query = query.is('brand_id', null);
-        if (state.filters.hasOrigin === 'no') query = query.or('origin.is.null,origin.eq.""');
-        if (state.filters.hasDesc === 'no') query = query.or('description.is.null,description.eq.""');
-        if (state.filters.hasSpecs === 'no') query = query.or('specifications.is.null,specifications.eq.""');
-
-        if (state.filters.hasInfo === 'yes') {
-            query = query
-                .not('name', 'is', null).neq('name', '')
-                .not('sku', 'is', null).neq('sku', '')
-                .not('brand_id', 'is', null)
-                .not('origin', 'is', null).neq('origin', '')
-                .not('description', 'is', null).neq('description', '')
-                .not('specifications', 'is', null).neq('specifications', '')
-                .not('image_path', 'is', null).neq('image_path', '');
-        } else if (state.filters.hasInfo === 'no') {
-            query = query.or(
-                ['name.is.null', 'name.eq.""', 'sku.is.null', 'sku.eq.""', 'brand_id.is.null', 
-                 'origin.is.null', 'origin.eq.""', 'description.is.null', 'description.eq.""', 
-                 'specifications.is.null', 'specifications.eq.""', 'image_path.is.null', 'image_path.eq.""'].join(',')
+        // Missing image
+        if (state.filters.hasImage === "no") {
+            logicGroups.push(
+                'or(image_path.is.null,image_path.eq."")'
             );
         }
-        
-        // 4. Sort
-        switch(state.filters.sort) {
-            case 'newest': query = query.order('created_at', { ascending: false }); break;
-            case 'oldest': query = query.order('created_at', { ascending: true }); break;
-            case 'name_asc': query = query.order('name', { ascending: true }); break;
-            case 'name_desc': query = query.order('name', { ascending: false }); break;
-            case 'price_asc': query = query.order('price', { ascending: true }); break;
-            case 'price_desc': query = query.order('price', { ascending: false }); break;
-            case 'stock_asc': query = query.order('stock_quantity', { ascending: true }); break;
-            case 'stock_desc': query = query.order('stock_quantity', { ascending: false }); break;
-            default: query = query.order('created_at', { ascending: false }); break;
+
+        // Missing datasheet
+        if (state.filters.hasDatasheet === "no") {
+            logicGroups.push(
+                'or(datasheet_url.is.null,datasheet_url.eq."")'
+            );
+        }
+
+        // Missing brand
+        if (state.filters.hasBrand === "no") {
+            logicGroups.push("brand_id.is.null");
+        }
+
+        // Missing origin
+        if (state.filters.hasOrigin === "no") {
+            logicGroups.push('or(origin.is.null,origin.eq."")');
+        }
+
+        // Missing description
+        if (state.filters.hasDesc === "no") {
+            logicGroups.push('or(description.is.null,description.eq."")');
+        }
+
+        // Missing specifications
+        if (state.filters.hasSpecs === "no") {
+            logicGroups.push('or(specifications.is.null,specifications.eq."")');
+        }
+
+        // Missing information = thiếu ÍT NHẤT 1 field bắt buộc.
+        if (state.filters.hasInfo === "no") {
+            logicGroups.push(
+                'or(' +
+                    'name.is.null,name.eq."",' +
+                    'sku.is.null,sku.eq."",' +
+                    'brand_id.is.null,' +
+                    'origin.is.null,origin.eq."",' +
+                    'description.is.null,description.eq."",' +
+                    'specifications.is.null,specifications.eq."",' +
+                    'image_path.is.null,image_path.eq.""' +
+                ')'
+            );
+        }
+
+        // Bắt buộc phải luôn có ngoặc tròn bọc ngoài cùng dù chỉ có 1 điều kiện
+        if (logicGroups.length > 0) {
+            query = addPostgrestLogicFilter(
+                query,
+                `(${logicGroups.join(",")})`
+            );
+        }
+
+        // hasImage=yes: điều kiện AND bình thường
+        if (state.filters.hasImage === "yes") {
+            query = query
+                .not("image_path", "is", null)
+                .neq("image_path", "");
+        }
+
+        // hasDatasheet=yes
+        if (state.filters.hasDatasheet === "yes") {
+            query = query
+                .not("datasheet_url", "is", null)
+                .neq("datasheet_url", "");
+        }
+
+        // hasInfo=yes: tất cả field bắt buộc phải có
+        if (state.filters.hasInfo === "yes") {
+            query = query
+                .not("name", "is", null)
+                .neq("name", "")
+                .not("sku", "is", null)
+                .neq("sku", "")
+                .not("brand_id", "is", null)
+                .not("origin", "is", null)
+                .neq("origin", "")
+                .not("description", "is", null)
+                .neq("description", "")
+                .not("specifications", "is", null)
+                .neq("specifications", "")
+                .not("image_path", "is", null)
+                .neq("image_path", "");
+        }
+
+        // Quick Filters
+        if (state.filters.category !== "all") {
+            query = query.eq("category_id", state.filters.category);
+        }
+
+        if (state.filters.industry !== "all") {
+            query = query.eq("industry_id", state.filters.industry);
+        }
+
+        if (state.filters.stock === "in_stock") {
+            query = query.gt("stock_quantity", 0);
+        }
+
+        if (state.filters.stock === "out_of_stock") {
+            query = query.lte("stock_quantity", 0);
+        }
+
+        // Advanced Filters
+        if (state.filters.subCategory !== "all") {
+            query = query.eq("sub_category_id", state.filters.subCategory);
+        }
+
+        if (state.filters.family !== "all") {
+            query = query.eq("family_id", state.filters.family);
+        }
+
+        if (state.filters.origin !== "all") {
+            query = query.eq("origin", state.filters.origin);
+        }
+
+        if (state.filters.priceMin) {
+            query = query.gte("price", state.filters.priceMin);
+        }
+
+        if (state.filters.priceMax) {
+            query = query.lte("price", state.filters.priceMax);
+        }
+
+        if (state.filters.brands.length > 0) {
+            query = query.in("brand_id", state.filters.brands);
+        }
+
+        if (state.filters.moqMin) {
+            query = query.gte(
+                "min_order_quantity",
+                state.filters.moqMin
+            );
+        }
+
+        if (state.filters.moqMax) {
+            query = query.lte(
+                "min_order_quantity",
+                state.filters.moqMax
+            );
+        }
+
+        // Sort
+        switch (state.filters.sort) {
+            case "newest":
+                query = query.order("created_at", { ascending: false });
+                break;
+            case "oldest":
+                query = query.order("created_at", { ascending: true });
+                break;
+            case "name_asc":
+                query = query.order("name", { ascending: true });
+                break;
+            case "name_desc":
+                query = query.order("name", { ascending: false });
+                break;
+            case "price_asc":
+                query = query.order("price", { ascending: true });
+                break;
+            case "price_desc":
+                query = query.order("price", { ascending: false });
+                break;
+            case "stock_asc":
+                query = query.order("stock_quantity", { ascending: true });
+                break;
+            case "stock_desc":
+                query = query.order("stock_quantity", { ascending: false });
+                break;
+            default:
+                query = query.order("created_at", { ascending: false });
+                break;
         }
 
         const { data, count, error } = await query.range(from, to);
+
         if (error) throw error;
 
         state.products = data || [];
         state.totalItems = count || 0;
-        
-        // Cập nhật Count ngay trên UI Lọc
-        if (DOM.filteredCountDisplay) DOM.filteredCountDisplay.textContent = state.totalItems;
+
+        if (DOM.filteredCountDisplay) {
+            DOM.filteredCountDisplay.textContent = state.totalItems;
+        }
 
         updateStatistics();
         renderProducts();
@@ -1026,15 +1419,19 @@ async function fetchProducts() {
 
     } catch (error) {
         console.error("Lỗi tải sản phẩm:", error);
+
         DOM.tableBody.innerHTML = `
             <tr>
                 <td colspan="9" class="text-center py-12 text-red-500 font-bold">
                     Không thể tải danh sách sản phẩm.
-                    <div class="text-xs font-normal mt-1 text-red-400">${escapeHTML(error.message)}</div>
+                    <div class="text-xs font-normal mt-1 text-red-400">
+                        ${escapeHTML(error.message)}
+                    </div>
                 </td>
             </tr>`;
     }
 }
+
 
 function renderTableLoading() {
     if (!DOM.tableBody) return;
@@ -1250,8 +1647,9 @@ async function updateDataQuality() {
 
         const completeInformation =
     products.filter(product => {
-
         return (
+            hasValue(product.name) &&
+            hasValue(product.sku) &&
             product.brand_id !== null &&
             product.brand_id !== undefined &&
             hasValue(product.origin) &&
@@ -1259,7 +1657,6 @@ async function updateDataQuality() {
             hasValue(product.specifications) &&
             hasValue(product.image_path)
         );
-
     }).length;
 
 const missingInformation =
@@ -1585,25 +1982,110 @@ function renderPagination() {
    FORM ACTIONS (Add/Edit/Cancel)
 ========================================================= */
 function showAddForm() {
+    clearTimeout(autoSlugTimer);
+    ++autoSlugRequestId;
     state.editingId = null;
+    state.editingSlugSource = "auto";
     if (DOM.form) DOM.form.reset();
     resetCatalogDropdowns();
     resetMediaInputs();
     if (typeof CKEDITOR !== "undefined" && CKEDITOR.instances.description) CKEDITOR.instances.description.setData("");
     if (DOM.formTitle) DOM.formTitle.textContent = "Nhập Sản Phẩm Mới";
     if (DOM.btnSubmit) DOM.btnSubmit.textContent = "Nhập kho sản phẩm";
+        // Reset SEO
+    if (DOM.slug) DOM.slug.value = "";
+    if (DOM.metaTitle) DOM.metaTitle.value = "";
+    if (DOM.metaDescription) DOM.metaDescription.value = "";
+    if (DOM.isH1) DOM.isH1.checked = true;
+
+    if (DOM.slugSourceLabel) {
+        DOM.slugSourceLabel.textContent = "Tự động";
+    }
+
+    if (DOM.metaTitleCount) {
+        DOM.metaTitleCount.textContent = "0 ký tự";
+    }
+
+    if (DOM.metaDescriptionCount) {
+        DOM.metaDescriptionCount.textContent = "0 ký tự";
+    }
     
+    updateSeoPreview();
+
     DOM.listView?.classList.add("hidden");
     DOM.formView?.classList.remove("hidden");
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function cancelForm() {
+    clearTimeout(autoSlugTimer);
+    ++autoSlugRequestId;
     state.editingId = null;
+    state.editingSlugSource = "auto";
     resetMediaInputs();
+
     DOM.formView?.classList.add("hidden");
     DOM.listView?.classList.remove("hidden");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+function updateSeoCounters() {
+    const META_TITLE_MAX = 60;
+    const META_DESCRIPTION_MAX = 160;
+
+    if (DOM.metaTitleCount) {
+        const length = DOM.metaTitle?.value?.length || 0;
+
+        DOM.metaTitleCount.textContent =
+            `${length} / ${META_TITLE_MAX} ký tự`;
+
+        DOM.metaTitleCount.classList.toggle(
+            "is-warning",
+            length > META_TITLE_MAX
+        );
+    }
+
+    if (DOM.metaDescriptionCount) {
+        const length = DOM.metaDescription?.value?.length || 0;
+
+        DOM.metaDescriptionCount.textContent =
+            `${length} / ${META_DESCRIPTION_MAX} ký tự`;
+
+        DOM.metaDescriptionCount.classList.toggle(
+            "is-warning",
+            length > META_DESCRIPTION_MAX
+        );
+    }
+}
+
+function updateSeoPreview() {
+    const name = DOM.name?.value?.trim() || "Tên sản phẩm";
+    const slug = DOM.slug?.value?.trim() || slugify(name);
+
+    const title =
+        DOM.metaTitle?.value?.trim() ||
+        `${name} - MRO Khang Nam`;
+
+    const description =
+        DOM.metaDescription?.value?.trim() ||
+        "Mô tả SEO sẽ hiển thị tại đây...";
+
+    if (DOM.seoPreviewTitle) {
+        DOM.seoPreviewTitle.textContent = title;
+    }
+
+    if (DOM.seoPreviewUrl) {
+        DOM.seoPreviewUrl.textContent =
+            `mrokhangnam.vn › san-pham › ${slug}`;
+    }
+
+    if (DOM.seoPreviewDescription) {
+        DOM.seoPreviewDescription.textContent = description;
+    }
 }
 
 function editProduct(id) {
@@ -1611,9 +2093,41 @@ function editProduct(id) {
     if (!item) { showToast("Không tìm thấy sản phẩm.", "error"); return; }
     
     state.editingId = item.id;
+    state.editingSlugSource = item.slug_source || "auto";
     
     document.getElementById("sku").value = item.sku || "";
     document.getElementById("name").value = item.name || "";
+        // SEO
+    if (DOM.slug) {
+        DOM.slug.value = item.slug || "";
+    }
+
+    if (DOM.metaTitle) {
+        DOM.metaTitle.value = item.meta_title || "";
+    }
+
+    if (DOM.metaDescription) {
+        DOM.metaDescription.value = item.meta_description || "";
+    }
+
+    if (DOM.isH1) {
+        DOM.isH1.checked = item.is_h1 !== false;
+    }
+
+    if (DOM.slugSourceLabel) {
+        DOM.slugSourceLabel.textContent =
+            item.slug_source === "manual"
+                ? "Thủ công"
+                : "Tự động";
+    }
+
+    updateSeoCounters();
+
+    // Sản phẩm cũ chưa có slug nhưng vẫn đang ở chế độ auto
+    if (getSlugSource() === "auto" && !DOM.slug?.value.trim()) {
+        scheduleAutoSlug();
+    }
+
     document.getElementById("origin_input").value = item.origin || "";
     document.getElementById("price").value = item.price ?? "";
     document.getElementById("discount_price").value = item.discount_price ?? "";
@@ -1786,7 +2300,14 @@ function buildProductPayload(brandId) {
         datasheet_url: document.getElementById("inDatasheet").value.trim() || null,
         short_description: document.getElementById("short_description").value.trim() || null,
         specifications: document.getElementById("specifications").value.trim() || null,
-        description: getDescriptionValue() || null
+       description: getDescriptionValue() || null,
+
+        // SEO
+        slug: DOM.slug?.value.trim() || null,
+        slug_source: state.editingSlugSource,
+        meta_title: DOM.metaTitle?.value.trim() || null,
+        meta_description: DOM.metaDescription?.value.trim() || null,
+        is_h1: DOM.isH1?.checked !== false
     };
 }
 
@@ -1839,6 +2360,34 @@ async function saveProduct(event) {
 
         btn.textContent = "Đang kiểm tra thương hiệu...";
         const brandId = await resolveBrandId();
+
+        // SEO 2.3 — đảm bảo slug sạch + unique ngay trước khi lưu.
+        if (DOM.slug) {
+            const rawSlug = DOM.slug.value.trim();
+
+            if (rawSlug) {
+                DOM.slug.value = slugify(rawSlug);
+                if (state.editingSlugSource === "auto") {
+                    DOM.slug.value = await ensureUniqueSlug(
+                        DOM.slug.value,
+                        state.editingId
+                    );
+                } else {
+                    // Slug thủ công vẫn phải unique.
+                    const uniqueManualSlug = await ensureUniqueSlug(
+                        DOM.slug.value,
+                        state.editingId
+                    );
+
+                    if (uniqueManualSlug !== DOM.slug.value) {
+                        throw new Error(
+                            `Slug "${DOM.slug.value}" đã tồn tại. Vui lòng chọn slug khác.`
+                        );
+                    }
+                }
+            }
+        }
+
         const payload = buildProductPayload(brandId);
 
         // CREATE NEW
@@ -2013,6 +2562,22 @@ function bindEvents() {
     // FORM CATEGORY CASCADE
     DOM.category?.addEventListener("change", e => updateSubCategories(e.target.value));
     DOM.subCategory?.addEventListener("change", e => updateFamilies(e.target.value));
+
+    DOM.metaTitle?.addEventListener("input", updateSeoCounters);
+    DOM.metaDescription?.addEventListener("input", updateSeoCounters);
+    DOM.metaTitle?.addEventListener("input", updateSeoPreview);
+    DOM.metaDescription?.addEventListener("input", updateSeoPreview);
+    DOM.name?.addEventListener("input", updateSeoPreview);
+    DOM.slug?.addEventListener("input", updateSeoPreview);
+
+    // SEO 2.3 — Auto Slug / Manual Slug Detection
+    document.getElementById("name")?.addEventListener("input", () => {
+        if (getSlugSource() === "auto") scheduleAutoSlug();
+    });
+
+    DOM.slug?.addEventListener("input", handleSlugInput);
+    DOM.btnCopySlug?.addEventListener("click", copyCurrentSlug);
+    DOM.btnViewSlug?.addEventListener("click", viewCurrentSlug);
 
     // ADVANCED FILTER TOGGLE
     DOM.btnToggleAdvanced?.addEventListener("click", () => {

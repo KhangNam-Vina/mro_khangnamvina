@@ -8,6 +8,7 @@
     <title>Sản phẩm | MRO Khang Nam</title>
 
     <meta
+        id="metaDescription"
         name="description"
         content="MRO Khang Nam cung cấp giải pháp vật tư công nghiệp, trang thiết bị văn phòng và nhà xưởng chính hãng cho doanh nghiệp."
     >
@@ -15,11 +16,13 @@
     <meta name="robots" content="index,follow">
 
     <meta
-        property="og:title"
-        content="Sản phẩm | MRO Khang Nam"
+    id="ogTitle"
+    property="og:title"
+    content="Sản phẩm | MRO Khang Nam"
     >
 
     <meta
+        id="ogDescription"
         property="og:description"
         content="Khám phá danh mục sản phẩm vật tư công nghiệp chính hãng tại MRO Khang Nam."
     >
@@ -28,6 +31,9 @@
         property="og:image"
         content="../assets/banner-brands.webp"
     >
+
+    <meta property="og:url" id="ogUrl" content="">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -52,6 +58,7 @@
         rel="stylesheet"
         href="../assets/css/catalog.css"
     >
+    <link rel="canonical" id="canonicalUrl" href="">
 </head>
 
 
@@ -79,37 +86,70 @@
         <div class="catalog-hero-container">
 
             <nav
-                class="catalog-breadcrumb"
-                aria-label="Breadcrumb"
-            >
+    class="catalog-breadcrumb"
+    aria-label="Breadcrumb"
+>
 
-                <a
-                    href="../index.html"
-                    class="catalog-breadcrumb-link"
-                >
-                    Trang chủ
-                </a>
+    <a
+        href="../index.html"
+        class="catalog-breadcrumb-link"
+    >
+        Trang chủ
+    </a>
 
-                <span
-                    class="catalog-breadcrumb-separator"
-                    aria-hidden="true"
-                >
-                    /
-                </span>
+    <span
+        class="catalog-breadcrumb-separator"
+        aria-hidden="true"
+    >
+        /
+    </span>
 
-                <span
-                    id="breadcrumbCurrent"
-                    class="catalog-breadcrumb-current"
-                >
-                    Danh sách sản phẩm
-                </span>
+    <a
+        id="breadcrumbCategory"
+        class="catalog-breadcrumb-link"
+        href="#"
+    >
+    </a>
 
-            </nav>
+    <span
+        id="breadcrumbCategorySeparator"
+        class="catalog-breadcrumb-separator is-hidden"
+        aria-hidden="true"
+    >
+        /
+    </span>
+
+    <a
+        id="breadcrumbSubCategory"
+        class="catalog-breadcrumb-link"
+        href="#"
+    >
+    </a>
+
+    <span
+        id="breadcrumbSubCategorySeparator"
+        class="catalog-breadcrumb-separator is-hidden"
+        aria-hidden="true"
+    >
+        /
+    </span>
+
+    <span
+        id="breadcrumbCurrent"
+        class="catalog-breadcrumb-current"
+    >
+        Danh sách sản phẩm
+    </span>
+
+</nav>
 
 
             <div class="catalog-hero-content">
 
-                <h1 class="catalog-hero-title">
+                <h1
+                    id="catalogHeroTitle"
+                    class="catalog-hero-title"
+                >
                     Sản phẩm
                 </h1>
 
@@ -265,7 +305,7 @@
                             id="pageTitle"
                             class="products-page-title"
                         >
-                            Danh sách sản phẩm
+                            Tất cả sản phẩm
                         </h2>
 
                         <p class="products-count-text">
@@ -391,7 +431,7 @@
                             </p>
 
                             <a
-                                href="contact.html"
+                                href="/pages/contact.html"
                                 class="products-rfq-button"
                             >
                                 Gửi Yêu Cầu Báo Giá

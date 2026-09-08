@@ -125,7 +125,7 @@ async function loadMainCategories() {
                                     ></span>
 
                                     <a
-                                        href="pages/family.html?sub_category_id=${encodeURIComponent(sub.id)}"
+                                        href="pages/family.html?slug=${encodeURIComponent(sub.slug)}"
                                         class="category-link"
                                         title="${escapeIndexHTML(sub.name)}"
                                     >
@@ -190,7 +190,7 @@ async function loadMainCategories() {
 
                             <h3 class="category-title">
                                 <a
-                                    href="pages/subcategory.html?category_id=${encodeURIComponent(cat.id)}"
+                                    href="pages/subcategory.html?slug=${encodeURIComponent(cat.slug)}"
                                     class="category-title-link"
                                 >
                                     ${escapeIndexHTML(cat.name)}
@@ -419,7 +419,7 @@ async function loadBestSellers(filterKeyword = 'ALL') {
     try {
         let query = window.supabaseClient
             .from('products')
-            .select('id, sku, name, image_path, unit, category_id, stock_quantity, price, discount_price, badge, brands(name)')
+            .select('id, sku, name, slug, image_path, unit, category_id, stock_quantity, price, discount_price, badge, brands(name)')
             .order('created_at', { ascending: false });
 
         // Logic ALL lấy toàn bộ sản phẩm hợp lệ, Category lọc đúng theo danh mục hiện tại
@@ -474,10 +474,11 @@ async function loadBestSellers(filterKeyword = 'ALL') {
             // Biến card thành phần tử có thể click hoàn toàn bằng div kết hợp hàm xử lý thông minh để không conflict drag & drop
             productItemsHTML += `
                <div
-    class="product-card"
-    data-product-id="${escapeIndexHTML(item.id)}"
-    style="cursor: pointer;"
->
+                    class="product-card"
+                    data-product-id="${escapeIndexHTML(item.id)}"
+                    data-product-slug="${escapeIndexHTML(item.slug || '')}"
+                    style="cursor: pointer;"
+                >
                     
                     <div class="product-image-link" style="border-bottom: 1px solid #eef0f3;">
                         ${leftBadgeHTML}
@@ -548,8 +549,26 @@ if (bestSellerSlider && !bestSellerSlider.dataset.clickBound) {
             return;
         }
 
-        window.location.href =
-            `pages/product-detail.html?id=${encodeURIComponent(productId)}`;
+        const productSlug = card.dataset.productSlug;
+
+        if (!productSlug) {
+            console.warn('Best Seller: thiếu product slug');
+            return;
+        }
+
+        const encodedSlug = encodeURIComponent(productSlug);
+
+        const isLocal =
+            window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1';
+
+        if (isLocal) {
+            window.location.href =
+                `pages/product-detail.html?slug=${encodedSlug}`;
+        } else {
+            window.location.href =
+                `/${encodedSlug}.html`;
+        }
     });
 }
 

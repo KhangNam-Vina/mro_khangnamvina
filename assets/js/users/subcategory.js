@@ -60,22 +60,22 @@ async function fetchSubCategories() {
         );
 
 
-    const urlParams =
-        new URLSearchParams(
-            window.location.search
-        );
+    const urlParams = new URLSearchParams(
+        window.location.search
+    );
 
-    const catId =
-        urlParams.get(
-            'category_id'
-        );
+    const categorySlug =
+        urlParams.get('slug');
+
+    const categoryIdParam =
+        urlParams.get('category_id');
 
 
     // ====================================================
     // KHÔNG CÓ CATEGORY ID
     // ====================================================
 
-    if (!catId) {
+    if (!categorySlug && !categoryIdParam) {
 
         skeleton?.classList.add(
             'is-hidden'
@@ -94,37 +94,60 @@ async function fetchSubCategories() {
     }
 
 
-    // ====================================================
-    // LOAD RELATED CATEGORY
-    // ====================================================
-
-    loadRelatedCategories(catId);
-
-
     try {
 
         // ==================================================
-        // 3 QUERY CHẠY SONG SONG
+        // TÌM CATEGORY BẰNG SLUG
+        // ==================================================
+
+        let categoryQuery =
+    window.supabaseClient
+        .from('categories')
+        .select('id, name, slug');
+
+if (categorySlug) {
+    categoryQuery = categoryQuery.eq(
+        'slug',
+        categorySlug
+    );
+} else {
+    categoryQuery = categoryQuery.eq(
+        'id',
+        categoryIdParam
+    );
+}
+
+const { data: catInfo, error: categoryError } =
+    await categoryQuery.single();
+
+        if (categoryError) {
+            throw categoryError;
+        }
+
+        if (!catInfo) {
+            throw new Error('Không tìm thấy danh mục.');
+        }
+
+        const categoryId = catInfo.id;
+
+        loadRelatedCategories(categoryId);
+
+
+        // ==================================================
+        // SAU KHI CÓ CATEGORY ID → LOAD SUBCATEGORY + PRODUCT
         // ==================================================
 
         const [
-            catRes,
             subRes,
             prodRes
         ] = await Promise.all([
-
-            window.supabaseClient
-                .from('categories')
-                .select('name')
-                .eq('id', catId)
-                .single(),
 
             window.supabaseClient
                 .from('sub_categories')
                 .select('*')
                 .eq(
                     'category_id',
-                    catId
+                    categoryId
                 )
                 .order(
                     'id',
@@ -138,23 +161,18 @@ async function fetchSubCategories() {
                 .select('sub_category_id')
                 .eq(
                     'category_id',
-                    catId
+                    categoryId
                 )
 
         ]);
 
+                if (subRes.error) {
+                    throw subRes.error;
+                }
 
-        if (catRes.error) {
-            throw catRes.error;
-        }
-
-        if (subRes.error) {
-            throw subRes.error;
-        }
-
-
-        const catInfo =
-            catRes.data;
+                if (prodRes.error) {
+                    throw prodRes.error;
+                }
 
         allSubCats =
             subRes.data || [];
@@ -235,8 +253,21 @@ async function fetchSubCategories() {
                 `Khám phá các nhóm sản phẩm thuộc danh mục ${categoryName} chính hãng. Cập nhật các dòng vật tư công nghiệp mới nhất tại MRO Khang Nam.`;
 
 
-            const currentUrl =
-                window.location.href.split('#')[0];
+            const categoryCanonicalUrl =
+                catInfo.slug
+                    ? new URL(
+                        `/${encodeURIComponent(String(catInfo.slug).trim())}.html`,
+                        window.location.origin
+                    ).href
+                    : window.location.href.split('#')[0];
+
+                    const subcategoryCanonicalUrl =
+                        catInfo.slug
+                            ? new URL(
+                                `/${encodeURIComponent(String(catInfo.slug).trim())}.html`,
+                                window.location.origin
+                            ).href
+                            : window.location.href.split('#')[0];
 
 
             document.title =
@@ -259,7 +290,7 @@ async function fetchSubCategories() {
                 )
                 ?.setAttribute(
                     'href',
-                    currentUrl
+                    subcategoryCanonicalUrl
                 );
 
 
@@ -269,7 +300,7 @@ async function fetchSubCategories() {
                 )
                 ?.setAttribute(
                     'content',
-                    currentUrl
+                    subcategoryCanonicalUrl
                 );
 
 
@@ -327,10 +358,10 @@ async function fetchSubCategories() {
                         position: 2,
 
                         name:
-                            'Nhóm Hàng',
+                            categoryName,
 
                         item:
-                            `${window.location.origin}/category.html`
+                            categoryCanonicalUrl
                     },
 
                     {
@@ -340,10 +371,10 @@ async function fetchSubCategories() {
                         position: 3,
 
                         name:
-                            categoryName,
+                            'Nhóm hàng',
 
                         item:
-                            currentUrl
+                            subcategoryCanonicalUrl
                     }
 
                 ]
@@ -500,6 +531,9 @@ function renderSubCategories(
 
     let html = '';
 
+    const isLocal =
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname === 'localhost';
 
     dataList.forEach(
         (sub, index) => {
@@ -516,10 +550,20 @@ function renderSubCategories(
                     sub.id
                 ] || 0;
 
+            const subSlug = sub?.slug
+                ? String(sub.slug).trim()
+                : '';
+
 
             html += `
                 <a
-                    href="family.html?sub_category_id=${encodeURIComponent(sub.id)}"
+                    href="${subSlug
+                        ? (
+                            isLocal
+                                ? `/pages/family.html?slug=${encodeURIComponent(subSlug)}`
+                                : `/${encodeURIComponent(subSlug)}.html`
+                        )
+                        : '#'}"
                     class="subcategory-card"
                     aria-label="Xem nhóm hàng ${escapeHTML(sub.name)}"
                 >
@@ -700,7 +744,7 @@ async function loadRelatedCategories(
             await window.supabaseClient
                 .from('categories')
                 .select(
-                    'id, name'
+                    'id, name, slug'
                 )
                 .neq(
                     'id',
@@ -731,18 +775,27 @@ async function loadRelatedCategories(
 
         let html = '';
 
+        const isLocal =
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname === 'localhost';
 
         data.forEach(
             category => {
 
+                const categorySlug = category?.slug
+                    ? String(category.slug).trim()
+                    : '';
+
+                if (!categorySlug) return;
+
                 html += `
                     <a
-                        href="subcategory.html?category_id=${encodeURIComponent(category.id)}"
+                        href="${isLocal
+                        ? `/pages/subcategory.html?slug=${encodeURIComponent(categorySlug)}`
+                        : `/${encodeURIComponent(categorySlug)}.html`}"
                         class="subcategory-related-link"
                     >
-                        ${escapeHTML(
-                            category.name
-                        )}
+                        ${escapeHTML(category.name)}
                     </a>
                 `;
 

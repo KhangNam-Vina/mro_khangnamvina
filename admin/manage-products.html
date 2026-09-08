@@ -26,6 +26,12 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        #metaTitleCount.is-warning,
+#metaDescriptionCount.is-warning {
+    color: #dc2626 !important;
+    font-weight: 600;
+}
+
     </style>
 </head>
 
@@ -340,7 +346,7 @@
 
                     <form id="productForm" class="space-y-6">
                         <!-- 1. THÔNG TIN CƠ BẢN -->
-                        <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                        <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
                             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
                                 <h3 class="text-sm font-black text-kn-blue uppercase tracking-wider flex items-center gap-2">
                                     <span class="bg-blue-100 text-kn-blue w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span> 
@@ -401,12 +407,163 @@
                             </div>
                         </div>
 
+                        <!-- 2. SEO -->
+                        <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
+                            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                                <h3 class="text-sm font-black text-kn-blue uppercase tracking-wider flex items-center gap-2">
+                                    <span class="bg-blue-100 text-kn-blue w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                                    SEO & URL
+                                </h3>
+                            </div>
+
+                            <div class="p-6 space-y-6">
+
+                                <!-- H1 -->
+                                <div class="flex items-center justify-between gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide">
+                                            Tiêu đề H1
+                                        </label>
+                                        <p class="mt-1 text-xs text-gray-400">
+                                            Cho phép dùng tên sản phẩm làm tiêu đề H1 trên trang chi tiết.
+                                        </p>
+                                    </div>
+
+                                    <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                                        <input type="checkbox" id="is_h1" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-kn-blue transition"></div>
+                                        <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-5"></div>
+                                    </label>
+                                </div>
+
+                                <!-- Slug -->
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <label for="slug" class="block text-xs font-bold text-gray-700 uppercase tracking-wide">
+                                            SEO Name / Slug
+                                        </label>
+
+                                        <span
+                                            id="slugSourceLabel"
+                                            class="inline-flex items-center px-2 py-0.5 rounded-md bg-blue-50 text-kn-blue text-[10px] font-bold uppercase tracking-wide"
+                                        >
+                                            Tự động
+                                        </span>
+                                    </div>
+
+                                    <div class="flex gap-2">
+                                        <input
+                                            type="text"
+                                            id="slug"
+                                            class="flex-1 w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm font-mono outline-none focus:border-kn-blue focus:ring-1 focus:ring-kn-blue shadow-sm"
+                                            placeholder="may-ban-vit-tu-dong-kilews-sk-3280pf"
+                                            autocomplete="off"
+                                        >
+
+                                        <button
+                                            type="button"
+                                            id="btnCopySlug"
+                                            class="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 font-bold text-sm transition"
+                                            title="Sao chép slug"
+                                        >
+                                            📋
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            id="btnViewSlug"
+                                            class="px-4 py-2.5 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 font-bold text-sm transition"
+                                            title="Xem URL"
+                                        >
+                                            ↗
+                                        </button>
+                                    </div>
+
+                                    <p class="mt-2 text-[11px] text-gray-400">
+                                        Slug được tạo tự động từ tên sản phẩm. Có thể chỉnh sửa thủ công.
+                                    </p>
+                                </div>
+
+                                <!-- SEO Title -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <label for="meta_title" class="block text-xs font-bold text-gray-700 uppercase tracking-wide">
+                                            SEO Title
+                                        </label>
+                                        <span id="metaTitleCount" class="text-[11px] text-gray-400">
+                                            0 ký tự
+                                        </span>
+                                    </div>
+
+                                    <input
+                                        type="text"
+                                        id="meta_title"
+                                        maxlength="70"
+                                        class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-kn-blue focus:ring-1 focus:ring-kn-blue shadow-sm"
+                                        placeholder="Tiêu đề SEO..."
+                                    >
+                                </div>
+
+                                <!-- SEO Description -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <label for="meta_description" class="block text-xs font-bold text-gray-700 uppercase tracking-wide">
+                                            SEO Description
+                                        </label>
+                                        <span id="metaDescriptionCount" class="text-[11px] text-gray-400">
+                                            0 ký tự
+                                        </span>
+                                    </div>
+
+                                    <textarea
+                                        id="meta_description"
+                                        rows="4"
+                                        maxlength="160"
+                                        class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm outline-none focus:border-kn-blue focus:ring-1 focus:ring-kn-blue shadow-sm resize-y"
+                                        placeholder="Mô tả ngắn dùng cho kết quả tìm kiếm Google..."
+                                    ></textarea>
+
+                                    <div
+                                            id="seoPreview"
+                                            class="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4"
+                                        >
+                                            <div class="text-[11px] font-bold uppercase tracking-wide text-gray-500 mb-3">
+                                                Xem trước kết quả tìm kiếm
+                                            </div>
+
+                                            <div
+                                                id="seoPreviewTitle"
+                                                class="text-base font-semibold text-blue-700 leading-snug"
+                                            >
+                                                Tiêu đề SEO...
+                                            </div>
+
+                                            <div
+                                                id="seoPreviewUrl"
+                                                class="mt-1 text-xs text-green-700 truncate"
+                                            >
+                                                mrokhangnam.vn › san-pham › ...
+                                            </div>
+
+                                            <div
+                                                id="seoPreviewDescription"
+                                                class="mt-2 text-sm text-gray-600 leading-relaxed"
+                                            >
+                                                Mô tả SEO sẽ hiển thị tại đây...
+                                            </div>
+                                        </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
                         <!-- 2. GIÁ & KHO HÀNG -->
                         <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
                             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
                                 <h3 class="text-sm font-black text-kn-blue uppercase tracking-wider flex items-center gap-2">
-                                    <span class="bg-blue-100 text-kn-blue w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
-                                    Giá & Kho hàng
+                                    <span class="bg-blue-100 text-kn-blue w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
+                                        Giá & Kho hàng
                                 </h3>
                             </div>
                             <div class="p-6">
@@ -436,7 +593,7 @@
                         <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
                             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
                                 <h3 class="text-sm font-black text-kn-blue uppercase tracking-wider flex items-center gap-2">
-                                    <span class="bg-blue-100 text-kn-blue w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
+                                    <span class="bg-blue-100 text-kn-blue w-6 h-6 rounded-full flex items-center justify-center text-xs">4</span>
                                     Hình ảnh & Tài liệu
                                 </h3>
                             </div>
@@ -473,7 +630,7 @@
                         <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
                             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
                                 <h3 class="text-sm font-black text-kn-blue uppercase tracking-wider flex items-center gap-2">
-                                    <span class="bg-blue-100 text-kn-blue w-6 h-6 rounded-full flex items-center justify-center text-xs">4</span>
+                                    <span class="bg-blue-100 text-kn-blue w-6 h-6 rounded-full flex items-center justify-center text-xs">5</span>
                                     Nội dung chi tiết
                                 </h3>
                             </div>

@@ -11,6 +11,17 @@ let currentSelectedSize = null; // Biến lưu trạng thái Size đang chọn
    HELPER
 ======================================================== */
 
+const pdStripHTML = (value) => {
+    if (!value) return "";
+
+    const temp = document.createElement("div");
+    temp.innerHTML = String(value);
+
+    return (temp.textContent || temp.innerText || "")
+        .replace(/\s+/g, " ")
+        .trim();
+};
+
 const pdEscapeHTML = (value) => {
     if (typeof utils !== "undefined" && typeof utils.escapeHTML === "function") {
         return utils.escapeHTML(value ?? "");
@@ -55,6 +66,90 @@ const pdBuildImageUrl = (imagePath) => {
     return `${PD_IMAGE_CDN_BASE}/${cleanPath}`;
 };
 
+const pdGetSlugFromPath = () => {
+    const pathname = window.location.pathname || "";
+    const filename = pathname.split("/").pop() || "";
+
+    if (!filename.endsWith(".html")) return "";
+
+    const slug = filename.slice(0, -5).trim();
+
+    // Không coi product-detail.html là slug
+    if (!slug || slug === "product-detail") return "";
+
+    return decodeURIComponent(slug);
+};
+
+
+const pdBuildProductDetailUrl = (item) => {
+    if (!item) return "#";
+
+    if (item.slug) {
+        const slug = encodeURIComponent(String(item.slug).trim());
+
+        // Production: /ten-san-pham.html
+        if (!window.location.pathname.includes("/pages/")) {
+            return `/${slug}.html`;
+        }
+
+        // Local / development
+        return `product-detail.html?slug=${slug}`;
+    }
+
+    if (item.id) {
+        return `product-detail.html?id=${encodeURIComponent(item.id)}`;
+    }
+
+    return "#";
+};
+
+const pdBuildCategoryUrl = (item) => {
+    if (!item?.slug) return "#";
+
+    const slug = encodeURIComponent(String(item.slug).trim());
+
+    if (
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+    ) {
+        return `subcategory.html?slug=${slug}`;
+    }
+
+    return `/pages/subcategory.html?slug=${slug}`;
+};
+
+
+const pdBuildSubcategoryUrl = (item) => {
+    if (!item?.slug) return "#";
+
+    const slug = encodeURIComponent(String(item.slug).trim());
+
+    if (
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+    ) {
+        return `family.html?slug=${slug}`;
+    }
+
+   return `/pages/family.html?slug=${slug}`;
+};
+
+
+const pdBuildFamilyUrl = (item) => {
+    if (!item?.slug) return "#";
+
+    const slug = encodeURIComponent(String(item.slug).trim());
+
+    if (
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+    ) {
+        return `products.html?slug=${slug}`;
+    }
+
+   return `/pages/products.html?slug=${slug}`;
+};
+
 /* ========================================================
    1. LOAD PRODUCT DETAIL
 ======================================================== */
@@ -62,34 +157,76 @@ const pdBuildImageUrl = (imagePath) => {
 async function loadProductDetail() {
 
     const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get("id");
 
+    const productId = urlParams.get("id");
+    const querySlug = urlParams.get("slug");
+    const pathSlug = pdGetSlugFromPath();
+
+    const productSlug = querySlug || pathSlug;
     const mainContent = document.getElementById("mainContent");
     const loadingScreen = document.getElementById("loadingScreen");
     const errorScreen = document.getElementById("errorScreen");
     const errorText = document.getElementById("errorText");
     const previousPage = document.referrer.toLowerCase();
-    const bcParentPage = document.getElementById("bcParentPage");
-    const bcCurrentProduct = document.getElementById("bcCurrentProduct");
+   const bcCategory = document.getElementById("bcCategory");
+    const bcSubcategory = document.getElementById("bcSubcategory");
+    const bcFamily = document.getElementById("bcFamily");
 
-    if (!productId) {
-        loadingScreen?.classList.add("is-hidden");
-        errorScreen?.classList.remove("is-hidden");
-        if (errorText) errorText.innerText = "Đường dẫn không hợp lệ. Thiếu mã ID sản phẩm.";
-        return;
+    const bcCategorySeparator =
+        document.getElementById("bcCategorySeparator");
+
+    const bcSubcategorySeparator =
+        document.getElementById("bcSubcategorySeparator");
+
+    const bcFamilySeparator =
+        document.getElementById("bcFamilySeparator");
+
+    const bcCurrentProduct =
+        document.getElementById("bcCurrentProduct");
+
+    const bcHome =
+        document.getElementById("bcHome");
+
+    if (!productId && !productSlug) {
+    loadingScreen?.classList.add("is-hidden");
+    errorScreen?.classList.remove("is-hidden");
+
+    if (errorText) {
+        errorText.innerText =
+            "Đường dẫn không hợp lệ. Thiếu mã sản phẩm hoặc slug.";
     }
 
+    return;
+}
+
+    if (bcHome) {
+    const isLocal =
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1";
+
+    bcHome.href = isLocal
+        ? "../index.html"
+        : "/";
+}
+
     try {
-        const { data: item, error } = await window.supabaseClient
-            .from("products")
-            .select(`
-                *,
-                categories(id, name),
-                sub_categories(id, name),
-                brands(id, name)
-            `)
-            .eq("id", productId)
-            .single();
+        let productQuery = window.supabaseClient
+    .from("products")
+    .select(`
+        *,
+        categories(id, name, slug),
+        sub_categories(id, name, slug),
+        families(id, name, slug),
+        brands(id, name)
+    `);
+
+if (productSlug) {
+    productQuery = productQuery.eq("slug", productSlug);
+} else {
+    productQuery = productQuery.eq("id", productId);
+}
+
+const { data: item, error } = await productQuery.single();
 
         if (error) throw error;
         if (!item) throw new Error("Sản phẩm không tồn tại");
@@ -101,22 +238,225 @@ async function loadProductDetail() {
         const brandName = item.brands?.name || "OEM";
         const priceFormat = pdFormatCurrency(item.price);
 
-        document.title = `${item.name} - MRO Khang Nam`;
+        /* SEO */
+const seoTitle =
+    item.meta_title?.trim() ||
+    `${item.name} - MRO Khang Nam`;
+
+const seoDescription =
+    item.meta_description?.trim() ||
+    item.short_description?.trim() ||
+    pdStripHTML(item.description) ||
+    `${item.name} - Sản phẩm vật tư công nghiệp chính hãng tại MRO Khang Nam.`;
+
+document.title = seoTitle;
+
+const metaDescription = document.querySelector('meta[name="description"]');
+
+if (metaDescription) {
+    metaDescription.setAttribute("content", seoDescription);
+}
+
+        const pdSetMeta = (name, content) => {
+            if (!content) return;
+            let meta = document.querySelector(`meta[name="${name}"]`);
+            if (!meta) {
+                meta = document.createElement("meta");
+                meta.name = name;
+                document.head.appendChild(meta);
+            }
+            meta.setAttribute("content", content);
+        };
+
+        pdSetMeta("description", seoDescription);
+
+
+        const pdSetProperty = (property, content) => {
+    if (!content) return;
+
+    let meta = document.querySelector(
+        `meta[property="${property}"]`
+    );
+
+    if (!meta) {
+        meta = document.createElement("meta");
+        meta.setAttribute("property", property);
+        document.head.appendChild(meta);
+    }
+
+    meta.setAttribute("content", content);
+};
+
+        const seoImage =
+            pdBuildImageUrl(item.image_path);
+
+        const seoUrl = item.slug
+            ? new URL(
+                `/${encodeURIComponent(String(item.slug).trim())}.html`,
+                window.location.origin
+            ).href
+            : window.location.href;
+
+        pdSetProperty("og:type", "product");
+        pdSetProperty("og:title", seoTitle);
+        pdSetProperty("og:description", seoDescription);
+        pdSetProperty("og:url", seoUrl);
+        pdSetProperty("og:image", seoImage);
+        pdSetProperty("og:site_name", "MRO Khang Nam");
+
+        /* PRODUCT JSON-LD */
+
+        const pdSetJsonLd = (data) => {
+            let script = document.getElementById("productJsonLd");
+
+            if (!script) {
+                script = document.createElement("script");
+                script.id = "productJsonLd";
+                script.type = "application/ld+json";
+                document.head.appendChild(script);
+            }
+
+            script.textContent = JSON.stringify(data);
+        };
+
+
+        const productJsonLd = {
+            "@context": "https://schema.org",
+            "@type": "Product",
+
+            "name": item.name || "",
+
+            "description":
+                seoDescription,
+
+            "sku":
+                item.sku || "",
+
+            "image":
+                seoImage
+                ? [seoImage]
+                : [],
+
+            "brand": {
+                "@type": "Brand",
+                "name": brandName
+            },
+
+            "url":
+                seoUrl
+        };
+
+
+        if (Number(item.price) > 0) {
+
+            const finalPrice =
+                Number(item.discount_price) > 0 &&
+                Number(item.discount_price) < Number(item.price)
+                    ? Number(item.discount_price)
+                    : Number(item.price);
+
+            productJsonLd.offers = {
+                "@type": "Offer",
+
+                "url":
+                    seoUrl,
+
+                "priceCurrency":
+                    "VND",
+
+                "price":
+                    finalPrice,
+
+                "availability":
+                    Number(item.stock_quantity) > 0
+                        ? "https://schema.org/InStock"
+                        : "https://schema.org/PreOrder",
+
+                "itemCondition":
+                    "https://schema.org/NewCondition"
+            };
+        }
+
+
+pdSetJsonLd(productJsonLd);
+
+        let canonical = document.querySelector('link[rel="canonical"]');
+        if (!canonical) {
+            canonical = document.createElement("link");
+            canonical.rel = "canonical";
+            document.head.appendChild(canonical);
+        }
+
+        if (item.slug) {
+    canonical.href = new URL(
+        `/${encodeURIComponent(String(item.slug).trim())}.html`,
+        window.location.origin
+    ).href;
+}
 
         /* BREADCRUMB */
-        if (bcParentPage) {
-            if (previousPage.includes("promotions.html")) {
-                bcParentPage.href = "promotions.html";
-                bcParentPage.innerText = "Giảm giá";
-            } else {
-                bcParentPage.href = "products.html";
-                bcParentPage.innerText = "Sản phẩm";
+
+            const category = item.categories;
+            const subcategory = item.sub_categories;
+            const family = item.families;
+
+            const setBreadcrumbItem = (
+                link,
+                separator,
+                data,
+                buildUrl
+            ) => {
+                if (data?.name && data?.slug) {
+                    link.innerText = data.name;
+                    link.href = buildUrl(data);
+
+                    link.style.display = "";
+                    separator.style.display = "";
+                } else {
+                    link.style.display = "none";
+                    separator.style.display = "none";
+                }
+            };
+
+
+            if (bcCategory && bcCategorySeparator) {
+                setBreadcrumbItem(
+                    bcCategory,
+                    bcCategorySeparator,
+                    category,
+                    pdBuildCategoryUrl
+                );
             }
-        }
-        if (bcCurrentProduct) {
-            bcCurrentProduct.innerText = item.name;
-            bcCurrentProduct.classList.remove("is-loading");
-        }
+
+
+            if (bcSubcategory && bcSubcategorySeparator) {
+                setBreadcrumbItem(
+                    bcSubcategory,
+                    bcSubcategorySeparator,
+                    subcategory,
+                    pdBuildSubcategoryUrl
+                );
+            }
+
+
+            if (bcFamily && bcFamilySeparator) {
+                setBreadcrumbItem(
+                    bcFamily,
+                    bcFamilySeparator,
+                    family,
+                    pdBuildFamilyUrl
+                );
+            }
+
+
+            if (bcCurrentProduct) {
+                bcCurrentProduct.innerText =
+                    item.name || "Chi tiết sản phẩm";
+
+                bcCurrentProduct.classList.remove(
+                    "is-loading"
+                );
+            }
 
         /* PRODUCT BASIC INFO */
         const brandLabel = document.getElementById("brandLabel");
@@ -617,18 +957,24 @@ async function loadRelatedProducts(currentItem) {
         data.forEach((item) => {
             const brandName = item.brands?.name || "OEM";
             const img = pdBuildImageUrl(item.image_path);
+            
+            // LẤY DỮ LIỆU TỒN KHO TỪ DATABASE ĐỂ RENDER
+            const stockQty = Number(item.stock_quantity) || 0;
+            const stockText = stockQty > 0 ? "IN STOCK" : "LIÊN HỆ";
+            const stockColor = stockQty > 0 ? "#16a34a" : "#ef4444"; // Xanh cho còn hàng, Đỏ cho hết hàng
 
             grid.innerHTML += `
                 <div class="related-product-card">
-                    <a href="product-detail.html?id=${item.id}" class="related-product-image-link">
+                    <a href="${pdEscapeHTML(pdBuildProductDetailUrl(item))}" class="related-product-image-link">
                         <img src="${pdEscapeHTML(img)}" alt="${pdEscapeHTML(item.name || "")}" class="related-product-image">
                     </a>
                     <div class="related-product-body">
                         <div class="related-product-brand">${pdEscapeHTML(brandName)}</div>
-                        <a href="product-detail.html?id=${item.id}"><h4 class="related-product-name">${pdEscapeHTML(item.name || "")}</h4></a>
+                        <a href="${pdEscapeHTML(pdBuildProductDetailUrl(item))}"><h4 class="related-product-name">${pdEscapeHTML(item.name || "")}</h4></a>
                         <div class="related-product-footer">
                             <div class="related-product-sku">SKU: ${pdEscapeHTML(item.sku || "")}</div>
-                            <div class="related-product-stock">IN STOCK</div>
+                            <!-- FIX: Hiển thị tự động màu và chữ theo trạng thái Kho -->
+                            <div class="related-product-stock" style="color: ${stockColor}; font-weight: 800;">${stockText}</div>
                         </div>
                     </div>
                 </div>
@@ -668,7 +1014,7 @@ async function loadSaleProductsSidebar(currentProductId) {
             const discountPrice = item.discount_price ? pdFormatCurrency(item.discount_price) : "Liên hệ";
 
             html += `
-                <a href="product-detail.html?id=${item.id}" class="product-sale-item">
+                <a href="${pdEscapeHTML(pdBuildProductDetailUrl(item))}" class="product-sale-item">
                     <div class="product-sale-image"><img src="${pdEscapeHTML(img)}" alt="${pdEscapeHTML(item.name || "")}"></div>
                     <div class="product-sale-info">
                         <div class="product-sale-brand">${pdEscapeHTML(brandName)}</div>
@@ -809,10 +1155,20 @@ function initMagnifierZoom() {
 
 window.addEventListener("load", async () => {
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get("id")) await loadProductDetail();
-    if (document.getElementById("cartList")) loadCartFromStorage();
-    initMagnifierZoom();
 
+    const hasId = !!urlParams.get("id");
+    const hasSlug = !!urlParams.get("slug");
+    const hasPathSlug = !!pdGetSlugFromPath();
+
+    if (hasId || hasSlug || hasPathSlug) {
+        await loadProductDetail();
+    }
+
+    if (document.getElementById("cartList")) {
+        loadCartFromStorage();
+    }
+
+    initMagnifierZoom();
     try {
         let isUserLoggedIn = false;
         if (typeof checkCustomerAuth === 'function') isUserLoggedIn = !!(await checkCustomerAuth());

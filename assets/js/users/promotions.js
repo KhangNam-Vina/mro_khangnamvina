@@ -71,6 +71,100 @@ function formatCurrency(value) {
     );
 }
 
+function updatePromotionSEO() {
+
+    const canonicalUrl =
+        new URL(
+            '/pages/promotions.html',
+            window.location.origin
+        ).href;
+
+    const ogUrl =
+        document.querySelector(
+            'meta[property="og:url"]'
+        );
+
+    if (ogUrl) {
+        ogUrl.setAttribute(
+            'content',
+            canonicalUrl
+        );
+    }
+
+    const ogImage =
+        document.querySelector(
+            'meta[property="og:image"]'
+        );
+
+    if (ogImage) {
+        ogImage.setAttribute(
+            'content',
+            new URL(
+                '/assets/banner-brands.webp',
+                window.location.origin
+            ).href
+        );
+    }
+
+    const jsonLd =
+        document.getElementById(
+            'promotionJsonLd'
+        );
+
+    if (!jsonLd) {
+        return;
+    }
+
+    jsonLd.textContent =
+        JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'CollectionPage',
+            'name': 'Sản phẩm giảm giá | MRO Khang Nam',
+            'description':
+                'Khám phá ngay hàng ngàn sản phẩm vật tư công nghiệp chính hãng đang được giảm giá tại MRO Khang Nam.',
+            'url': canonicalUrl,
+            'breadcrumb': {
+                '@type': 'BreadcrumbList',
+                'itemListElement': [
+                    {
+                        '@type': 'ListItem',
+                        'position': 1,
+                        'name': 'Trang chủ',
+                        'item':
+                            `${window.location.origin}/`
+                    },
+                    {
+                        '@type': 'ListItem',
+                        'position': 2,
+                        'name': 'Giảm giá',
+                        'item': canonicalUrl
+                    }
+                ]
+            }
+        });
+}
+
+const isLocal =
+            window.location.hostname === '127.0.0.1' ||
+            window.location.hostname === 'localhost';
+
+        function buildPromotionProductUrl(item) {
+
+            if (!item?.slug) {
+                return isLocal
+                    ? `product-detail.html?id=${encodeURIComponent(item?.id || '')}`
+                    : `/pages/product-detail.html?id=${encodeURIComponent(item?.id || '')}`;
+            }
+
+            const slug =
+                encodeURIComponent(
+                    String(item.slug).trim()
+                );
+
+            return isLocal
+                ? `/pages/product-detail.html?slug=${slug}`
+                : `/${slug}.html`;
+        }
 
 // ========================================================
 // 1. FETCH PRODUCTS
@@ -203,7 +297,7 @@ async function fetchFilteredProducts() {
     window.supabaseClient
         .from('products')
         .select(
-            'id, sku, name, price, discount_price, image_path, unit, badge, category_id, sub_category_id, brand_id, created_at, brands(name)',
+              'id, sku, name, slug, price, discount_price, image_path, unit, badge, category_id, sub_category_id, brand_id, created_at, brands(name)',
             {
                 count: 'exact'
             }
@@ -468,7 +562,7 @@ async function fetchFilteredProducts() {
                     </p>
 
                     <a
-                        href="promotions.html"
+                        href="/pages/promotions.html"
                         class="promotion-reset-button"
                     >
                         Xóa bộ lọc
@@ -583,7 +677,7 @@ async function fetchFilteredProducts() {
                     <article class="product-card promotion-product-card">
 
                         <a
-                            href="product-detail.html?id=${encodeURIComponent(item.id)}"
+                            href="${buildPromotionProductUrl(item)}"
                             class="product-card-image"
                         >
 
@@ -620,7 +714,7 @@ async function fetchFilteredProducts() {
 
 
                             <a
-                                href="product-detail.html?id=${encodeURIComponent(item.id)}"
+                                href="${buildPromotionProductUrl(item)}"
                                 class="product-card-name-link"
                             >
 
@@ -1489,6 +1583,8 @@ function initSort() {
 window.addEventListener(
     'load',
     async () => {
+
+        updatePromotionSEO();
 
         initSort();
 
