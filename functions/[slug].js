@@ -40,14 +40,11 @@ export async function onRequestGet(context) {
     }
 
     function buildTargetUrl(path, targetSlug) {
-        const targetUrl = new URL(path, request.url);
+    const targetUrl = new URL(path, request.url);
 
-        // Giữ lại các query params như ?page=2, filter...
-        targetUrl.search = new URL(request.url).search;
+    targetUrl.searchParams.set("slug", targetSlug);
 
-        targetUrl.searchParams.set("slug", targetSlug);
-
-        return targetUrl;
+    return targetUrl;
     }
 
     try {
@@ -60,7 +57,7 @@ export async function onRequestGet(context) {
                 category.slug
             );
 
-            return env.ASSETS.fetch(targetUrl);
+            return Response.redirect(targetUrl.toString(), 302);
         }
 
         // 2. SUBCATEGORY
@@ -75,7 +72,7 @@ export async function onRequestGet(context) {
                 subCategory.slug
             );
 
-            return env.ASSETS.fetch(targetUrl);
+            return Response.redirect(targetUrl.toString(), 302);
         }
 
         // 3. FAMILY
@@ -90,7 +87,7 @@ export async function onRequestGet(context) {
                 family.slug
             );
 
-            return env.ASSETS.fetch(targetUrl);
+            return Response.redirect(targetUrl.toString(), 302);
         }
 
         // 4. PRODUCT
@@ -99,13 +96,13 @@ export async function onRequestGet(context) {
             "id,slug"
         );
 
-        if (product) {
+       if (product) {
             const targetUrl = buildTargetUrl(
                 "/pages/product-detail.html",
                 product.slug
             );
 
-            return env.ASSETS.fetch(targetUrl);
+            return Response.redirect(targetUrl.toString(), 302);
         }
 
         // Không tìm thấy slug
