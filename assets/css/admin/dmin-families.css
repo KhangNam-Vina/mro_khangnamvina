@@ -1,0 +1,166 @@
+    /* =========================================================
+   FILE: assets/css/admin/admin-families.css
+   CSS RIÊNG CHO TRANG QUẢN LÝ FAMILY
+   ========================================================= */
+
+/* Admin scrollbar */
+.admin-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.admin-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.admin-scrollbar::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 999px;
+}
+
+.admin-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+.admin-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+}
+
+/* Family search */
+.family-search {
+    position: relative;
+    flex: 1 1 0%;
+    min-width: 250px;
+}
+
+.family-search-input {
+    width: 100%;
+    padding: 0.625rem 1rem 0.625rem 2.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.75rem;
+    background: #fff;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.family-search-input:focus {
+    border-color: #00479b;
+    box-shadow: 0 0 0 3px rgba(0, 71, 155, 0.08);
+}
+
+.family-search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    width: 1.25rem;
+    height: 1.25rem;
+    color: #9ca3af;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+/* Family table */
+.family-table {
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+    white-space: nowrap;
+}
+
+.family-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.family-table tbody tr:hover {
+    background: rgba(239, 246, 255, 0.55);
+}
+
+/* Family modal */
+.family-modal {
+    width: 100%;
+    max-width: 28rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.family-modal.is-open {
+    transform: scale(1);
+}
+
+.family-modal-body {
+    overflow-y: auto;
+}
+
+/* Family form */
+.family-form-label {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #374151;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.family-form-control {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.75rem;
+    background: #fff;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.family-form-control:focus {
+    border-color: #00479b;
+    box-shadow: 0 0 0 3px rgba(0, 71, 155, 0.08);
+}
+
+/* Action buttons */
+.family-action-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.family-action-button:active {
+    transform: scale(0.95);
+}
+
+.family-action-button--edit {
+    color: #2563eb;
+    background: #eff6ff;
+}
+
+.family-action-button--edit:hover {
+    background: #dbeafe;
+}
+
+.family-action-button--delete {
+    color: #dc2626;
+    background: #fef2f2;
+}
+
+.family-action-button--delete:hover {
+    background: #fee2e2;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+    .family-search {
+        min-width: 100%;
+    }
+
+    .family-modal {
+        max-width: none;
+    }
+}

@@ -1,933 +1,173 @@
 // ========================================================
 // FILE: assets/js/users/family.js
-// Luồng:
-// Category -> Subcategory -> Family -> Products
-//
-// IMAGE FLOW:
-// DB lưu Storage Path
-//      ↓
-// buildFamilyImageUrl()
-//      ↓
-// Cloudflare Worker CDN
-//      ↓
-// Browser
-//
-// Nâng cấp:
-// - Promise.all
-// - Dynamic SEO
-// - Product Count
-// - Breadcrumb
-// - Client-side Search
-// - Cloudflare CDN cho Family thumbnail
+// MINIMAL UI - CHỈ CÒN TEXT VÀ ĐẾM SỐ LƯỢNG
 // ========================================================
-
 
 let allFamilies = [];
-
-
-// ========================================================
-// CONFIG - CLOUDFLARE IMAGE CDN
-// ========================================================
-
-const FAMILY_IMAGE_CDN_BASE =
-    'https://mrokhangnam-image.khangnamvn.workers.dev';
-
-
-// ========================================================
-// BUILD FAMILY IMAGE URL
-// ========================================================
-//
-// DB:
-//
-// families/36/thumbnail/thumbnail-xxx.webp
-//
-// CDN:
-//
-// https://mrokhangnam-image.khangnamvn.workers.dev/
-// families/36/thumbnail/thumbnail-xxx.webp
-//
-// Nếu sau này DB đã chứa URL hoàn chỉnh thì giữ nguyên.
-// ========================================================
-
-function buildFamilyImageUrl(imagePath) {
-
-    if (
-        !imagePath ||
-        typeof imagePath !== 'string'
-    ) {
-
-        return '';
-
-    }
-
-
-    const cleanPath =
-        imagePath.trim();
-
-
-    if (!cleanPath) {
-
-        return '';
-
-    }
-
-
-    // ----------------------------------------------------
-    // Compatibility:
-    // Nếu dữ liệu đã là URL hoàn chỉnh
-    // thì giữ nguyên.
-    // ----------------------------------------------------
-
-    if (
-        /^https?:\/\//i.test(
-            cleanPath
-        )
-    ) {
-
-        return cleanPath;
-
-    }
-
-
-    // ----------------------------------------------------
-    // Storage Path -> Cloudflare CDN
-    // ----------------------------------------------------
-
-    return (
-        `${FAMILY_IMAGE_CDN_BASE}/${cleanPath.replace(/^\/+/, '')}`
-    );
-
-}
-
-
-// ========================================================
-// FALLBACK IMAGE
-// ========================================================
-
-const FAMILY_FALLBACK_IMAGE =
-    'https://placehold.co/150x100/f5f6f8/a0aec0?text=No+Image';
-
-
-// ========================================================
-// 1. FETCH FAMILY
-// ========================================================
+let productCounts = {};
 
 async function fetchFamilies() {
+    if (!window.supabaseClient) throw new Error('Supabase chưa khởi tạo.');
 
-    if (
-        typeof supabaseClient === 'undefined' ||
-        !supabaseClient
-    ) {
+    const container = document.getElementById('familyContainer');
+    const skeleton = document.getElementById('skeletonLoading');
+    const emptyState = document.getElementById('emptyState');
+    const title = document.getElementById('pageTitle');
+    const bcSubCategory = document.getElementById('bcSubCategory');
 
-        throw new Error(
-            'Supabase chưa khởi tạo.'
-        );
+    const urlParams = new URLSearchParams(window.location.search);
+    const subCatSlug = urlParams.get('slug');
+    const subCatIdParam = urlParams.get('sub_category_id');
 
+    if (!subCatSlug && !subCatIdParam) {
+        skeleton?.classList.add('is-hidden');
+        emptyState?.classList.remove('is-hidden');
+        if (title) title.textContent = 'Lỗi đường dẫn';
+        return;
     }
-
-
-    const container =
-        document.getElementById(
-            'familyContainer'
-        );
-
-
-    const title =
-        document.getElementById(
-            'pageTitle'
-        );
-
-
-    const emptyState =
-        document.getElementById(
-            'emptyState'
-        );
-
-
-    const urlParams =
-    new URLSearchParams(
-        window.location.search
-    );
-
-    const subCategorySlug =
-        urlParams.get(
-            'slug'
-        );
-
-
-    // ====================================================
-    // KIỂM TRA URL
-    // ====================================================
-
-    if (!subCategorySlug) {
-
-    if (title) {
-
-        title.textContent =
-            'Lỗi đường dẫn';
-
-    }
-
-    emptyState?.classList.remove(
-        'is-hidden'
-    );
-
-    return;
-
-}
-
-
-    // ====================================================
-    // LOADING SKELETON
-    // ====================================================
-
-    if (container) {
-
-        container.innerHTML =
-            Array(4)
-                .fill(null)
-                .map(
-                    () => `
-
-                        <div
-                            class="family-skeleton-card"
-                        >
-
-                            <div
-                                class="family-skeleton-title"
-                            ></div>
-
-                            <div
-                                class="family-skeleton-text"
-                            ></div>
-
-                        </div>
-
-                    `
-                )
-                .join('');
-
-    }
-
 
     try {
-
-        // ==================================================
-        // QUERY SONG SONG
-        // ==================================================
-
-        // ==================================================
-// TÌM SUBCATEGORY BẰNG SLUG
-// ==================================================
-
-const { data: subCatInfo, error: subCategoryError } =
-    await supabaseClient
-        .from('sub_categories')
-        .select(
-            'id, name, slug, category_id, categories(name, slug)'
-        )
-        .eq(
-            'slug',
-            subCategorySlug
-        )
-        .single();
-
-if (subCategoryError) {
-    throw subCategoryError;
-}
-
-if (!subCatInfo) {
-    throw new Error(
-        'Không tìm thấy nhóm hàng.'
-    );
-}
-
-const subCategoryId =
-    subCatInfo.id;
-
-
-// ==================================================
-// SAU KHI CÓ SUBCATEGORY ID → LOAD FAMILY
-// ==================================================
-
-const { data: families, error: familiesError } =
-    await supabaseClient
-        .from('families')
-        .select(
-            '*, products(id)'
-        )
-        .eq(
-            'sub_category_id',
-            subCategoryId
-        )
-        .order(
-            'name',
-            {
-                ascending: true
-            }
-        );
-
-if (familiesError) {
-    throw familiesError;
-}
-
-allFamilies =
-    families || [];
-
-        const familyCount =
-            document.getElementById(
-                'familyCount'
-            );
-
-
-        if (familyCount) {
-
-            familyCount.textContent =
-                allFamilies.length;
-
+        // TÌM NHÓM HÀNG BẰNG SLUG HOẶC ID
+        let subCatQuery = window.supabaseClient.from('sub_categories').select('id, name, slug');
+        if (subCatSlug) {
+            subCatQuery = subCatQuery.eq('slug', subCatSlug);
+        } else {
+            subCatQuery = subCatQuery.eq('id', subCatIdParam);
         }
 
+        const { data: subCatInfo, error: subCatError } = await subCatQuery.single();
 
-        // ==================================================
-        // SEO + BREADCRUMB
-        // ==================================================
+        if (subCatError) throw subCatError;
+        if (!subCatInfo) throw new Error('Không tìm thấy nhóm hàng.');
 
+        const subCategoryId = subCatInfo.id;
+
+        // LOAD FAMILY + ĐẾM PRODUCT
+        // Lấy đúng những trường cần thiết, tối ưu payload
+        const [famRes, prodRes] = await Promise.all([
+            window.supabaseClient
+                .from('families')
+                .select('id, name, slug, sub_category_id')
+                .eq('sub_category_id', subCategoryId)
+                .order('name', { ascending: true }),
+                
+            window.supabaseClient
+                .from('products')
+                .select('family_id')
+                .eq('sub_category_id', subCategoryId)
+        ]);
+
+        if (famRes.error) throw famRes.error;
+        if (prodRes.error) throw prodRes.error;
+
+        allFamilies = famRes.data || [];
+
+        const familyCount = document.getElementById('familyCount');
+        if (familyCount) familyCount.textContent = allFamilies.length;
+
+        // ĐẾM PRODUCT
+        productCounts = {};
+        if (prodRes.data) {
+            prodRes.data.forEach(product => {
+                if (product.family_id) {
+                    productCounts[product.family_id] = (productCounts[product.family_id] || 0) + 1;
+                }
+            });
+        }
+
+        // UPDATE SEO & BREADCRUMB
         if (subCatInfo) {
-
-            const catName =
-                subCatInfo.categories
-                    ? subCatInfo.categories.name
-                    : 'Danh mục';
-
-
-            const catId =
-                subCatInfo.category_id;
-
-
-            const categorySlug =
-                subCatInfo.categories?.slug || '';
-
-            const isLocal =
-            window.location.hostname === '127.0.0.1' ||
-            window.location.hostname === 'localhost';
-
-
-            const subName =
-                subCatInfo.name;
-
-
-            const subcategoryUrl =
-                    subCatInfo.slug
-                        ? new URL(
-                            `/${encodeURIComponent(String(subCatInfo.slug).trim())}.html`,
-                            window.location.origin
-                        ).href
-                        : window.location.href.split('#')[0];
-
-
-            const seoTitle =
-                `${subName} | ${catName} | MRO Khang Nam`;
-
-
-            const seoDesc =
-                `MRO Khang Nam phân phối đầy đủ dòng sản phẩm ${subName} thuộc nhóm ${catName} chính hãng với giá tốt nhất.`;
-
-
-            // ==================================================
-            // META
-            // ==================================================
-
-            document.title =
-                seoTitle;
-
-
-            document
-                .querySelector(
-                    'meta[name="description"]'
-                )
-                ?.setAttribute(
-                    'content',
-                    seoDesc
-                );
-
-
-            document
-                .getElementById(
-                    'canonicalUrl'
-                )
-                ?.setAttribute(
-                    'href',
-                    subcategoryUrl
-                );
-
-
-            document
-                .getElementById(
-                    'ogUrl'
-                )
-                ?.setAttribute(
-                    'content',
-                    subcategoryUrl
-                );
-
-
-            document
-                .getElementById(
-                    'ogTitle'
-                )
-                ?.setAttribute(
-                    'content',
-                    seoTitle
-                );
-
-
-            document
-                .getElementById(
-                    'ogDesc'
-                )
-                ?.setAttribute(
-                    'content',
-                    seoDesc
-                );
-
-
-            // ==================================================
-            // TITLE
-            // ==================================================
-
-            if (title) {
-
-                title.textContent =
-                    subName;
-
-            }
-
-
-            // ==================================================
-            // BREADCRUMB
-            // ==================================================
-
-            const bcParent =
-                document.getElementById(
-                    'bcParentCategory'
-                );
-
-
-            const bcSeparator =
-                document.getElementById(
-                    'bcSeparator'
-                );
-
-
-            const bcCurrent =
-                document.getElementById(
-                    'bcCurrent'
-                );
-
-
-            if (
-                bcParent &&
-                catId
-            ) {
-
-                bcParent.href =
-                    categorySlug
-                        ? (
-                            isLocal
-                                ? `/pages/subcategory.html?slug=${encodeURIComponent(categorySlug)}`
-                                : `/${encodeURIComponent(categorySlug)}.html`
-                        )
-                        : '#';
-
-
-                bcParent.textContent =
-                    catName;
-
-
-                bcParent.classList.remove(
-                    'is-hidden'
-                );
-
-
-                if (bcSeparator) {
-
-                    bcSeparator.classList.remove(
-                        'is-hidden'
-                    );
-
-                }
-
-            }
-
-
-            if (bcCurrent) {
-
-                bcCurrent.textContent =
-                    subName;
-
-
-                bcCurrent.classList.remove(
-                    'catalog-breadcrumb-loading'
-                );
-
-            }
-
-
-            // ==================================================
-            // JSON-LD
-            // ==================================================
-
-            const schemaData = {
-
-            '@context': 'https://schema.org',
-
-            '@type':
-                'BreadcrumbList',
-
-            itemListElement: [
-
-                {
-                    '@type':
-                        'ListItem',
-
-                    position:
-                        1,
-
-                    name:
-                        'Trang chủ',
-
-                    item:
-                        window.location.origin
-                },
-
-                {
-                    '@type':
-                        'ListItem',
-
-                    position:
-                        2,
-
-                    name:
-                        catName,
-
-                    item:
-                        categorySlug
-                            ? `${window.location.origin}/${encodeURIComponent(categorySlug)}.html`
-                            : `${window.location.origin}/pages/category.html`
-                },
-
-                {
-                    '@type':
-                        'ListItem',
-
-                    position:
-                        3,
-
-                    name:
-                        subName,
-
-                    item:
-                        subcategoryUrl
-                }
-
-            ]
+            const name = subCatInfo.name;
+            if (title) title.textContent = name;
+            if (bcSubCategory) bcSubCategory.textContent = name;
+            document.title = `${name} - Dòng sản phẩm | MRO Khang Nam`;
         }
 
+        skeleton?.classList.add('is-hidden');
 
-            const schemaElement =
-                document.getElementById(
-                    'schemaJSON'
-                );
-
-
-            if (schemaElement) {
-
-                schemaElement.textContent =
-                    JSON.stringify(
-                        schemaData
-                    );
-
-            }
-
+        if (allFamilies.length === 0) {
+            emptyState?.classList.remove('is-hidden');
+            return;
         }
 
-
-        // ==================================================
-        // RENDER
-        // ==================================================
-
-        renderFamilies(
-            allFamilies
-        );
-
+        container?.classList.remove('is-hidden');
+        renderFamilies(allFamilies);
 
     } catch (error) {
-
-        console.error(
-            'Lỗi fetchFamilies:',
-            error
-        );
-
-
+        console.error('Lỗi fetchFamilies:', error);
+        skeleton?.classList.add('is-hidden');
+        container?.classList.remove('is-hidden');
         if (container) {
-
-            container.innerHTML = `
-
-                <div
-                    class="catalog-error"
-                >
-                    Lỗi hệ thống:
-                    ${escapeFamilyHTML(
-                        error.message
-                    )}
-                </div>
-
-            `;
-
+            container.innerHTML = `<div class="subcategory-error text-red-500 font-bold p-4 text-center">Lỗi kết nối: ${escapeHTML(error.message)}</div>`;
         }
-
     }
-
 }
 
+function renderFamilies(dataList) {
+    const container = document.getElementById('familyContainer');
+    const emptyState = document.getElementById('emptyState');
+    if (!container || !emptyState) return;
 
-// ========================================================
-// 2. RENDER FAMILY
-// ========================================================
-
-function renderFamilies(
-    dataList
-) {
-
-    const container =
-        document.getElementById(
-            'familyContainer'
-        );
-
-
-    const emptyState =
-        document.getElementById(
-            'emptyState'
-        );
-
-
-    if (
-        !container ||
-        !emptyState
-    ) {
-
+    if (dataList.length === 0) {
+        container.innerHTML = '';
+        container.classList.add('is-hidden');
+        emptyState.classList.remove('is-hidden');
         return;
-
     }
 
+    emptyState.classList.add('is-hidden');
+    container.classList.remove('is-hidden');
 
-    // ====================================================
-    // EMPTY
-    // ====================================================
+    let html = '';
+    const isLocal = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
 
-    if (
-        dataList.length === 0
-    ) {
+    dataList.forEach((fam) => {
+        const pCount = productCounts[fam.id] || 0;
+        const slug = fam?.slug ? String(fam.slug).trim() : '';
+        const targetUrl = slug 
+            ? (isLocal ? `/pages/products.html?slug=${encodeURIComponent(slug)}` : `/${encodeURIComponent(slug)}.html`) 
+            : '#';
 
-        container.innerHTML =
-            '';
+        html += `
+            <a href="${targetUrl}" class="subcategory-card" aria-label="Xem dòng sản phẩm ${escapeHTML(fam.name)}">
+                <div class="subcategory-card-overlay"></div>
+                <h2 class="subcategory-card-title text-center mt-2">${escapeHTML(fam.name)}</h2>
+                <span class="subcategory-card-count text-center block mt-1">${pCount} sản phẩm</span>
+            </a>
+        `;
+    });
 
-
-        emptyState.classList.remove(
-            'is-hidden'
-        );
-
-
-        return;
-
-    }
-
-
-    emptyState.classList.add(
-        'is-hidden'
-    );
-
-
-    let html =
-        '';
-
-    const isLocal =
-    window.location.hostname === '127.0.0.1' ||
-    window.location.hostname === 'localhost';
-
-
-    dataList.forEach(
-        family => {
-
-            // ==================================================
-            // PRODUCT COUNT
-            // ==================================================
-
-            const skuCount =
-                family.products
-                    ? family.products.length
-                    : 0;
-
-
-            // ==================================================
-            // THUMBNAIL
-            // ==================================================
-
-            const thumbUrl =
-                buildFamilyImageUrl(
-                    family.thumbnail_url
-                );
-
-
-            const familyName =
-                family.name || '';
-
-
-            // ==================================================
-            // IMAGE SOURCE
-            // ==================================================
-
-            const imageSrc =
-                thumbUrl ||
-                FAMILY_FALLBACK_IMAGE;
-
-
-            // ==================================================
-            // CARD
-            // ==================================================
-
-            html += `
-
-                <a
-                    href="${family.slug
-                        ? (
-                            isLocal
-                                ? `/pages/products.html?slug=${encodeURIComponent(String(family.slug).trim())}`
-                                : `/${encodeURIComponent(String(family.slug).trim())}.html` 
-                        )
-                        : '#'}"
-                    aria-label="Xem dòng sản phẩm ${escapeFamilyHTML(
-                        familyName
-                    )}"
-                    class="family-card"
-                >
-
-                    <div
-                        class="family-card-image"
-                    >
-
-                        <img
-                            src="${escapeFamilyHTML(
-                                imageSrc
-                            )}"
-                            alt="${escapeFamilyHTML(
-                                familyName
-                            )}"
-                            class="family-card-image-element"
-                            loading="lazy"
-                            onerror="
-                                this.onerror=null;
-                                this.src='${FAMILY_FALLBACK_IMAGE}';
-                            "
-                        >
-
-                    </div>
-
-
-                    <div
-                        class="family-card-body"
-                    >
-
-                        <h2
-                            class="family-card-title"
-                        >
-                            ${escapeFamilyHTML(
-                                familyName
-                            )}
-                        </h2>
-
-
-                        <div
-                            class="family-card-footer"
-                        >
-
-                            <span
-                                class="family-card-count"
-                            >
-                                ${skuCount} SKU
-                            </span>
-
-
-                            <span
-                                class="family-card-link"
-                            >
-                                Khám phá →
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </a>
-
-            `;
-
-        }
-    );
-
-
-    container.innerHTML =
-        html;
-
+    container.innerHTML = html;
 }
 
-
-// ========================================================
-// 3. LIVE SEARCH
-// ========================================================
-
-document
-    .getElementById(
-        'searchFamily'
-    )
-    ?.addEventListener(
-        'input',
-        function (event) {
-
-            const keyword =
-                event.target.value
-                    .toLowerCase()
-                    .trim();
-
-
-            if (!keyword) {
-
-                renderFamilies(
-                    allFamilies
-                );
-
-                return;
-
-            }
-
-
-            const filtered =
-                allFamilies.filter(
-                    family => {
-
-                        return (
-                            family.name &&
-                            family.name
-                                .toLowerCase()
-                                .includes(
-                                    keyword
-                                )
-                        );
-
-                    }
-                );
-
-
-            renderFamilies(
-                filtered
-            );
-
-        }
-    );
-
-
-// ========================================================
-// 4. AUTH
-// ========================================================
-
-document.addEventListener(
-    'DOMContentLoaded',
-    async () => {
-
-        await fetchFamilies();
-
-
-        if (
-            typeof checkCustomerAuth ===
-            'function'
-        ) {
-
-            try {
-
-                const user =
-                    await checkCustomerAuth();
-
-
-                if (user) {
-
-                    document
-                        .getElementById(
-                            'btnGuestLogin'
-                        )
-                        ?.classList.add(
-                            'is-hidden'
-                        );
-
-
-                    const userProfileBtn =
-                        document.getElementById(
-                            'btnUserProfile'
-                        );
-
-
-                    if (userProfileBtn) {
-
-                        userProfileBtn.classList.remove(
-                            'is-hidden'
-                        );
-
-                    }
-
-                }
-
-            } catch (error) {
-
-                console.error(
-                    'Lỗi khi check auth:',
-                    error
-                );
-
-            }
-
-        }
-
+// LIVE SEARCH
+const searchInput = document.getElementById('searchFamily');
+searchInput?.addEventListener('input', function (event) {
+    const keyword = event.target.value.toLowerCase().trim();
+    if (!keyword) {
+        renderFamilies(allFamilies);
+        return;
     }
-);
+    const filtered = allFamilies.filter(f => f.name && f.name.toLowerCase().includes(keyword));
+    renderFamilies(filtered);
+});
 
-
-// ========================================================
-// 5. ESCAPE HTML
-// ========================================================
-
-function escapeFamilyHTML(
-    value
-) {
-
-    if (
-        value === null ||
-        value === undefined
-    ) {
-
-        return '';
-
-    }
-
-
-    const div =
-        document.createElement(
-            'div'
-        );
-
-
-    div.textContent =
-        String(value);
-
-
+function escapeHTML(value) {
+    if (value === null || value === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(value);
     return div.innerHTML;
-
 }
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await fetchFamilies();
+    if (typeof checkCustomerAuth === 'function') {
+        try {
+            const user = await checkCustomerAuth();
+            if (user) {
+                document.getElementById('btnGuestLogin')?.classList.add('is-hidden');
+                document.getElementById('btnUserProfile')?.classList.remove('is-hidden');
+            }
+        } catch (error) {}
+    }
+});

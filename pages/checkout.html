@@ -228,328 +228,136 @@
 
 
             <!-- =================================================
-                 CHECKOUT FORM
+                 CHECKOUT FORM (ĐÃ ĐẢO CỘT - BẮT CSS TĨNH)
             ================================================== -->
-
-            <form
-                id="checkoutForm"
-                class="checkout-layout"
-            >
-
+            <form id="checkoutForm" class="checkout-layout">
 
                 <!-- =================================================
-                     LEFT
+                     CỘT TRÁI: ĐƠN HÀNG CỦA BẠN (CỘT LỚN 2/3)
                 ================================================== -->
+                <section class="checkout-summary-section">
+                    <div class="checkout-summary-card">
 
-                <section class="checkout-form-section">
+                        <!-- HEADER -->
+                        <div class="checkout-summary-header">
+                            <h3 class="checkout-summary-title">
+                                Đơn hàng của bạn
+                            </h3>
+                        </div>
 
-                    <div class="checkout-form-card">
+                        <!-- BODY -->
+                        <div class="checkout-summary-body">
 
+                            <!-- MINI PRODUCTS (Tăng max-height lên xíu cho thoải mái không gian cột to) -->
+                            <div id="checkoutItemsContainer" class="checkout-items-container" style="max-height: 500px;">
+                                <p class="checkout-items-loading">
+                                    Đang tải giỏ hàng...
+                                </p>
+                            </div>
+
+                            <!-- TOTAL -->
+                            <div class="checkout-bill">
+                                <div class="checkout-bill-row">
+                                    <span>Tạm tính:</span>
+                                    <strong id="checkoutSubtotal">0 đ</strong>
+                                </div>
+                                <div class="checkout-bill-row">
+                                    <span>Phí vận chuyển:</span>
+                                    <strong>Liên hệ sau</strong>
+                                </div>
+                                <div class="checkout-bill-row">
+                                    <span>Thuế VAT (8-10%):</span>
+                                    <strong>Chưa bao gồm</strong>
+                                </div>
+                                <div class="checkout-bill-total">
+                                    <span>Tổng thanh toán:</span>
+                                    <strong id="checkoutTotal">0 đ</strong>
+                                </div>
+                            </div>
+
+                            <!-- PAYMENT METHOD -->
+                            <div class="checkout-payment-method">
+                                <div class="checkout-payment-row">
+                                    <input type="radio" name="paymentMethod" value="cod" checked class="checkout-radio" aria-label="Thanh toán chuyển khoản / Công nợ">
+                                    <div>
+                                        <h4 class="checkout-payment-title">
+                                            Thanh toán khi nhận hàng (COD)
+                                        </h4>
+                                        <p class="checkout-payment-description">
+                                            Quý khách kiểm tra hàng và thanh toán trực tiếp cho nhân viên giao hàng. Kế toán sẽ liên hệ chốt chi phí vận chuyển (nếu có) trước khi gửi.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =================================================
+                     CỘT PHẢI: THÔNG TIN GIAO HÀNG (CỘT NHỎ 1/3)
+                ================================================== -->
+                <aside class="checkout-form-section">
+                    <!-- Tái sử dụng class thẻ summary để nó tự sticky theo ý muốn -->
+                    <div class="checkout-form-card checkout-summary-card">
 
                         <!-- HEADER -->
                         <div class="checkout-card-header">
-
                             <h2 class="checkout-card-title">
-
-                                <svg
-                                    class="checkout-title-icon"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    aria-hidden="true"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                    ></path>
-
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                    ></path>
+                                <svg class="checkout-title-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 </svg>
-
                                 Thông tin Giao hàng
-
                             </h2>
-
                         </div>
-
 
                         <!-- FORM BODY -->
                         <div class="checkout-form-body">
 
-
-                            <!-- HỌ TÊN + PHONE -->
-
-                            <div class="checkout-field-grid">
-
-
-                                <div class="checkout-form-group">
-
-                                    <label
-                                        for="shippingName"
-                                        class="checkout-form-label"
-                                    >
-                                        Họ và tên người nhận
-                                        <span>*</span>
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        id="shippingName"
-                                        class="checkout-form-input"
-                                        required
-                                        placeholder="Nhập họ tên đầy đủ"
-                                    >
-
-                                </div>
-
-
-                                <div class="checkout-form-group">
-
-                                    <label
-                                        for="shippingPhone"
-                                        class="checkout-form-label"
-                                    >
-                                        Số điện thoại
-                                        <span>*</span>
-                                    </label>
-
-                                    <input
-                                        type="tel"
-                                        id="shippingPhone"
-                                        class="checkout-form-input"
-                                        required
-                                        placeholder="Nhập số điện thoại liên hệ"
-                                    >
-
-                                </div>
-
+                            <!-- HỌ TÊN (Đã gỡ class .checkout-field-grid để xuống dòng 1 cột) -->
+                            <div class="checkout-form-group">
+                                <label for="shippingName" class="checkout-form-label">
+                                    Họ tên <span>*</span>
+                                </label>
+                                <input type="text" id="shippingName" class="checkout-form-input" required placeholder="Nhập họ tên">
                             </div>
 
+                            <!-- SĐT -->
+                            <div class="checkout-form-group">
+                                <label for="shippingPhone" class="checkout-form-label">
+                                    Số điện thoại <span>*</span>
+                                </label>
+                                <input type="tel" id="shippingPhone" class="checkout-form-input" required placeholder="Nhập SĐT liên hệ">
+                            </div>
 
                             <!-- ĐỊA CHỈ -->
-
                             <div class="checkout-form-group">
-
-                                <label
-                                    for="shippingAddress"
-                                    class="checkout-form-label"
-                                >
-                                    Địa chỉ giao hàng chi tiết
-                                    <span>*</span>
+                                <label for="shippingAddress" class="checkout-form-label">
+                                    Địa chỉ giao hàng <span>*</span>
                                 </label>
-
-                                <input
-                                    type="text"
-                                    id="shippingAddress"
-                                    class="checkout-form-input"
-                                    required
-                                    placeholder="Số nhà, Tên đường, Phường/Xã, Quận/Huyện, Tỉnh/Thành phố..."
-                                >
-
+                                <input type="text" id="shippingAddress" class="checkout-form-input" required placeholder="Số nhà, Tên đường, Phường/Xã...">
                             </div>
-
 
                             <!-- NOTE -->
-
-                            <div class="checkout-form-group">
-
-                                <label
-                                    for="orderNotes"
-                                    class="checkout-form-label"
-                                >
-                                    Ghi chú đơn hàng
-                                    <small>
-                                        (Tùy chọn)
-                                    </small>
+                            <div class="checkout-form-group" style="margin-bottom: 8px;">
+                                <label for="orderNotes" class="checkout-form-label">
+                                    Ghi chú <small>(Tùy chọn)</small>
                                 </label>
-
-                                <textarea
-                                    id="orderNotes"
-                                    class="checkout-form-textarea"
-                                    rows="4"
-                                    placeholder="Ghi chú về thời gian giao hàng, yêu cầu xuất hóa đơn VAT, mã số thuế doanh nghiệp..."
-                                ></textarea>
-
+                                <textarea id="orderNotes" class="checkout-form-textarea" rows="3" placeholder="Ghi chú thời gian nhận, VAT..."></textarea>
                             </div>
 
-                        </div>
-
-                    </div>
-
-                </section>
-
-
-                <!-- =================================================
-                     RIGHT - BILL
-                ================================================== -->
-
-                <aside class="checkout-summary-section">
-
-                    <div class="checkout-summary-card">
-
-
-                        <!-- HEADER -->
-
-                        <div class="checkout-summary-header">
-
-                            <h3 class="checkout-summary-title">
-                                Đơn hàng của bạn
-                            </h3>
-
-                        </div>
-
-
-                        <!-- BODY -->
-
-                        <div class="checkout-summary-body">
-
-
-                            <!-- MINI PRODUCTS -->
-
-                            <div
-                                id="checkoutItemsContainer"
-                                class="checkout-items-container"
-                            >
-
-                                <p class="checkout-items-loading">
-                                    Đang tải giỏ hàng...
-                                </p>
-
-                            </div>
-
-
-                            <!-- TOTAL -->
-
-                            <div class="checkout-bill">
-
-
-                                <div class="checkout-bill-row">
-
-                                    <span>
-                                        Tạm tính:
-                                    </span>
-
-                                    <strong id="checkoutSubtotal">
-                                        0 đ
-                                    </strong>
-
-                                </div>
-
-
-                                <div class="checkout-bill-row">
-
-                                    <span>
-                                        Phí vận chuyển:
-                                    </span>
-
-                                    <strong>
-                                        Liên hệ sau
-                                    </strong>
-
-                                </div>
-
-
-                                <div class="checkout-bill-row">
-
-                                    <span>
-                                        Thuế VAT (8-10%):
-                                    </span>
-
-                                    <strong>
-                                        Chưa bao gồm
-                                    </strong>
-
-                                </div>
-
-
-                                <div class="checkout-bill-total">
-
-                                    <span>
-                                        Tổng thanh toán:
-                                    </span>
-
-                                    <strong id="checkoutTotal">
-                                        0 đ
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- PAYMENT METHOD -->
-
-                            <div class="checkout-payment-method">
-
-                                <div class="checkout-payment-row">
-
-                                    <input
-                                        type="radio"
-                                        checked
-                                        class="checkout-radio"
-                                        aria-label="Thanh toán chuyển khoản hoặc công nợ"
-                                    >
-
-
-                                    <div>
-
-                                        <h4 class="checkout-payment-title">
-                                            Thanh toán chuyển khoản / Công nợ
-                                        </h4>
-
-                                        <p class="checkout-payment-description">
-                                            Kế toán sẽ liên hệ xác nhận chi phí
-                                            vận chuyển, thuế VAT và công nợ
-                                            nếu có trước khi giao hàng.
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- SUBMIT -->
-
-                            <button
-                                type="submit"
-                                id="btnSubmitOrder"
-                                class="checkout-submit-button"
-                            >
-
-                                <span>
-                                    Xác Nhận Đặt Hàng
-                                </span>
-
-                                <svg
-                                    class="checkout-submit-icon"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    aria-hidden="true"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M5 13l4 4L19 7"
-                                    ></path>
+                            <!-- NÚT CHỐT ĐƠN DỜI SANG CỘT NÀY -->
+                            <button type="submit" id="btnSubmitOrder" class="checkout-submit-button">
+                                <span>Xác Nhận Đặt Hàng</span>
+                                <svg class="checkout-submit-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                 </svg>
-
                             </button>
 
                         </div>
 
                     </div>
-
                 </aside>
 
             </form>

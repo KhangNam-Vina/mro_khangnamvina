@@ -378,17 +378,25 @@ function normalizeProductSizes(product) {
     return [...new Set(sizes)];
 }
 
+/* =========================================================
+   SIZE (Đã nới rộng và cấm bẻ chữ)
+========================================================= */
 function renderProductSizes(product) {
     const sizes = normalizeProductSizes(product);
-    if (sizes.length === 0) return `<span class="text-sm text-gray-400 italic">—</span>`;
-    
-    return `<div class="flex flex-wrap items-center gap-1.5">
-        ${sizes.map(s => `
-            <span class="inline-flex items-center px-2.5 py-1.5 rounded-md bg-blue-50 border border-blue-200 text-kn-blue text-xs font-bold whitespace-nowrap shadow-sm">
-                ${escapeHTML(s)}
-            </span>
-        `).join("")}
-    </div>`;
+
+    if (sizes.length === 0) {
+        return `<span class="text-xs text-gray-400 italic">—</span>`;
+    }
+
+    return `
+        <div class="flex flex-wrap items-center gap-1.5 min-w-[160px] max-w-[260px]">
+            ${sizes.map(size => `
+                <span class="inline-flex items-center px-2 py-1 rounded-md bg-blue-50 border border-blue-100 text-kn-blue text-[10px] font-black leading-none whitespace-nowrap">
+                    ${escapeHTML(size)}
+                </span>
+            `).join("")}
+        </div>
+    `;
 }
 
 function normalizeImageList(value) {
@@ -1910,47 +1918,68 @@ const missingInformation =
 ========================================================= */
 function renderProducts() {
     if (!DOM.tableBody) return;
+
     if (state.products.length === 0) {
-        DOM.tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-14 text-gray-400 italic">Không tìm thấy sản phẩm phù hợp.</td></tr>`;
+        DOM.tableBody.innerHTML = `
+            <tr>
+                <td colspan="9" class="text-center py-14 text-gray-400">
+                    Không tìm thấy sản phẩm.
+                </td>
+            </tr>
+        `;
         return;
     }
 
     const from = (state.currentPage - 1) * state.itemsPerPage;
+
     DOM.tableBody.innerHTML = state.products.map((item, index) => {
         const brandName = item.brands?.name || "OEM";
         const imageUrl = buildProductImageUrl(item.image_path);
-        
+
         const imageHTML = imageUrl
-            ? `<img src="${escapeAttribute(imageUrl)}" class="w-10 h-10 object-contain mx-auto border border-gray-200 rounded-lg bg-white" loading="lazy" onerror="this.onerror=null;this.src='../assets/images/world mark.png';">`
+            ? `<img src="${escapeAttribute(imageUrl)}" alt="${escapeAttribute(item.name)}" class="w-10 h-10 object-contain mx-auto border border-gray-200 rounded-lg bg-white" loading="lazy" onerror="this.onerror=null;this.src='../assets/images/world mark.png';">`
             : `<div class="w-10 h-10 bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center text-[9px] text-gray-400 mx-auto">No Img</div>`;
 
         return `
             <tr class="border-b border-gray-100 hover:bg-blue-50/30 transition">
-                <td class="px-4 py-3 text-center font-bold text-gray-400 text-xs">${from + index + 1}</td>
-                <td class="px-4 py-3 text-center">${imageHTML}</td>
-                <td class="px-4 py-3 font-mono font-bold text-kn-blue text-xs whitespace-nowrap">${escapeHTML(item.sku)}</td>
-                <td class="px-4 py-3 font-bold text-gray-800 text-sm line-clamp-2" title="${escapeHTML(item.name)}">${escapeHTML(item.name)}</td>
-                <td class="px-4 py-3 text-gray-600 text-xs font-bold">${escapeHTML(brandName)}</td>
-                
-                <!-- Cột Size -->
-                <td class="px-4 py-3">${renderProductSizes(item)}</td>
-                
-                <!-- FIX CỘT GIÁ: Thêm class text-right vào đây -->
-                <td class="px-4 py-3 text-gray-800 font-bold text-sm whitespace-nowrap text-right">${formatCurrency(item.price)}</td>
-                
-                <!-- Cột Tồn kho -->
-                <td class="px-4 py-3 text-center">
-                    <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold ${Number(item.stock_quantity) > 0 ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'}">
+                <td class="px-4 py-3 text-center font-bold text-gray-400 text-xs align-middle">
+                    ${from + index + 1}
+                </td>
+                <td class="px-4 py-3 text-center align-middle">
+                    ${imageHTML}
+                </td>
+                <td class="px-4 py-3 font-mono font-bold text-kn-blue text-xs whitespace-nowrap align-middle">
+                    ${escapeHTML(item.sku)}
+                </td>
+                <td class="px-4 py-3 font-bold text-gray-800 text-sm align-middle leading-snug">
+                    ${escapeHTML(item.name)}
+                </td>
+                <td class="px-4 py-3 text-gray-600 text-xs font-bold uppercase align-middle">
+                    ${escapeHTML(brandName)}
+                </td>
+                <td class="px-4 py-3 align-middle">
+                    ${renderProductSizes(item)}
+                </td>
+                <td class="px-4 py-3 text-gray-800 font-bold text-sm whitespace-nowrap text-right align-middle">
+                    ${formatCurrency(item.price)}
+                </td>
+                <td class="px-4 py-3 text-center align-middle">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold ${Number(item.stock_quantity) > 0 ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'}">
                         ${Number(item.stock_quantity) > 0 ? Number(item.stock_quantity) : "Hết hàng"}
                     </span>
                 </td>
-                
-                <!-- Cột Thao tác -->
-                <td class="px-4 py-3 text-right whitespace-nowrap">
-                    <button type="button" data-action="edit" data-id="${escapeAttribute(item.id)}" class="p-1.5 text-blue-600 hover:bg-blue-100 rounded-lg transition font-bold text-xs uppercase">Sửa</button>
-                    <button type="button" data-action="delete" data-id="${escapeAttribute(item.id)}" class="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition font-bold text-xs uppercase">Xóa</button>
+                <td class="px-4 py-3 text-center whitespace-nowrap align-middle">
+                    <div class="flex items-center justify-center gap-1.5">
+                        <button type="button" data-action="edit" data-id="${escapeAttribute(item.id)}" class="px-2 py-1.5 text-blue-600 hover:bg-blue-100 rounded-lg transition font-bold text-[10px] uppercase">
+                            Sửa
+                        </button>
+                        <button type="button" data-action="delete" data-id="${escapeAttribute(item.id)}" class="px-2 py-1.5 text-red-500 hover:bg-red-50 rounded-lg transition font-bold text-[10px] uppercase">
+                            Xóa
+                        </button>
+                    </div>
                 </td>
-            </tr>`;
+            </tr>
+        `;
     }).join("");
 }
 

@@ -6,15 +6,6 @@
 "use strict";
 
 /* =========================================================
-   CONSTANTS
-========================================================= */
-const STORAGE_BUCKET = "product-images";
-const STORAGE_FAMILY_PREFIX = "families";
-const IMAGE_CDN_BASE = "https://mrokhangnam-image.khangnamvn.workers.dev";
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB cho thumbnail
-const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-
-/* =========================================================
    STATE
 ========================================================= */
 const state = {
@@ -30,13 +21,6 @@ const state = {
     
     editingId: null,
     selectedCategoryId: null,
-
-    mediaDraft: {
-        thumbnailPath: null,
-        thumbnailUrl: null,
-        thumbnailRemoved: false,
-        pendingFile: null
-    }
 };
 
 /* =========================================================
@@ -85,12 +69,6 @@ const DOM = {
     subDropdown: document.getElementById("subCategoryDropdown"),
     subSearch: document.getElementById("subCategorySearch"),
     subOptions: document.getElementById("subCategoryOptions"),
-
-    // Thumbnail
-    inThumbnailFile: document.getElementById("inThumbnailFile"),
-    thumbnailFileName: document.getElementById("thumbnailFileName"),
-    btnRemoveThumbnail: document.getElementById("btnRemoveThumbnail"),
-    thumbnailPreview: document.getElementById("thumbnailPreview")
 };
 
 /* =========================================================
@@ -175,10 +153,6 @@ function setupEvents() {
     DOM.catOptions?.addEventListener("click", handleCategorySelect);
     DOM.subOptions?.addEventListener("click", handleSubCategorySelect);
 
-    // Thumbnail Events
-    DOM.inThumbnailFile?.addEventListener("change", handleThumbnailSelect);
-    DOM.btnRemoveThumbnail?.addEventListener("click", handleThumbnailRemove);
-
     // Bảng Data Click (Sửa / Xóa)
     DOM.tableBody?.addEventListener("click", (e) => {
         const btn = e.target.closest("button[data-action]");
@@ -261,7 +235,7 @@ async function loadStatistics() {
 
 async function fetchFamilies() {
     if (!DOM.tableBody) return;
-    DOM.tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-gray-400">Đang tải dữ liệu...</td></tr>`;
+    DOM.tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-gray-400">Đang tải dữ liệu...</td></tr>`;
 
     try {
         let query = window.supabaseClient
@@ -293,7 +267,7 @@ async function fetchFamilies() {
 
     } catch (error) {
         console.error("Lỗi tải Families:", error);
-        DOM.tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-red-500">Lỗi: ${error.message}</td></tr>`;
+        DOM.tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-red-500">Lỗi: ${error.message}</td></tr>`;
     }
 }
 
@@ -302,7 +276,7 @@ async function fetchFamilies() {
 ========================================================= */
 function renderFamilies(from) {
     if (state.families.length === 0) {
-        DOM.tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-gray-400 italic">Chưa có dòng sản phẩm nào.</td></tr>`;
+        DOM.tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-gray-400 italic">Chưa có dòng sản phẩm nào.</td></tr>`;
         return;
     }
 
@@ -310,17 +284,10 @@ function renderFamilies(from) {
         const name = window.utils.escapeHTML(item.name);
         const slug = window.utils.escapeHTML(item.slug || "");
         const subCatName = item.sub_categories ? window.utils.escapeHTML(item.sub_categories.name) : `<span class="text-red-500 font-bold">Thiếu liên kết</span>`;
-        
-        let thumbHtml = `<div class="w-12 h-12 rounded bg-gray-100 flex items-center justify-center text-[10px] text-gray-400 border border-gray-200">Trống</div>`;
-        if (item.thumbnail_url) {
-            const url = buildImageUrl(item.thumbnail_url);
-            thumbHtml = `<img src="${url}" class="w-12 h-12 rounded object-contain bg-white border border-gray-200" alt="Thumb" onerror="this.outerHTML='<div class=\\'w-12 h-12 rounded bg-red-50 flex items-center justify-center text-[10px] text-red-400 border border-red-100\\'>Lỗi</div>'">`;
-        }
 
         return `
             <tr class="hover:bg-blue-50/30 transition">
                 <td class="p-4 text-center text-xs font-bold text-gray-400">${from + index + 1}</td>
-                <td class="p-4 text-center">${thumbHtml}</td>
                 <td class="p-4">
                     <div class="font-bold text-gray-900">${name}</div>
                     <div class="text-[11px] text-gray-500 mt-1">${slug}</div>
@@ -343,18 +310,52 @@ function renderFamilies(from) {
 
 function renderPagination() {
     if (!DOM.pagination) return;
+    
     const totalPages = Math.ceil(state.totalItems / state.itemsPerPage);
+    
     if (totalPages <= 1) {
         DOM.pagination.innerHTML = `<div class="text-xs text-gray-500">Tổng cộng: <strong class="text-gray-900">${state.totalItems}</strong> dòng sản phẩm</div>`;
         return;
     }
 
-    // Logic sinh nút phân trang... (Giữ nguyên logic của utils nếu có, hoặc tạo nút đơn giản)
+    // ==========================================
+    // THUẬT TOÁN TẠO SỐ TRANG (Tối đa 5 nút)
+    // ==========================================
+    let pagesHTML = '';
+    const maxVisible = 5;
+    let startPage = Math.max(1, state.currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+    if (endPage - startPage + 1 < maxVisible) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+
+    for (let page = startPage; page <= endPage; page++) {
+        pagesHTML += `
+            <button data-page="${page}" class="px-3 py-1.5 border rounded-lg text-xs font-bold transition ${page === state.currentPage ? 'bg-kn-blue text-white border-kn-blue' : 'bg-white text-gray-600 hover:bg-gray-50'}">
+                ${page}
+            </button>
+        `;
+    }
+
+    // ==========================================
+    // VẼ RA GIAO DIỆN
+    // ==========================================
     DOM.pagination.innerHTML = `
-        <div class="text-xs text-gray-500 mb-3 sm:mb-0">Trang ${state.currentPage} / ${totalPages} (${state.totalItems} kết quả)</div>
+        <div class="text-xs text-gray-500 mb-3 sm:mb-0">
+            Trang <strong class="text-gray-900">${state.currentPage}</strong> / ${totalPages} (${state.totalItems} kết quả)
+        </div>
+        
         <div class="flex gap-1">
-            <button data-page-action="prev" class="px-3 py-1.5 border rounded-lg text-xs font-bold ${state.currentPage === 1 ? 'bg-gray-100 text-gray-400' : 'bg-white hover:bg-gray-50'}">Trước</button>
-            <button data-page-action="next" class="px-3 py-1.5 border rounded-lg text-xs font-bold ${state.currentPage === totalPages ? 'bg-gray-100 text-gray-400' : 'bg-white hover:bg-gray-50'}">Sau</button>
+            <button data-page-action="prev" ${state.currentPage === 1 ? 'disabled' : ''} class="px-3 py-1.5 border rounded-lg text-xs font-bold transition ${state.currentPage === 1 ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-600 hover:bg-gray-50'}">
+                Trước
+            </button>
+            
+            ${pagesHTML}
+            
+            <button data-page-action="next" ${state.currentPage === totalPages ? 'disabled' : ''} class="px-3 py-1.5 border rounded-lg text-xs font-bold transition ${state.currentPage === totalPages ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-600 hover:bg-gray-50'}">
+                Sau
+            </button>
         </div>
     `;
 }
@@ -430,63 +431,11 @@ function handleSubCategorySelect(e) {
 }
 
 /* =========================================================
-   THUMBNAIL LOGIC
-========================================================= */
-function buildImageUrl(path) {
-    if (!path) return "";
-    if (/^https?:\/\//i.test(path)) return path;
-    return `${IMAGE_CDN_BASE}/${path.replace(/^\/+/, "")}`;
-}
-
-function handleThumbnailSelect(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    try {
-        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) throw new Error("Chỉ hỗ trợ file JPG, PNG, WEBP, GIF.");
-        if (file.size > MAX_IMAGE_SIZE) throw new Error("Kích thước file tối đa 5MB.");
-        
-        state.mediaDraft.pendingFile = file;
-        state.mediaDraft.thumbnailRemoved = false;
-
-        DOM.thumbnailFileName.textContent = file.name;
-        DOM.btnRemoveThumbnail.classList.remove("hidden");
-        
-        const previewUrl = URL.createObjectURL(file);
-        DOM.thumbnailPreview.classList.remove("hidden");
-        DOM.thumbnailPreview.innerHTML = `
-            <img src="${previewUrl}" class="w-32 h-32 object-contain rounded-lg border border-gray-200 bg-white p-1">
-        `;
-    } catch (error) {
-        window.utils.showToast(error.message, "error");
-        e.target.value = "";
-    }
-}
-
-function handleThumbnailRemove() {
-    state.mediaDraft.pendingFile = null;
-    state.mediaDraft.thumbnailRemoved = true;
-    
-    DOM.inThumbnailFile.value = "";
-    DOM.thumbnailFileName.textContent = "Chưa chọn ảnh";
-    DOM.btnRemoveThumbnail.classList.add("hidden");
-    DOM.thumbnailPreview.innerHTML = "";
-    DOM.thumbnailPreview.classList.add("hidden");
-}
-
-/* =========================================================
    MODAL ACTIONS (ADD/EDIT/DELETE)
 ========================================================= */
 function openModal(id = null) {
     state.editingId = id;
     DOM.form.reset();
-    
-    // Reset Media
-    state.mediaDraft = { thumbnailPath: null, thumbnailUrl: null, thumbnailRemoved: false, pendingFile: null };
-    DOM.thumbnailFileName.textContent = "Chưa chọn ảnh";
-    DOM.btnRemoveThumbnail.classList.add("hidden");
-    DOM.thumbnailPreview.classList.add("hidden");
-    DOM.thumbnailPreview.innerHTML = "";
 
     // Reset Combobox
     state.selectedCategoryId = null;
@@ -526,17 +475,6 @@ function openModal(id = null) {
                     }
                 }
             }
-
-            // Phục hồi Media
-            if (item.thumbnail_url) {
-                state.mediaDraft.thumbnailPath = item.thumbnail_url;
-                DOM.thumbnailFileName.textContent = "Ảnh hiện tại";
-                DOM.btnRemoveThumbnail.classList.remove("hidden");
-                DOM.thumbnailPreview.classList.remove("hidden");
-                DOM.thumbnailPreview.innerHTML = `
-                    <img src="${buildImageUrl(item.thumbnail_url)}" class="w-32 h-32 object-contain rounded-lg border border-gray-200 bg-white p-1">
-                `;
-            }
         }
     } else {
         DOM.modalTitle.textContent = "Thêm Dòng sản phẩm";
@@ -554,8 +492,10 @@ function closeModal() {
 
 async function saveFamily(e) {
     e.preventDefault();
+
     const btn = DOM.btnSave;
     const originText = btn.textContent;
+
     btn.disabled = true;
 
     try {
@@ -563,88 +503,73 @@ async function saveFamily(e) {
         const slug = DOM.inSlug.value.trim() || generateSlug(name);
         const subCategoryId = DOM.inSubCategory.value || null;
 
-        if (!name) throw new Error("Vui lòng nhập tên dòng sản phẩm.");
-        if (!subCategoryId) throw new Error("Vui lòng chọn Nhóm hàng.");
-
-        const payload = { name, slug, sub_category_id: subCategoryId };
-
-        // Xử lý Upload Ảnh
-        let newThumbPath = null;
-        if (state.mediaDraft.pendingFile) {
-            btn.textContent = "Đang tải ảnh lên...";
-            const file = state.mediaDraft.pendingFile;
-            const ext = file.name.split('.').pop().toLowerCase();
-            const fileName = `thumbnail-${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
-            // ID tạm nếu thêm mới thì mình lấy ID sau, nhưng Supabase cần path trước.
-            // Để chuẩn kiến trúc: families/FAMILY_ID/thumbnail/xxx
-            // Ta bắt buộc phải INSERT data trước để lấy ID, sau đó mới Upload và UPDATE lại.
+        if (!name) {
+            throw new Error("Vui lòng nhập tên dòng sản phẩm.");
         }
 
+        if (!subCategoryId) {
+            throw new Error("Vui lòng chọn Nhóm hàng.");
+        }
+
+        const payload = {
+            name,
+            slug,
+            sub_category_id: subCategoryId
+        };
+
         if (!state.editingId) {
-            // 1. THÊM MỚI
+            // =================================================
+            // THÊM MỚI
+            // =================================================
             btn.textContent = "Đang lưu DB...";
-            const { data: newFam, error: insertError } = await window.supabaseClient
+
+            const { error: insertError } = await window.supabaseClient
                 .from("families")
-                .insert([payload])
-                .select("id")
-                .single();
+                .insert([payload]);
 
             if (insertError) throw insertError;
-            
-            // 2. Nếu có ảnh, upload ảnh và update lại
-            if (state.mediaDraft.pendingFile) {
-                btn.textContent = "Đang tải ảnh...";
-                const file = state.mediaDraft.pendingFile;
-                const ext = file.name.split('.').pop().toLowerCase();
-                const path = `${STORAGE_FAMILY_PREFIX}/${newFam.id}/thumbnail/thumbnail-${Date.now()}.${ext}`;
-                
-                const { error: upErr } = await window.supabaseClient.storage.from(STORAGE_BUCKET).upload(path, file, { cacheControl: "31536000", upsert: false });
-                if (!upErr) {
-                    await window.supabaseClient.from("families").update({ thumbnail_url: path }).eq("id", newFam.id);
-                }
-            }
-            window.utils.showToast("Thêm dòng sản phẩm thành công!", "success");
+
+            window.utils.showToast(
+                "Thêm dòng sản phẩm thành công!",
+                "success"
+            );
 
         } else {
-            // 1. CẬP NHẬT
+            // =================================================
+            // CẬP NHẬT
+            // =================================================
             const famId = state.editingId;
-            let pathToDelete = null;
-
-            if (state.mediaDraft.pendingFile) {
-                btn.textContent = "Đang tải ảnh mới...";
-                const file = state.mediaDraft.pendingFile;
-                const ext = file.name.split('.').pop().toLowerCase();
-                const newPath = `${STORAGE_FAMILY_PREFIX}/${famId}/thumbnail/thumbnail-${Date.now()}.${ext}`;
-                
-                const { error: upErr } = await window.supabaseClient.storage.from(STORAGE_BUCKET).upload(newPath, file, { cacheControl: "31536000", upsert: false });
-                if (upErr) throw upErr;
-                
-                payload.thumbnail_url = newPath;
-                if (state.mediaDraft.thumbnailPath) pathToDelete = state.mediaDraft.thumbnailPath; // Dọn ảnh cũ
-            } else if (state.mediaDraft.thumbnailRemoved) {
-                payload.thumbnail_url = null;
-                if (state.mediaDraft.thumbnailPath) pathToDelete = state.mediaDraft.thumbnailPath;
-            }
 
             btn.textContent = "Đang lưu thay đổi...";
-            const { error: updateError } = await window.supabaseClient.from("families").update(payload).eq("id", famId);
+
+            const { error: updateError } = await window.supabaseClient
+                .from("families")
+                .update(payload)
+                .eq("id", famId);
+
             if (updateError) throw updateError;
 
-            // Dọn rác Storage
-            if (pathToDelete && !/^https?:\/\//i.test(pathToDelete)) {
-                await window.supabaseClient.storage.from(STORAGE_BUCKET).remove([pathToDelete]);
-            }
-
-            window.utils.showToast("Đã lưu thay đổi!", "success");
+            window.utils.showToast(
+                "Đã lưu thay đổi!",
+                "success"
+            );
         }
 
         closeModal();
+
         await fetchFamilies();
         await loadStatistics();
 
     } catch (error) {
-        console.error("Lỗi lưu:", error);
-        window.utils.showToast(error.message.includes("unique") ? "Tên hoặc Slug đã tồn tại!" : error.message, "error");
+        console.error("Lỗi lưu Family:", error);
+
+        window.utils.showToast(
+            error.message.includes("unique")
+                ? "Tên hoặc Slug đã tồn tại!"
+                : error.message,
+            "error"
+        );
+
     } finally {
         btn.disabled = false;
         btn.textContent = originText;
@@ -655,23 +580,27 @@ async function deleteFamily(id) {
     const item = state.families.find(f => String(f.id) === String(id));
     if (!item) return;
 
-    if (!window.confirm(`Xóa dòng sản phẩm: ${item.name}?\n\nChú ý: Hành động này sẽ xóa dòng sản phẩm và dọn dẹp ảnh trong Storage.`)) return;
+    if (!window.confirm(`Xóa dòng sản phẩm: ${item.name}?`)) return;
 
     try {
-        const { error } = await window.supabaseClient.from("families").delete().eq("id", id);
+        const { error } = await window.supabaseClient
+            .from("families")
+            .delete()
+            .eq("id", id);
+
         if (error) throw error;
 
-        // Cleanup Storage
-        if (item.thumbnail_url && !/^https?:\/\//i.test(item.thumbnail_url)) {
-            await window.supabaseClient.storage.from(STORAGE_BUCKET).remove([item.thumbnail_url]);
+        if (state.families.length === 1 && state.currentPage > 1) {
+            state.currentPage--;
         }
 
-        if (state.families.length === 1 && state.currentPage > 1) state.currentPage--;
-        
         window.utils.showToast("Đã xóa dòng sản phẩm!", "success");
+
         await fetchFamilies();
         await loadStatistics();
+
     } catch (error) {
+        console.error("Lỗi xóa Family:", error);
         window.utils.showToast(`Lỗi xóa: ${error.message}`, "error");
     }
 }

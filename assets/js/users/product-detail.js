@@ -1004,7 +1004,7 @@ async function loadSaleProductsSidebar(currentProductId) {
         }
 
         const shuffledData = data.sort(() => 0.5 - Math.random());
-        const randomPicks = shuffledData.slice(0, 4);
+        const randomPicks = shuffledData.slice(0, 10);
 
         let html = "";
         randomPicks.forEach((item) => {

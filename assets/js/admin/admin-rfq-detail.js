@@ -45,8 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Sự kiện cập nhật trạng thái
     if (DOM.btnReject) {
-        DOM.btnReject.addEventListener('click', () => updateRfqStatus('Từ chối'));
-    }
+    DOM.btnReject.addEventListener(
+        'click',
+        () => updateRfqStatus('Từ chối')
+    );
+}
     if (DOM.btnApprove) {
         DOM.btnApprove.addEventListener('click', () => updateRfqStatus('Đã báo giá'));
     }
@@ -102,36 +105,179 @@ async function fetchRfqDetail() {
     }
 }
 
-// --------------------------------------------------------
-// HÀM CẬP NHẬT TRẠNG THÁI
-// --------------------------------------------------------
 async function updateRfqStatus(newStatus) {
-    if (!confirm(`Xác nhận chuyển trạng thái đơn hàng thành: ${newStatus}?`)) return;
+
+    // ====================================================
+    // 1. XÁC NHẬN THAO TÁC
+    // ====================================================
+
+    if (
+        !confirm(
+            `Xác nhận chuyển trạng thái RFQ thành: ${newStatus}?`
+        )
+    ) {
+        return;
+    }
+
+
+    // ====================================================
+    // 2. NẾU TỪ CHỐI → BẮT BUỘC NHẬP LÝ DO
+    // ====================================================
+
+    let rejectionReason = null;
+
+
+    if (newStatus === 'Từ chối') {
+
+        rejectionReason = prompt(
+            'Nhập lý do từ chối RFQ:'
+        );
+
+
+        // Admin bấm Cancel
+        if (rejectionReason === null) {
+            return;
+        }
+
+
+        // Xóa khoảng trắng đầu/cuối
+        rejectionReason =
+            rejectionReason.trim();
+
+
+        // Không cho lý do rỗng
+        if (!rejectionReason) {
+
+            alert(
+                'Vui lòng nhập lý do từ chối.'
+            );
+
+            return;
+        }
+
+    }
+
+
+    // ====================================================
+    // 3. CHUẨN BỊ DATA UPDATE
+    // ====================================================
+
+    const updateData = {
+        status: newStatus
+    };
+
+
+    // Nếu từ chối → lưu lý do
+    if (newStatus === 'Từ chối') {
+
+        updateData.rejection_reason =
+            rejectionReason;
+
+    } else {
+
+        // Nếu chuyển sang trạng thái khác
+        // → xóa lý do từ chối cũ
+
+        updateData.rejection_reason = null;
+
+    }
+
+
+    // ====================================================
+    // 4. UPDATE SUPABASE
+    // ====================================================
 
     try {
-        const { error } = await window.supabaseClient
-            .from('rfqs')
-            .update({ status: newStatus })
-            .eq('id', state.rfqId);
 
-        if (error) throw error;
-        
-        if(window.utils && window.utils.showToast) {
-            window.utils.showToast("Cập nhật trạng thái thành công!", "success");
-        } else {
-            alert("Cập nhật trạng thái thành công!");
+        const { error } =
+            await window.supabaseClient
+
+                .from('rfqs')
+
+                .update(updateData)
+
+                .eq(
+                    'id',
+                    state.rfqId
+                );
+
+
+        if (error) {
+            throw error;
         }
-        
-        state.rfqData.status = newStatus;
+
+
+        // ====================================================
+        // 5. THÔNG BÁO THÀNH CÔNG
+        // ====================================================
+
+        if (
+            window.utils &&
+            window.utils.showToast
+        ) {
+
+            window.utils.showToast(
+                'Cập nhật trạng thái thành công!',
+                'success'
+            );
+
+        } else {
+
+            alert(
+                'Cập nhật trạng thái thành công!'
+            );
+
+        }
+
+
+        // ====================================================
+        // 6. CẬP NHẬT STATE
+        // ====================================================
+
+        state.rfqData.status =
+            newStatus;
+
+        state.rfqData.rejection_reason =
+            rejectionReason;
+
+
+        // ====================================================
+        // 7. RENDER LẠI GIAO DIỆN
+        // ====================================================
+
         renderRfqInfo();
-        
+
+
     } catch (error) {
-        if(window.utils && window.utils.showToast) {
-            window.utils.showToast("Lỗi cập nhật: " + error.message, "error");
+
+        console.error(
+            '[admin-rfq-detail] Update status error:',
+            error
+        );
+
+
+        if (
+            window.utils &&
+            window.utils.showToast
+        ) {
+
+            window.utils.showToast(
+                'Lỗi cập nhật: ' +
+                error.message,
+                'error'
+            );
+
         } else {
-            alert("Lỗi cập nhật: " + error.message);
+
+            alert(
+                'Lỗi cập nhật: ' +
+                error.message
+            );
+
         }
+
     }
+
 }
 
 // --------------------------------------------------------

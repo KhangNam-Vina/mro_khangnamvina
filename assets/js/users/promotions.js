@@ -3,7 +3,7 @@
 // TRANG SẢN PHẨM KHUYẾN MÃI
 // ========================================================
 
-const ITEMS_PER_PAGE = 24;
+const ITEMS_PER_PAGE = 20;
 
 let currentSort = 'newest';
 

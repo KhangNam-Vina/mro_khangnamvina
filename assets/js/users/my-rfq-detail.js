@@ -1,6 +1,6 @@
 // ========================================================
 // FILE: assets/js/users/my-rfq-detail.js
-// CHI TIẾT YÊU CẦU BÁO GIÁ - FIX CỘT SIZE
+// CHI TIẾT YÊU CẦU BÁO GIÁ - FIX CỘT SIZE VÀ LÝ DO TỪ CHỐI
 // ========================================================
 
 let rfqItemsData = [];
@@ -74,6 +74,7 @@ window.handleCustomerLogout = window.handleLogout;
 async function loadRFQDetail(user) {
     const loadingScreen = document.getElementById("rfqLoadingScreen");
     const contentScreen = document.getElementById("rfqDetailContent");
+
     const urlParams = new URLSearchParams(window.location.search);
     const rfqId = urlParams.get("id");
 
@@ -83,57 +84,106 @@ async function loadRFQDetail(user) {
     }
 
     try {
+        // ========================================================
+        // LẤY RFQ
+        // ========================================================
         const { data: rfq, error: rfqError } = await window.supabaseClient
-            .from("rfqs").select("*").eq("id", rfqId).eq("user_id", user.id).single();
+            .from("rfqs")
+            .select("*")
+            .eq("id", rfqId)
+            .eq("user_id", user.id)
+            .single();
 
-        if (rfqError || !rfq) throw new Error("Không tìm thấy đơn hàng hoặc bạn không có quyền truy cập.");
+        if (rfqError || !rfq) {
+            throw new Error("Không tìm thấy đơn hàng hoặc bạn không có quyền truy cập.");
+        }
 
+        // ========================================================
+        // DỮ LIỆU CƠ BẢN
+        // ========================================================
         rfqItemsData = Array.isArray(rfq.items) ? rfq.items : [];
         currentRfqCode = rfq.rfq_code || "RFQ-NA";
 
         setText("rfqCodeDisplay", currentRfqCode);
+
         const dateObj = new Date(rfq.created_at);
-        const formattedDate = `${dateObj.toLocaleDateString("vi-VN")} ${dateObj.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}`;
+        const formattedDate =
+            `${dateObj.toLocaleDateString("vi-VN")} ` +
+            `${dateObj.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}`;
+
         setText("rfqDateDisplay", formattedDate);
 
+        // ========================================================
+        // THÔNG TIN DOANH NGHIỆP
+        // ========================================================
         setText("infoCompany", rfq.company_name || "Khách lẻ");
         setText("infoName", rfq.contact_person || "-");
         setText("infoPhone", rfq.phone || "-");
         setText("infoEmail", rfq.email || "-");
         setText("infoNote", rfq.notes || "Không có ghi chú");
 
+        // ========================================================
+        // TRẠNG THÁI VÀ STATUS BADGE
+        // ========================================================
         const status = rfq.status || "Chờ xử lý";
-        const statusLower = status.toLowerCase();
+        const statusLower = String(status).toLowerCase();
+        
+        const isRejected = statusLower.includes("từ chối") || statusLower.includes("hủy");
+        const rejectionReasonText = rfq.rejection_reason || "Không có lý do chi tiết.";
+
         const badge = document.getElementById("rfqStatusBadge");
         let timelineLevel = 1;
 
         if (badge) {
             badge.textContent = status;
             badge.className = "rfq-detail-badge";
+
             if (statusLower.includes("đã gửi") || statusLower.includes("mới")) {
-                badge.classList.add("status-new"); timelineLevel = 1;
+                badge.classList.add("status-new");
+                timelineLevel = 1;
             } else if (statusLower.includes("đang xử lý") || statusLower.includes("chờ")) {
-                badge.classList.add("status-pending"); timelineLevel = 2;
+                badge.classList.add("status-pending");
+                timelineLevel = 2;
             } else if (statusLower.includes("đã báo giá") || statusLower.includes("thành công")) {
-                badge.classList.add("status-quoted"); timelineLevel = 3;
-            } else if (statusLower.includes("từ chối") || statusLower.includes("hủy")) {
-                badge.classList.add("status-canceled"); timelineLevel = 4;
+                badge.classList.add("status-quoted");
+                timelineLevel = 3;
+            } else if (isRejected) {
+                badge.classList.add("status-canceled");
+                timelineLevel = 4;
             }
         }
 
-        renderTimeline(timelineLevel, dateObj.toLocaleDateString("vi-VN"));
+        // Truyền lý do từ chối vào Timeline nếu bị Reject
+        renderTimeline(
+            timelineLevel,
+            dateObj.toLocaleDateString("vi-VN"),
+            isRejected ? rejectionReasonText : null
+        );
 
+        // ========================================================
+        // SUMMARY
+        // ========================================================
         setText("summaryLines", `${rfqItemsData.length} Dòng`);
-        const totalQty = rfqItemsData.reduce((total, item) => total + (Number(item.qty) || Number(item.quantity) || 1), 0);
+
+        const totalQty = rfqItemsData.reduce(
+            (total, item) => total + (Number(item.qty) || Number(item.quantity) || 1), 0
+        );
         setText("summaryQty", `${totalQty} Sản phẩm`);
 
+        // ========================================================
+        // BẢNG SẢN PHẨM
+        // ========================================================
         renderItemsTable(rfqItemsData);
 
+        // ========================================================
+        // HIỂN THỊ CONTENT
+        // ========================================================
         loadingScreen?.classList.add("is-hidden");
         contentScreen?.classList.remove("is-hidden");
 
     } catch (error) {
-        showRFQError(error.message);
+        console.error("Lỗi load RFQ detail:", error);
+        showRFQError(error.message || "Không thể tải dữ liệu yêu cầu báo giá.");
     }
 }
 
@@ -148,7 +198,6 @@ function renderItemsTable(dataList) {
 
     let html = "";
     dataList.forEach((item, index) => {
-        // Lọc bỏ phần (Size: ...) bị lặp lại trong Tên sản phẩm
         let rawName = item.name || item.product_name || "Sản phẩm không xác định";
         let cleanName = String(rawName).replace(/\s*\(Size:\s*[^)]+\)/i, '').trim();
 
@@ -174,7 +223,8 @@ function renderItemsTable(dataList) {
     tbody.innerHTML = html;
 }
 
-function renderTimeline(level, createDate) {
+// Bơm tham số rejectionReason vào hàm
+function renderTimeline(level, createDate, rejectionReason = null) {
     const container = document.getElementById("rfqTimeline");
     if (!container) return;
 
@@ -189,12 +239,24 @@ function renderTimeline(level, createDate) {
     `;
 
     if (level === 4) {
+        // UI Khung lý do từ chối dùng class CSS sạch
+        let reasonHtml = '';
+        if (rejectionReason) {
+            reasonHtml = `
+                <div class="rejection-reason-box">
+                    <p class="rejection-reason-title">Lý do từ chối / Hủy:</p>
+                    <p class="rejection-reason-content">${escapeHTML(rejectionReason)}</p>
+                </div>
+            `;
+        }
+
         html += `
             <div class="timeline-step step-canceled">
                 <div class="timeline-dot"></div>
                 <div class="timeline-content">
                     <p class="timeline-title">Đơn hàng bị hủy / từ chối</p>
                     <p class="timeline-desc">Vui lòng liên hệ Kỹ sư để biết thêm chi tiết</p>
+                    ${reasonHtml}
                 </div>
             </div>
         `;
@@ -301,4 +363,4 @@ function escapeHTML(value) {
 
 function csvCSV(value) {
     return `"${String(value ?? "").replace(/"/g, '""')}"`;
-} 
+}

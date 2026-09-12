@@ -38,6 +38,8 @@ document.addEventListener(
             return;
         }
 
+        updateQuickOrderRfqCount(); 
+
 
         /* =================================================
            1. FILE INPUT
@@ -588,7 +590,7 @@ async function smartSearchAndRenderTable(
                 await window.supabaseClient
                     .from("products")
                     .select(
-    "id, sku, name, image_path, brand_id, brands(name), unit"
+    "id, sku, name, image_path, brand_id, brands(name), unit, stock_quantity"
 )
                     .eq(
                         "sku",
@@ -619,7 +621,7 @@ async function smartSearchAndRenderTable(
                     await window.supabaseClient
                         .from("products")
                         .select(
-    "id, sku, name, image_path, brand_id, brands(name), unit"
+    "id, sku, name, image_path, brand_id, brands(name), unit, stock_quantity"
 )
                         .ilike(
                             "name",
@@ -643,14 +645,29 @@ async function smartSearchAndRenderTable(
                 data.length > 0
             ) {
 
+                const product = data[0];
+
+                const requestedQuantity =
+                    Number(item.quantity) || 1;
+
+                const stockQuantity =
+                    Number(product.stock_quantity) || 0;
+
                 validProducts.push(
                     {
-                        ...data[0],
+                        ...product,
 
                         quantity:
-                            Number(
-                                item.quantity
-                            ) || 1
+                            requestedQuantity,
+
+                        stock_quantity:
+                            stockQuantity,
+
+                        is_in_stock:
+                            stockQuantity > 0,
+
+                        is_stock_sufficient:
+                            stockQuantity >= requestedQuantity
                     }
                 );
 
@@ -690,6 +707,11 @@ async function smartSearchAndRenderTable(
                 "dashQuotation"
             );
 
+        const dashRfqCount =
+            document.getElementById(
+                "dashRfqCount"
+            );
+
 
         const totalCount =
             validProducts.length +
@@ -702,13 +724,17 @@ async function smartSearchAndRenderTable(
                 totalCount;
         }
 
-
         if (dashInStock) {
 
-            dashInStock.innerText =
-                validProducts.length;
-        }
+            const inStockCount =
+                validProducts.filter(
+                    (product) =>
+                        product.is_stock_sufficient
+                ).length;
 
+            dashInStock.innerText =
+                inStockCount;
+        }
 
         if (dashQuotation) {
 
@@ -807,9 +833,29 @@ async function smartSearchAndRenderTable(
 
                         <td class="cell-status">
 
-                            <span class="quick-order-status quick-order-status-success">
-                                ✓ Sẵn sàng báo giá
-                            </span>
+                            ${
+                                    product.stock_quantity <= 0
+                                        ? `
+                                            <span class="quick-order-status quick-order-status-warning">
+                                                ⚠ Hết hàng
+                                            </span>
+                                        `
+                                        : product.is_stock_sufficient
+                                            ? `
+                                                <span class="quick-order-status quick-order-status-success">
+                                                    ✓ Đủ hàng
+                                                </span>
+                                            `
+                                            : `
+                                                <span class="quick-order-status quick-order-status-warning">
+                                                    ⚠ Không đủ hàng
+                                                    <small>
+                                                        Kho: ${Number(product.stock_quantity).toLocaleString("vi-VN")}
+                                                        / Cần: ${Number(product.quantity).toLocaleString("vi-VN")}
+                                                    </small>
+                                                </span>
+                                            `
+                                }
 
                         </td>
 
@@ -995,6 +1041,33 @@ async function smartSearchAndRenderTable(
     }
 }
 
+/* ========================================================
+   RFQ CREATED COUNT
+======================================================== */
+
+function getQuickOrderRfqCount() {
+
+    return Number(
+        localStorage.getItem(
+            "mro_quick_order_rfq_count"
+        )
+    ) || 0;
+}
+
+function updateQuickOrderRfqCount() {
+
+    const dashRfqCount =
+        document.getElementById(
+            "dashRfqCount"
+        );
+
+    if (!dashRfqCount) {
+        return;
+    }
+
+    dashRfqCount.innerText =
+        getQuickOrderRfqCount();
+}
 
 /* ========================================================
    6. ADD TO RFQ CART

@@ -1,327 +1,88 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Dòng sản phẩm | MRO Khang Nam</title>
+    <meta name="description" content="Danh sách các dòng sản phẩm chi tiết vật tư công nghiệp chính hãng.">
+    <link rel="icon" type="image/png" href="../assets/images/world mark.png">
 
-    <meta
-        name="description"
-        content="Danh sách dòng sản phẩm vật tư công nghiệp tại MRO Khang Nam."
-    >
-
-    <meta name="robots" content="index,follow">
-
-    <link
-        rel="canonical"
-        id="canonicalUrl"
-        href=""
-    >
-
-    <meta
-        property="og:title"
-        id="ogTitle"
-        content="Dòng sản phẩm | MRO Khang Nam"
-    >
-
-    <meta
-        property="og:description"
-        id="ogDesc"
-        content="Danh sách dòng sản phẩm vật tư công nghiệp tại MRO Khang Nam."
-    >
-
-    <meta
-        property="og:url"
-        id="ogUrl"
-        content=""
-    >
-
-    <meta
-        property="og:image"
-        content="../assets/banner-brands.webp"
-    >
-
-    <link
-        rel="icon"
-        type="image/png"
-        href="../assets/images/world mark.png"
-    >
-
-    <!-- JSON-LD -->
-    <script
-        type="application/ld+json"
-        id="schemaJSON"
-    ></script>
-
-    <!-- CSS DÙNG CHUNG -->
-     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link
-        rel="stylesheet"
-        href="../assets/css/style.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="../assets/css/header.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="../assets/css/footer.css"
-    >
-
-    <!-- CATALOG CSS -->
-    <link
-        rel="stylesheet"
-        href="../assets/css/catalog.css"
-    >
+    
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/header.css">
+    <link rel="stylesheet" href="../assets/css/footer.css">
+    <link rel="stylesheet" href="../assets/css/catalog.css">
 </head>
 
+<body class="subcategory-page">
 
-<body class="catalog-page">
+    <div id="app-header" class="site-header-placeholder"></div>
 
-    <!-- HEADER -->
-    <div
-        id="app-header"
-        class="site-header-placeholder"
-    ></div>
-
-
-    <!-- ====================================================
-         HERO
-    ===================================================== -->
-
-    <section class="catalog-hero family-hero">
-
-        <div class="catalog-hero-overlay"></div>
-
-        <div class="catalog-hero-container">
-
-            <!-- BREADCRUMB -->
-
-            <nav
-                id="dynamicBreadcrumb"
-                class="catalog-breadcrumb"
-                aria-label="Breadcrumb"
-            >
-
-                <a
-                    href="../index.html"
-                    class="catalog-breadcrumb-link"
-                >
-                    Trang chủ
-                </a>
-
-                <span
-                    class="catalog-breadcrumb-separator"
-                    aria-hidden="true"
-                >
-                    /
-                </span>
-
-                <a
-                    href="/pages/category.html"
-                    class="catalog-breadcrumb-link"
-                >
-                    Danh Mục
-                </a>
-
-                <span
-                    class="catalog-breadcrumb-separator"
-                    aria-hidden="true"
-                >
-                    /
-                </span>
-
-                <a
-                    id="bcParentCategory"
-                    href="#"
-                    class="catalog-breadcrumb-link is-hidden"
-                >
-                    Parent Category
-                </a>
-
-                <span
-                    id="bcSeparator"
-                    class="catalog-breadcrumb-separator is-hidden"
-                    aria-hidden="true"
-                >
-                    /
-                </span>
-
-                <span
-                    id="bcCurrent"
-                    class="catalog-breadcrumb-current catalog-breadcrumb-loading"
-                >
-                    Đang tải...
-                </span>
-
+    <section class="subcategory-hero">
+        <div class="subcategory-hero-overlay"></div>
+        <div class="subcategory-hero-container">
+            <nav aria-label="Breadcrumb" class="subcategory-breadcrumb">
+                <a href="../index.html" class="subcategory-breadcrumb-link">Trang chủ</a>
+                <span class="subcategory-breadcrumb-separator" aria-hidden="true">/</span>
+                <a href="/pages/category.html" class="subcategory-breadcrumb-link">Danh Mục</a>
+                <span class="subcategory-breadcrumb-separator" aria-hidden="true">/</span>
+                <span id="bcSubCategory" class="subcategory-breadcrumb-current">Đang tải...</span>
             </nav>
-
-
-            <!-- TITLE -->
-
-            <div class="catalog-hero-content">
-
-                <h1
-                    id="pageTitle"
-                    class="catalog-hero-title"
-                >
-                    Đang tải dữ liệu...
-                </h1>
-
-                <p class="catalog-hero-description">
-                    Chọn một dòng sản phẩm để xem chi tiết các mã hàng
-                </p>
-
+            <div class="subcategory-hero-content">
+                <h1 id="pageTitle" class="subcategory-page-title">Đang tải dữ liệu...</h1>
+                <p class="subcategory-page-description">Chọn dòng sản phẩm để xem thông số kỹ thuật chi tiết</p>
             </div>
-
         </div>
-
     </section>
 
-
-    <!-- ====================================================
-         MAIN
-    ===================================================== -->
-
-    <main class="catalog-main family-main">
-
-        <div class="catalog-container">
-
-
-            <!-- FAMILY TOOLS -->
-
-<div class="family-section-header">
-
-    <div class="family-tools">
-
-        <!-- TỔNG SỐ DÒNG SẢN PHẨM -->
-
-        <div class="catalog-counter-wrapper family-counter-wrapper">
-
-            <div class="catalog-counter">
-
-                <span
-                    id="familyCount"
-                    class="catalog-counter-number"
-                >
-                    0
-                </span>
-
-                dòng sản phẩm
-
+    <main class="subcategory-main">
+        <div class="catalog-section-header subcategory-section-header">
+            <div class="subcategory-tools">
+                <div class="catalog-counter-wrapper subcategory-counter-wrapper">
+                    <div class="catalog-counter"><span id="familyCount" class="catalog-counter-number">0</span> dòng sản phẩm</div>
+                </div>
+                <div class="subcategory-search-wrapper">
+                    <div class="subcategory-search-box">
+                        <input type="text" id="searchFamily" class="subcategory-search-input" placeholder="Tìm dòng sản phẩm..." autocomplete="off">
+                        <svg class="subcategory-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
             </div>
-
         </div>
 
-
-        <!-- SEARCH -->
-
-        <div class="catalog-search-wrapper family-search-wrapper">
-
-            <div class="catalog-search-box">
-
-                <input
-                    type="text"
-                    id="searchFamily"
-                    class="catalog-search-input"
-                    placeholder="Tìm dòng sản phẩm (VD: MY Series)..."
-                    autocomplete="off"
-                    aria-label="Tìm dòng sản phẩm"
-                >
-
-                <svg
-                    class="catalog-search-icon"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    ></path>
-                </svg>
-
-            </div>
-
+        <!-- SKELETON (KHÔNG CÓ ICON) -->
+        <div id="skeletonLoading" class="subcategory-grid subcategory-loading-grid">
+            <div class="subcategory-skeleton-card"><div class="subcategory-skeleton-title"></div><div class="subcategory-skeleton-text"></div></div>
+            <div class="subcategory-skeleton-card"><div class="subcategory-skeleton-title"></div><div class="subcategory-skeleton-text"></div></div>
+            <div class="subcategory-skeleton-card"><div class="subcategory-skeleton-title"></div><div class="subcategory-skeleton-text"></div></div>
+            <div class="subcategory-skeleton-card"><div class="subcategory-skeleton-title"></div><div class="subcategory-skeleton-text"></div></div>
         </div>
 
-    </div>
+        <div id="familyContainer" class="subcategory-grid is-hidden"></div>
 
-</div>
-
-
-            <!-- FAMILY GRID -->
-
-            <div
-                id="familyContainer"
-                class="catalog-grid family-grid"
-            >
-                <!-- JS render -->
+        <!-- EMPTY STATE CHUẨN SVG -->
+        <div id="emptyState" class="subcategory-empty-state is-hidden">
+            <div class="flex justify-center mb-4 text-gray-400">
+                <svg class="w-14 h-14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
             </div>
-
-
-            <!-- EMPTY STATE -->
-
-            <div
-                id="emptyState"
-                class="catalog-empty-state is-hidden"
-            >
-
-                <span class="catalog-empty-emoji">
-                    📭
-                </span>
-
-                <h2 class="catalog-empty-title">
-                    Chưa có dòng sản phẩm
-                </h2>
-
-                <p class="catalog-empty-description">
-                    Chúng tôi đang cập nhật thêm dữ liệu cho phân nhóm này.
-                </p>
-
-                <a
-                    href="/pages/category.html"
-                    class="catalog-empty-button"
-                >
-                    Quay lại danh mục
-                </a>
-
-            </div>
-
+            <h2 class="subcategory-empty-title">Chưa có dòng sản phẩm</h2>
+            <p class="subcategory-empty-description">Hệ thống đang cập nhật dữ liệu cho nhóm hàng này.</p>
         </div>
-
     </main>
 
-
-    <!-- FOOTER -->
     <div id="app-footer"></div>
 
- 
-    <!-- ====================================================
-         JAVASCRIPT
-    ===================================================== -->
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <script src="../assets/js/common/supabase.js"></script>
     <script src="../assets/js/common/utils.js"></script>
-    <script src="../assets/js/common/auth.js"></script>
-
     <script src="../assets/components/header.js"></script>
     <script src="../assets/components/footer.js"></script>
-
+    <script src="../assets/js/common/auth.js"></script>
     <script src="../assets/js/users/auth-ui.js"></script>
     <script src="../assets/js/users/family.js"></script>
 
 </body>
-
 </html>

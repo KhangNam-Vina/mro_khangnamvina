@@ -2,12 +2,31 @@
 <html lang="vi">
 
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Quản lý Giới thiệu - KN Admin</title>
 
+
+    <!-- =====================================================
+         TAILWIND CSS
+    ====================================================== -->
+
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+
+
+    <!-- =====================================================
+         CKEDITOR
+    ====================================================== -->
+
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/super-build/ckeditor.js"></script>
+
+
+    <!-- =====================================================
+         TAILWIND CONFIG
+    ====================================================== -->
 
     <script>
         tailwind.config = {
@@ -22,215 +41,656 @@
         };
     </script>
 
-    <style type="text/tailwindcss">
-        /* CKEditor Custom Styles */
-        .ck-editor__editable_inline { min-height: 520px; font-family: inherit; }
-        .ck-toolbar { flex-wrap: wrap !important; }
-        .ck-content { @apply prose prose-blue max-w-none; }
-        .ck-editor, .ck-editor__main { width: 100%; }
-        .ck-editor__editable { border-color: #e5e7eb !important; }
 
-        /* Custom Scrollbar */
-        .admin-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .admin-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .admin-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
-        .admin-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+    <!-- =====================================================
+         ADMIN ABOUT CSS
+    ====================================================== -->
 
-        /* UI Components */
-        .admin-card { @apply bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden; }
-        .section-label { @apply text-xs font-black uppercase tracking-wider text-gray-400; }
-        .form-label { @apply block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2; }
-        
-        .form-input { 
-            @apply w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white text-sm text-gray-800 outline-none shadow-sm transition; 
-        }
-        .form-input:focus { @apply border-kn-blue ring-2 ring-blue-100; }
-        
-        .stat-input { 
-            @apply w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-50 text-2xl font-black text-kn-blue outline-none shadow-sm transition text-center; 
-        }
-        .stat-input:focus { @apply bg-white border-kn-blue ring-2 ring-blue-100; }
-    </style>
+    <link
+        rel="stylesheet"
+        href="../assets/css/admin/admin-about.css"
+    >
+
 </head>
+
 
 <body class="bg-gray-50 text-gray-800 font-sans flex h-screen overflow-hidden">
 
-    <!-- TOAST -->
-    <div id="toastContainer" class="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-2 pointer-events-none"></div>
 
-    <!-- MOBILE SIDEBAR BACKDROP -->
-    <div id="sidebarBackdrop" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden backdrop-blur-sm transition-opacity" onclick="toggleSidebar()"></div>
+    <!-- =====================================================
+         TOAST
+    ====================================================== -->
 
-    <!-- SIDEBAR -->
-    <aside id="adminSidebar" class="fixed md:static inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white flex flex-col shrink-0 -translate-x-full md:translate-x-0 transition-transform duration-300"></aside>
-
-    <!-- MAIN AREA -->
-    <div class="flex-1 min-w-0 flex flex-col h-screen overflow-hidden">
-
-        <!-- HEADER (STICKY) -->
-        <header class="sticky top-0 z-30 h-16 bg-white border-b border-gray-200 px-4 sm:px-6 flex items-center justify-between shrink-0 shadow-sm">
-            <div class="flex items-center gap-3 min-w-0">
-                <!-- Mobile Toggle -->
-                <button type="button" onclick="toggleSidebar()" class="md:hidden p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition shrink-0" aria-label="Mở menu">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                </button>
-                <div class="min-w-0">
-                    <div class="hidden sm:flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
-                    </div>
-                    <h1 id="pageTitle" class="text-lg sm:text-xl font-black text-gray-900 truncate">Quản lý Trang Giới thiệu</h1>
-                </div>
-            </div>
-
-            <!-- NÚT LƯU HEADER -->
-            <button id="btnSave" type="button" onclick="saveContent()" class="shrink-0 inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-kn-blue text-white text-sm font-black shadow-sm hover:bg-blue-800 active:scale-[0.98] transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                <span class="hidden sm:inline">Lưu thay đổi</span>
-                <span class="sm:hidden">Lưu</span>
-            </button>
-        </header>
-
-        <!-- CONTENT -->
-        <main class="flex-1 overflow-y-auto admin-scrollbar bg-gray-50 p-4 sm:p-6 lg:p-8">
-            <div class="w-full max-w-[1600px] mx-auto space-y-6 pb-10">
-
-                <!-- INTRO CARD -->
-                <div class="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 shadow-sm flex items-start gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-kn-blue flex items-center justify-center shrink-0">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0Z"/></svg>
-                    </div>
-                    <div class="min-w-0 mt-1">
-                        <h2 class="text-base sm:text-lg font-black text-gray-900">Thiết lập Trang Giới thiệu</h2>
-                        <p class="text-sm text-gray-500 mt-1">Quản lý nội dung giới thiệu, thông tin doanh nghiệp, chỉ số nổi bật (KPI) và SEO của trang web.</p>
-                    </div>
-                </div>
-
-                <!-- LOADING -->
-                <div id="loadingIndicator" class="hidden bg-white border border-gray-200 rounded-2xl shadow-sm py-16 text-center">
-                    <div class="inline-block w-8 h-8 border-4 border-kn-blue border-t-transparent rounded-full animate-spin"></div>
-                    <p class="mt-3 text-sm font-bold text-gray-500">Đang tải dữ liệu...</p>
-                </div>
-
-                <!-- EDITOR WRAPPER -->
-                <div id="editorWrapper" class="space-y-6">
-
-                    <!-- 01: SEO META -->
-                    <section class="admin-card">
-                        <div class="px-5 sm:px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-3">
-                            <span class="w-8 h-8 rounded-lg bg-blue-100 text-kn-blue flex items-center justify-center text-xs font-black shrink-0">1</span>
-                            <div>
-                                <h3 class="text-sm sm:text-base font-black text-kn-blue uppercase tracking-wide">SEO Meta</h3>
-                                <p class="text-[11px] text-gray-500 mt-0.5 font-medium">Thiết lập tiêu đề và mô tả cho Google</p>
-                            </div>
-                        </div>
-                        <div class="p-5 sm:p-6 space-y-5">
-                            <div>
-                                <div class="flex justify-between items-center mb-2">
-                                    <label for="metaTitle" class="form-label mb-0">Meta Title</label>
-                                    <span id="metaTitleCount" class="text-xs font-mono font-bold text-gray-400">0 / 60</span>
-                                </div>
-                                <input id="metaTitle" type="text" maxlength="60" class="form-input" placeholder="VD: Giới thiệu hệ thống phân phối MRO Khang Nam...">
-                            </div>
-                            <div>
-                                <div class="flex justify-between items-center mb-2">
-                                    <label for="metaDesc" class="form-label mb-0">Meta Description</label>
-                                    <span id="metaDescCount" class="text-xs font-mono font-bold text-gray-400">0 / 160</span>
-                                </div>
-                                <textarea id="metaDesc" rows="3" maxlength="160" class="form-input resize-y" placeholder="Nhập mô tả ngắn thu hút hiển thị trên kết quả tìm kiếm..."></textarea>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- 02: HERO -->
-                    <section class="admin-card">
-                        <div class="px-5 sm:px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-3">
-                            <span class="w-8 h-8 rounded-lg bg-orange-100 text-kn-orange flex items-center justify-center text-xs font-black shrink-0">2</span>
-                            <div>
-                                <h3 class="text-sm sm:text-base font-black text-kn-orange uppercase tracking-wide">Hero Đầu Trang</h3>
-                                <p class="text-[11px] text-gray-500 mt-0.5 font-medium">Nội dung nổi bật xuất hiện ngay khi mở trang</p>
-                            </div>
-                        </div>
-                        <div class="p-5 sm:p-6 space-y-5">
-                            <div>
-                                <label for="heroHeading" class="form-label">Tiêu đề chính</label>
-                                <input id="heroHeading" type="text" class="form-input text-lg font-bold" placeholder="Nhập tiêu đề Hero hùng hồn...">
-                            </div>
-                            <div>
-                                <label for="heroDesc" class="form-label">Mô tả giới thiệu</label>
-                                <textarea id="heroDesc" rows="4" class="form-input resize-y" placeholder="Nhập đoạn văn bản dẫn dắt..."></textarea>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- 03: KPI -->
-                    <section class="admin-card">
-                        <div class="px-5 sm:px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-3">
-                            <span class="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-xs font-black shrink-0">3</span>
-                            <div>
-                                <h3 class="text-sm sm:text-base font-black text-green-700 uppercase tracking-wide">Chỉ số nổi bật (KPI)</h3>
-                                <p class="text-[11px] text-gray-500 mt-0.5 font-medium">Các con số chứng minh năng lực doanh nghiệp</p>
-                            </div>
-                        </div>
-                        <div class="p-5 sm:p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-                            <div>
-                                <label for="kpiYears" class="form-label text-center">Năm kinh nghiệm</label>
-                                <input id="kpiYears" type="number" min="0" class="stat-input" value="0">
-                            </div>
-                            <div>
-                                <label for="kpiBrands" class="form-label text-center">Thương hiệu</label>
-                                <input id="kpiBrands" type="number" min="0" class="stat-input" value="0">
-                            </div>
-                            <div>
-                                <label for="kpiSkus" class="form-label text-center">Mã SKU phân phối</label>
-                                <input id="kpiSkus" type="number" min="0" class="stat-input" value="0">
-                            </div>
-                            <div>
-                                <label for="kpiCustomers" class="form-label text-center">Khách hàng nhà máy</label>
-                                <input id="kpiCustomers" type="number" min="0" class="stat-input" value="0">
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- 04: CONTENT -->
-                    <section class="admin-card">
-                        <div class="px-5 sm:px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-3">
-                            <span class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-black shrink-0">4</span>
-                            <div>
-                                <h3 class="text-sm sm:text-base font-black text-purple-700 uppercase tracking-wide">Nội dung chi tiết</h3>
-                                <p class="text-[11px] text-gray-500 mt-0.5 font-medium">Lịch sử, thành tựu và giới thiệu chuyên sâu</p>
-                            </div>
-                        </div>
-                        <div class="p-5 sm:p-6">
-                            <div class="mb-5 px-4 py-3 rounded-xl bg-blue-50 border border-blue-100 flex gap-3 items-start">
-                                <svg class="w-5 h-5 text-kn-blue shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0Z"/></svg>
-                                <div class="text-sm text-blue-800 leading-relaxed">
-                                    <strong>Lưu ý:</strong> Nên sử dụng công cụ <strong>Heading (Tiêu đề 2, Tiêu đề 3)</strong>, danh sách (List), và bôi đậm (Bold) để định dạng bài viết. Hệ thống sẽ tự động tự render chuẩn đẹp trên website khách hàng.
-                                </div>
-                            </div>
-
-                            <!-- KHUNG TRÌNH SOẠN THẢO CKEDITOR -->
-                            <div id="ckEditorContainer" class="shadow-sm rounded-lg overflow-hidden border border-gray-200"></div>
-                        </div>
-                    </section>
-
-                    <!-- BOTTOM SAVE -->
-                    <div class="flex justify-end pt-4 pb-8">
-                        <button type="button" onclick="saveContent()" class="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-kn-blue text-white text-sm font-black shadow-md hover:bg-blue-800 active:scale-[0.98] transition">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                            Lưu toàn bộ thay đổi
-                        </button>
-                    </div>
-
-                </div>
-            </div>
-        </main>
+    <div
+        id="toastContainer"
+        class="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-2 pointer-events-none">
     </div>
 
-    <!-- SCRIPTS -->
+
+    <!-- =====================================================
+         MOBILE SIDEBAR BACKDROP
+    ====================================================== -->
+
+    <div
+        id="sidebarBackdrop"
+        class="fixed inset-0 bg-black/60 z-40 hidden md:hidden backdrop-blur-sm transition-opacity"
+        onclick="toggleSidebar()">
+    </div>
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside
+        id="adminSidebar"
+        class="fixed md:static inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white flex flex-col shrink-0 -translate-x-full md:translate-x-0 transition-transform duration-300">
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN AREA
+    ====================================================== -->
+
+    <div class="flex-1 min-w-0 flex flex-col h-screen overflow-hidden">
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <header
+            class="sticky top-0 z-30 h-16 bg-white border-b border-gray-200 px-4 sm:px-6 flex items-center justify-between shrink-0 shadow-sm">
+
+            <div class="flex items-center gap-3 min-w-0">
+
+
+                <!-- MOBILE TOGGLE -->
+
+                <button
+                    type="button"
+                    onclick="toggleSidebar()"
+                    class="md:hidden p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition shrink-0"
+                    aria-label="Mở menu">
+
+                    <svg
+                        class="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24">
+
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16">
+                        </path>
+
+                    </svg>
+
+                </button>
+
+
+                <div class="min-w-0">
+
+                    <div
+                        class="hidden sm:flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
+                    </div>
+
+                    <h1
+                        id="pageTitle"
+                        class="text-lg sm:text-xl font-black text-gray-900 truncate">
+                        Quản lý Trang Giới thiệu
+                    </h1>
+
+                </div>
+
+            </div>
+
+
+            <!-- HEADER SAVE -->
+
+            <button
+                id="btnSave"
+                type="button"
+                onclick="saveContent()"
+                class="shrink-0 inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-kn-blue text-white text-sm font-black shadow-sm hover:bg-blue-800 active:scale-[0.98] transition">
+
+                <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M5 13l4 4L19 7">
+                    </path>
+
+                </svg>
+
+                <span class="hidden sm:inline">
+                    Lưu thay đổi
+                </span>
+
+                <span class="sm:hidden">
+                    Lưu
+                </span>
+
+            </button>
+
+        </header>
+
+
+        <!-- =================================================
+             CONTENT
+        ================================================== -->
+
+        <main
+            class="flex-1 overflow-y-auto admin-scrollbar bg-gray-50 p-4 sm:p-6 lg:p-8">
+
+            <div
+                class="w-full max-w-[1600px] mx-auto space-y-6 pb-10">
+
+
+                <!-- =================================================
+                     INTRO CARD
+                ================================================== -->
+
+                <div
+                    class="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 shadow-sm flex items-start gap-4">
+
+                    <div
+                        class="w-12 h-12 rounded-xl bg-blue-50 text-kn-blue flex items-center justify-center shrink-0">
+
+                        <svg
+                            class="w-6 h-6"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24">
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="1.8"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0Z">
+                            </path>
+
+                        </svg>
+
+                    </div>
+
+
+                    <div class="min-w-0 mt-1">
+
+                        <h2
+                            class="text-base sm:text-lg font-black text-gray-900">
+                            Thiết lập Trang Giới thiệu
+                        </h2>
+
+                        <p
+                            class="text-sm text-gray-500 mt-1">
+                            Quản lý nội dung giới thiệu, thông tin doanh nghiệp,
+                            chỉ số nổi bật (KPI) và SEO của trang web.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     LOADING
+                ================================================== -->
+
+                <div
+                    id="loadingIndicator"
+                    class="hidden bg-white border border-gray-200 rounded-2xl shadow-sm py-16 text-center">
+
+                    <div
+                        class="inline-block w-8 h-8 border-4 border-kn-blue border-t-transparent rounded-full animate-spin">
+                    </div>
+
+                    <p
+                        class="mt-3 text-sm font-bold text-gray-500">
+                        Đang tải dữ liệu...
+                    </p>
+
+                </div>
+
+
+                <!-- =================================================
+                     EDITOR WRAPPER
+                ================================================== -->
+
+                <div
+                    id="editorWrapper"
+                    class="space-y-6">
+
+
+                    <!-- =================================================
+                         01 SEO META
+                    ================================================== -->
+
+                    <section class="admin-card">
+
+                        <div
+                            class="px-5 sm:px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-3">
+
+                            <span
+                                class="w-8 h-8 rounded-lg bg-blue-100 text-kn-blue flex items-center justify-center text-xs font-black shrink-0">
+                                1
+                            </span>
+
+                            <div>
+
+                                <h3
+                                    class="text-sm sm:text-base font-black text-kn-blue uppercase tracking-wide">
+                                    SEO Meta
+                                </h3>
+
+                                <p
+                                    class="text-[11px] text-gray-500 mt-0.5 font-medium">
+                                    Thiết lập tiêu đề và mô tả cho Google
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="p-5 sm:p-6 space-y-5">
+
+                            <div>
+
+                                <div
+                                    class="flex justify-between items-center mb-2">
+
+                                    <label
+                                        for="metaTitle"
+                                        class="form-label mb-0">
+                                        Meta Title
+                                    </label>
+
+                                    <span
+                                        id="metaTitleCount"
+                                        class="text-xs font-mono font-bold text-gray-400">
+                                        0 / 60
+                                    </span>
+
+                                </div>
+
+
+                                <input
+                                    id="metaTitle"
+                                    type="text"
+                                    maxlength="60"
+                                    class="form-input"
+                                    placeholder="VD: Giới thiệu hệ thống phân phối MRO Khang Nam...">
+
+                            </div>
+
+
+                            <div>
+
+                                <div
+                                    class="flex justify-between items-center mb-2">
+
+                                    <label
+                                        for="metaDesc"
+                                        class="form-label mb-0">
+                                        Meta Description
+                                    </label>
+
+                                    <span
+                                        id="metaDescCount"
+                                        class="text-xs font-mono font-bold text-gray-400">
+                                        0 / 160
+                                    </span>
+
+                                </div>
+
+
+                                <textarea
+                                    id="metaDesc"
+                                    rows="3"
+                                    maxlength="160"
+                                    class="form-input resize-y"
+                                    placeholder="Nhập mô tả ngắn thu hút hiển thị trên kết quả tìm kiếm..."></textarea>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =================================================
+                         02 HERO
+                    ================================================== -->
+
+                    <section class="admin-card">
+
+                        <div
+                            class="px-5 sm:px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-3">
+
+                            <span
+                                class="w-8 h-8 rounded-lg bg-orange-100 text-kn-orange flex items-center justify-center text-xs font-black shrink-0">
+                                2
+                            </span>
+
+                            <div>
+
+                                <h3
+                                    class="text-sm sm:text-base font-black text-kn-orange uppercase tracking-wide">
+                                    Hero Đầu Trang
+                                </h3>
+
+                                <p
+                                    class="text-[11px] text-gray-500 mt-0.5 font-medium">
+                                    Nội dung nổi bật xuất hiện ngay khi mở trang
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="p-5 sm:p-6 space-y-5">
+
+                            <div>
+
+                                <label
+                                    for="heroHeading"
+                                    class="form-label">
+                                    Tiêu đề chính
+                                </label>
+
+                                <input
+                                    id="heroHeading"
+                                    type="text"
+                                    class="form-input text-lg font-bold"
+                                    placeholder="Nhập tiêu đề Hero hùng hồn...">
+
+                            </div>
+
+
+                            <div>
+
+                                <label
+                                    for="heroDesc"
+                                    class="form-label">
+                                    Mô tả giới thiệu
+                                </label>
+
+                                <textarea
+                                    id="heroDesc"
+                                    rows="4"
+                                    class="form-input resize-y"
+                                    placeholder="Nhập đoạn văn bản dẫn dắt..."></textarea>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =================================================
+                         03 KPI
+                    ================================================== -->
+
+                    <section class="admin-card">
+
+                        <div
+                            class="px-5 sm:px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-3">
+
+                            <span
+                                class="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-xs font-black shrink-0">
+                                3
+                            </span>
+
+                            <div>
+
+                                <h3
+                                    class="text-sm sm:text-base font-black text-green-700 uppercase tracking-wide">
+                                    Chỉ số nổi bật (KPI)
+                                </h3>
+
+                                <p
+                                    class="text-[11px] text-gray-500 mt-0.5 font-medium">
+                                    Các con số chứng minh năng lực doanh nghiệp
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="p-5 sm:p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+
+                            <div>
+
+                                <label
+                                    for="kpiYears"
+                                    class="form-label text-center">
+                                    Năm kinh nghiệm
+                                </label>
+
+                                <input
+                                    id="kpiYears"
+                                    type="number"
+                                    min="0"
+                                    class="stat-input"
+                                    value="0">
+
+                            </div>
+
+
+                            <div>
+
+                                <label
+                                    for="kpiBrands"
+                                    class="form-label text-center">
+                                    Thương hiệu
+                                </label>
+
+                                <input
+                                    id="kpiBrands"
+                                    type="number"
+                                    min="0"
+                                    class="stat-input"
+                                    value="0">
+
+                            </div>
+
+
+                            <div>
+
+                                <label
+                                    for="kpiSkus"
+                                    class="form-label text-center">
+                                    Mã SKU phân phối
+                                </label>
+
+                                <input
+                                    id="kpiSkus"
+                                    type="number"
+                                    min="0"
+                                    class="stat-input"
+                                    value="0">
+
+                            </div>
+
+
+                            <div>
+
+                                <label
+                                    for="kpiCustomers"
+                                    class="form-label text-center">
+                                    Khách hàng nhà máy
+                                </label>
+
+                                <input
+                                    id="kpiCustomers"
+                                    type="number"
+                                    min="0"
+                                    class="stat-input"
+                                    value="0">
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =================================================
+                         04 CONTENT
+                    ================================================== -->
+
+                    <section class="admin-card">
+
+                        <div
+                            class="px-5 sm:px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-3">
+
+                            <span
+                                class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-black shrink-0">
+                                4
+                            </span>
+
+                            <div>
+
+                                <h3
+                                    class="text-sm sm:text-base font-black text-purple-700 uppercase tracking-wide">
+                                    Nội dung chi tiết
+                                </h3>
+
+                                <p
+                                    class="text-[11px] text-gray-500 mt-0.5 font-medium">
+                                    Lịch sử, thành tựu và giới thiệu chuyên sâu
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="p-5 sm:p-6">
+
+
+                            <div
+                                class="mb-5 px-4 py-3 rounded-xl bg-blue-50 border border-blue-100 flex gap-3 items-start">
+
+                                <svg
+                                    class="w-5 h-5 text-kn-blue shrink-0 mt-0.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24">
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0Z">
+                                    </path>
+
+                                </svg>
+
+
+                                <div
+                                    class="text-sm text-blue-800 leading-relaxed">
+
+                                    <strong>Lưu ý:</strong>
+                                    Nên sử dụng công cụ
+                                    <strong>Heading (Tiêu đề 2, Tiêu đề 3)</strong>,
+                                    danh sách (List), và bôi đậm (Bold) để định dạng bài viết.
+                                    Hệ thống sẽ tự động tự render chuẩn đẹp trên website khách hàng.
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- CKEDITOR -->
+
+                    <div class="about-editor-wrapper">
+
+                        <div
+                            id="ckEditorContainer"
+                            class="about-rich-content">
+                        </div>
+
+                    </div>
+
+
+                    </section>
+
+
+                    <!-- =================================================
+                         BOTTOM SAVE
+                    ================================================== -->
+
+                    <div
+                        class="flex justify-end pt-4 pb-8">
+
+                        <button
+                            type="button"
+                            onclick="saveContent()"
+                            class="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-kn-blue text-white text-sm font-black shadow-md hover:bg-blue-800 active:scale-[0.98] transition">
+
+                            <svg
+                                class="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24">
+
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M5 13l4 4L19 7">
+                                </path>
+
+                            </svg>
+
+                            Lưu toàn bộ thay đổi
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script src="../assets/js/common/supabase.js"></script>
+
     <script src="../assets/js/common/utils.js"></script>
+
     <script src="../assets/js/admin/admin-core.js"></script>
+
     <script src="../assets/js/admin/admin-nav.js"></script>
+
     <script src="../assets/js/admin/admin-about.js"></script>
+
 </body>
+
 </html>

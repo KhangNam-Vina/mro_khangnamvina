@@ -22,6 +22,40 @@ const CART_STORAGE_KEY =
     const CART_IMAGE_CDN_BASE =
     "https://mrokhangnam-image.khangnamvn.workers.dev";
 
+    const CART_MIN_QTY = 1;
+
+    const CART_MAX_QTY = 1000000;
+
+function getCartProductPrice(product) {
+
+    if (!product) {
+        return 0;
+    }
+
+    const discountPrice =
+        Number(
+            product.discount_price
+        );
+
+    const regularPrice =
+        Number(
+            product.price
+        );
+
+    if (
+        Number.isFinite(discountPrice) &&
+        discountPrice > 0
+    ) {
+        return discountPrice;
+    }
+
+    return Number.isFinite(
+        regularPrice
+    )
+        ? regularPrice
+        : 0;
+}
+
 function buildCartImageUrl(imagePath) {
 
     if (!imagePath) {
@@ -237,16 +271,28 @@ function () {
         );
 
 
-    const qty =
-        Math.max(
-            1,
-            parseInt(
-                qtyInput
-                    ? qtyInput.value
-                    : 1,
-                10
-            ) || 1
+    const rawQty =
+    Number(
+        qtyInput
+            ? qtyInput.value
+            : 1
+    );
+
+    if (
+        !Number.isInteger(rawQty) ||
+        rawQty < CART_MIN_QTY ||
+        rawQty > CART_MAX_QTY
+    ) {
+
+        alert(
+            `Số lượng phải là số nguyên từ ${CART_MIN_QTY.toLocaleString("vi-VN")} đến ${CART_MAX_QTY.toLocaleString("vi-VN")}.`
         );
+
+        return;
+    }
+
+    const qty =
+        rawQty;
 
 
     /*
@@ -393,9 +439,9 @@ function () {
                         product.name,
 
                     price:
-                        Number(
-                            product.price
-                        ) || 0,
+                        getCartProductPrice(
+                            product
+                        ),
 
                     image:
                         buildCartImageUrl(
@@ -476,13 +522,16 @@ function () {
                     shoppingCart[
                         existingNewIndex
                     ].qty =
-                        (
-                            Number(
-                                shoppingCart[
-                                    existingNewIndex
-                                ].qty
-                            ) || 0
-                        ) + qty;
+                        Math.min(
+                            CART_MAX_QTY,
+                            (
+                                Number(
+                                    shoppingCart[
+                                        existingNewIndex
+                                    ].qty
+                                ) || 0
+                            ) + qty
+                        );
 
 
                     /*
@@ -523,9 +572,9 @@ function () {
                             product.name,
 
                         price:
-                            Number(
-                                product.price
-                            ) || 0,
+                            getCartProductPrice(
+                                product
+                            ),
 
                         image:
                             buildCartImageUrl(
@@ -648,13 +697,16 @@ function () {
         shoppingCart[
             existingIndex
         ].qty =
-            (
-                Number(
-                    shoppingCart[
-                        existingIndex
-                    ].qty
-                ) || 0
-            ) + qty;
+            Math.min(
+                CART_MAX_QTY,
+                (
+                    Number(
+                        shoppingCart[
+                            existingIndex
+                        ].qty
+                    ) || 0
+                ) + qty
+            );
 
 
         shoppingCart[
@@ -686,10 +738,10 @@ function () {
             name:
                 product.name,
 
-            price:
-                Number(
-                    product.price
-                ) || 0,
+           price:
+                getCartProductPrice(
+                    product
+                ),
 
             image:
                 buildCartImageUrl(
@@ -1031,19 +1083,29 @@ function (
         ) || 1;
 
 
-    let newQty =
-        currentQty +
-        Number(change);
+    const numericChange =
+    Number(change);
 
+if (
+    !Number.isFinite(
+        numericChange
+    )
+) {
+    return;
+}
 
-    if (
-        newQty <
-        1
-    ) {
+let newQty =
+    currentQty +
+    numericChange;
 
-        newQty =
-            1;
-    }
+newQty =
+    Math.min(
+        CART_MAX_QTY,
+        Math.max(
+            CART_MIN_QTY,
+            Math.trunc(newQty)
+        )
+    );
 
 
     shoppingCart[
@@ -1191,23 +1253,43 @@ function getShoppingCart() {
          * vẫn được tính bằng ID + SIZE.
          */
         return parsed.map(
-            item => ({
+    item => {
 
-                ...item,
+        const rawQty =
+            Number(item.qty);
 
-                size:
-                    normalizeCartSize(
-                        item.size
-                    ),
-
-                cartKey:
-                    item.cartKey ||
-                    getCartItemKey(
-                        item.id,
-                        item.size
+        const safeQty =
+            Number.isInteger(rawQty)
+                ? Math.min(
+                    CART_MAX_QTY,
+                    Math.max(
+                        CART_MIN_QTY,
+                        rawQty
                     )
-            })
-        );
+                )
+                : CART_MIN_QTY;
+
+        return {
+
+            ...item,
+
+            qty:
+                safeQty,
+
+            size:
+                normalizeCartSize(
+                    item.size
+                ),
+
+            cartKey:
+                item.cartKey ||
+                getCartItemKey(
+                    item.id,
+                    item.size
+                )
+        };
+    }
+);
 
     } catch (error) {
 

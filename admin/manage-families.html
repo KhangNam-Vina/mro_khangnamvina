@@ -47,6 +47,12 @@
         };
 
     </script>
+
+    <!-- ADMIN FAMILY CSS -->
+    <link
+        rel="stylesheet"
+        href="../assets/css/admin/admin-families.css"
+    >
 </head>
 
 
@@ -133,9 +139,9 @@
 
             <header
                 class="
-                    sticky         /* Ép dính */
-                    top-0          /* Dính ở sát mép trên cùng */
-                    z-30           /* Đẩy layer lên trên để không bị bảng che mất */
+                    sticky
+                    top-0
+                    z-30
                     h-16
                     bg-white
                     border-b
@@ -528,6 +534,7 @@
                                 "
                             >
 
+                                <!-- TABLE HEADER (ĐÃ XÓA CỘT ẢNH & THẢ RÔNG CỘT TÊN) -->
                                 <thead
                                     class="
                                         bg-gray-50
@@ -540,63 +547,30 @@
                                         tracking-wider
                                     "
                                 >
-
                                     <tr>
-
-                                        <th
-                                            class="
-                                                p-4
-                                                text-center
-                                                w-12
-                                            "
-                                        >
+                                        <!-- ID -->
+                                        <th class="p-4 text-center w-16">
                                             #
                                         </th>
 
-
-                                        <th
-                                            class="
-                                                p-4
-                                                w-20
-                                                text-center
-                                            "
-                                        >
-                                            Ảnh
-                                        </th>
-
-
-                                        <th
-                                            class="p-4"
-                                        >
+                                        <!-- TÊN DÒNG SẢN PHẨM (Thả rông width để bung rộng ra hút khoảng trống) -->
+                                        <th class="p-4">
                                             Dòng sản phẩm
                                         </th>
 
-
-                                        <th
-                                            class="
-                                                p-4
-                                                w-56
-                                            "
-                                        >
+                                        <!-- THUỘC NHÓM HÀNG -->
+                                        <th class="p-4 w-64 text-left">
                                             Thuộc nhóm hàng
                                         </th>
 
-
-                                        <th
-                                            class="
-                                                p-4
-                                                w-32
-                                                text-center
-                                            "
-                                        >
+                                        <!-- THAO TÁC -->
+                                        <th class="p-4 w-32 text-center">
                                             Thao tác
                                         </th>
-
                                     </tr>
-
                                 </thead>
 
-
+                                <!-- BODY TRẠNG THÁI CHỜ -->
                                 <tbody
                                     id="familyTableBody"
                                     class="
@@ -605,11 +579,9 @@
                                         bg-white
                                     "
                                 >
-
                                     <tr>
-
                                         <td
-                                            colspan="5"
+                                            colspan="4"
                                             class="
                                                 text-center
                                                 py-10
@@ -618,13 +590,9 @@
                                         >
                                             Đang tải dữ liệu...
                                         </td>
-
                                     </tr>
-
                                 </tbody>
-
                             </table>
-
                         </div>
 
 
@@ -1452,149 +1420,7 @@
                     </div>
 
 
-                    <!-- THUMBNAIL -->
-
-<div class="mt-4">
-
-    <label
-        for="inThumbnailFile"
-        class="
-            block
-            text-xs
-            font-bold
-            text-gray-700
-            mb-1.5
-        "
-    >
-        Thumbnail
-    </label>
-
-
-    <div
-        class="
-            rounded-xl
-            border
-            border-gray-200
-            bg-gray-50
-            p-3
-        "
-    >
-
-        <div
-            class="
-                flex
-                flex-col
-                sm:flex-row
-                sm:items-center
-                gap-3
-            "
-        >
-
-            <label
-                for="inThumbnailFile"
-                class="
-                    inline-flex
-                    items-center
-                    justify-center
-                    gap-2
-                    px-4
-                    py-2.5
-                    rounded-lg
-                    bg-white
-                    border
-                    border-gray-300
-                    hover:border-kn-blue
-                    hover:text-kn-blue
-                    text-sm
-                    font-bold
-                    cursor-pointer
-                    transition
-                "
-            >
-
-                <svg
-                    class="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 16V4m0 0-4 4m4-4 4 4M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"
-                    />
-                </svg>
-
-                Chọn ảnh
-
-            </label>
-
-
-            <input
-                type="file"
-                id="inThumbnailFile"
-                accept="image/jpeg,image/png,image/webp,image/gif"
-                class="hidden"
-            >
-
-
-            <span
-                id="thumbnailFileName"
-                class="
-                    text-xs
-                    text-gray-500
-                    truncate
-                "
-            >
-                Chưa chọn ảnh
-            </span>
-
-
-            <button
-                type="button"
-                id="btnRemoveThumbnail"
-                class="
-                    hidden
-                    sm:ml-auto
-                    inline-flex
-                    items-center
-                    justify-center
-                    px-3
-                    py-2
-                    rounded-lg
-                    bg-red-50
-                    text-red-600
-                    hover:bg-red-100
-                    text-xs
-                    font-bold
-                    transition
-                "
-            >
-                Xóa ảnh
-            </button>
-
-        </div>
-
-
-        <p
-            class="
-                text-[11px]
-                text-gray-400
-                mt-2
-            "
-        >
-            JPG, PNG, WEBP, GIF · tối đa 10MB.
-            Ảnh mới sẽ được lưu vào Supabase Storage.
-            Ảnh được lưu vào Supabase Storage và khi hiển thị sẽ đi qua Cloudflare CDN.
-        </p>
-
-    </div>
-
-</div>
-
-
-<!-- THUMBNAIL PREVIEW -->
+                    
 
 <div
     id="thumbnailPreview"
@@ -1602,7 +1428,7 @@
 ></div>
 
 
-                    <!-- THUMBNAIL PREVIEW -->
+                    
 
                     
 

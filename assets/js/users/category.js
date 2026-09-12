@@ -113,9 +113,6 @@ async function loadCategories() {
                     <span class="catalog-category-count ${categoryProductCount === 0 ? 'is-empty' : ''}">
                         ${escapeCategoryHTML(productCountText)}
                     </span>
-                    <span class="catalog-category-link">
-                        Xem danh mục <span aria-hidden="true">→</span>
-                    </span>
                 </a>
             `;
         });
