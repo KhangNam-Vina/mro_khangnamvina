@@ -1153,6 +1153,72 @@ function initMagnifierZoom() {
     });
 }
 
+/* ========================================================
+   HIỆU ỨNG TỰ ĐỘNG CHUYỂN ẢNH (AUTO SLIDER)
+======================================================== */
+let autoSlideTimer;
+
+function initAutoImageSlider() {
+    const wrapper = document.querySelector('.product-main-image-wrapper');
+    const thumbList = document.getElementById('thumbnailList');
+    
+    // Đợi 1 chút để DOM render xong danh sách ảnh
+    setTimeout(() => {
+        const thumbnails = document.querySelectorAll('.thumbnail-item');
+
+        // Nếu sản phẩm chỉ có 1 ảnh hoặc không có ảnh thì không cần tự chuyển
+        if (!wrapper || thumbnails.length <= 1) return;
+
+        function nextSlide() {
+            // Tìm ảnh đang sáng (active) hiện tại
+            const currentActive = document.querySelector('.thumbnail-item.is-active');
+            if (!currentActive) return;
+
+            // Tìm vị trí của nó trong danh sách
+            const thumbsArray = Array.from(document.querySelectorAll('.thumbnail-item'));
+            let currentIndex = thumbsArray.indexOf(currentActive);
+
+            // Tính vị trí ảnh tiếp theo (nếu đang ở ảnh cuối thì quay lại ảnh đầu)
+            let nextIndex = (currentIndex + 1) % thumbsArray.length;
+
+            // Tự động kích hoạt click vào ảnh tiếp theo
+            thumbsArray[nextIndex].click();
+            
+            // Cuộn thanh thumbnail để ảnh luôn nằm trong tầm nhìn
+            thumbsArray[nextIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+
+        function startSlide() {
+            // Đổi ảnh mỗi 3.5 giây (3500ms)
+            autoSlideTimer = setInterval(nextSlide, 3500);
+        }
+
+        function stopSlide() {
+            clearInterval(autoSlideTimer);
+        }
+
+        // 1. Bắt đầu chạy Slide
+        startSlide();
+
+        // 2. DỪNG LẠI khi khách rê chuột vào xem kính lúp
+        wrapper.addEventListener('mouseenter', stopSlide);
+        wrapper.addEventListener('mouseleave', startSlide);
+
+        // 3. RESET thời gian nếu khách tự bấm tay vào hình nhỏ
+        if (thumbList) {
+            thumbList.addEventListener('click', function(e) {
+                if (e.target.closest('.thumbnail-item')) {
+                    stopSlide();
+                    startSlide(); 
+                }
+            });
+        }
+    }, 500); // Trễ 0.5s để đảm bảo ảnh đã load xong từ Database
+}
+
+/* ========================================================
+   KHỞI TẠO TRANG (INIT)
+======================================================== */
 window.addEventListener("load", async () => {
     const urlParams = new URLSearchParams(window.location.search);
 
@@ -1168,7 +1234,11 @@ window.addEventListener("load", async () => {
         loadCartFromStorage();
     }
 
+    // GỌI 2 HIỆU ỨNG ẢNH Ở ĐÂY
     initMagnifierZoom();
+    initAutoImageSlider();
+
+    /* Xác thực User (Check Auth) */
     try {
         let isUserLoggedIn = false;
         if (typeof checkCustomerAuth === 'function') isUserLoggedIn = !!(await checkCustomerAuth());

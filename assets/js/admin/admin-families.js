@@ -272,11 +272,11 @@ async function fetchFamilies() {
 }
 
 /* =========================================================
-   RENDER TABLE
+   RENDER TABLE (ĐÃ TÁCH CỘT SLUG ĐỘC LẬP)
 ========================================================= */
 function renderFamilies(from) {
     if (state.families.length === 0) {
-        DOM.tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-gray-400 italic">Chưa có dòng sản phẩm nào.</td></tr>`;
+        DOM.tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-gray-400 italic">Chưa có dòng sản phẩm nào.</td></tr>`;
         return;
     }
 
@@ -288,11 +288,17 @@ function renderFamilies(from) {
         return `
             <tr class="hover:bg-blue-50/30 transition">
                 <td class="p-4 text-center text-xs font-bold text-gray-400">${from + index + 1}</td>
-                <td class="p-4">
-                    <div class="font-bold text-gray-900">${name}</div>
-                    <div class="text-[11px] text-gray-500 mt-1">${slug}</div>
-                </td>
+                
+                <!-- CỘT 1: TÊN -->
+                <td class="p-4 font-bold text-gray-900">${name}</td>
+                
+                <!-- CỘT 2: SLUG (ĐỨNG RIÊNG) -->
+                <td class="p-4 text-sm font-mono text-gray-500">${slug}</td>
+                
+                <!-- CỘT 3: SUBCATEGORY -->
                 <td class="p-4 text-sm">${subCatName}</td>
+                
+                <!-- CỘT 4: THAO TÁC -->
                 <td class="p-4 text-center">
                     <div class="flex items-center justify-center gap-2">
                         <button type="button" data-action="edit" data-id="${item.id}" class="p-2 text-kn-blue hover:bg-blue-50 rounded transition" title="Sửa">

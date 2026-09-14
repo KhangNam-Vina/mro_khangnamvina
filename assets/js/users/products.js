@@ -1418,73 +1418,56 @@ if (bcSubCategory && subCategorySlug) {
 
 
                 // ==================================================
-                // CUSTOM BADGE
-                // ==================================================
+// CUSTOM BADGE
+// ==================================================
+let leftBadgeHtml = '';
 
-                let leftBadgeHtml =
-                    '';
+const rawBadge = item.badge;
 
+if (
+    rawBadge !== null &&
+    rawBadge !== undefined &&
+    String(rawBadge).trim() !== ''
+) {
+    const badgeVal = String(rawBadge)
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toUpperCase();
 
-                if (
-                    item.badge &&
-                    item.badge.trim() !== ''
-                ) {
+    let badgeType = '';
 
-                    const badgeVal =
-                        item.badge
-                            .trim()
-                            .toUpperCase();
+    switch (badgeVal) {
+        case 'NEW':
+            badgeType = 'product-badge-new';
+            break;
 
+        case 'HOT':
+            badgeType = 'product-badge-hot';
+            break;
 
-                    let badgeType =
-                        'product-badge-custom';
+        case 'SALE':
+            badgeType = 'product-badge-sale-custom';
+            break;
 
+        case 'BEST SELLER':
+            badgeType = 'product-badge-best';
+            break;
 
-                    if (
-                        badgeVal === 'NEW'
-                    ) {
+        case 'CLEARANCE':
+            badgeType = 'product-badge-clearance';
+            break;
 
-                        badgeType =
-                            'product-badge-new';
+        default:
+            badgeType = 'product-badge-custom';
+            break;
+    }
 
-                    } else if (
-                        badgeVal === 'HOT'
-                    ) {
-
-                        badgeType =
-                            'product-badge-hot';
-
-                    } else if (
-                        badgeVal === 'SALE'
-                    ) {
-
-                        badgeType =
-                            'product-badge-sale-custom';
-
-                    } else if (
-                        badgeVal === 'BEST SELLER'
-                    ) {
-
-                        badgeType =
-                            'product-badge-best';
-
-                    } else if (
-                        badgeVal === 'CLEARANCE'
-                    ) {
-
-                        badgeType =
-                            'product-badge-clearance';
-
-                    }
-
-
-                    leftBadgeHtml = `
-                        <span class="product-badge ${badgeType}">
-                            ${escapeProductsHTML(badgeVal)}
-                        </span>
-                    `;
-
-                }
+    leftBadgeHtml = `
+        <span class="product-badge ${badgeType}">
+            ${escapeProductsHTML(badgeVal)}
+        </span>
+    `;
+}
 
 
                 // ==================================================

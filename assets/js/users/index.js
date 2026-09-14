@@ -399,219 +399,777 @@ function buildIndexImageUrl(
 
 
 // ========================================================
-// 4. KÉO SẢN PHẨM BÁN CHẠY (FIX CLICK CARD & GIỚI HẠN TỐI ĐA 20 SP)
+// 4. PRODUCT SHOWCASE
 // ========================================================
 
-async function loadBestSellers(filterKeyword = 'ALL') {
-    const container = document.getElementById('bestSellingGrid');
-    if (!container) return;
+const INDEX_PRODUCT_LIMIT = 20;
 
-    // SKELETON LOADING
-    container.innerHTML = `
-        <div class="product-slider-track">
-            <div class="product-skeleton"><div class="skel-img"></div><div class="skel-line w-1-3 mb-2"></div><div class="skel-line w-full mb-2"></div><div class="skel-line w-2-3 mb-auto"></div></div>
-            <div class="product-skeleton"><div class="skel-img"></div><div class="skel-line w-1-3 mb-2"></div><div class="skel-line w-full mb-2"></div><div class="skel-line w-2-3 mb-auto"></div></div>
-            <div class="product-skeleton hidden-mobile"><div class="skel-img"></div><div class="skel-line w-1-3 mb-2"></div><div class="skel-line w-full mb-2"></div><div class="skel-line w-2-3 mb-auto"></div></div>
-            <div class="product-skeleton hidden-tablet"><div class="skel-img"></div><div class="skel-line w-1-3 mb-2"></div><div class="skel-line w-full mb-2"></div><div class="skel-line w-2-3 mb-auto"></div></div>
-        </div>
-    `;
 
-    try {
-        let query = window.supabaseClient
-            .from('products')
-            .select('id, sku, name, slug, image_path, unit, category_id, stock_quantity, price, discount_price, badge, brands(name)')
-            .order('created_at', { ascending: false });
+// ========================================================
+// PRODUCT QUERY
+// Dùng chung cho Best Seller + Category Showcase
+// ========================================================
 
-        // Logic ALL lấy toàn bộ sản phẩm hợp lệ, Category lọc đúng theo danh mục hiện tại
-        if (filterKeyword !== 'ALL') {
-            query = query.eq('category_id', filterKeyword);
+async function fetchProductsByCategory(categoryId = null) {
+
+    let query = window.supabaseClient
+        .from('products')
+        .select(`
+            id,
+            sku,
+            name,
+            slug,
+            image_path,
+            unit,
+            category_id,
+            stock_quantity,
+            price,
+            discount_price,
+            badge,
+            created_at,
+            brands(name)
+        `)
+        .order('created_at', {
+            ascending: false
+        })
+        .limit(INDEX_PRODUCT_LIMIT);
+
+
+    if (categoryId) {
+
+        query = query.eq(
+            'category_id',
+            categoryId
+        );
+
+    }
+
+
+    const {
+        data,
+        error
+    } = await query;
+
+
+    if (error) {
+        throw error;
+    }
+
+
+    return data || [];
+
+}
+
+
+// ========================================================
+// RENDER PRODUCT CARD
+// ========================================================
+
+function renderIndexProductCard(item) {
+
+    const brandName =
+        item.brands
+            ? item.brands.name
+            : 'OEM';
+
+    const salesQuantity =
+    item.sales
+        ? Number(
+            item.sales.sales_quantity || 0
+        )
+        : 0;
+
+    // ----------------------------------------------------
+    // BADGE TRÁI
+    // ----------------------------------------------------
+
+    let leftBadgeHTML = '';
+
+
+    if (
+        item.badge &&
+        String(item.badge).trim() !== ''
+    ) {
+
+        const badgeVal =
+            String(item.badge)
+                .trim()
+                .toUpperCase();
+
+
+        let badgeType =
+            'product-badge-custom';
+
+
+        if (badgeVal === 'NEW') {
+
+            badgeType =
+                'product-badge-new';
+
+        } else if (badgeVal === 'HOT') {
+
+            badgeType =
+                'product-badge-hot';
+
+        } else if (badgeVal === 'SALE') {
+
+            badgeType =
+                'product-badge-sale-custom';
+
+        } else if (
+            badgeVal === 'BEST SELLER'
+        ) {
+
+            badgeType =
+                'product-badge-best';
+
+        } else if (
+            badgeVal === 'CLEARANCE'
+        ) {
+
+            badgeType =
+                'product-badge-clearance';
+
         }
 
-        // CHỈ LẤY TỐI ĐA 20 SẢN PHẨM (Nếu database có ít hơn 20 thì lấy tất cả)
-        const { data, error } = await query.limit(20);
 
-        if (error) throw error;
-
-        if (!data || data.length === 0) {
-            container.innerHTML = `<p class="empty-msg">Chưa có sản phẩm nào cho danh mục này.</p>`;
-            return;
-        }
-
-        let productItemsHTML = '';
-
-        data.forEach(item => {
-            const brandName = item.brands ? item.brands.name : 'OEM';
-            
-            // Xử lý Badge Trái
-            let leftBadgeHTML = '';
-            if (item.badge && String(item.badge).trim() !== '') {
-                const badgeVal = String(item.badge).trim().toUpperCase();
-                let badgeType = 'product-badge-custom';
-                if (badgeVal === 'NEW') badgeType = 'product-badge-new';
-                else if (badgeVal === 'HOT') badgeType = 'product-badge-hot';
-                else if (badgeVal === 'SALE') badgeType = 'product-badge-sale-custom';
-                else if (badgeVal === 'BEST SELLER') badgeType = 'product-badge-best';
-                else if (badgeVal === 'CLEARANCE') badgeType = 'product-badge-clearance';
-                
-                leftBadgeHTML = `<span class="product-badge ${badgeType}">${escapeIndexHTML(badgeVal)}</span>`;
-            }
-
-            // Xử lý Badge Phải
-            let rightBadgeHTML = '';
-            if (item.discount_price && item.discount_price > 0 && item.discount_price < item.price) {
-                const percent = Math.round(((item.price - item.discount_price) / item.price) * 100);
-                rightBadgeHTML = `<span class="product-badge product-badge-sale">GIẢM ${percent}%</span>`;
-            } else {
-                if (item.stock_quantity !== undefined && item.stock_quantity <= 0) {
-                    rightBadgeHTML = `<span class="product-badge product-badge-preorder">Pre-order</span>`;
-                } else {
-                    rightBadgeHTML = `<span class="product-badge product-badge-stock">Có sẵn</span>`;
-                }
-            }
-
-            const productImage = buildIndexImageUrl(item.image_path);
-
-            // Biến card thành phần tử có thể click hoàn toàn bằng div kết hợp hàm xử lý thông minh để không conflict drag & drop
-            productItemsHTML += `
-               <div
-                    class="product-card"
-                    data-product-id="${escapeIndexHTML(item.id)}"
-                    data-product-slug="${escapeIndexHTML(item.slug || '')}"
-                    style="cursor: pointer;"
-                >
-                    
-                    <div class="product-image-link" style="border-bottom: 1px solid #eef0f3;">
-                        ${leftBadgeHTML}
-                        ${rightBadgeHTML}
-                        <img src="${escapeIndexHTML(productImage)}" alt="${escapeIndexHTML(item.name || '')}" class="product-img" loading="lazy" onerror="this.onerror=null;this.src='assets/images/world mark.png';">
-                    </div>
-
-                    <div class="product-info">
-                        <div class="product-brand">${escapeIndexHTML(brandName)}</div>
-                        
-                        <div class="product-name" title="${escapeIndexHTML(item.name || '')}">
-                            ${escapeIndexHTML(item.name || '')}
-                        </div>
-
-                        <div class="product-meta">
-                            <div class="product-sku" style="display: inline-block;">SKU: ${escapeIndexHTML(item.sku || 'Đang cập nhật')}</div><br>
-                            <div class="product-unit" style="display: inline-block; margin-top: 4px;">${escapeIndexHTML(item.unit || 'Cái')}</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-
-        // Nhân đôi track để chạy infinite carousel vô tận
-        container.innerHTML = `
-            <div class="product-slider-track">${productItemsHTML}</div>
-            <div class="product-slider-track" aria-hidden="true">${productItemsHTML}</div>
+        leftBadgeHTML = `
+            <span class="product-badge ${badgeType}">
+                ${escapeIndexHTML(badgeVal)}
+            </span>
         `;
 
-        // Kích hoạt lại hiệu ứng kéo thả mượt mà
-if (typeof initDragAndScroll === 'function') {
-    initDragAndScroll('bestSellingGrid', 1.5);
-}
+    }
 
 
-// Xử lý click sản phẩm bằng event delegation
-const bestSellerSlider = document.getElementById('bestSellingGrid');
+    // ----------------------------------------------------
+    // BADGE PHẢI
+    // ----------------------------------------------------
 
-if (bestSellerSlider && !bestSellerSlider.dataset.clickBound) {
-
-    bestSellerSlider.dataset.clickBound = 'true';
-
-    bestSellerSlider.addEventListener('click', function (event) {
-
-        // Vừa kéo slider thì không mở sản phẩm
-        if (bestSellerSlider.isDraggingActive) {
-            return;
-        }
-
-        // Không can thiệp vào link/button bên trong card
-        if (
-            event.target.closest('a') ||
-            event.target.closest('button')
-        ) {
-            return;
-        }
-
-        const card = event.target.closest('.product-card');
-
-        if (!card) {
-            return;
-        }
-
-        const productId = card.dataset.productId;
-
-        if (!productId) {
-            console.warn('Best Seller: thiếu product ID');
-            return;
-        }
-
-        const productSlug = card.dataset.productSlug;
-
-        if (!productSlug) {
-            console.warn('Best Seller: thiếu product slug');
-            return;
-        }
-
-        const encodedSlug = encodeURIComponent(productSlug);
-
-        const isLocal =
-            window.location.hostname === 'localhost' ||
-            window.location.hostname === '127.0.0.1';
-
-        if (isLocal) {
-            window.location.href =
-                `pages/product-detail.html?slug=${encodedSlug}`;
-        } else {
-            window.location.href =
-                `/${encodedSlug}.html`;
-        }
-    });
-}
-
-} catch (error) {
-    console.error("Lỗi tải Best Seller:", error);
-
-    container.innerHTML = `
-        <p class="empty-msg" style="color:red;">
-            Lỗi lấy dữ liệu: ${escapeIndexHTML(error.message)}
-        </p>
-    `;
-}
-}
+    let rightBadgeHTML = '';
 
 
-// ========================================================
-// 5. TẠO TABS BEST SELLER
-// ========================================================
+    if (
+        item.discount_price &&
+        item.price &&
+        item.discount_price > 0 &&
+        item.discount_price < item.price
+    ) {
 
-async function initBestSellerTabs() {
+        const percent =
+            Math.round(
+                (
+                    (item.price - item.discount_price)
+                    /
+                    item.price
+                ) * 100
+            );
 
-    const tabsContainer =
-        document.getElementById(
-            'bestSellerTabs'
+
+        rightBadgeHTML = `
+            <span class="product-badge product-badge-sale">
+                GIẢM ${percent}%
+            </span>
+        `;
+
+    } else if (
+        item.stock_quantity !== undefined &&
+        item.stock_quantity <= 0
+    ) {
+
+        rightBadgeHTML = `
+            <span class="product-badge product-badge-preorder">
+                Pre-order
+            </span>
+        `;
+
+    } else {
+
+        rightBadgeHTML = `
+            <span class="product-badge product-badge-stock">
+                Có sẵn
+            </span>
+        `;
+
+    }
+
+
+    const productImage =
+        buildIndexImageUrl(
+            item.image_path
         );
 
 
-    if (!tabsContainer) {
+    return `
+        <div
+            class="product-card"
+            data-product-id="${escapeIndexHTML(item.id)}"
+            data-product-slug="${escapeIndexHTML(item.slug || '')}"
+        >
+
+            <div class="product-image-link">
+
+                ${leftBadgeHTML}
+
+                ${rightBadgeHTML}
+
+                <img
+                    src="${escapeIndexHTML(productImage)}"
+                    alt="${escapeIndexHTML(item.name || '')}"
+                    class="product-img"
+                    loading="lazy"
+                    draggable="false"
+                    onerror="
+                        this.onerror=null;
+                        this.src='assets/images/world mark.png';
+                    "
+                >
+
+            </div>
+
+
+            <div class="product-info">
+
+                <div class="product-brand">
+                    ${escapeIndexHTML(brandName)}
+                </div>
+
+
+                <div
+                    class="product-name"
+                    title="${escapeIndexHTML(item.name || '')}"
+                >
+                    ${escapeIndexHTML(item.name || '')}
+                </div>
+
+
+                <div class="product-meta">
+
+                    <div class="product-sku">
+                        SKU:
+                        ${escapeIndexHTML(
+                            item.sku || 'Đang cập nhật'
+                        )}
+                    </div>
+
+                    <div class="product-unit">
+                        ${escapeIndexHTML(
+                            item.unit || 'Cái'
+                        )}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+}
+
+
+// ========================================================
+// RENDER PRODUCT SLIDER
+// ========================================================
+
+function renderProductSlider(
+    containerId,
+    products
+) {
+
+    const container =
+        document.getElementById(
+            containerId
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    if (
+        !products ||
+        products.length === 0
+    ) {
+
+        container.innerHTML = `
+            <p class="empty-msg">
+                Chưa có sản phẩm trong danh mục này.
+            </p>
+        `;
+
+        return;
+
+    }
+
+
+    const productItemsHTML =
+        products
+            .map(
+                product =>
+                    renderIndexProductCard(
+                        product
+                    )
+            )
+            .join('');
+
+
+    // Nhân đôi track để infinite carousel
+    container.innerHTML = `
+        <div class="product-slider-track">
+            ${productItemsHTML}
+        </div>
+
+        <div
+            class="product-slider-track"
+            aria-hidden="true"
+        >
+            ${productItemsHTML}
+        </div>
+    `;
+
+
+    // ----------------------------------------------------
+    // DRAG / AUTO SCROLL
+    // ----------------------------------------------------
+
+    if (
+        typeof initDragAndScroll ===
+        'function'
+    ) {
+
+        initDragAndScroll(
+            containerId,
+            1.5
+        );
+
+    }
+
+}
+
+
+// ========================================================
+// BIND CLICK PRODUCT CARD
+// ========================================================
+
+function bindProductSliderClick(
+    containerId
+) {
+
+    const slider =
+        document.getElementById(
+            containerId
+        );
+
+
+    if (
+        !slider ||
+        slider.dataset.clickBound
+    ) {
+
+        return;
+
+    }
+
+
+    slider.dataset.clickBound =
+        'true';
+
+
+    slider.addEventListener(
+        'click',
+        function (event) {
+
+            // Vừa kéo slider → không mở product
+            if (
+                slider.isDraggingActive
+            ) {
+
+                return;
+
+            }
+
+
+            // Không can thiệp link/button
+            if (
+                event.target.closest('a') ||
+                event.target.closest('button')
+            ) {
+
+                return;
+
+            }
+
+
+            const card =
+                event.target.closest(
+                    '.product-card'
+                );
+
+
+            if (!card) {
+                return;
+            }
+
+
+            const productSlug =
+                card.dataset.productSlug;
+
+
+            if (!productSlug) {
+
+                console.warn(
+                    'Product: thiếu slug'
+                );
+
+                return;
+
+            }
+
+
+            const encodedSlug =
+                encodeURIComponent(
+                    productSlug
+                );
+
+
+            const isLocal =
+                window.location.hostname ===
+                    'localhost' ||
+                window.location.hostname ===
+                    '127.0.0.1';
+
+
+            if (isLocal) {
+
+                window.location.href =
+                    `pages/product-detail.html?slug=${encodedSlug}`;
+
+            } else {
+
+                window.location.href =
+                    `/${encodedSlug}.html`;
+
+            }
+
+        }
+    );
+
+}
+
+// ========================================================
+// BEST SELLER - SALES STATS
+// ========================================================
+async function fetchBestSellingProducts() {
+
+    // ----------------------------------------------------
+    // 1. LẤY THỐNG KÊ BÁN HÀNG
+    // ----------------------------------------------------
+    const {
+        data: salesData,
+        error: salesError
+    } = await window.supabaseClient
+        .from('product_sales_stats')
+        .select(`
+            product_id,
+            sales_quantity,
+            sales_revenue,
+            order_count
+        `)
+        .order('sales_quantity', {
+            ascending: false
+        })
+        .limit(INDEX_PRODUCT_LIMIT);
+
+    if (salesError) {
+        console.error(
+            'Lỗi product_sales_stats:',
+            salesError
+        );
+
+        throw salesError;
+    }
+
+    // ----------------------------------------------------
+    // 2. KHÔNG CÓ LỊCH SỬ BÁN HÀNG
+    // ----------------------------------------------------
+    if (!salesData || salesData.length === 0) {
+
+        console.log(
+            '[BEST SELLER] Chưa có dữ liệu sales.'
+        );
+
+        return {
+            products: [],
+            hasSalesData: false
+        };
+    }
+
+    console.log(
+        '[BEST SELLER] Sales stats:',
+        salesData
+    );
+
+    // ----------------------------------------------------
+    // 3. LẤY PRODUCT ID
+    // ----------------------------------------------------
+    const productIds = salesData
+        .map(item => item.product_id)
+        .filter(Boolean);
+
+    if (productIds.length === 0) {
+
+        return {
+            products: [],
+            hasSalesData: false
+        };
+    }
+
+    // ----------------------------------------------------
+    // 4. LẤY THÔNG TIN PRODUCT
+    // ----------------------------------------------------
+    const {
+        data: products,
+        error: productError
+    } = await window.supabaseClient
+        .from('products')
+        .select(`
+            id,
+            sku,
+            name,
+            slug,
+            image_path,
+            unit,
+            category_id,
+            stock_quantity,
+            price,
+            discount_price,
+            badge,
+            created_at,
+            brands(name)
+        `)
+        .in('id', productIds);
+
+    if (productError) {
+        console.error(
+            'Lỗi lấy products Best Seller:',
+            productError
+        );
+
+        throw productError;
+    }
+
+    // ----------------------------------------------------
+    // 5. GHÉP SALES STATS
+    // ----------------------------------------------------
+    const salesMap = new Map(
+        salesData.map(item => [
+            item.product_id,
+            item
+        ])
+    );
+
+    const sortedProducts = (products || [])
+        .map(product => {
+
+            const sales =
+                salesMap.get(product.id) || {
+                    sales_quantity: 0,
+                    sales_revenue: 0,
+                    order_count: 0
+                };
+
+            return {
+                ...product,
+                sales: sales
+            };
+        })
+        .filter(product => {
+            // Chỉ lấy sản phẩm thực sự có bán
+            return Number(
+                product.sales.sales_quantity
+            ) > 0;
+        })
+        .sort((a, b) => {
+
+            return Number(
+                b.sales.sales_quantity
+            ) - Number(
+                a.sales.sales_quantity
+            );
+
+        })
+        .slice(0, INDEX_PRODUCT_LIMIT);
+
+    console.log(
+        '[BEST SELLER] Products:',
+        sortedProducts
+    );
+
+    return {
+        products: sortedProducts,
+        hasSalesData: sortedProducts.length > 0
+    };
+}
+
+// ========================================================
+// BEST SELLER FALLBACK
+// Dùng khi chưa có dữ liệu completed / delivered
+// ========================================================
+
+async function fetchBestSellerFallback() {
+
+    const {
+        data,
+        error
+    } = await window.supabaseClient
+        .from('products')
+        .select(`
+            id,
+            sku,
+            name,
+            slug,
+            image_path,
+            unit,
+            category_id,
+            stock_quantity,
+            price,
+            discount_price,
+            badge,
+            created_at,
+            brands(name)
+        `)
+        .gt(
+            'stock_quantity',
+            0
+        )
+        .order(
+            'created_at',
+            {
+                ascending: false
+            }
+        )
+        .limit(
+            INDEX_PRODUCT_LIMIT
+        );
+
+
+    if (error) {
+        throw error;
+    }
+
+
+    return data || [];
+
+}
+
+// ========================================================
+// LOAD BEST SELLERS
+// ========================================================
+
+async function loadBestSellers() {
+
+    const container =
+        document.getElementById(
+            'bestSellingGrid'
+        );
+
+
+    if (!container) {
         return;
     }
 
 
     try {
 
+        // ------------------------------------------------
+        // 1. ƯU TIÊN DỮ LIỆU SALES THẬT
+        // ------------------------------------------------
+
+        const result =
+            await fetchBestSellingProducts();
+
+
+        let products =
+            result.products;
+
+
+        // ------------------------------------------------
+        // 2. FALLBACK KHI CHƯA CÓ LỊCH SỬ BÁN
+        // ------------------------------------------------
+
+        if (
+            !result.hasSalesData ||
+            products.length === 0
+        ) {
+
+            products =
+                await fetchBestSellerFallback();
+
+        }
+
+
+        // ------------------------------------------------
+        // 3. RENDER
+        // ------------------------------------------------
+
+        renderProductSlider(
+            'bestSellingGrid',
+            products
+        );
+
+
+        // ------------------------------------------------
+        // 4. CLICK PRODUCT
+        // ------------------------------------------------
+
+        bindProductSliderClick(
+            'bestSellingGrid'
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            'Lỗi tải Best Seller:',
+            error
+        );
+
+
+        container.innerHTML = `
+            <p
+                class="empty-msg"
+                style="color:red;"
+            >
+                Không thể tải sản phẩm.
+            </p>
+        `;
+
+    }
+
+}
+
+
+// ========================================================
+// LẤY 2 CATEGORY CÓ NHIỀU PRODUCT NHẤT
+// ========================================================
+
+async function loadTopProductCategories() {
+
+    try {
+
         const {
             data,
             error
-        } =
-            await window.supabaseClient
-                .from('categories')
-                .select(
-                    'id, name, products(id)'
-                );
+        } = await window.supabaseClient
+            .from('categories')
+            .select(`
+                id,
+                name,
+                slug,
+                products(id)
+            `);
 
 
         if (error) {
@@ -619,169 +1177,295 @@ async function initBestSellerTabs() {
         }
 
 
-        const topCategories =
+        if (
+            !data ||
+            data.length === 0
+        ) {
+
+            return [];
+
+        }
+
+
+        const categories =
             data
-                .map(
-                    cat => ({
+                .map(category => {
+
+                    const products =
+                        Array.isArray(
+                            category.products
+                        )
+                            ? category.products
+                            : [];
+
+
+                    return {
 
                         id:
-                            cat.id,
+                            category.id,
 
                         name:
-                            cat.name,
+                            category.name,
 
-                        count:
-                            cat.products
-                                ? cat.products.length
-                                : 0
+                        slug:
+                            category.slug,
 
-                    })
-                )
+                        productCount:
+                            products.length
+
+                    };
+
+                })
                 .filter(
-                    cat =>
-                        cat.count > 0
+                    category =>
+                        category.productCount > 0
                 )
                 .sort(
                     (a, b) =>
-                        b.count -
-                        a.count
+                        b.productCount -
+                        a.productCount
                 )
                 .slice(
                     0,
-                    4
+                    2
                 );
 
 
-        let html = `
-            <button
-                type="button"
-                data-filter="ALL"
-                class="home-tab-btn is-active"
-            >
-                ALL
-            </button>
-        `;
-
-
-        topCategories.forEach(
-            cat => {
-
-                html += `
-                    <button
-                        type="button"
-                        data-filter="${encodeURIComponent(cat.id)}"
-                        class="home-tab-btn"
-                    >
-                        ${escapeIndexHTML(
-                            cat.name
-                        )}
-                    </button>
-                `;
-
-            }
-        );
-
-
-        tabsContainer.innerHTML =
-            html;
-
-
-        const tabs =
-            tabsContainer.querySelectorAll(
-                '.home-tab-btn'
-            );
-
-
-        tabs.forEach(
-            tab => {
-
-                tab.addEventListener(
-                    'click',
-                    e => {
-
-                        tabs.forEach(
-                            t =>
-                                t.classList.remove(
-                                    'is-active'
-                                )
-                        );
-
-
-                        const clickedBtn =
-                            e.currentTarget;
-
-
-                        clickedBtn.classList.add(
-                            'is-active'
-                        );
-
-
-                        const filterValue =
-                            clickedBtn.getAttribute(
-                                'data-filter'
-                            );
-
-
-                        if (
-                            typeof loadBestSellers ===
-                            'function'
-                        ) {
-
-                            loadBestSellers(
-                                filterValue
-                            );
-
-                        }
-
-                    }
-                );
-
-            }
-        );
-
-
-        const btnAll =
-            tabsContainer.querySelector(
-                '[data-filter="ALL"]'
-            );
-
-
-        if (
-            btnAll &&
-            typeof loadBestSellers ===
-                'function'
-        ) {
-
-            loadBestSellers(
-                'ALL'
-            );
-
-        }
+        return categories;
 
 
     } catch (error) {
 
         console.error(
-            "Lỗi tải Tabs Best Seller:",
+            'Lỗi lấy top categories:',
             error
         );
 
 
-        tabsContainer.innerHTML = `
-            <span
-                style="
-                    font-size:12px;
-                    color:red;
-                "
+        return [];
+
+    }
+
+}
+
+
+// ========================================================
+// CONFIG CATEGORY SECTION
+// ========================================================
+
+function updateCategorySection(
+    sectionNumber,
+    category
+) {
+
+    const section =
+        document.getElementById(
+            `topCategorySection${sectionNumber}`
+        );
+
+
+    if (!section) {
+        return;
+    }
+
+
+    // Không có category
+    if (!category) {
+
+        section.style.display =
+            'none';
+
+        return;
+
+    }
+
+
+    const title =
+        document.getElementById(
+            `topCategoryTitle${sectionNumber}`
+        );
+
+
+    const desc =
+        document.getElementById(
+            `topCategoryDesc${sectionNumber}`
+        );
+
+
+    const link =
+        document.getElementById(
+            `topCategoryLink${sectionNumber}`
+        );
+
+
+    const mobileLink =
+        document.getElementById(
+            `topCategoryMobileLink${sectionNumber}`
+        );
+
+
+    if (title) {
+
+        title.innerHTML = `
+            ${escapeIndexHTML(category.name)}
+            <span class="section-title-line"></span>
+        `;
+
+    }
+
+
+    if (desc) {
+
+        desc.textContent =
+            `Khám phá ${category.productCount} sản phẩm nổi bật trong danh mục ${category.name}.`;
+
+    }
+
+
+    const categoryUrl =
+        `pages/subcategory.html?slug=${encodeURIComponent(category.slug)}`;
+
+
+    if (link) {
+
+        link.href =
+            categoryUrl;
+
+    }
+
+
+    if (mobileLink) {
+
+        mobileLink.href =
+            categoryUrl;
+
+    }
+
+}
+
+
+// ========================================================
+// LOAD CATEGORY PRODUCT SECTION
+// ========================================================
+
+async function loadCategoryProductSection(
+    sectionNumber,
+    category
+) {
+
+    if (!category) {
+        return;
+    }
+
+
+    const gridId =
+        `topCategoryGrid${sectionNumber}`;
+
+
+    const grid =
+        document.getElementById(
+            gridId
+        );
+
+
+    if (!grid) {
+        return;
+    }
+
+
+    try {
+
+        updateCategorySection(
+            sectionNumber,
+            category
+        );
+
+
+        const products =
+            await fetchProductsByCategory(
+                category.id
+            );
+
+
+        renderProductSlider(
+            gridId,
+            products
+        );
+
+
+        bindProductSliderClick(
+            gridId
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            `Lỗi tải category #${sectionNumber}:`,
+            error
+        );
+
+
+        grid.innerHTML = `
+            <p
+                class="empty-msg"
+                style="color:red;"
             >
-                Lỗi tải bộ lọc
-            </span>
+                Không thể tải sản phẩm.
+            </p>
         `;
 
     }
 
 }
 
+
+// ========================================================
+// LOAD TOÀN BỘ PRODUCT SHOWCASE
+// ========================================================
+
+async function loadProductShowcase() {
+
+    // ----------------------------------------------------
+    // 1. BEST SELLERS
+    // ----------------------------------------------------
+
+    loadBestSellers();
+
+
+    // ----------------------------------------------------
+    // 2. TOP 2 CATEGORY
+    // ----------------------------------------------------
+
+    const topCategories =
+        await loadTopProductCategories();
+
+
+    const category1 =
+        topCategories[0] ||
+        null;
+
+
+    const category2 =
+        topCategories[1] ||
+        null;
+
+
+    await Promise.all([
+
+        loadCategoryProductSection(
+            1,
+            category1
+        ),
+
+        loadCategoryProductSection(
+            2,
+            category2
+        )
+
+    ]);
+
+}
 
 // ========================================================
 // 6. THÊM VÀO GIỎ TỪ TRANG CHỦ
@@ -1534,92 +2218,116 @@ function escapeIndexHTML(
 }
 
 
-// ========================================================
-// 11. INIT
-// ========================================================
+window.onload = async function () {
 
-window.onload =
-    async function () {
+    // ====================================================
+    // TRANG CHỦ
+    // ====================================================
 
-        initBestSellerTabs();
+    loadMainCategories();
 
-        loadMainCategories();
+    loadBrandsToMarquee();
 
-        loadBrandsToMarquee();
+    loadProductShowcase();
 
-        loadHomeBlogs();
+    loadHomeBlogs();
 
-        loadIndustries();
-
-
-        if (
-            typeof checkCustomerAuth ===
-            "function"
-        ) {
-
-            try {
-
-                const user =
-                    await checkCustomerAuth();
+    loadIndustries();
 
 
-                if (user) {
+    // ====================================================
+    // AUTH
+    // ====================================================
 
-                    document
-                        .getElementById(
-                            "btnGuestLogin"
-                        )
-                        ?.classList.add(
-                            "d-none"
-                        );
+    if (
+        typeof checkCustomerAuth ===
+        "function"
+    ) {
 
+        try {
 
-                    const userProfileBtn =
-                        document.getElementById(
-                            "btnUserProfile"
-                        );
+            const user =
+                await checkCustomerAuth();
 
 
-                    if (
-                        userProfileBtn
-                    ) {
+            if (user) {
 
-                        userProfileBtn.classList.remove(
-                            "d-none"
-                        );
+                document
+                    .getElementById(
+                        "btnGuestLogin"
+                    )
+                    ?.classList.add(
+                        "d-none"
+                    );
 
-                    }
+
+                const userProfileBtn =
+                    document.getElementById(
+                        "btnUserProfile"
+                    );
+
+
+                if (
+                    userProfileBtn
+                ) {
+
+                    userProfileBtn.classList.remove(
+                        "d-none"
+                    );
 
                 }
 
-            } catch (error) {
-
-                console.error(
-                    "Lỗi xác thực:",
-                    error
-                );
-
             }
+
+        } catch (error) {
+
+            console.error(
+                "Lỗi xác thực:",
+                error
+            );
 
         }
 
-    };
+    }
+
+};
 
 
 // ========================================================
-// 12. NÚT CUỘN BÊN NGOÀI (BẤM MŨI TÊN TRÁI/PHẢI)
+// SCROLL PRODUCT SECTION
 // ========================================================
-window.scrollBestSellers = function (amount) {
-    const slider = document.getElementById('bestSellingGrid');
-    if (!slider) return;
 
-    // 1. Cho phép cuộn smooth khi bấm nút
-    slider.style.scrollBehavior = 'smooth';
-    slider.scrollBy({ left: amount });
+window.scrollProductSection = function (
+    sliderId,
+    amount
+) {
 
-    // 2. Chờ cuộn xong thì trả về auto và kích hoạt lại vòng lặp
+    const slider =
+        document.getElementById(
+            sliderId
+        );
+
+
+    if (!slider) {
+        return;
+    }
+
+
+    slider.style.scrollBehavior =
+        'smooth';
+
+
+    slider.scrollBy({
+        left: amount,
+        behavior: 'smooth'
+    });
+
+
     setTimeout(() => {
-        slider.style.scrollBehavior = 'auto';
-        slider.dispatchEvent(new Event('mouseleave'));
-    }, 400); 
+
+        slider.style.scrollBehavior =
+            'auto';
+
+    }, 400);
+
 };

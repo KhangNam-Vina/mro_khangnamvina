@@ -533,8 +533,7 @@
                                     text-gray-600
                                 "
                             >
-
-                                <!-- TABLE HEADER (ĐÃ XÓA CỘT ẢNH & THẢ RÔNG CỘT TÊN) -->
+                                <!-- TABLE HEADER (ĐÃ CHIA ĐỀU TỶ LỆ CỘT) -->
                                 <thead
                                     class="
                                         bg-gray-50
@@ -548,25 +547,20 @@
                                     "
                                 >
                                     <tr>
-                                        <!-- ID -->
-                                        <th class="p-4 text-center w-16">
-                                            #
-                                        </th>
+                                        <!-- ID (Cố định nhỏ gọn) -->
+                                        <th class="p-4 text-center w-16">#</th>
 
-                                        <!-- TÊN DÒNG SẢN PHẨM (Thả rông width để bung rộng ra hút khoảng trống) -->
-                                        <th class="p-4">
-                                            Dòng sản phẩm
-                                        </th>
+                                        <!-- TÊN DÒNG SẢN PHẨM (Chiếm 30%) -->
+                                        <th class="p-4 w-[30%]">Dòng sản phẩm</th>
 
-                                        <!-- THUỘC NHÓM HÀNG -->
-                                        <th class="p-4 w-64 text-left">
-                                            Thuộc nhóm hàng
-                                        </th>
+                                        <!-- SLUG (Chiếm 25%) -->
+                                        <th class="p-4 w-[25%] text-left">Slug</th>
 
-                                        <!-- THAO TÁC -->
-                                        <th class="p-4 w-32 text-center">
-                                            Thao tác
-                                        </th>
+                                        <!-- THUỘC NHÓM HÀNG (Chiếm 25%) -->
+                                        <th class="p-4 w-[25%] text-left">Thuộc nhóm hàng</th>
+
+                                        <!-- THAO TÁC (Cố định lề phải) -->
+                                        <th class="p-4 w-32 text-center">Thao tác</th>
                                     </tr>
                                 </thead>
 
@@ -581,7 +575,7 @@
                                 >
                                     <tr>
                                         <td
-                                            colspan="4"
+                                            colspan="5"
                                             class="
                                                 text-center
                                                 py-10

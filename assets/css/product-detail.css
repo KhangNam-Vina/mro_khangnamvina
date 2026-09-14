@@ -2963,3 +2963,59 @@
             flex-start;
     }
 }
+
+/* =========================================================
+   POLICY CARD (SIDEBAR)
+========================================================= */
+.product-policy-card {
+    margin-top: 20px;
+    padding: 24px 20px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .05);
+}
+
+.product-policy-title {
+    margin: 0 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #1f2937;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.product-policy-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.product-policy-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.product-policy-icon {
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+    color: #00479b; /* Màu xanh chuẩn MRO Khang Nam */
+    margin-top: 2px;
+}
+
+.product-policy-text {
+    flex: 1;
+    color: #4b5563;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.product-policy-text strong {
+    color: #1f2937;
+    font-weight: 800;
+}

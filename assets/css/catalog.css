@@ -1358,64 +1358,160 @@
 ========================================================= */
 
 .product-badge {
-    position: absolute;
-    top: 8px;
-    z-index: 5;
-    padding: 5px 8px;
+    position: absolute !important;
+    top: 8px !important;
+
+    z-index: 20 !important;
+
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+
+    width: auto !important;
+    min-width: 0 !important;
+    height: auto !important;
+
+    margin: 0 !important;
+    padding: 5px 8px !important;
+
+    box-sizing: border-box;
+
+    color: #fff !important;
+
+    border: 0 !important;
     border-radius: 5px;
-    color: #fff;
+
+    font-family: inherit;
     font-size: 10px;
     line-height: 1;
+
     font-weight: 800;
-    text-transform: uppercase;
+
+    white-space: nowrap;
+    text-align: center;
+
+    text-decoration: none !important;
+
     box-shadow: 0 2px 5px rgba(0, 0, 0, .12);
+
+    pointer-events: none;
 }
 
-.product-badge-sale,
-.product-badge-hot {
-    right: 8px;
-    background: #ef4444;
-}
 
-.product-badge-preorder {
-    right: 8px;
-    background: #6b7280;
-}
-
-.product-badge-stock,
-.product-badge-new {
-    background: #22c55e;
-}
+/* =========================================================
+   BADGE BÊN PHẢI
+   - Có sẵn
+   - Pre-order
+   - Giảm giá
+========================================================= */
 
 .product-badge-stock,
 .product-badge-preorder,
-.product-badge-sale,
-.product-badge-hot {
-    right: 8px;
+.product-badge-sale {
+    right: 8px !important;
+    left: auto !important;
 }
 
+
+/* =========================================================
+   CÓ SẴN
+========================================================= */
+
+.product-badge-stock {
+    background: #22c55e !important;
+}
+
+
+/* =========================================================
+   PRE-ORDER
+========================================================= */
+
+.product-badge-preorder {
+    background: #6b7280 !important;
+}
+
+
+/* =========================================================
+   GIẢM GIÁ
+========================================================= */
+
+.product-badge-sale {
+    background: #ef4444 !important;
+}
+
+
+/* =========================================================
+   BADGE BÊN TRÁI
+   - NEW
+   - HOT
+   - SALE CUSTOM
+   - BEST SELLER
+   - CLEARANCE
+   - CUSTOM
+========================================================= */
+
 .product-badge-new,
+.product-badge-hot,
 .product-badge-sale-custom,
 .product-badge-best,
 .product-badge-clearance,
 .product-badge-custom {
-    left: 8px;
+    left: 8px !important;
+    right: auto !important;
 }
+
+
+/* =========================================================
+   NEW
+========================================================= */
+
+.product-badge-new {
+    background: #22c55e !important;
+}
+
+
+/* =========================================================
+   HOT
+========================================================= */
+
+.product-badge-hot {
+    background: #ef4444 !important;
+}
+
+
+/* =========================================================
+   SALE CUSTOM
+========================================================= */
 
 .product-badge-sale-custom {
-    background: #f97316;
+    background: #f97316 !important;
 }
+
+
+/* =========================================================
+   BEST SELLER
+========================================================= */
 
 .product-badge-best {
-    background: #9333ea;
+    background: #9333ea !important;
 }
+
+
+/* =========================================================
+   CLEARANCE
+========================================================= */
 
 .product-badge-clearance {
-    background: #ca8a04;
+    background: #ca8a04 !important;
 }
 
+
+/* =========================================================
+   CUSTOM
+========================================================= */
+
 .product-badge-custom {
-    background: #6b7280;
+    background: #6b7280 !important;
 }
 
 

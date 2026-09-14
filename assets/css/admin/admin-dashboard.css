@@ -1,0 +1,12 @@
+/* =========================================================
+   KN ADMIN — DASHBOARD
+   CSS riêng cho Dashboard.
+   TailwindCSS vẫn được load qua CDN trong HTML.
+   ========================================================= */
+.dashboard-main{min-width:0}
+.dashboard-chart{position:relative;height:300px;width:100%}
+.dashboard-kpi-card{position:relative;overflow:hidden}
+.dashboard-kpi-decoration{position:absolute;right:0;top:0;width:4rem;height:4rem;border-bottom-left-radius:9999px;z-index:0}
+#activityChart{display:block;max-width:100%}
+.dashboard-loading{text-align:center;padding:2rem 1rem;color:#9ca3af}
+@media (max-width:767px){.dashboard-chart{height:260px}}
