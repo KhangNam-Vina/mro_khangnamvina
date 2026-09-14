@@ -177,19 +177,52 @@
 
                     <!-- ACTION -->
                     <div class="order-detail-actions no-print" style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end; align-items: center;">
-                        <a href="my-orders.html" class="btn-outline-blue" style="margin-right: auto;">← Quay lại lịch sử mua hàng</a>
+                        <a href="my-orders.html" class="btn-outline-blue" style="margin-right: auto;">Quay lại lịch sử mua hàng</a>
                         
                         <!-- NÚT HỦY ĐƠN HÀNG -->
                         <button type="button" id="btnCancelOrder" onclick="cancelOrder()" class="d-none" style="padding: 10px 20px; border-radius: 8px; border: 1px solid #ef4444; color: #ef4444; font-weight: 700; background: #fff; cursor: pointer;">
-                            ❌ Hủy đơn hàng
+                            Hủy đơn hàng
                         </button>
 
-                        <button type="button" onclick="reorderCurrentItems()" class="btn-primary reorder-btn">🛒 Mua lại đơn này</button>
+                        <button type="button" onclick="reorderCurrentItems()" class="btn-primary reorder-btn">Mua lại đơn này</button>
                     </div>
 
                 </div>
             </div>
         </div>
+        <!-- MODAL LÝ DO HỦY ĐƠN HÀNG (BƠM VÀO TRƯỚC THẺ </main>) -->
+    <div id="cancelOrderModal" class="cancel-modal-overlay d-none no-print">
+        <div class="cancel-modal-box">
+            <h3 class="cancel-modal-title">Lý do hủy đơn hàng</h3>
+            <p class="cancel-modal-desc">Vui lòng cho Khang Nam biết lý do bạn muốn hủy đơn hàng này nhé:</p>
+            
+            <form id="cancelOrderForm">
+                <label class="cancel-reason-label">
+                    <input type="radio" name="cancel_reason" value="Thay đổi ý định mua hàng" checked>
+                    <span>Thay đổi ý định mua hàng</span>
+                </label>
+                <label class="cancel-reason-label">
+                    <input type="radio" name="cancel_reason" value="Tìm thấy giá rẻ hơn ở nơi khác">
+                    <span>Tìm thấy giá rẻ hơn ở nơi khác</span>
+                </label>
+                <label class="cancel-reason-label">
+                    <input type="radio" name="cancel_reason" value="Đặt nhầm sản phẩm / số lượng">
+                    <span>Đặt nhầm sản phẩm / số lượng</span>
+                </label>
+                <label class="cancel-reason-label">
+                    <input type="radio" name="cancel_reason" value="Khác">
+                    <span>Lý do khác...</span>
+                </label>
+                
+                <textarea id="cancelReasonOther" class="cancel-reason-textarea d-none" placeholder="Nhập lý do của bạn (Tùy chọn)..."></textarea>
+
+                <div class="cancel-modal-actions">
+                    <button type="button" class="btn-cancel-modal" onclick="closeCancelModal()">Không, giữ lại đơn</button>
+                    <button type="submit" class="btn-confirm-modal" id="btnConfirmCancel">Xác nhận Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
     </main>
 
     <div id="app-footer" class="no-print"></div>

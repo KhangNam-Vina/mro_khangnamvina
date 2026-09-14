@@ -388,7 +388,9 @@
 
 /* =========================================================
    7. STATUS BADGES
+   ĐỒNG BỘ VỚI ADMIN-ORDERS.JS
 ========================================================= */
+
 .status-badge {
     display: inline-block;
     padding: 4px 12px;
@@ -396,13 +398,57 @@
     font-size: 11px;
     font-weight: 800;
     border: 1px solid transparent;
+    white-space: nowrap;
 }
 
-.status-pending { background: #fef3c7; color: #b45309; border-color: #fde68a; }
-.status-processing { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
-.status-shipping { background: #faf5ff; color: #4338ca; border-color: #e9d5ff; }
-.status-completed { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
-.status-cancelled { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+/* Chờ xử lý */
+.status-pending {
+    background: #ffedd5;
+    color: #c2410c;
+    border-color: #fed7aa;
+}
+
+/* Đã xác nhận */
+.status-confirmed {
+    background: #dbeafe;
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+}
+
+/* Đang xử lý */
+.status-processing {
+    background: #f3e8ff;
+    color: #7e22ce;
+    border-color: #e9d5ff;
+}
+
+/* Đang giao */
+.status-shipped {
+    background: #e0e7ff;
+    color: #4338ca;
+    border-color: #c7d2fe;
+}
+
+/* Đã giao */
+.status-delivered {
+    background: #dcfce7;
+    color: #15803d;
+    border-color: #bbf7d0;
+}
+
+/* Đã hủy */
+.status-cancelled {
+    background: #fee2e2;
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+
+/* Không xác định */
+.status-unknown {
+    background: #f3f4f6;
+    color: #4b5563;
+    border-color: #e5e7eb;
+}
 
 /* =========================================================
    8. BUTTONS
@@ -687,4 +733,19 @@
         border: 0;
         box-shadow: none;
     }
+}
+
+/* =========================================================
+   CANCEL REASON
+========================================================= */
+
+.order-cancel-reason {
+    max-width: 220px;
+    margin: 6px auto 0;
+    color: #991b1b;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.5;
+    text-align: center;
+    word-break: break-word;
 }

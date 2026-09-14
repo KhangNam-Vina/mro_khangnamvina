@@ -10,9 +10,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>
-        Chi tiết Đơn hàng - KN Admin
-    </title>
+    <title>Chi tiết Đơn hàng - KN Admin</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -360,33 +358,7 @@
                                     outline-none
                                     focus:border-kn-blue
                                 "
-                            >
-
-                                <option value="pending">
-                                    Chờ xử lý
-                                </option>
-
-                                <option value="confirmed">
-                                    Đã xác nhận
-                                </option>
-
-                                <option value="processing">
-                                    Đang xử lý
-                                </option>
-
-                                <option value="shipped">
-                                    Đang giao
-                                </option>
-
-                                <option value="delivered">
-                                    Đã giao
-                                </option>
-
-                                <option value="cancelled">
-                                    Đã hủy
-                                </option>
-
-                            </select>
+                            ></select>
 
 
                             <button
@@ -403,8 +375,112 @@
                                     font-black
                                 "
                             >
-                                Cập nhật
+                                Cập nhật trạng thái
                             </button>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- STATUS PROGRESS -->
+
+                <section
+                    class="
+                        bg-white
+                        border
+                        border-gray-200
+                        rounded-xl
+                        shadow-sm
+                        p-6
+                    "
+                >
+
+                    <div
+                        id="orderStatusProgress"
+                        class="
+                            flex
+                            items-start
+                            gap-2
+                            overflow-x-auto
+                        "
+                    ></div>
+
+                    <div
+                        id="orderStatusDescription"
+                        class="
+                            mt-5
+                            pt-4
+                            border-t
+                            border-gray-200
+                            text-sm
+                            text-gray-500
+                        "
+                    ></div>
+
+                </section>
+
+
+
+                <!-- CANCELLATION REASON -->
+
+                <section
+                    id="orderCancellationSection"
+                    class="
+                        hidden
+                        bg-red-50
+                        border
+                        border-red-200
+                        rounded-xl
+                        shadow-sm
+                        p-6
+                    "
+                >
+
+                    <div class="flex items-start gap-3">
+
+                        <div
+                            class="
+                                w-9
+                                h-9
+                                shrink-0
+                                rounded-full
+                                bg-red-100
+                                text-red-600
+                                flex
+                                items-center
+                                justify-center
+                                font-black
+                            "
+                        >
+                            !
+                        </div>
+
+                        <div class="min-w-0">
+
+                            <h3
+                                class="
+                                    text-base
+                                    font-black
+                                    text-red-800
+                                "
+                            >
+                                Lý do hủy đơn
+                            </h3>
+
+                            <p
+                                id="orderCancellationReason"
+                                class="
+                                    text-sm
+                                    text-red-700
+                                    mt-1
+                                    whitespace-pre-wrap
+                                    break-words
+                                "
+                            ></p>
 
                         </div>
 
@@ -449,27 +525,16 @@
                             "
                         >
 
-                            <div
+                            <h3
                                 class="
-                                    flex
-                                    items-center
-                                    justify-between
-                                    gap-3
+                                    text-lg
+                                    font-black
+                                    text-gray-900
                                     mb-5
                                 "
                             >
-
-                                <h3
-                                    class="
-                                        text-lg
-                                        font-black
-                                        text-gray-900
-                                    "
-                                >
-                                    Thông tin khách hàng
-                                </h3>
-
-                            </div>
+                                Thông tin khách hàng
+                            </h3>
 
 
                             <div
@@ -497,10 +562,7 @@
 
                                     <p
                                         id="customerName"
-                                        class="
-                                            font-bold
-                                            mt-1
-                                        "
+                                        class="font-bold mt-1"
                                     >
                                         -
                                     </p>
@@ -524,10 +586,7 @@
 
                                     <p
                                         id="customerPhone"
-                                        class="
-                                            font-bold
-                                            mt-1
-                                        "
+                                        class="font-bold mt-1"
                                     >
                                         -
                                     </p>
@@ -553,36 +612,6 @@
                                         id="customerEmail"
                                         class="
                                             font-bold
-                                            mt-1
-                                            break-all
-                                        "
-                                    >
-                                        -
-                                    </p>
-
-                                </div>
-
-
-                                <div>
-
-                                    <p
-                                        class="
-                                            text-[11px]
-                                            uppercase
-                                            tracking-wider
-                                            text-gray-400
-                                            font-black
-                                        "
-                                    >
-                                        User ID
-                                    </p>
-
-                                    <p
-                                        id="customerUserId"
-                                        class="
-                                            text-xs
-                                            font-mono
-                                            text-gray-500
                                             mt-1
                                             break-all
                                         "
@@ -680,9 +709,7 @@
                                 </div>
 
 
-                                <div
-                                    class="md:col-span-2"
-                                >
+                                <div class="md:col-span-2">
 
                                     <p
                                         class="
@@ -698,10 +725,7 @@
 
                                     <p
                                         id="shippingAddress"
-                                        class="
-                                            font-bold
-                                            mt-1
-                                        "
+                                        class="font-bold mt-1"
                                     >
                                         -
                                     </p>
@@ -749,9 +773,7 @@
                             </div>
 
 
-                            <div
-                                class="overflow-x-auto"
-                            >
+                            <div class="overflow-x-auto">
 
                                 <table
                                     class="
@@ -761,6 +783,7 @@
                                 >
 
                                     <thead>
+
                                         <tr>
 
                                             <th class="p-4 text-left text-[11px] uppercase font-black text-gray-500">
@@ -788,6 +811,7 @@
                                             </th>
 
                                         </tr>
+
                                     </thead>
 
                                     <tbody
@@ -849,11 +873,7 @@
 
                     <!-- RIGHT -->
 
-                    <div
-                        class="
-                            space-y-5
-                        "
-                    >
+                    <div class="space-y-5">
 
 
                         <!-- SUMMARY -->
@@ -881,12 +901,7 @@
                             </h3>
 
 
-                            <div
-                                class="
-                                    space-y-4
-                                    text-sm
-                                "
-                            >
+                            <div class="space-y-4 text-sm">
 
                                 <div
                                     class="
@@ -896,15 +911,11 @@
                                     "
                                 >
 
-                                    <span
-                                        class="text-gray-500"
-                                    >
+                                    <span class="text-gray-500">
                                         Tạm tính
                                     </span>
 
-                                    <strong
-                                        id="orderSubtotal"
-                                    >
+                                    <strong id="orderSubtotal">
                                         0 ₫
                                     </strong>
 
@@ -919,15 +930,11 @@
                                     "
                                 >
 
-                                    <span
-                                        class="text-gray-500"
-                                    >
+                                    <span class="text-gray-500">
                                         Phí giao hàng
                                     </span>
 
-                                    <strong
-                                        id="orderShippingFee"
-                                    >
+                                    <strong id="orderShippingFee">
                                         0 ₫
                                     </strong>
 
@@ -998,9 +1005,7 @@
                             </h3>
 
 
-                            <div
-                                class="space-y-4"
-                            >
+                            <div class="space-y-4">
 
                                 <div>
 
@@ -1018,10 +1023,7 @@
 
                                     <p
                                         id="quickOrderCode"
-                                        class="
-                                            font-bold
-                                            mt-1
-                                        "
+                                        class="font-bold mt-1"
                                     >
                                         -
                                     </p>
@@ -1045,10 +1047,7 @@
 
                                     <p
                                         id="quickCreatedAt"
-                                        class="
-                                            font-bold
-                                            mt-1
-                                        "
+                                        class="font-bold mt-1"
                                     >
                                         -
                                     </p>
@@ -1072,10 +1071,7 @@
 
                                     <p
                                         id="quickItemsCount"
-                                        class="
-                                            font-bold
-                                            mt-1
-                                        "
+                                        class="font-bold mt-1"
                                     >
                                         0
                                     </p>
@@ -1101,14 +1097,313 @@
 
 
 <!-- =========================================================
+     CANCEL ORDER MODAL
+========================================================= -->
+
+<div
+    id="cancelOrderModal"
+    class="
+        hidden
+        fixed
+        inset-0
+        z-[100]
+        items-center
+        justify-center
+        p-4
+    "
+>
+
+    <div
+        id="cancelOrderOverlay"
+        class="
+            absolute
+            inset-0
+            bg-black/50
+            backdrop-blur-sm
+        "
+    ></div>
+
+
+    <div
+        class="
+            relative
+            w-full
+            max-w-lg
+            bg-white
+            rounded-2xl
+            shadow-2xl
+            overflow-hidden
+        "
+    >
+
+        <!-- MODAL HEADER -->
+
+        <div
+            class="
+                px-6
+                py-5
+                border-b
+                border-gray-200
+                flex
+                items-start
+                justify-between
+                gap-4
+            "
+        >
+
+            <div>
+
+                <div
+                    class="
+                        flex
+                        items-center
+                        gap-3
+                    "
+                >
+
+                    <div
+                        class="
+                            w-10
+                            h-10
+                            rounded-full
+                            bg-red-100
+                            text-red-600
+                            flex
+                            items-center
+                            justify-center
+                            font-black
+                            text-lg
+                        "
+                    >
+                        !
+                    </div>
+
+                    <div>
+
+                        <h3
+                            class="
+                                text-lg
+                                font-black
+                                text-gray-900
+                            "
+                        >
+                            Hủy đơn hàng
+                        </h3>
+
+                        <p
+                            id="cancelOrderCode"
+                            class="
+                                text-xs
+                                text-gray-500
+                                mt-0.5
+                            "
+                        >
+                            -
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <button
+                id="btnCloseCancelModal"
+                type="button"
+                class="
+                    w-8
+                    h-8
+                    rounded-lg
+                    hover:bg-gray-100
+                    text-gray-400
+                    hover:text-gray-700
+                    font-bold
+                    text-xl
+                "
+            >
+                ×
+            </button>
+
+        </div>
+
+
+
+        <!-- MODAL BODY -->
+
+        <div class="p-6">
+
+            <div
+                class="
+                    rounded-lg
+                    border
+                    border-red-200
+                    bg-red-50
+                    px-4
+                    py-3
+                    mb-5
+                "
+            >
+
+                <p
+                    class="
+                        text-sm
+                        text-red-700
+                        font-bold
+                    "
+                >
+                    Sau khi hủy, đơn hàng sẽ không thể tiếp tục xử lý.
+                </p>
+
+            </div>
+
+
+            <label
+                for="cancelOrderReason"
+                class="
+                    block
+                    text-sm
+                    font-black
+                    text-gray-800
+                    mb-2
+                "
+            >
+                Lý do hủy đơn
+                <span class="text-red-500">*</span>
+            </label>
+
+
+            <textarea
+                id="cancelOrderReason"
+                rows="5"
+                maxlength="500"
+                placeholder="Nhập lý do hủy đơn..."
+                class="
+                    w-full
+                    px-4
+                    py-3
+                    rounded-xl
+                    border
+                    border-gray-300
+                    outline-none
+                    resize-none
+                    text-sm
+                    text-gray-800
+                    placeholder:text-gray-400
+                    focus:border-red-400
+                    focus:ring-2
+                    focus:ring-red-100
+                "
+            ></textarea>
+
+
+            <div
+                class="
+                    flex
+                    items-center
+                    justify-between
+                    mt-2
+                "
+            >
+
+                <p
+                    id="cancelOrderReasonError"
+                    class="
+                        text-xs
+                        text-red-600
+                        font-bold
+                    "
+                ></p>
+
+                <p
+                    id="cancelOrderReasonCount"
+                    class="
+                        text-xs
+                        text-gray-400
+                    "
+                >
+                    0/500
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- MODAL FOOTER -->
+
+        <div
+            class="
+                px-6
+                py-4
+                bg-gray-50
+                border-t
+                border-gray-200
+                flex
+                justify-end
+                gap-3
+            "
+        >
+
+            <button
+                id="btnCancelOrderModal"
+                type="button"
+                class="
+                    px-4
+                    py-2.5
+                    rounded-lg
+                    border
+                    border-gray-300
+                    bg-white
+                    hover:bg-gray-100
+                    text-sm
+                    font-black
+                    text-gray-700
+                "
+            >
+                Đóng
+            </button>
+
+
+            <button
+                id="btnConfirmCancelOrder"
+                type="button"
+                class="
+                    px-5
+                    py-2.5
+                    rounded-lg
+                    bg-red-600
+                    hover:bg-red-700
+                    text-white
+                    text-sm
+                    font-black
+                    disabled:opacity-50
+                    disabled:cursor-not-allowed
+                "
+            >
+                Xác nhận hủy đơn
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
      SCRIPTS
 ========================================================= -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="../assets/js/common/supabase.js"></script>
 <script src="../assets/js/common/utils.js"></script>
 <script src="../assets/js/admin/admin-core.js"></script>
 <script src="../assets/js/admin/admin-nav.js"></script>
 <script src="../assets/js/admin/admin-order-detail.js"></script>
+
 </body>
 </html>
