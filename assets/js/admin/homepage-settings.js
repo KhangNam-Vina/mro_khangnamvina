@@ -129,8 +129,8 @@ async function loadAllSelectableData() {
             });
         }
 
-        // 2. Industries
-        const { data: inds } = await window.supabaseClient.from("industries").select("id, name").neq("is_active", false).order("id", { ascending: true });
+        // 2. Industries (ĐÃ FIX: Dùng .eq('is_active', true) cho đồng bộ)
+        const { data: inds } = await window.supabaseClient.from("industries").select("id, name").eq("is_active", true).order("id", { ascending: true });
         const indContainer = document.getElementById("industriesCheckboxContainer");
         if (indContainer) {
             indContainer.innerHTML = "";
@@ -139,8 +139,8 @@ async function loadAllSelectableData() {
             });
         }
 
-        // 3. Brands
-        const { data: brands } = await window.supabaseClient.from("brands").select("id, name").order("name", { ascending: true });
+        // 3. Brands (ĐÃ FIX: Thêm .eq('is_active', true) để chặn brand bị ẩn)
+        const { data: brands } = await window.supabaseClient.from("brands").select("id, name").eq("is_active", true).order("name", { ascending: true });
         const brandContainer = document.getElementById("brandsCheckboxContainer");
         if (brandContainer) {
             brandContainer.innerHTML = "";
@@ -383,9 +383,47 @@ function bindEvents() {
     });
 }
 
+// CẬP NHẬT TRẠNG THÁI ẨN/HIỆN SECTION (ĐÃ FIX LỖI LIỆT CÔNG TẮC)
 function updateSectionVisibility() {
-    const mappings = [["heroEnabled", "heroSettingsSection"], ["categoriesEnabled", "categoriesSettingsSection"], ["bestSellingEnabled", "bestSellingSettingsSection"], ["categoryShowcase1Enabled", "categoryShowcase1SettingsSection"], ["categoryShowcase2Enabled", "categoryShowcase2SettingsSection"], ["industriesEnabled", "industriesSettingsSection"], ["brandsEnabled", "brandsSettingsSection"], ["blogEnabled", "blogSettingsSection"]];
-    mappings.forEach(([c, s]) => { const cb = document.getElementById(c); const sec = document.getElementById(s); if(cb && sec) sec.classList.toggle("is-disabled", !cb.checked); });
+    const mappings = [
+        ["heroEnabled", "heroSettingsSection"], 
+        ["categoriesEnabled", "categoriesSettingsSection"], 
+        ["bestSellingEnabled", "bestSellingSettingsSection"], 
+        ["categoryShowcase1Enabled", "categoryShowcase1SettingsSection"], 
+        ["categoryShowcase2Enabled", "categoryShowcase2SettingsSection"], 
+        ["industriesEnabled", "industriesSettingsSection"], 
+        ["brandsEnabled", "brandsSettingsSection"], 
+        ["blogEnabled", "blogSettingsSection"]
+    ];
+    
+    mappings.forEach(([checkboxId, sectionId]) => { 
+        const cb = document.getElementById(checkboxId); 
+        const sec = document.getElementById(sectionId); 
+        
+        if (cb && sec) {
+            const isOff = !cb.checked;
+            
+            // 1. Dọn dẹp class is-disabled (thủ phạm gây liệt chuột)
+            sec.classList.remove("is-disabled"); 
+            
+            // 2. Làm mờ Section bằng class của Tailwind cho thân thiện
+            if (isOff) {
+                sec.classList.add("opacity-50", "grayscale");
+            } else {
+                sec.classList.remove("opacity-50", "grayscale");
+            }
+
+            // 3. Khóa tất cả input/button bên trong (TRỪ CÁI CÔNG TẮC) để khỏi bị sửa nhầm
+            const formElements = sec.querySelectorAll("input, select, textarea, button");
+            formElements.forEach(el => {
+                if (el.id !== checkboxId) {
+                    el.disabled = isOff;
+                    if (isOff) el.classList.add("cursor-not-allowed");
+                    else el.classList.remove("cursor-not-allowed");
+                }
+            });
+        }
+    });
 }
 
 function previewHomepage() {

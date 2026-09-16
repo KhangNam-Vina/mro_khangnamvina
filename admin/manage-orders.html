@@ -13,40 +13,21 @@ tailwind.config={theme:{extend:{colors:{'kn-blue':'#00479b','kn-orange':'#ff5e00
 
 <aside
     id="adminSidebar"
-    class="
-        w-64
-        shrink-0
-        bg-gray-900
-        text-white
-        hidden
-        md:flex
-        flex-col
-        sticky
-        top-0
-        h-screen
-        self-start
-    "
+    class="w-64 shrink-0 bg-gray-900 text-white hidden md:flex flex-col sticky top-0 h-screen self-start"
 ></aside>
 
 <div class="flex-1 flex flex-col h-screen overflow-hidden">
-<header class="bg-white shadow-sm px-6 py-4 border-b border-gray-200">
+<header class="bg-white shadow-sm px-6 py-4 border-b border-gray-200 z-10 sticky top-0">
   <div class="flex flex-wrap gap-4 justify-between items-center">
     <div>
       <h1 class="text-xl font-black text-gray-900">Quản lý Đơn hàng</h1>
       <p class="text-xs text-gray-500 mt-1">Theo dõi và xử lý các đơn hàng từ khách hàng.</p>
     </div>
-    <div class="flex flex-wrap items-center gap-3">
-      <input id="searchOrderInput" type="text" placeholder="Mã đơn, tên, SĐT..." class="bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm w-52 outline-none focus:border-kn-blue">
-      <select id="statusFilter" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-bold outline-none focus:border-kn-blue">
-        <option value="all">Tất cả trạng thái</option>
-        <option value="pending">Chờ xử lý</option>
-        <option value="confirmed">Đã xác nhận</option>
-        <option value="processing">Đang xử lý</option>
-        <option value="shipped">Đang giao</option>
-        <option value="delivered">Đã giao</option>
-        <option value="cancelled">Đã hủy</option>
-      </select>
-    </div>
+    <!-- ĐƯA NÚT LÀM MỚI LÊN ĐÂY -->
+    <button id="btnRefreshOrders" type="button" class="px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        Làm mới
+    </button>
   </div>
 </header>
 
@@ -61,23 +42,54 @@ tailwind.config={theme:{extend:{colors:{'kn-blue':'#00479b','kn-orange':'#ff5e00
 </section>
 
 <section class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-  <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center gap-3">
-    <div><h2 class="font-black text-gray-900">Danh sách đơn hàng</h2><p class="text-xs text-gray-500 mt-1">Nhấn "Xem đơn" để mở chi tiết.</p></div>
-    <button id="btnRefreshOrders" type="button" class="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-bold">Làm mới</button>
+  
+  <!-- BỘ LỌC ĐƯỢC CHUYỂN XUỐNG DƯỚI -->
+  <div class="px-6 py-4 border-b border-gray-200 flex flex-wrap justify-between items-center gap-4 bg-gray-50/50">
+    <div>
+        <h2 class="font-black text-gray-900">Danh sách đơn hàng</h2>
+        <p class="text-xs text-gray-500 mt-1">Nhấn "Xem đơn" để mở chi tiết.</p>
+    </div>
+    
+    <div class="flex flex-wrap items-center gap-3">
+        <!-- Ô TÌM KIẾM -->
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <input id="searchOrderInput" type="text" placeholder="Mã đơn, tên, SĐT..." class="bg-white border border-gray-300 rounded-lg pl-9 pr-3 py-2 text-sm w-64 outline-none focus:border-kn-blue shadow-sm">
+        </div>
+
+        <!-- BỘ LỌC NGÀY THÁNG NĂM -->
+        <div class="relative" title="Lọc theo ngày đặt hàng">
+            <input id="dateFilter" type="date" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none focus:border-kn-blue shadow-sm cursor-pointer">
+        </div>
+        
+        <!-- LỌC TRẠNG THÁI -->
+        <select id="statusFilter" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-bold outline-none focus:border-kn-blue shadow-sm cursor-pointer">
+            <option value="all">Tất cả trạng thái</option>
+            <option value="pending">Chờ xử lý</option>
+            <option value="confirmed">Đã xác nhận</option>
+            <option value="processing">Đang xử lý</option>
+            <option value="shipped">Đang giao</option>
+            <option value="delivered">Đã giao</option>
+            <option value="cancelled">Đã hủy</option>
+        </select>
+    </div>
   </div>
+
   <div class="overflow-x-auto">
     <table class="w-full min-w-[1050px] text-left">
       <thead class="bg-gray-50 border-b border-gray-200">
-        <tr>
-          <th class="p-4 text-center text-[11px] uppercase font-black text-gray-500">#</th>
-          <th class="p-4 text-[11px] uppercase font-black text-gray-500">Mã đơn</th>
-          <th class="p-4 text-[11px] uppercase font-black text-gray-500">Khách hàng</th>
-          <th class="p-4 text-[11px] uppercase font-black text-gray-500">Ngày đặt</th>
-          <th class="p-4 text-right text-[11px] uppercase font-black text-gray-500">Tổng tiền</th>
-          <th class="p-4 text-center text-[11px] uppercase font-black text-gray-500">Trạng thái</th>
-          <th class="p-4 text-right text-[11px] uppercase font-black text-gray-500">Thao tác</th>
-        </tr>
-      </thead>
+                                <tr>
+                                    <th class="p-4 text-center text-[11px] uppercase font-black text-gray-500 w-12">#</th>
+                                    <th class="p-4 text-[11px] uppercase font-black text-gray-500 whitespace-nowrap">Mã đơn</th>
+                                    <th class="p-4 text-[11px] uppercase font-black text-gray-500 w-[35%]">Khách hàng</th>
+                                    <th class="p-4 text-[11px] uppercase font-black text-gray-500 whitespace-nowrap">Ngày đặt</th>
+                                    <th class="p-4 text-right text-[11px] uppercase font-black text-gray-500 whitespace-nowrap">Tổng tiền</th>
+                                    <th class="p-4 text-center text-[11px] uppercase font-black text-gray-500 whitespace-nowrap">Trạng thái</th>
+                                    <th class="p-4 text-right text-[11px] uppercase font-black text-gray-500 whitespace-nowrap">Thao tác</th>
+                                </tr>
+                            </thead>
       <tbody id="orderTableBody" class="divide-y divide-gray-100"><tr><td colspan="7" class="p-12 text-center text-gray-400">Đang tải đơn hàng...</td></tr></tbody>
     </table>
   </div>

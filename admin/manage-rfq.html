@@ -1,174 +1,139 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý Báo giá - KN Admin</title>
-
-    <!-- TAILWIND -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        "kn-blue": "#00479b",
-                        "kn-orange": "#ff5e00"
-                    }
-                }
-            }
-        };
+        tailwind.config = { theme: { extend: { colors: { "kn-blue": "#00479b", "kn-orange": "#ff5e00" } } } };
     </script>
-
-    <!-- CUSTOM CSS -->
-    <style type="text/tailwindcss">
-        .admin-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .admin-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .admin-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
-        .admin-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
-
-        .form-input { 
-            @apply w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-800 outline-none shadow-sm transition; 
-        }
-        .form-input:focus { @apply border-kn-blue ring-2 ring-blue-100; }
-    </style>
 </head>
-
 <body class="bg-gray-50 text-gray-800 font-sans flex h-screen overflow-hidden">
 
     <!-- TOAST -->
     <div id="toastContainer" class="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-2 pointer-events-none"></div>
 
-    <!-- MOBILE BACKDROP -->
-    <div id="sidebarBackdrop" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden backdrop-blur-sm transition-opacity" onclick="toggleSidebar()"></div>
-
     <!-- SIDEBAR -->
-    <aside id="adminSidebar" class="fixed md:static inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white flex flex-col shrink-0 -translate-x-full md:translate-x-0 transition-transform duration-300"></aside>
+    <aside id="adminSidebar" class="w-64 shrink-0 bg-gray-900 text-white hidden md:flex flex-col sticky top-0 h-screen self-start"></aside>
 
     <!-- MAIN AREA -->
-    <div class="flex-1 min-w-0 flex flex-col h-screen overflow-hidden">
+    <div class="flex-1 flex flex-col h-screen overflow-hidden">
 
-        <!-- HEADER (STICKY) -->
-        <header class="sticky top-0 z-30 h-16 bg-white border-b border-gray-200 px-4 sm:px-6 flex items-center justify-between shrink-0 shadow-sm">
-            <div class="flex items-center gap-3 min-w-0">
-                <button type="button" onclick="toggleSidebar()" class="md:hidden p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition shrink-0" aria-label="Mở menu">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                </button>
-                <div class="min-w-0">
-                    <h1 class="text-lg sm:text-xl font-black text-gray-900 truncate">Quản lý Báo giá</h1>
-                    <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5 truncate">Theo dõi và xử lý các yêu cầu báo giá từ khách hàng.</p>
+        <!-- HEADER -->
+        <header class="bg-white shadow-sm px-6 py-4 border-b border-gray-200 z-10 sticky top-0">
+            <div class="flex flex-wrap gap-4 justify-between items-center">
+                <div>
+                    <h1 class="text-xl font-black text-gray-900">Quản lý Báo giá</h1>
+                    <p class="text-xs text-gray-500 mt-1">Theo dõi và xử lý các yêu cầu báo giá từ khách hàng.</p>
                 </div>
+                <!-- NÚT LÀM MỚI -->
+                <button id="btnRefresh" type="button" class="px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    Làm mới
+                </button>
             </div>
-
-            <!-- BUTTON LÀM MỚI -->
-            <button type="button" id="btnRefresh" class="shrink-0 inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gray-900 text-white text-sm font-bold shadow-sm hover:bg-black active:scale-[0.98] transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                <span class="hidden sm:inline">Làm mới dữ liệu</span>
-            </button>
         </header>
 
         <!-- CONTENT -->
-        <main class="flex-1 overflow-y-auto admin-scrollbar bg-gray-50 p-4 sm:p-6 lg:p-8">
-            <div class="w-full max-w-[1600px] mx-auto space-y-6 pb-10">
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-6">
+            <div class="max-w-[1600px] mx-auto space-y-5">
 
-                <!-- 4 STATS CARDS (MINIMALIST) -->
-                <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                    
-                    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm transition">
-                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Tổng RFQ</p>
+                <!-- 4 STATS CARDS -->
+                <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                        <p class="text-xs font-black text-gray-400 uppercase tracking-wider mb-2">Tổng RFQ</p>
                         <h3 id="statTotal" class="text-3xl font-black text-kn-blue">0</h3>
                     </div>
-
-                    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm transition">
-                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Chờ xử lý</p>
-                        <h3 id="statPending" class="text-3xl font-black text-kn-orange">0</h3>
+                    <div class="bg-white rounded-xl border border-orange-200 shadow-sm p-5">
+                        <p class="text-xs font-black text-orange-500 uppercase tracking-wider mb-2">Chờ xử lý</p>
+                        <h3 id="statPending" class="text-3xl font-black text-orange-600">0</h3>
                     </div>
-
-                    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm transition">
-                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Đã báo giá</p>
+                    <div class="bg-white rounded-xl border border-green-200 shadow-sm p-5">
+                        <p class="text-xs font-black text-green-500 uppercase tracking-wider mb-2">Đã báo giá</p>
                         <h3 id="statQuoted" class="text-3xl font-black text-green-600">0</h3>
                     </div>
-
-                    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm transition">
-                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Từ chối</p>
-                        <h3 id="statRejected" class="text-3xl font-black text-red-500">0</h3>
+                    <div class="bg-white rounded-xl border border-red-200 shadow-sm p-5">
+                        <p class="text-xs font-black text-red-500 uppercase tracking-wider mb-2">Từ chối</p>
+                        <h3 id="statRejected" class="text-3xl font-black text-red-600">0</h3>
                     </div>
-
                 </section>
 
-                <!-- TOOLBAR (FILTER & SEARCH) -->
-                <section class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between relative z-20">
-                    <!-- SEARCH -->
-                    <div class="relative w-full md:w-[400px]">
-                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"/></svg>
+                <!-- BẢNG VÀ BỘ LỌC -->
+                <section class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    
+                    <!-- BỘ LỌC TÌM KIẾM -->
+                    <div class="px-6 py-4 border-b border-gray-200 flex flex-wrap justify-between items-center gap-4 bg-gray-50/50">
+                        <div>
+                            <h2 class="font-black text-gray-900">Danh sách báo giá</h2>
+                            <p class="text-xs text-gray-500 mt-1">Nhấn "Xem chi tiết" để mở RFQ.</p>
                         </div>
-                        <input id="searchInput" type="text" class="form-input pl-10 pr-4 py-2.5" placeholder="Tìm mã RFQ, công ty, SĐT...">
+                        
+                        <div class="flex flex-wrap items-center gap-3">
+                            <!-- SEARCH -->
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                </div>
+                                <input id="searchInput" type="text" placeholder="Mã RFQ, công ty, SĐT..." class="bg-white border border-gray-300 rounded-lg pl-9 pr-3 py-2 text-sm w-64 outline-none focus:border-kn-blue shadow-sm">
+                            </div>
+
+                            <!-- LỌC NGÀY -->
+                            <div class="relative" title="Lọc theo ngày gửi">
+                                <input id="dateFilter" type="date" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none focus:border-kn-blue shadow-sm cursor-pointer">
+                            </div>
+
+                            <!-- STATUS SELECT -->
+                            <select id="statusFilter" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-bold outline-none focus:border-kn-blue shadow-sm cursor-pointer">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="Chờ xử lý">Chờ xử lý</option>
+                                <option value="Đã báo giá">Đã báo giá</option>
+                                <option value="Từ chối">Từ chối</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <!-- STATUS SELECT -->
-                    <select id="statusFilter" class="form-input w-full md:w-56 cursor-pointer font-bold text-gray-700">
-                        <option value="">Tất cả trạng thái</option>
-                        <option value="Chờ xử lý">Chờ xử lý</option>
-                        <option value="Đã báo giá">Đã báo giá</option>
-                        <option value="Từ chối">Từ chối</option>
-                    </select>
-                </section>
-
-                <!-- EMPTY STATE -->
-                <div id="emptyState" class="hidden bg-white border border-gray-200 rounded-xl shadow-sm py-16 text-center">
-                    <div class="mx-auto w-16 h-16 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mb-4">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z"/></svg>
+                    <!-- EMPTY STATE -->
+                    <div id="emptyState" class="hidden py-16 text-center">
+                        <div class="mx-auto w-16 h-16 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z"/></svg>
+                        </div>
+                        <h3 class="text-base font-black text-gray-800">Không tìm thấy yêu cầu báo giá</h3>
+                        <p class="mt-1 text-sm text-gray-500">Thử thay đổi từ khóa, ngày tháng hoặc bộ lọc trạng thái.</p>
                     </div>
-                    <h3 class="text-base font-black text-gray-800">Không tìm thấy yêu cầu báo giá</h3>
-                    <p id="emptyMessage" class="mt-1 text-sm text-gray-500">Thử thay đổi từ khóa hoặc bộ lọc trạng thái phía trên.</p>
-                </div>
 
-                <!-- TABLE WRAPPER -->
-                <div id="tableWrapper" class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden relative z-10">
-                    
-                    <!-- THẺ RỖNG ĐỂ CHỐNG LỖI JS -->
-                    <div id="paginationContainer" class="hidden"></div>
-                    
-                    <div class="overflow-x-auto admin-scrollbar">
-                        <table class="w-full text-left text-sm">
+                    <!-- TABLE -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm min-w-[1050px]">
                             <thead class="bg-gray-50 border-b border-gray-200">
                                 <tr>
-                                    <th class="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wider whitespace-nowrap">Mã RFQ</th>
-                                    <th class="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wider whitespace-nowrap">Ngày gửi</th>
-                                    <th class="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wider">Công ty / Nhà máy</th>
-                                    <th class="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wider whitespace-nowrap">Người liên hệ</th>
-                                    <th class="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wider whitespace-nowrap">SĐT</th>
-                                    <th class="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wider text-center whitespace-nowrap">Vật tư</th>
-                                    <th class="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wider text-center whitespace-nowrap">Trạng thái</th>
-                                    <th class="px-6 py-4 text-xs font-black text-gray-500 uppercase tracking-wider text-right whitespace-nowrap">Thao tác</th>
+                                    <th class="p-4 text-center text-[11px] uppercase font-black text-gray-500 w-12">#</th>
+                                    <th class="p-4 text-[11px] uppercase font-black text-gray-500 whitespace-nowrap">Mã RFQ</th>
+                                    <th class="p-4 text-[11px] uppercase font-black text-gray-500 whitespace-nowrap">Ngày gửi</th>
+                                    <th class="p-4 text-[11px] uppercase font-black text-gray-500 w-[25%]">Công ty / Nhà máy</th>
+                                    <th class="p-4 text-[11px] uppercase font-black text-gray-500 w-[20%]">Người liên hệ</th>
+                                    <th class="p-4 text-[11px] uppercase font-black text-gray-500 whitespace-nowrap">SĐT</th>
+                                    <th class="p-4 text-center text-[11px] uppercase font-black text-gray-500 whitespace-nowrap">Vật tư</th>
+                                    <th class="p-4 text-center text-[11px] uppercase font-black text-gray-500 whitespace-nowrap">Trạng thái</th>
+                                    <th class="p-4 text-right text-[11px] uppercase font-black text-gray-500 whitespace-nowrap">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody id="rfqTableBody" class="divide-y divide-gray-100">
-                                <tr>
-                                    <td colspan="8" class="px-6 py-16 text-center text-gray-400 font-medium">Đang tải danh sách RFQ...</td>
-                                </tr>
+                                <tr><td colspan="9" class="p-12 text-center text-gray-400 font-medium">Đang tải danh sách RFQ...</td></tr>
                             </tbody>
                         </table>
                     </div>
-                </div>
-
-                <!-- BOTTOM PAGINATION -->
-                <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-5 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <p id="resultInfo" class="text-xs font-bold text-gray-500">0 yêu cầu</p>
                     
-                    <div class="flex items-center gap-2">
-                        <button id="btnPrev" type="button" class="px-4 py-2.5 rounded-lg border border-gray-300 text-sm font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
-                            ← Trước
-                        </button>
-                        <span id="pageInfo" class="px-3 py-2 text-sm font-bold text-kn-blue bg-blue-50 rounded-lg">1 / 1</span>
-                        <button id="btnNext" type="button" class="px-4 py-2.5 rounded-lg border border-gray-300 text-sm font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
-                            Sau →
-                        </button>
+                    <!-- PAGINATION -->
+                    <div class="bg-white border-t border-gray-200 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <p id="resultInfo" class="text-xs font-bold text-gray-500">0 yêu cầu</p>
+                        <div class="flex items-center gap-2">
+                            <button id="btnPrev" type="button" class="px-4 py-2 rounded-lg border border-gray-300 text-sm font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition">← Trước</button>
+                            <span id="pageInfo" class="px-3 py-2 text-sm font-bold text-kn-blue border border-transparent">1 / 1</span>
+                            <button id="btnNext" type="button" class="px-4 py-2 rounded-lg border border-gray-300 text-sm font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition">Sau →</button>
+                        </div>
                     </div>
-                </div>
-
+                </section>
             </div>
         </main>
     </div>

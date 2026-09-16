@@ -1,16 +1,12 @@
 // ============================================================
 // FILE: assets/js/admin/admin-dashboard.js
-// DASHBOARD TỔNG QUAN v2.2 - MRO KHANG NAM
+// DASHBOARD TỔNG QUAN v3.0 (SUPER OPTIMIZED RPC)
 // ============================================================
 
 "use strict";
 
 const DASHBOARD = {
-    chart: null,
-    // Bao thầu cả viết hoa lẫn viết thường để Supabase không bị mù
-    pendingOrderStatuses: ["pending", "Pending", "chờ xử lý", "Chờ xử lý", "chờ xác nhận", "Chờ xác nhận", "new", "New"],
-    pendingRfqStatuses: ["pending", "Pending", "chờ xử lý", "Chờ xử lý", "chờ báo giá", "Chờ báo giá"],
-    pendingContactStatuses: ["pending", "Pending", "chờ duyệt", "Chờ duyệt", "chưa đọc", "Chưa đọc"]
+    chart: null
 };
 
 const DOM = {
@@ -73,93 +69,50 @@ async function loadDashboard() {
         return;
     }
 
-    // Load song song mọi thứ để tối ưu tốc độ
+    // TỐI ƯU CỰC ĐỘ: Từ 13 requests trước đây, giờ gom lại chạy song song ĐÚNG 2 REQUEST!
     await Promise.all([
-        loadCoreKPIs(),
-        loadRevenue(), // Kéo lại Doanh thu hiển thị lên thẻ KPI trên cùng
-        loadRecentHotOrders(),
-        loadRecentHotRfqs(),
-        loadRecentContacts(),
-        loadSecondaryStats(),
+        loadMainSummary(),
         loadActivityChart()
     ]);
 }
 
 // ============================================================
-// 1. CORE KPIs (COUNT CHUẨN XÁC, KHÔNG LIMIT)
+// HÀM TRIỆU HỒI DỮ LIỆU TỔNG HỢP QUA RPC (SUPABASE)
 // ============================================================
-async function loadCoreKPIs() {
+async function loadMainSummary() {
+    const now = new Date();
+    const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
+    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59).toISOString();
+
     try {
-        const [ordersRes, rfqsRes, contactsRes] = await Promise.all([
-            window.supabaseClient.from("orders").select("id", { count: "exact", head: true }).in("status", DASHBOARD.pendingOrderStatuses),
-            window.supabaseClient.from("rfqs").select("id", { count: "exact", head: true }).in("status", DASHBOARD.pendingRfqStatuses),
-            window.supabaseClient.from("contacts").select("id", { count: "exact", head: true }).in("status", DASHBOARD.pendingContactStatuses)
-        ]);
+        // GỌI ĐÚNG 1 LẦN DUY NHẤT TRÊN SERVER
+        const { data, error } = await window.supabaseClient.rpc('get_admin_dashboard_summary', {
+            this_month_start: startOfThisMonth,
+            last_month_start: startOfLastMonth,
+            last_month_end: endOfLastMonth
+        });
 
-        const pendingOrdersCount = ordersRes.count || 0;
-        const pendingRfqsCount = rfqsRes.count || 0;
-        const pendingContactsCount = contactsRes.count || 0;
+        if (error) throw error;
 
-        // Cập nhật thẻ KPI chính
-        setText(DOM.kpiOrdersPending, pendingOrdersCount);
-        setText(DOM.kpiRfqPending, pendingRfqsCount);
-        setText(DOM.kpiContactPending, pendingContactsCount);
-
-        // Cập nhật khu vực CẦN XỬ LÝ NGAY
-        setText(DOM.hqOrders, pendingOrdersCount);
-        setText(DOM.hqRfqs, pendingRfqsCount);
-        setText(DOM.hqContacts, pendingContactsCount);
-
-    } catch (error) {
-        console.error("Lỗi tải KPI cốt lõi:", error);
-        setText(DOM.kpiOrdersPending, "--");
-        setText(DOM.kpiRfqPending, "--");
-        setText(DOM.kpiContactPending, "--");
-    }
-}
-
-// ============================================================
-// 2. DOANH THU & TĂNG TRƯỞNG (CHỈ HIỆN Ở THẺ KPI)
-// ============================================================
-async function loadRevenue() {
-    try {
-        const now = new Date();
-        const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-        const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
-        const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59).toISOString();
-
-        // Query đơn hàng tháng này (Bỏ qua Đã hủy)
-        const currentMonthQuery = window.supabaseClient.from("orders")
-            .select("total")
-            .gte("created_at", startOfThisMonth)
-            .not("status", "in", '("cancelled","canceled","đã hủy","hủy")');
-
-        // Query đơn hàng tháng trước (Bỏ qua Đã hủy)
-        const lastMonthQuery = window.supabaseClient.from("orders")
-            .select("total")
-            .gte("created_at", startOfLastMonth)
-            .lte("created_at", endOfLastMonth)
-            .not("status", "in", '("cancelled","canceled","đã hủy","hủy")');
-
-        const [currRes, lastRes] = await Promise.all([currentMonthQuery, lastMonthQuery]);
+        // 1. CẬP NHẬT CÁC CON SỐ KPI & CẦN XỬ LÝ
+        setText(DOM.kpiOrdersPending, data.pending_orders);
+        setText(DOM.kpiRfqPending, data.pending_rfqs);
+        setText(DOM.kpiContactPending, data.pending_contacts);
         
-        if (currRes.error) throw currRes.error;
-        if (lastRes.error) throw lastRes.error;
+        setText(DOM.hqOrders, data.pending_orders);
+        setText(DOM.hqRfqs, data.pending_rfqs);
+        setText(DOM.hqContacts, data.pending_contacts);
 
-        const currentRevenue = (currRes.data || []).reduce((sum, order) => sum + (Number(order.total) || 0), 0);
-        const lastRevenue = (lastRes.data || []).reduce((sum, order) => sum + (Number(order.total) || 0), 0);
-
-        // Render Doanh thu
+        // 2. CẬP NHẬT DOANH THU & TĂNG TRƯỞNG
         if (DOM.kpiRevenue) {
-            DOM.kpiRevenue.textContent = new Intl.NumberFormat("vi-VN").format(currentRevenue) + " ₫";
+            DOM.kpiRevenue.textContent = new Intl.NumberFormat("vi-VN").format(data.current_revenue) + " ₫";
         }
-
-        // Render Tăng trưởng
         if (DOM.kpiRevenueGrowth) {
-            if (lastRevenue === 0) {
+            if (data.last_revenue === 0) {
                 DOM.kpiRevenueGrowth.innerHTML = `<span class="text-gray-400">Không có dữ liệu tháng trước</span>`;
             } else {
-                const growth = ((currentRevenue - lastRevenue) / lastRevenue) * 100;
+                const growth = ((data.current_revenue - data.last_revenue) / data.last_revenue) * 100;
                 if (growth >= 0) {
                     DOM.kpiRevenueGrowth.innerHTML = `↑ ${growth.toFixed(1)}% <span class="text-gray-400 font-normal">so với tháng trước</span>`;
                     DOM.kpiRevenueGrowth.className = "text-xs font-bold text-green-500 mt-1.5 flex items-center gap-1 relative z-10";
@@ -169,27 +122,14 @@ async function loadRevenue() {
                 }
             }
         }
-    } catch (error) {
-        console.error("Lỗi tính doanh thu:", error);
-        if(DOM.kpiRevenue) DOM.kpiRevenue.textContent = "--";
-        if(DOM.kpiRevenueGrowth) DOM.kpiRevenueGrowth.innerHTML = "Không thể tải số liệu";
-    }
-}
 
-// ============================================================
-// 3. DANH SÁCH HOT (CHỈ LẤY PENDING)
-// ============================================================
-async function loadRecentHotOrders() {
-    try {
-        const { data, error } = await window.supabaseClient.from("orders")
-            .select("id, order_code, shipping_name, created_at, status")
-            .in("status", DASHBOARD.pendingOrderStatuses)
-            .order("created_at", { ascending: false })
-            .limit(5);
+        // 3. CẬP NHẬT THỐNG KÊ PHỤ
+        setText(DOM.statUsers, data.total_users);
+        setText(DOM.statProducts, data.total_products);
+        setText(DOM.statBlogs, data.total_blogs);
 
-        if (error) throw error;
-
-        renderHotList(DOM.hotOrdersBody, data, "Chưa có đơn hàng nào chờ xử lý.", (item) => {
+        // 4. VẼ 3 BẢNG LIST HOT (CHỜ XỬ LÝ)
+        renderHotList(DOM.hotOrdersBody, data.hot_orders, "Chưa có đơn hàng nào chờ xử lý.", (item) => {
             return `
                 <tr class="hover:bg-blue-50/50 transition border-b border-gray-50 last:border-0">
                     <td class="px-5 py-3">
@@ -203,22 +143,8 @@ async function loadRecentHotOrders() {
                 </tr>
             `;
         });
-    } catch (error) {
-        renderError(DOM.hotOrdersBody, 3, "Lỗi tải đơn hàng mới.");
-    }
-}
 
-async function loadRecentHotRfqs() {
-    try {
-        const { data, error } = await window.supabaseClient.from("rfqs")
-            .select("id, rfq_code, company_name, created_at, status")
-            .in("status", DASHBOARD.pendingRfqStatuses)
-            .order("created_at", { ascending: false })
-            .limit(5);
-
-        if (error) throw error;
-
-        renderHotList(DOM.hotRfqBody, data, "Chưa có RFQ nào chờ báo giá.", (item) => {
+        renderHotList(DOM.hotRfqBody, data.hot_rfqs, "Chưa có RFQ nào chờ báo giá.", (item) => {
             return `
                 <tr class="hover:bg-orange-50/50 transition border-b border-gray-50 last:border-0">
                     <td class="px-5 py-3">
@@ -232,22 +158,8 @@ async function loadRecentHotRfqs() {
                 </tr>
             `;
         });
-    } catch (error) {
-        renderError(DOM.hotRfqBody, 3, "Lỗi tải RFQ mới.");
-    }
-}
 
-async function loadRecentContacts() {
-    try {
-        const { data, error } = await window.supabaseClient.from("contacts")
-            .select("*")
-            .in("status", DASHBOARD.pendingContactStatuses)
-            .order("created_at", { ascending: false })
-            .limit(5);
-
-        if (error) throw error;
-
-        renderHotList(DOM.hotContactsBody, data, "Chưa có liên hệ nào chờ phản hồi.", (item) => {
+        renderHotList(DOM.hotContactsBody, data.hot_contacts, "Chưa có liên hệ nào chờ phản hồi.", (item) => {
             const name = item.name || item.full_name || item.contact_name || "Khách hàng";
             return `
                 <tr class="hover:bg-red-50/50 transition border-b border-gray-50 last:border-0">
@@ -260,13 +172,22 @@ async function loadRecentContacts() {
                 </tr>
             `;
         });
+
     } catch (error) {
-        renderError(DOM.hotContactsBody, 4, "Lỗi tải liên hệ mới.");
+        console.error("Lỗi tải Dashboard Summary:", error);
+        setText(DOM.kpiOrdersPending, "--");
+        setText(DOM.kpiRfqPending, "--");
+        setText(DOM.kpiContactPending, "--");
+        if(DOM.kpiRevenue) DOM.kpiRevenue.textContent = "--";
+        if(DOM.kpiRevenueGrowth) DOM.kpiRevenueGrowth.innerHTML = "Lỗi kết nối";
+        renderError(DOM.hotOrdersBody, 3, "Lỗi tải dữ liệu.");
+        renderError(DOM.hotRfqBody, 3, "Lỗi tải dữ liệu.");
+        renderError(DOM.hotContactsBody, 4, "Lỗi tải dữ liệu.");
     }
 }
 
 // ============================================================
-// 4. BIỂU ĐỒ (CHỈ HIỂN THỊ SỐ LƯỢNG ĐƠN & BÁO GIÁ)
+// 4. BIỂU ĐỒ (DỮ LIỆU ĐỘC LẬP - 2 REQUESTS)
 // ============================================================
 async function loadActivityChart() {
     if (!DOM.activityChart) return;
@@ -290,7 +211,7 @@ async function loadActivityChart() {
         const endMonthDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0, 23, 59, 59);
         const endDate = endMonthDate.toISOString();
 
-        // Kéo số liệu Đơn hàng & Báo giá
+        // Kéo số liệu Đơn hàng & Báo giá cho biểu đồ
         const [orderResult, rfqResult] = await Promise.all([
             window.supabaseClient.from("orders").select("created_at").gte("created_at", startDate).lte("created_at", endDate),
             window.supabaseClient.from("rfqs").select("created_at").gte("created_at", startDate).lte("created_at", endDate)
@@ -363,28 +284,7 @@ async function loadActivityChart() {
 }
 
 // ============================================================
-// 5. THỐNG KÊ PHỤ (SECONDARY STATS)
-// ============================================================
-async function loadSecondaryStats() {
-    try {
-        const [usersRes, productsRes, blogsRes] = await Promise.all([
-            window.supabaseClient.from("profiles").select("id", { count: "exact", head: true }),
-            window.supabaseClient.from("products").select("id", { count: "exact", head: true }),
-            window.supabaseClient.from("blogs").select("id", { count: "exact", head: true })
-        ]);
-
-        setText(DOM.statUsers, usersRes.count || "--");
-        setText(DOM.statProducts, productsRes.count || "--");
-        setText(DOM.statBlogs, blogsRes.count || "--");
-    } catch (error) {
-        setText(DOM.statUsers, "--");
-        setText(DOM.statProducts, "--");
-        setText(DOM.statBlogs, "--");
-    }
-}
-
-// ============================================================
-// HELPERS
+// CÁC HÀM TIỆN ÍCH (HELPERS)
 // ============================================================
 function renderHotList(tbody, data, emptyMessage, mapFn) {
     if (!tbody) return;
