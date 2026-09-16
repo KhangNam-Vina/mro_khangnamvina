@@ -126,6 +126,7 @@ async function findProductIdsBySearch(searchText) {
         } = await window.supabaseClient
             .from('products')
             .select('id')
+            .eq('is_active', true)
             .or(orCondition);
 
         if (productError) {
@@ -586,8 +587,8 @@ const familySlug =
                     {
                         count: 'exact'
                     }
-                );
-
+                )
+                .eq('is_active', true);
         // ==================================================
         // FAMILY SLUG → FAMILY ID
         // ==================================================
@@ -1905,7 +1906,8 @@ const familySlug =
                 .from('products')
                 .select(
                     'sub_category_id, brands(id, name)'
-                );
+                )
+                .eq('is_active', true);
 
 
         if (resolvedSidebarFamilyId) {

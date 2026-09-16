@@ -27,6 +27,7 @@ async function initBrandsPage() {
         const { data, error } = await window.supabaseClient
             .from('brands')
             .select('id, name, products(id)')
+            .eq('is_active', true)
             .order('name', { ascending: true });
 
         if (error) throw error;

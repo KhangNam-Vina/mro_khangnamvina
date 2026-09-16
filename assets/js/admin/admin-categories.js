@@ -1,1978 +1,350 @@
-/* =========================================================
-   ADMIN CATEGORIES
-   QUẢN LÝ DANH MỤC
+// ========================================================
+// FILE: assets/js/admin/admin-categories.js
+// QUẢN LÝ DANH MỤC (PHÂN TRANG + ẨN/HIỆN STATUS)
+// ========================================================
 
-   - Load
-   - Search
-   - Filter
-   - Create
-   - Update
-   - Toggle Active
-   - Delete protection
-   - Auto slug
-   - Toast
-========================================================= */
-
-
-let allCategories = [];
-
-
-/* =========================================================
-   DOM
-========================================================= */
-
-const DOM = {
-    tableBody: document.getElementById("categoryTableBody"),
-
-    searchInput:
-        document.getElementById("searchCategoryInput"),
-
-    filterStatus:
-        document.getElementById("filterStatusSelect"),
-
-    modal:
-        document.getElementById("categoryModal"),
-
-    modalTitle:
-        document.getElementById("modalTitle"),
-
-    form:
-        document.getElementById("categoryForm"),
-
-    id:
-        document.getElementById("categoryId"),
-
-    name:
-        document.getElementById("categoryName"),
-
-    slug:
-        document.getElementById("categorySlug"),
-
-    icon:
-        document.getElementById("categoryIcon"),
-
-    description:
-        document.getElementById("categoryDescription"),
-
-    metaTitle:
-        document.getElementById("categoryMetaTitle"),
-
-    metaDescription:
-        document.getElementById("categoryMetaDescription"),
-
-    isActive:
-        document.getElementById("categoryIsActive"),
-
-    submit:
-        document.getElementById("btnSubmitForm"),
-
-    add:
-        document.getElementById("btnAddCategory"),
-
-    close:
-        document.getElementById("btnCloseModal"),
-
-    cancel:
-        document.getElementById("btnCancelModal"),
-
-    total:
-        document.getElementById("categoryTotal"),
-
-    active:
-        document.getElementById("categoryActive"),
-
-    hidden:
-        document.getElementById("categoryHidden"),
-
-    resultInfo:
-        document.getElementById("categoryResultInfo"),
-
-    toast:
-        document.getElementById("toastContainer")
+const state = {
+    categories: [],
+    filteredCategories: [],
+    editingId: null,
+    isSaving: false,
+    currentPage: 1,
+    itemsPerPage: 15,
+    filterStatus: 'all' // 'all' | 'active' | 'hidden'
 };
 
+const DOM = {
+    toastContainer: document.getElementById("toastContainer"),
+    search: document.getElementById("searchCategoryInput"),
+    filterStatus: document.getElementById("filterStatusSelect"),
+    tableBody: document.getElementById("categoryTableBody"),
+    categoryTotal: document.getElementById("categoryTotal"),
+    categoryActive: document.getElementById("categoryActive"),
+    categoryHidden: document.getElementById("categoryHidden"),
+    resultInfo: document.getElementById("categoryResultInfo"),
+    pagination: document.getElementById("paginationContainer"),
+    modal: document.getElementById("categoryModal"),
+    modalTitle: document.getElementById("modalTitle"),
+    form: document.getElementById("categoryForm"),
+    id: document.getElementById("categoryId"),
+    name: document.getElementById("categoryName"),
+    slug: document.getElementById("categorySlug"),
+    description: document.getElementById("categoryDescription"),
+    isActive: document.getElementById("categoryIsActive"),
+    metaTitle: document.getElementById("categoryMetaTitle"),
+    metaDescription: document.getElementById("categoryMetaDescription"),
+    btnSave: document.getElementById("btnSubmitForm"),
+    btnAdd: document.getElementById("btnAddCategory"),
+    btnClose: document.getElementById("btnCloseModal"),
+    btnCancel: document.getElementById("btnCancelModal")
+};
 
-/* =========================================================
-   ESCAPE HTML
-========================================================= */
-
-function escapeHTML(value) {
-
-    if (
-        value === null ||
-        value === undefined
-    ) {
-        return "";
+const utils = {
+    escapeHTML(val) {
+        if (!val) return "";
+        return String(val).replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
+    },
+    showToast(message, type = "success") {
+        if (!DOM.toastContainer) return;
+        const config = { success: { bg: "bg-green-600", icon: "✓" }, error: { bg: "bg-red-600", icon: "×" }, warning: { bg: "bg-orange-500", icon: "!" } };
+        const style = config[type] || config.success;
+        const toast = document.createElement("div");
+        toast.className = `flex items-center gap-2 px-4 py-3 rounded-xl shadow-xl text-sm font-bold text-white ${style.bg} opacity-0 translate-y-2 transition-all duration-300`;
+        toast.innerHTML = `<span class="font-black text-base">${style.icon}</span><span>${utils.escapeHTML(message)}</span>`;
+        DOM.toastContainer.appendChild(toast);
+        requestAnimationFrame(() => toast.classList.remove("opacity-0", "translate-y-2"));
+        setTimeout(() => { toast.classList.add("opacity-0", "translate-y-2"); setTimeout(() => toast.remove(), 300); }, 3500);
     }
+};
 
-    return String(value).replace(
-        /[&<>'"]/g,
-        character => ({
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            "'": "&#39;",
-            '"': "&quot;"
-        })[character]
-    );
-}
-
-
-/* =========================================================
-   ESCAPE ATTRIBUTE
-========================================================= */
-
-function escapeAttribute(value) {
-
-    return escapeHTML(value)
-        .replace(/`/g, "&#96;");
-}
-
-
-/* =========================================================
-   SLUG
-========================================================= */
-
-function generateSlug(text) {
-
-    return String(text || "")
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/đ/g, "d")
-        .replace(/[^a-z0-9\s-]/g, "")
-        .trim()
-        .replace(/\s+/g, "-")
-        .replace(/-+/g, "-");
-}
-
-
-/* =========================================================
-   LOAD CATEGORIES
-========================================================= */
-
+// ========================================================
+// 1. TẢI DỮ LIỆU TỪ SUPABASE
+// ========================================================
 async function loadCategories() {
-
-    if (!DOM.tableBody) {
-        return;
-    }
-
-    DOM.tableBody.innerHTML = `
-        <tr>
-            <td
-                colspan="6"
-                class="
-                    text-center
-                    py-12
-                    text-gray-400
-                "
-            >
-                <div
-                    class="
-                        inline-block
-                        w-6
-                        h-6
-                        border-2
-                        border-kn-blue
-                        border-t-transparent
-                        rounded-full
-                        animate-spin
-                        mb-2
-                    "
-                ></div>
-
-                <div>
-                    Đang tải danh mục...
-                </div>
-            </td>
-        </tr>
-    `;
-
-
     try {
-
-        const {
-            data,
-            error
-        } = await window.supabaseClient
-            .from("categories")
-            .select("*")
-            .order("id", {
-                ascending: true
-            });
-
-
-        if (error) {
-            throw error;
-        }
-
-
-        allCategories =
-            Array.isArray(data)
-                ? data
-                : [];
-
-
-        updateStatistics();
-
-        applyFilters();
-
-
+        const { data, error } = await window.supabaseClient.from("categories").select("*").order("id", { ascending: true });
+        if (error) throw error;
+        state.categories = data || [];
+        renderSummary();
+        applySearchAndFilter();
     } catch (error) {
+        utils.showToast(`Lỗi tải danh mục: ${error.message}`, "error");
+        DOM.tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-12 text-red-500 font-bold">Lỗi tải dữ liệu.</td></tr>`;
+    }
+}
 
-        console.error(
-            "Lỗi tải danh mục:",
-            error
-        );
+// Cập nhật thẻ tóm tắt (Summary)
+function renderSummary() {
+    if (!DOM.categoryTotal) return;
+    const total = state.categories.length;
+    const active = state.categories.filter(c => c.is_active !== false).length;
+    const hidden = total - active;
+    
+    DOM.categoryTotal.textContent = total;
+    DOM.categoryActive.textContent = active;
+    DOM.categoryHidden.textContent = hidden;
+}
 
+// ========================================================
+// 2. LỌC & TÌM KIẾM
+// ========================================================
+function applySearchAndFilter() {
+    const keyword = DOM.search?.value.trim().toLowerCase() || "";
+    const status = state.filterStatus;
 
-        DOM.tableBody.innerHTML = `
-            <tr>
-                <td
-                    colspan="6"
-                    class="
-                        text-center
-                        py-12
-                        text-red-500
-                        font-bold
-                    "
-                >
-                    Không thể tải danh mục.
+    let result = state.categories.filter(cat => {
+        // Lọc theo keyword (Tên hoặc Slug)
+        const matchKeyword = !keyword || (cat.name?.toLowerCase().includes(keyword) || cat.slug?.toLowerCase().includes(keyword));
+        
+        // Lọc theo trạng thái
+        let matchStatus = true;
+        if (status === "active") matchStatus = cat.is_active !== false;
+        if (status === "hidden") matchStatus = cat.is_active === false;
 
-                    <div
-                        class="
-                            text-xs
-                            font-normal
-                            text-red-400
-                            mt-1
-                        "
-                    >
-                        ${escapeHTML(error.message)}
+        return matchKeyword && matchStatus;
+    });
+
+    state.filteredCategories = result;
+    state.currentPage = 1; // Reset trang về 1 khi lọc
+    renderTable();
+}
+
+// ========================================================
+// 3. XUẤT BẢNG VÀ PHÂN TRANG
+// ========================================================
+function renderTable() {
+    if (!DOM.tableBody) return;
+    DOM.tableBody.innerHTML = "";
+
+    const total = state.filteredCategories.length;
+    if (DOM.resultInfo) DOM.resultInfo.innerHTML = `Hiển thị <strong>${total}</strong> danh mục phù hợp`;
+
+    if (total === 0) {
+        DOM.tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-gray-500 font-medium bg-gray-50/50">Không tìm thấy danh mục nào phù hợp.</td></tr>`;
+        DOM.pagination.innerHTML = "";
+        return;
+    }
+
+    const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+    const endIndex = startIndex + state.itemsPerPage;
+    const paginatedData = state.filteredCategories.slice(startIndex, endIndex);
+
+    let html = '';
+    paginatedData.forEach((cat, index) => {
+        const stt = startIndex + index + 1;
+        const isChecked = cat.is_active !== false ? "checked" : "";
+
+        html += `
+            <tr class="hover:bg-gray-50/80 transition border-b border-gray-100 last:border-0">
+                <!-- STT -->
+                <td class="px-4 py-3.5 text-center text-sm font-bold text-gray-600 border-r border-gray-50 w-16">${stt}</td>
+                <!-- ID -->
+                <td class="px-4 py-3.5 text-center text-sm font-mono text-gray-400 w-24">#${cat.id}</td>
+                <!-- TÊN DANH MỤC -->
+                <td class="px-4 py-3.5 text-left"><span class="font-black text-gray-900 text-base">${utils.escapeHTML(cat.name)}</span></td>
+                <!-- SLUG -->
+                <td class="px-4 py-3.5 text-left text-sm text-gray-500 font-mono">${utils.escapeHTML(cat.slug)}</td>
+                
+                <!-- TRẠNG THÁI GẠT -->
+                <td class="px-4 py-3.5 text-center w-36">
+                    <label class="relative inline-flex items-center cursor-pointer" title="${cat.is_active !== false ? 'Đang hiển thị' : 'Đang ẩn'}">
+                        <input type="checkbox" onchange="toggleCategoryStatus(${cat.id}, ${cat.is_active})" class="sr-only peer" ${isChecked}>
+                        <div class="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500 shadow-inner"></div>
+                    </label>
+                </td>
+
+                <!-- THAO TÁC -->
+                <td class="px-4 py-3.5 text-right w-40">
+                    <div class="flex justify-end items-center gap-1">
+                        <button type="button" onclick="editCategory(${cat.id})" class="px-3 py-2 rounded-lg text-xs font-bold text-kn-blue hover:bg-blue-50 transition">Sửa</button>
+                        <button type="button" onclick="deleteCategory(${cat.id})" class="px-3 py-2 rounded-lg text-xs font-bold text-red-600 hover:bg-red-50 transition">Xóa</button>
                     </div>
                 </td>
             </tr>
         `;
-
-    }
-
+    });
+    DOM.tableBody.innerHTML = html;
+    renderPagination(total);
 }
 
+function renderPagination(totalItems) {
+    if (!DOM.pagination) return;
+    const totalPages = Math.ceil(totalItems / state.itemsPerPage);
+    if (totalPages <= 1) { DOM.pagination.innerHTML = ""; return; }
 
-/* =========================================================
-   STATISTICS
-========================================================= */
+    let pagesHTML = ''; const maxVisible = 5;
+    let startPage = Math.max(1, state.currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+    if (endPage - startPage + 1 < maxVisible) startPage = Math.max(1, endPage - maxVisible + 1);
 
-function updateStatistics() {
-
-    const total =
-        allCategories.length;
-
-
-    const active =
-        allCategories.filter(
-            category =>
-                category.is_active !== false
-        ).length;
-
-
-    const hidden =
-        total - active;
-
-
-    if (DOM.total) {
-
-        DOM.total.textContent =
-            total;
-
+    for (let page = startPage; page <= endPage; page++) {
+        pagesHTML += `<button type="button" onclick="changePage(${page})" class="px-2.5 py-1.5 rounded-lg text-xs font-bold border ${page === state.currentPage ? 'bg-kn-blue text-white border-kn-blue' : 'text-gray-600 border-gray-200 hover:bg-gray-100'}">${page}</button>`;
     }
 
-
-    if (DOM.active) {
-
-        DOM.active.textContent =
-            active;
-
-    }
-
-
-    if (DOM.hidden) {
-
-        DOM.hidden.textContent =
-            hidden;
-
-    }
-
-}
-
-
-/* =========================================================
-   FILTER
-========================================================= */
-
-function applyFilters() {
-
-    const keyword =
-        DOM.searchInput
-            ?.value
-            ?.trim()
-            ?.toLowerCase() || "";
-
-
-    const status =
-        DOM.filterStatus?.value || "all";
-
-
-    const filtered =
-        allCategories.filter(
-            category => {
-
-                const name =
-                    String(
-                        category.name || ""
-                    ).toLowerCase();
-
-
-                const slug =
-                    String(
-                        category.slug || ""
-                    ).toLowerCase();
-
-
-                const matchesKeyword =
-                    !keyword ||
-                    name.includes(keyword) ||
-                    slug.includes(keyword);
-
-
-                const isActive =
-                    category.is_active !== false;
-
-
-                const matchesStatus =
-                    status === "all" ||
-                    (
-                        status === "active" &&
-                        isActive
-                    ) ||
-                    (
-                        status === "hidden" &&
-                        !isActive
-                    );
-
-
-                return (
-                    matchesKeyword &&
-                    matchesStatus
-                );
-
-            }
-        );
-
-
-    renderCategoryTable(
-        filtered
-    );
-
-}
-
-
-/* =========================================================
-   RENDER TABLE
-========================================================= */
-
-function renderCategoryTable(
-    categories
-) {
-
-    if (!DOM.tableBody) {
-        return;
-    }
-
-
-    if (!categories.length) {
-
-        DOM.tableBody.innerHTML = `
-            <tr>
-
-                <td
-                    colspan="6"
-                    class="
-                        text-center
-                        py-14
-                        text-gray-400
-                    "
-                >
-
-                    <div
-                        class="
-                            w-12
-                            h-12
-                            rounded-full
-                            bg-gray-100
-                            flex
-                            items-center
-                            justify-center
-                            mx-auto
-                            mb-3
-                        "
-                    >
-
-                        <svg
-                            class="w-6 h-6 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.7"
-                                d="M20 13V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7m16 0v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5m16 0H4"
-                            />
-                        </svg>
-
-                    </div>
-
-
-                    <div
-                        class="
-                            font-bold
-                            text-gray-500
-                        "
-                    >
-                        Không tìm thấy danh mục
-                    </div>
-
-
-                    <div
-                        class="
-                            text-xs
-                            mt-1
-                        "
-                    >
-                        Thử thay đổi từ khóa hoặc bộ lọc.
-                    </div>
-
-                </td>
-
-            </tr>
-        `;
-
-
-        updateResultInfo(
-            0
-        );
-
-
-        return;
-    }
-
-
-    let html = "";
-
-
-    categories.forEach(
-        category => {
-
-            const isActive =
-                category.is_active !== false;
-
-
-            const icon =
-                renderIcon(
-                    category.icon_url,
-                    category.name
-                );
-
-
-            const status =
-                isActive
-
-                    ? `
-                        <span
-                            class="
-                                inline-flex
-                                items-center
-                                gap-1.5
-                                px-2.5
-                                py-1
-                                rounded-full
-                                text-[11px]
-                                font-bold
-                                bg-green-50
-                                text-green-700
-                                border
-                                border-green-100
-                            "
-                        >
-                            <span
-                                class="
-                                    w-1.5
-                                    h-1.5
-                                    rounded-full
-                                    bg-green-500
-                                "
-                            ></span>
-
-                            Đang hiển thị
-                        </span>
-                    `
-
-                    : `
-                        <span
-                            class="
-                                inline-flex
-                                items-center
-                                gap-1.5
-                                px-2.5
-                                py-1
-                                rounded-full
-                                text-[11px]
-                                font-bold
-                                bg-gray-100
-                                text-gray-500
-                                border
-                                border-gray-200
-                            "
-                        >
-                            <span
-                                class="
-                                    w-1.5
-                                    h-1.5
-                                    rounded-full
-                                    bg-gray-400
-                                "
-                            ></span>
-
-                            Đang ẩn
-                        </span>
-                    `;
-
-
-            const toggleLabel =
-                isActive
-                    ? "Ẩn"
-                    : "Hiện";
-
-
-            const toggleIcon =
-                isActive
-
-                    ? `
-                        <svg
-                            class="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M3 3l18 18M10.58 10.58A2 2 0 0013.4 13.4M9.88 5.09A9.94 9.94 0 0112 4c5 0 9.27 3.11 11 8a17.8 17.8 0 01-2.02 3.68M6.61 6.61C4.8 8.02 3.36 9.9 2.5 12c1.73 4.89 6 8 9.5 8 1.15 0 2.27-.2 3.3-.57"
-                            />
-                        </svg>
-                    `
-
-                    : `
-                        <svg
-                            class="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M2.46 12C3.73 7.94 7.5 5 12 5s8.27 2.94 9.54 7c-1.27 4.06-5.04 7-9.54 7s-8.27-2.94-9.54-7z"
-                            />
-                            <circle
-                                cx="12"
-                                cy="12"
-                                r="3"
-                            />
-                        </svg>
-                    `;
-
-
-            html += `
-
-                <tr
-                    class="
-                        group
-                        hover:bg-blue-50/40
-                        transition-colors
-                    "
-                >
-
-                    <!-- ID -->
-
-                    <td
-                        class="
-                            px-4
-                            py-4
-                            text-center
-                            text-xs
-                            font-mono
-                            font-bold
-                            text-gray-400
-                        "
-                    >
-                        #${category.id}
-                    </td>
-
-
-                    <!-- ICON -->
-
-                    <td
-                        class="
-                            px-4
-                            py-4
-                            text-center
-                        "
-                    >
-                        ${icon}
-                    </td>
-
-
-                    <!-- NAME -->
-
-                    <td
-                        class="
-                            px-4
-                            py-4
-                        "
-                    >
-
-                        <div
-                            class="
-                                font-bold
-                                text-gray-900
-                            "
-                        >
-                            ${escapeHTML(category.name)}
-                        </div>
-
-                        ${
-                            category.description
-                                ? `
-                                    <div
-                                        class="
-                                            text-xs
-                                            text-gray-400
-                                            mt-1
-                                            max-w-md
-                                            truncate
-                                        "
-                                    >
-                                        ${escapeHTML(
-                                            category.description
-                                        )}
-                                    </div>
-                                `
-                                : ""
-                        }
-
-                    </td>
-
-
-                    <!-- SLUG -->
-
-                    <td
-                        class="
-                            px-4
-                            py-4
-                        "
-                    >
-
-                        <span
-                            class="
-                                inline-block
-                                px-2.5
-                                py-1
-                                rounded-md
-                                bg-gray-50
-                                border
-                                border-gray-200
-                                text-xs
-                                font-mono
-                                text-gray-500
-                            "
-                        >
-                            ${escapeHTML(
-                                category.slug || "--"
-                            )}
-                        </span>
-
-                    </td>
-
-
-                    <!-- STATUS -->
-
-                    <td
-                        class="
-                            px-4
-                            py-4
-                            text-center
-                        "
-                    >
-                        ${status}
-                    </td>
-
-
-                    <!-- ACTION -->
-
-                    <td
-                        class="
-                            px-4
-                            py-4
-                        "
-                    >
-
-                        <div
-                            class="
-                                flex
-                                justify-end
-                                items-center
-                                gap-1
-                            "
-                        >
-
-                            <!-- TOGGLE -->
-
-                            <button
-                                type="button"
-                                data-action="toggle"
-                                data-id="${category.id}"
-                                class="
-                                    p-2
-                                    rounded-lg
-                                    text-gray-500
-                                    hover:text-kn-blue
-                                    hover:bg-blue-50
-                                    transition
-                                "
-                                title="${toggleLabel} danh mục"
-                            >
-                                ${toggleIcon}
-                            </button>
-
-
-                            <!-- EDIT -->
-
-                            <button
-                                type="button"
-                                data-action="edit"
-                                data-id="${category.id}"
-                                class="
-                                    p-2
-                                    rounded-lg
-                                    text-blue-600
-                                    hover:bg-blue-50
-                                    transition
-                                "
-                                title="Chỉnh sửa"
-                            >
-
-                                <svg
-                                    class="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652l-9.193 9.193a4.5 4.5 0 01-1.897 1.13l-2.052.616.616-2.052a4.5 4.5 0 011.13-1.897l9.193-9.193z"
-                                    />
-                                </svg>
-
-                            </button>
-
-
-                            <!-- DELETE -->
-
-                            <button
-                                type="button"
-                                data-action="delete"
-                                data-id="${category.id}"
-                                class="
-                                    p-2
-                                    rounded-lg
-                                    text-red-500
-                                    hover:bg-red-50
-                                    transition
-                                "
-                                title="Xóa"
-                            >
-
-                                <svg
-                                    class="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4V4a1 1 0 011-1h4a1 1 0 011 1v3m5 0H4"
-                                    />
-                                </svg>
-
-                            </button>
-
-                        </div>
-
-                    </td>
-
-                </tr>
-            `;
-
-        }
-    );
-
-
-    DOM.tableBody.innerHTML =
-        html;
-
-
-    updateResultInfo(
-        categories.length
-    );
-
-}
-
-
-/* =========================================================
-   ICON
-========================================================= */
-
-function renderIcon(
-    iconUrl,
-    name
-) {
-
-    if (!iconUrl) {
-
-        return `
-            <div
-                class="
-                    w-10
-                    h-10
-                    mx-auto
-                    rounded-lg
-                    bg-gray-100
-                    border
-                    border-gray-200
-                    flex
-                    items-center
-                    justify-center
-                    text-gray-400
-                "
-            >
-
-                <span class="text-sm font-black">
-                    ${escapeHTML(
-                        String(name || "?")
-                            .trim()
-                            .charAt(0)
-                            .toUpperCase()
-                    )}
-                </span>
-
-            </div>
-        `;
-
-    }
-
-
-    if (
-        typeof iconUrl === "string" &&
-        /^https?:\/\//i.test(
-            iconUrl
-        )
-    ) {
-
-        return `
-            <div
-                class="
-                    w-10
-                    h-10
-                    mx-auto
-                    rounded-lg
-                    bg-gray-50
-                    border
-                    border-gray-200
-                    flex
-                    items-center
-                    justify-center
-                    overflow-hidden
-                "
-            >
-
-                <img
-                    src="${escapeAttribute(iconUrl)}"
-                    alt="${escapeAttribute(name || "Icon")}"
-                    class="
-                        w-8
-                        h-8
-                        object-contain
-                    "
-                    loading="lazy"
-                    onerror="
-                        this.style.display='none';
-                        this.nextElementSibling.classList.remove('hidden');
-                    "
-                >
-
-                <span
-                    class="
-                        hidden
-                        text-gray-400
-                        text-xs
-                        font-bold
-                    "
-                >
-                    IMG
-                </span>
-
-            </div>
-        `;
-
-    }
-
-
-    return `
-        <div
-            class="
-                w-10
-                h-10
-                mx-auto
-                rounded-lg
-                bg-blue-50
-                border
-                border-blue-100
-                flex
-                items-center
-                justify-center
-                text-lg
-            "
-        >
-            ${escapeHTML(iconUrl)}
-        </div>
+    DOM.pagination.innerHTML = `
+        <button type="button" onclick="changePage(${state.currentPage - 1})" ${state.currentPage === 1 ? 'disabled' : ''} class="px-2.5 py-1.5 rounded-lg text-xs font-bold border ${state.currentPage === 1 ? 'text-gray-300 border-gray-100 cursor-not-allowed' : 'text-gray-600 border-gray-200 hover:bg-gray-100'}">←</button>
+        ${pagesHTML}
+        <button type="button" onclick="changePage(${state.currentPage + 1})" ${state.currentPage === totalPages ? 'disabled' : ''} class="px-2.5 py-1.5 rounded-lg text-xs font-bold border ${state.currentPage === totalPages ? 'text-gray-300 border-gray-100 cursor-not-allowed' : 'text-gray-600 border-gray-200 hover:bg-gray-100'}">→</button>
     `;
-
 }
 
-
-/* =========================================================
-   RESULT INFO
-========================================================= */
-
-function updateResultInfo(
-    count
-) {
-
-    if (!DOM.resultInfo) {
-        return;
+window.changePage = function(page) {
+    const totalPages = Math.ceil(state.filteredCategories.length / state.itemsPerPage);
+    if (page >= 1 && page <= totalPages) {
+        state.currentPage = page; renderTable();
+        document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' });
     }
+};
 
+// ========================================================
+// 4. BẤM GẠT CÔNG TẮC BÊN NGOÀI BẢNG
+// ========================================================
+window.toggleCategoryStatus = async function (id, currentStatus) {
+    const newStatus = !currentStatus;
+    try {
+        const { error } = await window.supabaseClient.from("categories").update({ is_active: newStatus }).eq("id", id);
+        if (error) throw error;
+        
+        const catIndex = state.categories.findIndex(c => c.id === id);
+        if (catIndex !== -1) state.categories[catIndex].is_active = newStatus;
+        
+        utils.showToast(newStatus ? "Đã BẬT danh mục" : "Đã ẨN danh mục", "success");
+        renderSummary(); 
+        applySearchAndFilter(); 
+    } catch (error) {
+        utils.showToast("Lỗi cập nhật trạng thái", "error");
+        applySearchAndFilter(); // Đảo nút lại như cũ
+    }
+};
 
-    DOM.resultInfo.textContent =
-        `${count} danh mục được hiển thị`;
-
+// ========================================================
+// 5. THÊM, SỬA, XÓA DANH MỤC
+// ========================================================
+function openCategoryModal() {
+    state.editingId = null;
+    DOM.modalTitle.textContent = "Thêm danh mục mới";
+    DOM.form.reset();
+    DOM.id.value = "";
+    DOM.isActive.checked = true; // Bật mặc định
+    
+    DOM.modal.classList.remove("hidden");
+    DOM.modal.classList.add("flex");
+    setTimeout(() => DOM.name.focus(), 100);
 }
-
-
-/* =========================================================
-   OPEN MODAL
-========================================================= */
-
-function openCategoryModal(
-    category = null
-) {
-
-    if (!DOM.modal) {
-        return;
-    }
-
-
-    if (category) {
-
-        DOM.modalTitle.textContent =
-            "Chỉnh sửa danh mục";
-
-
-        DOM.id.value =
-            category.id;
-
-
-        DOM.name.value =
-            category.name || "";
-
-
-        DOM.slug.value =
-            category.slug || "";
-
-
-        DOM.icon.value =
-            category.icon_url || "";
-
-
-        DOM.description.value =
-            category.description || "";
-
-
-        DOM.metaTitle.value =
-            category.meta_title || "";
-
-
-        DOM.metaDescription.value =
-            category.meta_description || "";
-
-
-        DOM.isActive.checked =
-            category.is_active !== false;
-
-    } else {
-
-        DOM.modalTitle.textContent =
-            "Thêm danh mục";
-
-
-        DOM.form.reset();
-
-
-        DOM.id.value =
-            "";
-
-
-        DOM.isActive.checked =
-            true;
-
-    }
-
-
-    DOM.modal.classList.remove(
-        "hidden"
-    );
-
-    DOM.modal.classList.add(
-        "flex"
-    );
-
-
-    setTimeout(() => {
-
-        DOM.name?.focus();
-
-    }, 50);
-
-}
-
-
-/* =========================================================
-   CLOSE MODAL
-========================================================= */
 
 function closeCategoryModal() {
-
-    if (!DOM.modal) {
-        return;
-    }
-
-
-    DOM.modal.classList.add(
-        "hidden"
-    );
-
-    DOM.modal.classList.remove(
-        "flex"
-    );
-
+    DOM.modal.classList.add("hidden");
+    DOM.modal.classList.remove("flex");
+    DOM.form.reset();
+    state.editingId = null;
 }
 
+window.editCategory = function(id) {
+    const cat = state.categories.find(c => c.id === id);
+    if (!cat) return;
 
-/* =========================================================
-   EDIT
-========================================================= */
+    state.editingId = cat.id;
+    DOM.modalTitle.textContent = "Sửa danh mục";
+    DOM.id.value = cat.id;
+    DOM.name.value = cat.name;
+    DOM.slug.value = cat.slug;
+    DOM.description.value = cat.description || "";
+    DOM.isActive.checked = cat.is_active !== false;
+    DOM.metaTitle.value = cat.meta_title || "";
+    DOM.metaDescription.value = cat.meta_description || "";
 
-function editCategory(
-    id
-) {
+    DOM.modal.classList.remove("hidden");
+    DOM.modal.classList.add("flex");
+    setTimeout(() => DOM.name.focus(), 100);
+};
 
-    const category =
-        allCategories.find(
-            item =>
-                Number(item.id) ===
-                Number(id)
-        );
+window.deleteCategory = async function(id) {
+    const cat = state.categories.find(c => c.id === id);
+    if (!cat) return;
+    if (!confirm(`Bạn có chắc muốn XÓA danh mục "${cat.name}"? Dữ liệu không thể khôi phục.`)) return;
 
-
-    if (!category) {
-
-        showToast(
-            "Không tìm thấy danh mục.",
-            "error"
-        );
-
-        return;
+    try {
+        const { error } = await window.supabaseClient.from("categories").delete().eq("id", id);
+        if (error) throw error;
+        
+        utils.showToast("Đã xóa danh mục.", "success");
+        
+        // Lùi 1 trang nếu xóa bản ghi cuối cùng của trang
+        const totalPages = Math.ceil((state.filteredCategories.length - 1) / state.itemsPerPage);
+        if (state.currentPage > totalPages && totalPages > 0) state.currentPage = totalPages;
+        
+        await loadCategories();
+    } catch (error) {
+        if (error.code === "23503") utils.showToast("Không thể xóa do đang có chứa sản phẩm.", "warning");
+        else utils.showToast(`Lỗi: ${error.message}`, "error");
     }
+};
 
+async function saveCategory() {
+    if (state.isSaving) return;
 
-    openCategoryModal(
-        category
-    );
+    const name = DOM.name.value.trim();
+    const slug = DOM.slug.value.trim();
+    if (!name || !slug) { utils.showToast("Vui lòng điền đủ Tên và Slug.", "warning"); return; }
 
-}
-
-
-/* =========================================================
-   SAVE
-========================================================= */
-
-async function saveCategory(
-    event
-) {
-
-    event.preventDefault();
-
-
-    const name =
-        DOM.name.value.trim();
-
-
-    const slug =
-        DOM.slug.value.trim();
-
-
-    if (!name) {
-
-        showToast(
-            "Vui lòng nhập tên danh mục.",
-            "error"
-        );
-
-        DOM.name.focus();
-
-        return;
-    }
-
-
-    if (!slug) {
-
-        showToast(
-            "Vui lòng nhập slug.",
-            "error"
-        );
-
-        DOM.slug.focus();
-
-        return;
-    }
-
-
-    const id =
-        DOM.id.value.trim();
-
+    state.isSaving = true;
+    DOM.btnSave.disabled = true;
+    DOM.btnSave.textContent = "Đang lưu...";
 
     const payload = {
-
-        name,
-
-        slug,
-
-        icon_url:
-            DOM.icon.value.trim() ||
-            null,
-
-        description:
-            DOM.description.value.trim() ||
-            null,
-
-        meta_title:
-            DOM.metaTitle.value.trim() ||
-            null,
-
-        meta_description:
-            DOM.metaDescription.value.trim() ||
-            null,
-
-        is_active:
-            DOM.isActive.checked
-
+        name: name,
+        slug: slug,
+        description: DOM.description.value.trim() || null,
+        is_active: DOM.isActive.checked,
+        meta_title: DOM.metaTitle.value.trim() || null,
+        meta_description: DOM.metaDescription.value.trim() || null
     };
 
-
-    const originalText =
-        DOM.submit.innerHTML;
-
-
-    DOM.submit.disabled =
-        true;
-
-
-    DOM.submit.innerHTML =
-        "Đang lưu...";
-
-
     try {
-
-        if (id) {
-
-            const {
-                error
-            } =
-                await window.supabaseClient
-                    .from("categories")
-                    .update(payload)
-                    .eq("id", id);
-
-
-            if (error) {
-                throw error;
-            }
-
-
-            showToast(
-                "Cập nhật danh mục thành công.",
-                "success"
-            );
-
+        if (state.editingId) {
+            const { error } = await window.supabaseClient.from("categories").update(payload).eq("id", state.editingId);
+            if (error) throw error;
+            utils.showToast("Cập nhật thành công!", "success");
         } else {
-
-            const {
-                error
-            } =
-                await window.supabaseClient
-                    .from("categories")
-                    .insert([
-                        payload
-                    ]);
-
-
-            if (error) {
-                throw error;
-            }
-
-
-            showToast(
-                "Thêm danh mục thành công.",
-                "success"
-            );
-
+            const { error } = await window.supabaseClient.from("categories").insert(payload);
+            if (error) throw error;
+            utils.showToast("Đã thêm danh mục mới!", "success");
         }
-
-
         closeCategoryModal();
-
         await loadCategories();
-
-
     } catch (error) {
-
-        console.error(
-            "Lỗi lưu danh mục:",
-            error
-        );
-
-
-        showToast(
-            `Không thể lưu danh mục: ${error.message}`,
-            "error"
-        );
-
+        if (error.code === "23505") utils.showToast("Tên danh mục hoặc Slug đã bị trùng.", "error");
+        else utils.showToast(`Lỗi lưu dữ liệu: ${error.message}`, "error");
     } finally {
-
-        DOM.submit.disabled =
-            false;
-
-
-        DOM.submit.innerHTML =
-            originalText;
-
+        state.isSaving = false;
+        DOM.btnSave.disabled = false;
+        DOM.btnSave.textContent = "Lưu danh mục";
     }
-
 }
 
-
-/* =========================================================
-   TOGGLE ACTIVE
-========================================================= */
-
-async function toggleCategory(
-    id
-) {
-
-    const category =
-        allCategories.find(
-            item =>
-                Number(item.id) ===
-                Number(id)
-        );
-
-
-    if (!category) {
-        return;
-    }
-
-
-    const newStatus =
-        category.is_active === false;
-
-
-    try {
-
-        const {
-            error
-        } =
-            await window.supabaseClient
-                .from("categories")
-                .update({
-                    is_active:
-                        newStatus
-                })
-                .eq("id", id);
-
-
-        if (error) {
-            throw error;
-        }
-
-
-        showToast(
-            newStatus
-                ? "Đã hiển thị danh mục."
-                : "Đã ẩn danh mục.",
-            "success"
-        );
-
-
-        await loadCategories();
-
-
-    } catch (error) {
-
-        console.error(
-            "Lỗi đổi trạng thái:",
-            error
-        );
-
-
-        showToast(
-            `Không thể cập nhật trạng thái: ${error.message}`,
-            "error"
-        );
-
-    }
-
+// ========================================================
+// 6. AUTO GENERATE SLUG
+// ========================================================
+function generateSlug(str) {
+    return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
 
-
-/* =========================================================
-   CHECK DEPENDENCIES
-========================================================= */
-
-async function checkCategoryDependencies(
-    categoryId
-) {
-
-    const [
-        subCategoryResult,
-        productResult
-    ] = await Promise.all([
-
-        window.supabaseClient
-            .from("sub_categories")
-            .select("id", {
-                count: "exact",
-                head: true
-            })
-            .eq(
-                "category_id",
-                categoryId
-            ),
-
-        window.supabaseClient
-            .from("products")
-            .select("id", {
-                count: "exact",
-                head: true
-            })
-            .eq(
-                "category_id",
-                categoryId
-            )
-
-    ]);
-
-
-    if (
-        subCategoryResult.error
-    ) {
-        throw subCategoryResult.error;
-    }
-
-
-    if (
-        productResult.error
-    ) {
-        throw productResult.error;
-    }
-
-
-    return {
-
-        subCategories:
-            subCategoryResult.count || 0,
-
-        products:
-            productResult.count || 0
-
-    };
-
-}
-
-
-/* =========================================================
-   DELETE
-========================================================= */
-
-async function deleteCategory(
-    id
-) {
-
-    const category =
-        allCategories.find(
-            item =>
-                Number(item.id) ===
-                Number(id)
-        );
-
-
-    if (!category) {
-        return;
-    }
-
-
-    try {
-
-        const dependencies =
-            await checkCategoryDependencies(
-                id
-            );
-
-
-        if (
-            dependencies.subCategories > 0 ||
-            dependencies.products > 0
-        ) {
-
-            const messages = [];
-
-
-            if (
-                dependencies.subCategories > 0
-            ) {
-
-                messages.push(
-                    `${dependencies.subCategories} nhóm hàng`
-                );
-
-            }
-
-
-            if (
-                dependencies.products > 0
-            ) {
-
-                messages.push(
-                    `${dependencies.products} sản phẩm`
-                );
-
-            }
-
-
-            showToast(
-                `Không thể xóa "${category.name}" vì đang có ${messages.join(" và ")} liên kết. Hãy ẩn danh mục thay vì xóa.`,
-                "error"
-            );
-
-
-            return;
-
-        }
-
-
-        const confirmed =
-            window.confirm(
-                `Bạn có chắc muốn xóa danh mục "${category.name}"?\n\nDanh mục này chưa có dữ liệu liên kết và có thể xóa an toàn.`
-            );
-
-
-        if (!confirmed) {
-            return;
-        }
-
-
-        const {
-            error
-        } =
-            await window.supabaseClient
-                .from("categories")
-                .delete()
-                .eq("id", id);
-
-
-        if (error) {
-
-            if (
-                error.code === "23503"
-            ) {
-
-                showToast(
-                    "Không thể xóa vì danh mục đang được dữ liệu khác sử dụng. Hãy ẩn danh mục thay vì xóa.",
-                    "error"
-                );
-
-                return;
-
-            }
-
-
-            throw error;
-
-        }
-
-
-        showToast(
-            "Đã xóa danh mục thành công.",
-            "success"
-        );
-
-
-        await loadCategories();
-
-
-    } catch (error) {
-
-        console.error(
-            "Lỗi xóa danh mục:",
-            error
-        );
-
-
-        showToast(
-            `Không thể xóa danh mục: ${error.message}`,
-            "error"
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   EVENT DELEGATION - TABLE
-========================================================= */
-
-function bindTableActions() {
-
-    DOM.tableBody?.addEventListener(
-        "click",
-        event => {
-
-            const button =
-                event.target.closest(
-                    "button[data-action]"
-                );
-
-
-            if (!button) {
-                return;
-            }
-
-
-            const action =
-                button.dataset.action;
-
-
-            const id =
-                button.dataset.id;
-
-
-            if (!id) {
-                return;
-            }
-
-
-            if (
-                action === "edit"
-            ) {
-
-                editCategory(
-                    id
-                );
-
-            }
-
-
-            if (
-                action === "toggle"
-            ) {
-
-                toggleCategory(
-                    id
-                );
-
-            }
-
-
-            if (
-                action === "delete"
-            ) {
-
-                deleteCategory(
-                    id
-                );
-
-            }
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   TOAST
-========================================================= */
-
-function showToast(
-    message,
-    type = "success"
-) {
-
-    if (!DOM.toast) {
-        return;
-    }
-
-
-    const toast =
-        document.createElement(
-            "div"
-        );
-
-
-    const success =
-        type === "success";
-
-
-    toast.className = `
-        pointer-events-auto
-        flex
-        items-center
-        gap-2
-        px-4
-        py-3
-        rounded-xl
-        shadow-xl
-        text-sm
-        font-bold
-        text-white
-        ${success
-            ? "bg-gray-900"
-            : "bg-red-600"
-        }
-        opacity-0
-        translate-y-2
-        transition-all
-        duration-300
-    `;
-
-
-    toast.innerHTML = success
-
-        ? `
-            <svg
-                class="w-4 h-4 text-green-400 shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="m5 12 4 4L19 6"
-                />
-            </svg>
-
-            <span>
-                ${escapeHTML(message)}
-            </span>
-        `
-
-        : `
-            <svg
-                class="w-4 h-4 shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18 18 6M6 6l12 12"
-                />
-            </svg>
-
-            <span>
-                ${escapeHTML(message)}
-            </span>
-        `;
-
-
-    DOM.toast.appendChild(
-        toast
-    );
-
-
-    requestAnimationFrame(
-        () => {
-
-            toast.classList.remove(
-                "opacity-0",
-                "translate-y-2"
-            );
-
-        }
-    );
-
-
-    setTimeout(
-        () => {
-
-            toast.classList.add(
-                "opacity-0",
-                "translate-y-2"
-            );
-
-
-            setTimeout(
-                () => {
-                    toast.remove();
-                },
-                300
-            );
-
-        },
-        3500
-    );
-
-}
-
-
-/* =========================================================
-   EVENTS
-========================================================= */
-
-function bindEvents() {
-
-
-    /* -----------------------------------------
-       ADD
-    ------------------------------------------ */
-
-    DOM.add?.addEventListener(
-        "click",
-        () => {
-
-            openCategoryModal();
-
-        }
-    );
-
-
-    /* -----------------------------------------
-       CLOSE
-    ------------------------------------------ */
-
-    DOM.close?.addEventListener(
-        "click",
-        closeCategoryModal
-    );
-
-
-    DOM.cancel?.addEventListener(
-        "click",
-        closeCategoryModal
-    );
-
-
-    /* -----------------------------------------
-       CLICK BACKDROP
-    ------------------------------------------ */
-
-    DOM.modal?.addEventListener(
-        "click",
-        event => {
-
-            if (
-                event.target ===
-                DOM.modal
-            ) {
-
-                closeCategoryModal();
-
-            }
-
-        }
-    );
-
-
-    /* -----------------------------------------
-       ESC
-    ------------------------------------------ */
-
-    document.addEventListener(
-        "keydown",
-        event => {
-
-            if (
-                event.key === "Escape" &&
-                DOM.modal &&
-                !DOM.modal.classList.contains(
-                    "hidden"
-                )
-            ) {
-
-                closeCategoryModal();
-
-            }
-
-        }
-    );
-
-
-    /* -----------------------------------------
-       SEARCH
-    ------------------------------------------ */
-
-    DOM.searchInput?.addEventListener(
-        "input",
-        applyFilters
-    );
-
-
-    /* -----------------------------------------
-       FILTER
-    ------------------------------------------ */
-
-    DOM.filterStatus?.addEventListener(
-        "change",
-        applyFilters
-    );
-
-
-    /* -----------------------------------------
-       FORM
-    ------------------------------------------ */
-
-    DOM.form?.addEventListener(
-        "submit",
-        saveCategory
-    );
-
-
-    /* -----------------------------------------
-       AUTO SLUG
-    ------------------------------------------ */
-
-    DOM.name?.addEventListener(
-        "input",
-        event => {
-
-            if (
-                DOM.id.value
-            ) {
-
-                return;
-
-            }
-
-
-            DOM.slug.value =
-                generateSlug(
-                    event.target.value
-                );
-
-        }
-    );
-
-
-    /* -----------------------------------------
-       SLUG NORMALIZE
-    ------------------------------------------ */
-
-    DOM.slug?.addEventListener(
-        "blur",
-        () => {
-
-            DOM.slug.value =
-                generateSlug(
-                    DOM.slug.value
-                );
-
-        }
-    );
-
-
-    /* -----------------------------------------
-       TABLE
-    ------------------------------------------ */
-
-    bindTableActions();
-
-}
-
-
-/* =========================================================
-   BACKWARD COMPATIBILITY
-   Nếu chỗ khác trong hệ thống còn gọi các hàm cũ
-========================================================= */
-
-window.openModal =
-    openCategoryModal;
-
-
-window.closeModal =
-    closeCategoryModal;
-
-
-window.editCategory =
-    editCategory;
-
-
-window.deleteCategory =
-    deleteCategory;
-
-
-/* =========================================================
-   INIT
-========================================================= */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    async () => {
-
-        bindEvents();
-
-        await loadCategories();
-
-    }
-);
+DOM.name?.addEventListener("input", function() {
+    if (!state.editingId) DOM.slug.value = generateSlug(this.value);
+});
+
+// ========================================================
+// 7. SỰ KIỆN KÍCH HOẠT
+// ========================================================
+DOM.btnAdd?.addEventListener("click", openCategoryModal);
+DOM.btnClose?.addEventListener("click", closeCategoryModal);
+DOM.btnCancel?.addEventListener("click", closeCategoryModal);
+DOM.form?.addEventListener("submit", e => { e.preventDefault(); saveCategory(); });
+
+let searchTimer;
+DOM.search?.addEventListener("input", () => { clearTimeout(searchTimer); searchTimer = setTimeout(applySearchAndFilter, 300); });
+DOM.filterStatus?.addEventListener("change", (e) => { state.filterStatus = e.target.value; applySearchAndFilter(); });
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadCategories();
+});

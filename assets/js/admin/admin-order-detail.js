@@ -875,7 +875,7 @@ async function loadOrderDetail() {
                 shipping_phone,
                 shipping_address,
                 note,
-                cancellation_reason,
+                cancel_reason,
                 created_at
             `)
 
@@ -1683,7 +1683,7 @@ function renderCancellationReason() {
     const cancellationReason =
 
         String(
-            order.cancellation_reason || ""
+            order.cancel_reason || ""
         ).trim();
 
 
@@ -2676,7 +2676,7 @@ async function updateOrderStatus() {
                     shipping_phone,
                     shipping_address,
                     note,
-                    cancellation_reason,
+                    cancel_reason,
                     created_at
                 `)
 
@@ -2839,7 +2839,7 @@ async function confirmCancelOrder() {
 
                     status: "cancelled",
 
-                    cancellation_reason: reason
+                    cancel_reason: reason
 
                 })
 
@@ -2859,7 +2859,7 @@ async function confirmCancelOrder() {
                     shipping_phone,
                     shipping_address,
                     note,
-                    cancellation_reason,
+                    cancel_reason,
                     created_at
                 `)
 

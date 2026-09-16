@@ -51,7 +51,7 @@ async function fetchSubCategories() {
 
         // LOAD SUBCATEGORY + PRODUCT
         const [subRes, prodRes] = await Promise.all([
-            window.supabaseClient.from('sub_categories').select('*').eq('category_id', categoryId).order('id', { ascending: true }),
+            window.supabaseClient.from('sub_categories').select('*').eq('category_id', categoryId).eq('is_active', true).order('id', { ascending: true }),
             window.supabaseClient.from('products').select('sub_category_id').eq('category_id', categoryId)
         ]);
 
@@ -221,7 +221,7 @@ async function loadRelatedCategories(currentCatId) {
     if (!container) return;
 
     try {
-        const { data, error } = await window.supabaseClient.from('categories').select('id, name, slug').neq('id', currentCatId).limit(6);
+        const { data, error } = await window.supabaseClient.from('categories').select('id, name, slug').eq('is_active', true).neq('id', currentCatId).limit(6);
         if (error) throw error;
 
         if (!data || data.length === 0) {

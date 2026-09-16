@@ -49,6 +49,7 @@ async function fetchFamilies() {
                 .from('families')
                 .select('id, name, slug, sub_category_id')
                 .eq('sub_category_id', subCategoryId)
+                .eq('is_active', true)
                 .order('name', { ascending: true }),
                 
             window.supabaseClient

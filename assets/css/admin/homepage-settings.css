@@ -1,0 +1,322 @@
+/* =========================================================
+   MRO KHANG NAM
+   HOMEPAGE SETTINGS - ADMIN
+   FILE: assets/css/admin/homepage-settings.css
+   (Đã tối ưu class khớp 100% với HTML)
+   ========================================================= */
+
+/* =========================================================
+   1. ROOT
+   ========================================================= */
+:root {
+    --hp-primary: #2563eb;
+    --hp-primary-dark: #1d4ed8;
+    --hp-primary-light: #eff6ff;
+
+    --hp-success: #16a34a;
+    --hp-warning: #d97706;
+    --hp-danger: #dc2626;
+
+    --hp-text: #111827;
+    --hp-text-secondary: #6b7280;
+    --hp-text-muted: #9ca3af;
+
+    --hp-border: #e5e7eb;
+    --hp-border-light: #f1f5f9;
+
+    --hp-bg: #f8fafc;
+    --hp-card: #ffffff;
+
+    --hp-radius: 12px;
+    --hp-radius-sm: 8px;
+
+    --hp-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.04),
+        0 4px 12px rgba(15, 23, 42, 0.04);
+
+    --hp-transition: 0.2s ease;
+}
+
+/* =========================================================
+   2. PAGE
+   ========================================================= */
+.admin-page {
+    min-height: 100vh;
+    background: var(--hp-bg);
+    color: var(--hp-text);
+    margin: 0;
+}
+
+/* =========================================================
+   3. ADMIN HEADER
+   ========================================================= */
+.admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: var(--hp-card);
+    border-bottom: 1px solid var(--hp-border);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    margin-bottom: 32px;
+}
+.admin-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.admin-icon-btn {
+    width: 36px; height: 36px; border: 1px solid var(--hp-border); border-radius: 8px; background: transparent; cursor: pointer;
+}
+.admin-page-heading {
+    display: flex;
+    flex-direction: column;
+}
+.admin-page-kicker {
+    font-size: 10px; font-weight: 800; color: var(--hp-primary); letter-spacing: 0.05em;
+}
+.admin-page-heading h1 {
+    margin: 0; font-size: 18px; font-weight: 800; color: var(--hp-text);
+}
+.admin-header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.admin-view-site {
+    font-size: 13px; font-weight: 600; color: var(--hp-text-secondary); text-decoration: none;
+}
+.admin-view-site:hover { color: var(--hp-primary); }
+.admin-user {
+    display: flex; align-items: center; gap: 10px; padding-left: 20px; border-left: 1px solid var(--hp-border);
+}
+.admin-user-avatar {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--hp-primary-light); color: var(--hp-primary); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px;
+}
+.admin-user-info { display: flex; flex-direction: column; }
+.admin-user-info strong { font-size: 13px; color: var(--hp-text); }
+.admin-user-info span { font-size: 11px; color: var(--hp-text-secondary); }
+
+/* =========================================================
+   4. LAYOUT & SIDEBAR
+   ========================================================= */
+.admin-layout {
+    width: min(1400px, calc(100% - 48px));
+    margin: 0 auto;
+    padding: 0 0 60px;
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.admin-sidebar {
+    position: sticky;
+    top: 24px;
+    padding: 8px;
+    background: var(--hp-card);
+    border: 1px solid var(--hp-border);
+    border-radius: var(--hp-radius);
+    box-shadow: var(--hp-shadow);
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 120px);
+}
+
+.admin-sidebar-brand {
+    display: flex; align-items: center; gap: 12px; padding: 12px; margin-bottom: 16px;
+}
+.admin-sidebar-logo {
+    width: 40px; height: 40px; background: var(--hp-primary); color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 12px;
+}
+.admin-sidebar-brand > div { display: flex; flex-direction: column; }
+.admin-sidebar-brand strong { font-size: 15px; font-weight: 900; color: var(--hp-text); }
+.admin-sidebar-brand span { font-size: 11px; color: var(--hp-text-secondary); letter-spacing: 0.05em; text-transform: uppercase; }
+
+.admin-nav-group { margin-bottom: 24px; }
+.admin-nav-label { font-size: 11px; font-weight: 800; color: var(--hp-text-muted); margin-bottom: 8px; padding: 0 12px; letter-spacing: 0.05em; }
+.admin-nav { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
+.admin-nav-item {
+    width: 100%; display: flex; align-items: center; gap: 10px; padding: 11px 12px; border: 0; border-radius: 8px; background: transparent; color: var(--hp-text-secondary); font-size: 13px; font-weight: 600; text-decoration: none; transition: var(--hp-transition);
+}
+.admin-nav-item:hover { color: var(--hp-text); background: #f8fafc; }
+.admin-nav-item.active { color: var(--hp-primary); background: var(--hp-primary-light); }
+.admin-nav-icon { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; }
+
+.admin-sidebar-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--hp-border-light); }
+.admin-logout-btn {
+    width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 11px; border: 0; border-radius: 8px; background: transparent; color: var(--hp-danger); font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--hp-transition);
+}
+.admin-logout-btn:hover { background: #fef2f2; }
+
+/* =========================================================
+   5. MAIN CONTENT HEADER (PAGE INTRO)
+   ========================================================= */
+.admin-main { min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+
+.homepage-page-intro {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 8px;
+}
+.homepage-page-intro > div:first-child { min-width: 0; }
+.breadcrumb { font-size: 12px; color: var(--hp-text-secondary); margin-bottom: 8px; font-weight: 500; }
+.breadcrumb strong { color: var(--hp-primary); font-weight: 700; }
+.homepage-page-intro h2 { margin: 0; font-size: 28px; line-height: 1.25; font-weight: 800; letter-spacing: -0.025em; color: var(--hp-text); }
+.homepage-page-intro p { margin: 8px 0 0; max-width: 760px; font-size: 14px; line-height: 1.6; color: var(--hp-text-secondary); }
+
+/* Buttons */
+.homepage-intro-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.btn-primary, .btn-secondary {
+    min-height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 1px solid transparent; border-radius: var(--hp-radius-sm); font-family: inherit; font-size: 13px; font-weight: 700; text-decoration: none; cursor: pointer; transition: var(--hp-transition);
+}
+.btn-primary { color: #ffffff; background: var(--hp-primary); border-color: var(--hp-primary); }
+.btn-primary:hover { background: var(--hp-primary-dark); border-color: var(--hp-primary-dark); transform: translateY(-1px); }
+.btn-secondary { color: var(--hp-text); background: #ffffff; border-color: var(--hp-border); }
+.btn-secondary:hover { background: #f9fafb; border-color: #d1d5db; transform: translateY(-1px); }
+
+/* =========================================================
+   6. SECTION STATUS
+   ========================================================= */
+.homepage-save-status {
+    display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; color: #991b1b; background: #fef2f2;
+}
+.save-status-icon { color: #ef4444; font-size: 14px; line-height: 1; margin-top: -2px; }
+
+/* =========================================================
+   7. SECTIONS & CARDS
+   ========================================================= */
+.homepage-sections { display: flex; flex-direction: column; gap: 20px; }
+
+.homepage-card {
+    overflow: hidden; background: var(--hp-card); border: 1px solid var(--hp-border); border-radius: var(--hp-radius); box-shadow: var(--hp-shadow);
+}
+.homepage-card-header {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 20px 22px; border-bottom: 1px solid var(--hp-border-light);
+}
+.homepage-card-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.homepage-card-title > div:last-child { min-width: 0; }
+.homepage-card-title h3 { margin: 0; font-size: 17px; line-height: 1.4; font-weight: 750; color: var(--hp-text); }
+.homepage-card-title p { margin: 5px 0 0; font-size: 13px; line-height: 1.6; color: var(--hp-text-secondary); }
+.homepage-card-body { padding: 22px; }
+
+/* Drag Handle & Section Number */
+.section-drag-handle {
+    width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; color: #9ca3af; cursor: grab; font-weight: bold;
+}
+.section-drag-handle:active { cursor: grabbing; }
+.section-number {
+    width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: #f1f5f9; color: #475569; font-size: 12px; font-weight: 800; flex-shrink: 0;
+}
+
+/* =========================================================
+   8. FORM & GRIDS
+   ========================================================= */
+.hero-settings-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.settings-inline-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.hero-buttons-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+
+.form-group { min-width: 0; margin-bottom: 16px; }
+.form-group label { display: block; margin-bottom: 7px; font-size: 12px; font-weight: 700; color: #374151; }
+.form-group small { display: block; margin-top: 5px; font-size: 11px; line-height: 1.5; color: var(--hp-text-muted); }
+
+.form-group input:not([type="checkbox"]):not([type="radio"]),
+.form-group select,
+.form-group textarea {
+    width: 100%; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: var(--hp-radius-sm); background: #ffffff; color: var(--hp-text); font-family: inherit; font-size: 13px; outline: none; transition: var(--hp-transition);
+}
+.form-group input:not([type="checkbox"]):not([type="radio"]),
+.form-group select { height: 42px; padding: 0 12px; }
+.form-group textarea { min-height: 110px; padding: 11px 12px; resize: vertical; line-height: 1.6; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--hp-primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+/* Toggle Switch */
+.switch { position: relative; width: 44px; height: 24px; display: inline-block; flex-shrink: 0; }
+.switch input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.switch-slider {
+    position: absolute; inset: 0; border-radius: 999px; background: #d1d5db; cursor: pointer; transition: background-color var(--hp-transition);
+}
+.switch-slider::after {
+    content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #ffffff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18); transition: transform var(--hp-transition);
+}
+.switch input:checked + .switch-slider { background: var(--hp-success); }
+.switch input:checked + .switch-slider::after { transform: translateX(20px); }
+
+/* =========================================================
+   9. CUSTOM ELEMENTS (PREVIEW, UPLOAD, INFO BOX)
+   ========================================================= */
+.showcase-preview {
+    position: relative; overflow: hidden; min-height: 140px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: 24px; border: 1px solid var(--hp-border); border-radius: 12px; background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 55%, #ffffff 100%); margin-top: 20px;
+}
+.preview-label {
+    display: inline-flex; padding: 5px 9px; border-radius: 999px; background: rgba(37, 99, 235, 0.10); color: var(--hp-primary); font-size: 10px; font-weight: 800; letter-spacing: 0.04em; margin-bottom: 8px;
+}
+.showcase-preview strong { margin: 0; font-size: 20px; font-weight: 800; color: var(--hp-text); }
+.showcase-preview span:last-child { margin: 6px 0 0; font-size: 12px; color: var(--hp-text-secondary); }
+
+.image-upload-preview {
+    position: relative; width: 100%; height: 140px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px dashed #cbd5e1; border-radius: 10px; background: #f8fafc; margin-bottom: 12px;
+}
+.image-placeholder { display: flex; flex-direction: column; align-items: center; gap: 7px; color: var(--hp-text-muted); font-size: 11px; text-align: center; }
+.image-placeholder-icon { font-size: 24px; }
+
+.readonly-source {
+    display: flex; align-items: center; gap: 12px; padding: 0 14px; background: #f8fafc; border: 1px solid var(--hp-border); border-radius: var(--hp-radius-sm); height: 42px; box-sizing: border-box;
+}
+.source-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hp-success); }
+.readonly-source strong { font-size: 13px; color: var(--hp-text); display: block; line-height: 1.2; }
+.readonly-source small { font-size: 10px; color: var(--hp-text-muted); }
+
+.info-box {
+    display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1px solid #dbeafe; border-radius: 9px; font-size: 12px; line-height: 1.55; color: #1e40af; background: #eff6ff; margin-top: 16px;
+}
+.info-icon {
+    width: 18px; height: 18px; flex-shrink: 0; background: #3b82f6; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px;
+}
+.info-box p { margin: 0; }
+
+/* =========================================================
+   10. SAVE BAR
+   ========================================================= */
+.homepage-bottom-actions {
+    position: sticky; bottom: 16px; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 16px; border: 1px solid var(--hp-border); border-radius: 12px; background: rgba(255, 255, 255, 0.94); box-shadow: 0 10px 30px rgba(15, 23, 42, 0.10); backdrop-filter: blur(10px);
+}
+.homepage-bottom-actions > div:first-child { min-width: 0; display: flex; flex-direction: column; }
+.homepage-bottom-actions strong { margin: 0; font-size: 13px; font-weight: 700; color: var(--hp-text); }
+.homepage-bottom-actions span { margin: 2px 0 0; font-size: 11px; color: var(--hp-text-muted); }
+.bottom-action-buttons { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+/* =========================================================
+   11. TOAST
+   ========================================================= */
+.admin-toast {
+    position: fixed; bottom: -100px; right: 24px; display: flex; align-items: center; gap: 12px; padding: 14px 20px; background: #111827; color: white; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); font-size: 13px; font-weight: 600; transition: bottom 0.3s ease; z-index: 100;
+}
+.admin-toast.show { bottom: 24px; }
+#adminToastIcon { color: #4ade80; font-size: 16px; }
+
+/* =========================================================
+   12. RESPONSIVE
+   ========================================================= */
+@media (max-width: 1100px) {
+    .admin-layout { grid-template-columns: 200px minmax(0, 1fr); gap: 18px; }
+    .hero-settings-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+    .admin-layout { display: block; padding-top: 20px; }
+    .admin-sidebar { position: static; height: auto; margin-bottom: 24px; }
+    .homepage-page-intro { flex-direction: column; gap: 16px; }
+    .homepage-intro-actions { width: 100%; }
+    .homepage-intro-actions .btn-secondary, .homepage-intro-actions .btn-primary { flex: 1; }
+    .homepage-card-header { flex-direction: column; gap: 14px; padding: 16px; }
+    .homepage-card-body { padding: 16px; }
+    .settings-inline-grid, .hero-buttons-grid { grid-template-columns: 1fr; }
+    .homepage-bottom-actions { flex-direction: column; align-items: stretch; bottom: 10px; }
+    .bottom-action-buttons { width: 100%; }
+    .bottom-action-buttons button { flex: 1; }
+}

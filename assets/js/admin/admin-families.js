@@ -1,13 +1,10 @@
 // ========================================================
 // FILE: assets/js/admin/admin-families.js
-// QUẢN LÝ DÒNG SẢN PHẨM (FAMILIES) - CHUẨN STORAGE PATH
+// QUẢN LÝ DÒNG SẢN PHẨM (CÓ STT + CÔNG TẮC ẨN/HIỆN)
 // ========================================================
 
 "use strict";
 
-/* =========================================================
-   STATE
-========================================================= */
 const state = {
     families: [],
     categories: [],
@@ -23,11 +20,7 @@ const state = {
     selectedCategoryId: null,
 };
 
-/* =========================================================
-   DOM ELEMENTS
-========================================================= */
 const DOM = {
-    // Table & Stats
     tableBody: document.getElementById("familyTableBody"),
     pagination: document.getElementById("paginationContainer"),
     searchInput: document.getElementById("searchFamilyInput"),
@@ -37,10 +30,8 @@ const DOM = {
     statLinked: document.getElementById("familyLinked"),
     statBroken: document.getElementById("familyBroken"),
 
-    // Buttons
     btnAdd: document.getElementById("btnAddFamily"),
     
-    // Modal
     modal: document.getElementById("familyModal"),
     modalTitle: document.getElementById("modalTitle"),
     form: document.getElementById("familyForm"),
@@ -48,13 +39,11 @@ const DOM = {
     btnCancel: document.getElementById("btnCancelEdit"),
     btnSave: document.getElementById("btnSaveFamily"),
 
-    // Form Inputs
     inFamilyId: document.getElementById("familyId"),
     inName: document.getElementById("inName"),
     inSlug: document.getElementById("inSlug"),
     inSubCategory: document.getElementById("selSubCategory"),
 
-    // Combobox Elements (Category)
     catCombobox: document.getElementById("categoryCombobox"),
     catTrigger: document.getElementById("categoryTrigger"),
     catSelectedText: document.getElementById("categorySelectedText"),
@@ -62,7 +51,6 @@ const DOM = {
     catSearch: document.getElementById("categorySearch"),
     catOptions: document.getElementById("categoryOptions"),
 
-    // Combobox Elements (SubCategory)
     subCombobox: document.getElementById("subCategoryCombobox"),
     subTrigger: document.getElementById("subCategoryTrigger"),
     subSelectedText: document.getElementById("subCategorySelectedText"),
@@ -71,9 +59,6 @@ const DOM = {
     subOptions: document.getElementById("subCategoryOptions"),
 };
 
-/* =========================================================
-   INIT
-========================================================= */
 document.addEventListener("DOMContentLoaded", async () => {
     if (typeof window.checkAdminAuth === "function") {
         const user = await window.checkAdminAuth();
@@ -86,11 +71,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadStatistics();
 });
 
-/* =========================================================
-   EVENTS
-========================================================= */
 function setupEvents() {
-    // Search & Filter
     let searchTimer;
     DOM.searchInput?.addEventListener("input", (e) => {
         clearTimeout(searchTimer);
@@ -107,25 +88,21 @@ function setupEvents() {
         fetchFamilies();
     });
 
-    // Auto-generate Slug
     DOM.inName?.addEventListener("input", (e) => {
         if (!state.editingId) {
             DOM.inSlug.value = generateSlug(e.target.value);
         }
     });
 
-    // Modal
     DOM.btnAdd?.addEventListener("click", () => openModal());
     DOM.btnClose?.addEventListener("click", closeModal);
     DOM.btnCancel?.addEventListener("click", closeModal);
     DOM.form?.addEventListener("submit", saveFamily);
     
-    // Đóng Modal khi bấm ra ngoài nền đen
     DOM.modal?.addEventListener("click", (e) => {
         if (e.target === DOM.modal) closeModal();
     });
 
-    // Combobox Toggles
     DOM.catTrigger?.addEventListener("click", () => {
         DOM.catDropdown.classList.toggle("hidden");
         DOM.subDropdown.classList.add("hidden");
@@ -139,21 +116,17 @@ function setupEvents() {
         DOM.subSearch.focus();
     });
 
-    // Đóng Combobox khi click ra ngoài
     document.addEventListener("click", (e) => {
         if (!e.target.closest("#categoryCombobox")) DOM.catDropdown?.classList.add("hidden");
         if (!e.target.closest("#subCategoryCombobox")) DOM.subDropdown?.classList.add("hidden");
     });
 
-    // Combobox Search
     DOM.catSearch?.addEventListener("input", e => renderCategoryOptions(e.target.value));
     DOM.subSearch?.addEventListener("input", e => renderSubCategoryOptions(e.target.value));
 
-    // Chọn Option
     DOM.catOptions?.addEventListener("click", handleCategorySelect);
     DOM.subOptions?.addEventListener("click", handleSubCategorySelect);
 
-    // Bảng Data Click (Sửa / Xóa)
     DOM.tableBody?.addEventListener("click", (e) => {
         const btn = e.target.closest("button[data-action]");
         if (!btn) return;
@@ -165,7 +138,6 @@ function setupEvents() {
         if (action === "delete") deleteFamily(id);
     });
 
-    // Phân trang
     DOM.pagination?.addEventListener("click", (e) => {
         const pageBtn = e.target.closest("button[data-page]");
         const actionBtn = e.target.closest("button[data-page-action]");
@@ -187,9 +159,6 @@ function setupEvents() {
     });
 }
 
-/* =========================================================
-   LOAD DATA
-========================================================= */
 async function loadMasterData() {
     try {
         const [catsRes, subsRes] = await Promise.all([
@@ -203,7 +172,6 @@ async function loadMasterData() {
         state.categories = catsRes.data || [];
         state.subCategories = subsRes.data || [];
 
-        // Đổ dữ liệu vào Filter dropdown
         if (DOM.filterSubCategory) {
             DOM.filterSubCategory.innerHTML = `
                 <option value="all">Tất cả nhóm hàng</option>
@@ -235,7 +203,7 @@ async function loadStatistics() {
 
 async function fetchFamilies() {
     if (!DOM.tableBody) return;
-    DOM.tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-gray-400">Đang tải dữ liệu...</td></tr>`;
+    DOM.tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-gray-400">Đang tải dữ liệu...</td></tr>`;
 
     try {
         let query = window.supabaseClient
@@ -267,46 +235,43 @@ async function fetchFamilies() {
 
     } catch (error) {
         console.error("Lỗi tải Families:", error);
-        DOM.tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-red-500">Lỗi: ${error.message}</td></tr>`;
+        DOM.tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-red-500">Lỗi: ${error.message}</td></tr>`;
     }
 }
 
-/* =========================================================
-   RENDER TABLE (ĐÃ TÁCH CỘT SLUG ĐỘC LẬP)
-========================================================= */
 function renderFamilies(from) {
     if (state.families.length === 0) {
-        DOM.tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-gray-400 italic">Chưa có dòng sản phẩm nào.</td></tr>`;
+        DOM.tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-gray-400 italic">Chưa có dòng sản phẩm nào.</td></tr>`;
         return;
     }
 
     DOM.tableBody.innerHTML = state.families.map((item, index) => {
+        const stt = from + index + 1;
         const name = window.utils.escapeHTML(item.name);
         const slug = window.utils.escapeHTML(item.slug || "");
         const subCatName = item.sub_categories ? window.utils.escapeHTML(item.sub_categories.name) : `<span class="text-red-500 font-bold">Thiếu liên kết</span>`;
+        const isChecked = item.is_active !== false ? "checked" : "";
 
         return `
             <tr class="hover:bg-blue-50/30 transition">
-                <td class="p-4 text-center text-xs font-bold text-gray-400">${from + index + 1}</td>
+                <td class="p-4 text-center text-xs font-bold text-gray-600 border-r border-gray-50 w-16">${stt}</td>
+                <td class="p-4 text-center text-xs font-mono font-bold text-gray-400 w-20">#${item.id}</td>
+                <td class="p-4 font-bold text-gray-900 w-[26%]">${name}</td>
+                <td class="p-4 text-sm font-mono text-gray-500 w-[22%]">${slug}</td>
+                <td class="p-4 text-sm w-[22%]">${subCatName}</td>
                 
-                <!-- CỘT 1: TÊN -->
-                <td class="p-4 font-bold text-gray-900">${name}</td>
-                
-                <!-- CỘT 2: SLUG (ĐỨNG RIÊNG) -->
-                <td class="p-4 text-sm font-mono text-gray-500">${slug}</td>
-                
-                <!-- CỘT 3: SUBCATEGORY -->
-                <td class="p-4 text-sm">${subCatName}</td>
-                
-                <!-- CỘT 4: THAO TÁC -->
-                <td class="p-4 text-center">
-                    <div class="flex items-center justify-center gap-2">
-                        <button type="button" data-action="edit" data-id="${item.id}" class="p-2 text-kn-blue hover:bg-blue-50 rounded transition" title="Sửa">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                        </button>
-                        <button type="button" data-action="delete" data-id="${item.id}" class="p-2 text-red-500 hover:bg-red-50 rounded transition" title="Xóa">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                        </button>
+                <!-- CÔNG TẮC GẠT TRẠNG THÁI -->
+                <td class="p-4 text-center w-32">
+                    <label class="relative inline-flex items-center cursor-pointer" title="${item.is_active !== false ? 'Đang hiển thị' : 'Đang ẩn'}">
+                        <input type="checkbox" onchange="toggleFamilyStatus(${item.id}, ${item.is_active})" class="sr-only peer" ${isChecked}>
+                        <div class="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500 shadow-inner"></div>
+                    </label>
+                </td>
+
+                <td class="p-4 text-right w-36">
+                    <div class="flex justify-end items-center gap-1">
+                        <button type="button" data-action="edit" data-id="${item.id}" class="px-3 py-2 rounded-lg text-xs font-bold text-kn-blue hover:bg-blue-50 transition">Sửa</button>
+                        <button type="button" data-action="delete" data-id="${item.id}" class="px-3 py-2 rounded-lg text-xs font-bold text-red-600 hover:bg-red-50 transition">Xóa</button>
                     </div>
                 </td>
             </tr>
@@ -314,9 +279,25 @@ function renderFamilies(from) {
     }).join('');
 }
 
+window.toggleFamilyStatus = async function (id, currentStatus) {
+    const newStatus = !currentStatus;
+    try {
+        const { error } = await window.supabaseClient.from("families").update({ is_active: newStatus }).eq("id", id);
+        if (error) throw error;
+
+        const idx = state.families.findIndex(f => Number(f.id) === Number(id));
+        if (idx !== -1) state.families[idx].is_active = newStatus;
+
+        window.utils.showToast(newStatus ? "Đã BẬT dòng sản phẩm" : "Đã ẨN dòng sản phẩm", "success");
+        renderFamilies((state.currentPage - 1) * state.itemsPerPage);
+    } catch (error) {
+        window.utils.showToast("Lỗi cập nhật trạng thái", "error");
+        renderFamilies((state.currentPage - 1) * state.itemsPerPage);
+    }
+};
+
 function renderPagination() {
     if (!DOM.pagination) return;
-    
     const totalPages = Math.ceil(state.totalItems / state.itemsPerPage);
     
     if (totalPages <= 1) {
@@ -324,9 +305,6 @@ function renderPagination() {
         return;
     }
 
-    // ==========================================
-    // THUẬT TOÁN TẠO SỐ TRANG (Tối đa 5 nút)
-    // ==========================================
     let pagesHTML = '';
     const maxVisible = 5;
     let startPage = Math.max(1, state.currentPage - 2);
@@ -344,9 +322,6 @@ function renderPagination() {
         `;
     }
 
-    // ==========================================
-    // VẼ RA GIAO DIỆN
-    // ==========================================
     DOM.pagination.innerHTML = `
         <div class="text-xs text-gray-500 mb-3 sm:mb-0">
             Trang <strong class="text-gray-900">${state.currentPage}</strong> / ${totalPages} (${state.totalItems} kết quả)
@@ -356,9 +331,7 @@ function renderPagination() {
             <button data-page-action="prev" ${state.currentPage === 1 ? 'disabled' : ''} class="px-3 py-1.5 border rounded-lg text-xs font-bold transition ${state.currentPage === 1 ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-600 hover:bg-gray-50'}">
                 Trước
             </button>
-            
             ${pagesHTML}
-            
             <button data-page-action="next" ${state.currentPage === totalPages ? 'disabled' : ''} class="px-3 py-1.5 border rounded-lg text-xs font-bold transition ${state.currentPage === totalPages ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-600 hover:bg-gray-50'}">
                 Sau
             </button>
@@ -366,9 +339,6 @@ function renderPagination() {
     `;
 }
 
-/* =========================================================
-   COMBOBOX LOGIC
-========================================================= */
 function renderCategoryOptions(keyword = "") {
     const kw = keyword.toLowerCase().trim();
     const filtered = state.categories.filter(c => c.name.toLowerCase().includes(kw));
@@ -414,7 +384,6 @@ function handleCategorySelect(e) {
     DOM.catSelectedText.classList.add("font-bold");
     DOM.catDropdown.classList.add("hidden");
 
-    // Mở khóa Subcategory
     DOM.inSubCategory.value = "";
     DOM.subSelectedText.textContent = "-- Chọn nhóm hàng --";
     DOM.subSelectedText.classList.remove("font-bold", "text-gray-900");
@@ -436,14 +405,10 @@ function handleSubCategorySelect(e) {
     DOM.subDropdown.classList.add("hidden");
 }
 
-/* =========================================================
-   MODAL ACTIONS (ADD/EDIT/DELETE)
-========================================================= */
 function openModal(id = null) {
     state.editingId = id;
     DOM.form.reset();
 
-    // Reset Combobox
     state.selectedCategoryId = null;
     DOM.catSelectedText.textContent = "-- Chọn danh mục --";
     DOM.catSelectedText.classList.replace("text-gray-900", "text-gray-500");
@@ -462,7 +427,6 @@ function openModal(id = null) {
             DOM.inName.value = item.name;
             DOM.inSlug.value = item.slug || "";
             
-            // Phục hồi Combobox
             if (item.sub_category_id) {
                 DOM.inSubCategory.value = item.sub_category_id;
                 const sub = state.subCategories.find(s => String(s.id) === String(item.sub_category_id));
@@ -501,7 +465,6 @@ async function saveFamily(e) {
 
     const btn = DOM.btnSave;
     const originText = btn.textContent;
-
     btn.disabled = true;
 
     try {
@@ -509,13 +472,8 @@ async function saveFamily(e) {
         const slug = DOM.inSlug.value.trim() || generateSlug(name);
         const subCategoryId = DOM.inSubCategory.value || null;
 
-        if (!name) {
-            throw new Error("Vui lòng nhập tên dòng sản phẩm.");
-        }
-
-        if (!subCategoryId) {
-            throw new Error("Vui lòng chọn Nhóm hàng.");
-        }
+        if (!name) throw new Error("Vui lòng nhập tên dòng sản phẩm.");
+        if (!subCategoryId) throw new Error("Vui lòng chọn Nhóm hàng.");
 
         const payload = {
             name,
@@ -524,58 +482,24 @@ async function saveFamily(e) {
         };
 
         if (!state.editingId) {
-            // =================================================
-            // THÊM MỚI
-            // =================================================
             btn.textContent = "Đang lưu DB...";
-
-            const { error: insertError } = await window.supabaseClient
-                .from("families")
-                .insert([payload]);
-
+            const { error: insertError } = await window.supabaseClient.from("families").insert([payload]);
             if (insertError) throw insertError;
-
-            window.utils.showToast(
-                "Thêm dòng sản phẩm thành công!",
-                "success"
-            );
-
+            window.utils.showToast("Thêm dòng sản phẩm thành công!", "success");
         } else {
-            // =================================================
-            // CẬP NHẬT
-            // =================================================
-            const famId = state.editingId;
-
             btn.textContent = "Đang lưu thay đổi...";
-
-            const { error: updateError } = await window.supabaseClient
-                .from("families")
-                .update(payload)
-                .eq("id", famId);
-
+            const { error: updateError } = await window.supabaseClient.from("families").update(payload).eq("id", state.editingId);
             if (updateError) throw updateError;
-
-            window.utils.showToast(
-                "Đã lưu thay đổi!",
-                "success"
-            );
+            window.utils.showToast("Đã lưu thay đổi!", "success");
         }
 
         closeModal();
-
         await fetchFamilies();
         await loadStatistics();
 
     } catch (error) {
         console.error("Lỗi lưu Family:", error);
-
-        window.utils.showToast(
-            error.message.includes("unique")
-                ? "Tên hoặc Slug đã tồn tại!"
-                : error.message,
-            "error"
-        );
-
+        window.utils.showToast(error.message.includes("unique") ? "Tên hoặc Slug đã tồn tại!" : error.message, "error");
     } finally {
         btn.disabled = false;
         btn.textContent = originText;
@@ -589,11 +513,7 @@ async function deleteFamily(id) {
     if (!window.confirm(`Xóa dòng sản phẩm: ${item.name}?`)) return;
 
     try {
-        const { error } = await window.supabaseClient
-            .from("families")
-            .delete()
-            .eq("id", id);
-
+        const { error } = await window.supabaseClient.from("families").delete().eq("id", id);
         if (error) throw error;
 
         if (state.families.length === 1 && state.currentPage > 1) {
@@ -601,7 +521,6 @@ async function deleteFamily(id) {
         }
 
         window.utils.showToast("Đã xóa dòng sản phẩm!", "success");
-
         await fetchFamilies();
         await loadStatistics();
 
@@ -611,9 +530,6 @@ async function deleteFamily(id) {
     }
 }
 
-/* =========================================================
-   UTILS
-========================================================= */
 function generateSlug(text) {
     return text.toString().toLowerCase()
         .replace(/á|à|ả|ạ|ã|ă|ắ|ằ|ẳ|ẵ|ặ|â|ấ|ầ|ẩ|ẫ|ậ/gi, 'a')

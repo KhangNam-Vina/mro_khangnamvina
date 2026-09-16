@@ -782,10 +782,9 @@
                             <table class="w-full min-w-[1000px] text-left">
 
                                 <!-- ĐÃ NỚI RỘNG CỘT SIZE VÀ ĐỒNG BỘ CĂN LỀ -->
-                                <thead
-                                    class="bg-gray-50 border-b border-gray-200">
+                                <thead class="bg-gray-50 border-b border-gray-200">
                                     <tr>
-                                        <th class="px-4 py-4 text-xs font-black text-gray-500 uppercase tracking-wider text-center w-12">#</th>
+                                        <th class="px-4 py-4 text-xs font-black text-gray-500 uppercase tracking-wider text-center w-12">STT</th>
                                         <th class="px-4 py-4 text-xs font-black text-gray-500 uppercase tracking-wider text-center w-16">Ảnh</th>
                                         <th class="px-4 py-4 text-xs font-black text-gray-500 uppercase tracking-wider w-32">SKU</th>
                                         <th class="px-4 py-4 text-xs font-black text-gray-500 uppercase tracking-wider min-w-[220px]">Sản Phẩm</th>
@@ -793,7 +792,8 @@
                                         <th class="px-4 py-4 text-xs font-black text-gray-500 uppercase tracking-wider min-w-[180px]">Size</th>
                                         <th class="px-4 py-4 text-xs font-black text-gray-500 uppercase tracking-wider text-right w-28">Giá</th>
                                         <th class="px-4 py-4 text-xs font-black text-gray-500 uppercase tracking-wider text-center w-28">Tồn Kho</th>
-                                        <th class="px-4 py-4 text-xs font-black text-gray-500 uppercase tracking-wider text-center w-28">Thao Tác</th>
+                                        <th class="px-4 py-4 text-xs font-black text-gray-500 uppercase tracking-wider text-center w-32">Trạng thái</th>
+                                        <th class="px-4 py-4 text-xs font-black text-gray-500 uppercase tracking-wider text-center w-32">Thao Tác</th>
                                     </tr>
                                 </thead>
 
@@ -1103,6 +1103,18 @@
                                             </div>
 
                                         </div>
+                                        
+                                        <!-- TRẠNG THÁI HIỂN THỊ -->
+                                <div class="flex items-center justify-between p-5 bg-gray-50 border border-gray-200 rounded-xl mt-6">
+                                    <div>
+                                        <div class="text-sm font-bold text-gray-800">Hiển thị trên Website</div>
+                                        <div class="text-xs text-gray-500 mt-0.5">Bật để cho phép khách hàng nhìn thấy và đặt mua sản phẩm này.</div>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                                        <input type="checkbox" id="is_active" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500 shadow-inner"></div>
+                                    </label>
+                                </div>
 
                                     </div>
 

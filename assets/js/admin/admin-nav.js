@@ -113,6 +113,14 @@
 
         {
             type: "single",
+            label: "Cấu hình Trang chủ",
+            href: "homepage-settings.html",
+            key: "homepage-settings",
+            icon: "homepage"
+        },
+
+        {
+            type: "single",
             label: "Quản lý Bài viết",
             href: "manage-blog.html",
             key: "manage-blog",
@@ -268,6 +276,24 @@
             </svg>
         `,
 
+
+        homepage: `
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <path d="M3 10.5 12 3l9 7.5"></path>
+                <path d="M5 9.5V21h14V9.5"></path>
+                <path d="M9 21v-6h6v6"></path>
+            </svg>
+        `,
 
         families: `
             <svg

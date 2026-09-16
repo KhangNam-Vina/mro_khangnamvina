@@ -72,8 +72,6 @@ const state = {
     }
 };
 
-
-
 /* =========================================================
    DOM ELEMENTS
 ========================================================= */
@@ -124,14 +122,10 @@ const DOM = {
     outOfStock: document.getElementById("productOutOfStock"),
     onSale: document.getElementById("productOnSale"),
     toast: document.getElementById("toastContainer"),
-    dataQualityDashboard:
-        document.getElementById("dataQualityDashboard"),
-
-    dataQualityTotal:
-        document.getElementById("dataQualityTotal"),
-
-    dataQualityGrid:
-        document.getElementById("dataQualityGrid"),
+    dataQualityDashboard: document.getElementById("dataQualityDashboard"),
+    dataQualityTotal: document.getElementById("dataQualityTotal"),
+    dataQualityGrid: document.getElementById("dataQualityGrid"),
+    isActive: document.getElementById("is_active"),
 
     // SEO
     slug: document.getElementById("slug"),
@@ -158,7 +152,6 @@ const DOM = {
     filterHasImage: document.getElementById("filterHasImage"),
     filterHasDatasheet: document.getElementById("filterHasDatasheet"),
     filterHasInfo: document.getElementById("filterHasInfo"),
-    
 };
 
 /* =========================================================
@@ -237,8 +230,6 @@ async function updateAutoSlug({ force = false } = {}) {
 
     try {
         const slug = await ensureUniqueSlug(slugify(name), state.editingId);
-
-        // Bỏ qua kết quả cũ nếu admin đã gõ/đổi tên tiếp trong lúc chờ DB.
         if (requestId !== autoSlugRequestId) return;
         if (!force && getSlugSource() !== "auto") return;
 
@@ -252,9 +243,7 @@ async function updateAutoSlug({ force = false } = {}) {
 
 function scheduleAutoSlug() {
     clearTimeout(autoSlugTimer);
-
     if (getSlugSource() !== "auto") return;
-
     autoSlugTimer = setTimeout(() => {
         updateAutoSlug();
     }, 350);
@@ -262,25 +251,13 @@ function scheduleAutoSlug() {
 
 function updateSlugSourceUI() {
     if (!DOM.slugSourceLabel) return;
-    DOM.slugSourceLabel.textContent =
-        getSlugSource() === "manual" ? "Thủ công" : "Tự động";
-}
-
-function markSlugManual() {
-    if (!DOM.slug) return;
-    state.editingSlugSource = "manual";
-    updateSlugSourceUI();
+    DOM.slugSourceLabel.textContent = getSlugSource() === "manual" ? "Thủ công" : "Tự động";
 }
 
 function handleSlugInput() {
     if (!DOM.slug) return;
 
     let value = DOM.slug.value;
-
-    // Cho phép nhập slug tự nhiên:
-    // - chữ cái a-z
-    // - số 0-9
-    // - dấu gạch ngang "-"
     value = value
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
@@ -292,17 +269,14 @@ function handleSlugInput() {
 
     DOM.slug.value = value;
 
-    // Có nội dung => người dùng đang chỉnh slug thủ công
     if (value) {
         state.editingSlugSource = "manual";
         ++autoSlugRequestId;
         clearTimeout(autoSlugTimer);
     } else {
-        // Xóa hết slug => quay lại Auto
         state.editingSlugSource = "auto";
         scheduleAutoSlug();
     }
-
     updateSlugSourceUI();
 }
 
@@ -340,28 +314,24 @@ function getProductSlugUrl() {
     if (!slug) return "";
 
     const productId = state.editingId;
-
     if (!productId) {
         showToast("Sản phẩm chưa được lưu nên chưa có trang để xem.", "error");
         return "";
     }
-
     return `${window.location.origin}/product-detail.html?id=${encodeURIComponent(productId)}`;
 }
 
 function viewCurrentSlug() {
     const url = getProductSlugUrl();
-
     if (!url) {
         showToast("Chưa có slug để xem.", "error");
         return;
     }
-
     window.open(url, "_blank", "noopener,noreferrer");
 }
 
 /* =========================================================
-   SIZE & IMAGE HELPERS (Giữ nguyên gốc)
+   SIZE HELPERS
 ========================================================= */
 function normalizeProductSizes(product) {
     if (!product) return [];
@@ -378,16 +348,9 @@ function normalizeProductSizes(product) {
     return [...new Set(sizes)];
 }
 
-/* =========================================================
-   SIZE (Đã nới rộng và cấm bẻ chữ)
-========================================================= */
 function renderProductSizes(product) {
     const sizes = normalizeProductSizes(product);
-
-    if (sizes.length === 0) {
-        return `<span class="text-xs text-gray-400 italic">—</span>`;
-    }
-
+    if (sizes.length === 0) return `<span class="text-xs text-gray-400 italic">—</span>`;
     return `
         <div class="flex flex-wrap items-center gap-1.5 min-w-[160px] max-w-[260px]">
             ${sizes.map(size => `
@@ -399,6 +362,9 @@ function renderProductSizes(product) {
     `;
 }
 
+/* =========================================================
+   IMAGE & STORAGE HELPERS
+========================================================= */
 function normalizeImageList(value) {
     if (!value) return [];
     if (Array.isArray(value)) return value.map(i => String(i).trim()).filter(Boolean);
@@ -429,12 +395,6 @@ function getStoragePathFromUrl(url) {
         }
         return null;
     } catch (e) { return null; }
-}
-
-function isOwnProductStorageUrl(url, productId) {
-    const path = getStoragePathFromUrl(url);
-    if (!path || !productId) return false;
-    return path.startsWith(`${STORAGE_PRODUCT_PREFIX}/${productId}/`);
 }
 
 function validateImageFile(file) {
@@ -515,10 +475,6 @@ function renderMainImagePreview(url) {
             <button type="button" data-media-action="remove-main" class="absolute top-1 right-1 w-7 h-7 rounded-full bg-red-500 text-white flex items-center justify-center text-sm font-black opacity-0 group-hover:opacity-100 transition hover:bg-red-600">×</button>
             <span class="absolute left-1 bottom-1 px-1.5 py-0.5 rounded bg-black/60 text-white text-[9px] font-bold">Ảnh đại diện</span>
         </div>`;
-}
-
-function renderExtraImagesPreview(urls = []) {
-    // Basic legacy func
 }
 
 function renderPendingExtraFiles() {
@@ -684,21 +640,14 @@ function escapeDropdownHTML(value) {
    BỘ LỌC ĐA NĂNG (ADVANCED FILTERS)
 ========================================================= */
 
-// Cập nhật Cấp 2 (SubCategory) dựa vào Cấp 1
 function updateFilterSubCategories(categoryId, preserveSelection = false) {
     if (!DOM.filterSubCategory || !DOM.filterFamily) return;
 
-    const previousSubCategory = preserveSelection
-        ? state.filters.subCategory
-        : "all";
-    const previousFamily = preserveSelection
-        ? state.filters.family
-        : "all";
+    const previousSubCategory = preserveSelection ? state.filters.subCategory : "all";
+    const previousFamily = preserveSelection ? state.filters.family : "all";
 
     if (categoryId && categoryId !== "all") {
-        const filtered = state.subCategories.filter(
-            item => String(item.category_id) === String(categoryId)
-        );
+        const filtered = state.subCategories.filter(item => String(item.category_id) === String(categoryId));
         populateSelect(DOM.filterSubCategory, filtered, "-- Tất cả nhóm hàng --", "all");
         DOM.filterSubCategory.disabled = false;
     } else {
@@ -706,22 +655,14 @@ function updateFilterSubCategories(categoryId, preserveSelection = false) {
         DOM.filterSubCategory.disabled = true;
     }
 
-    const hasSubSelection =
-        previousSubCategory !== "all" &&
-        Array.from(DOM.filterSubCategory.options).some(
-            option => String(option.value) === String(previousSubCategory)
-        );
+    const hasSubSelection = previousSubCategory !== "all" && Array.from(DOM.filterSubCategory.options).some(option => String(option.value) === String(previousSubCategory));
 
     if (hasSubSelection) {
         DOM.filterSubCategory.value = previousSubCategory;
         state.filters.subCategory = previousSubCategory;
         updateFilterFamilies(previousSubCategory, true);
 
-        const hasFamilySelection =
-            previousFamily !== "all" &&
-            Array.from(DOM.filterFamily.options).some(
-                option => String(option.value) === String(previousFamily)
-            );
+        const hasFamilySelection = previousFamily !== "all" && Array.from(DOM.filterFamily.options).some(option => String(option.value) === String(previousFamily));
 
         if (hasFamilySelection) {
             DOM.filterFamily.value = previousFamily;
@@ -737,18 +678,13 @@ function updateFilterSubCategories(categoryId, preserveSelection = false) {
     }
 }
 
-// Cập nhật Cấp 3 (Family) dựa vào Cấp 2
 function updateFilterFamilies(subCategoryId, preserveSelection = false) {
     if (!DOM.filterFamily) return;
 
-    const previousFamily = preserveSelection
-        ? state.filters.family
-        : "all";
+    const previousFamily = preserveSelection ? state.filters.family : "all";
 
     if (subCategoryId && subCategoryId !== "all") {
-        const filtered = state.families.filter(
-            item => String(item.sub_category_id) === String(subCategoryId)
-        );
+        const filtered = state.families.filter(item => String(item.sub_category_id) === String(subCategoryId));
         populateSelect(DOM.filterFamily, filtered, "-- Tất cả dòng sản phẩm --", "all");
         DOM.filterFamily.disabled = false;
     } else {
@@ -756,12 +692,7 @@ function updateFilterFamilies(subCategoryId, preserveSelection = false) {
         DOM.filterFamily.disabled = true;
     }
 
-    const hasFamilySelection =
-        preserveSelection &&
-        previousFamily !== "all" &&
-        Array.from(DOM.filterFamily.options).some(
-            option => String(option.value) === String(previousFamily)
-        );
+    const hasFamilySelection = preserveSelection && previousFamily !== "all" && Array.from(DOM.filterFamily.options).some(option => String(option.value) === String(previousFamily));
 
     if (hasFamilySelection) {
         DOM.filterFamily.value = previousFamily;
@@ -772,7 +703,7 @@ function updateFilterFamilies(subCategoryId, preserveSelection = false) {
 }
 
 /* =========================================================
-   RENDER CHECKBOX BRAND (REFACTORED UX)
+   RENDER CHECKBOX BRAND
 ========================================================= */
 function renderBrandsForFilter(keyword = "") {
     const listContainer = document.getElementById("filterBrandList");
@@ -781,24 +712,15 @@ function renderBrandsForFilter(keyword = "") {
     if (!listContainer || !selectAllContainer) return;
 
     const search = keyword.trim().toLowerCase();
-    
-    // 1. Sắp xếp toàn bộ Brand A-Z
-    let sortedBrands = [...state.brands].sort((a, b) => 
-        a.name.toLowerCase().localeCompare(b.name.toLowerCase())
-    );
-    
-    // 2. Lọc realtime theo từ khóa gõ vào
+    let sortedBrands = [...state.brands].sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
     let filtered = sortedBrands.filter(b => String(b.name).toLowerCase().includes(search));
 
-    // 3. Xử lý UI nếu không tìm thấy Brand
     if (filtered.length === 0) {
         selectAllContainer.innerHTML = '';
         listContainer.innerHTML = `<div class="p-4 text-sm text-gray-500 text-center">Không tìm thấy thương hiệu</div>`;
         return;
     }
 
-    // 4. Logic "Chọn tất cả" & Trạng thái Indeterminate (Bán phần)
-    // Đếm số brand TRONG KẾT QUẢ TÌM KIẾM đang được tick
     const visibleSelectedCount = filtered.filter(b => state.filters.brands.includes(String(b.id))).length;
     const totalVisible = filtered.length;
     
@@ -814,7 +736,6 @@ function renderBrandsForFilter(keyword = "") {
         isIndeterminate = true;
     }
 
-    // Wording cho Label
     let selectAllLabel = `Chọn tất cả (${totalVisible})`;
     if (visibleSelectedCount > 0 && visibleSelectedCount < totalVisible) {
         selectAllLabel = `Chọn tất cả (${visibleSelectedCount}/${totalVisible})`;
@@ -827,30 +748,18 @@ function renderBrandsForFilter(keyword = "") {
         </label>
     `;
 
-    // Thiết lập trạng thái Indeterminate cho DOM
     const cbSelectAll = document.getElementById("cbSelectAllBrands");
-    if (cbSelectAll) {
-        cbSelectAll.indeterminate = isIndeterminate;
-    }
+    if (cbSelectAll) cbSelectAll.indeterminate = isIndeterminate;
 
-    // 5. Render Danh sách Checkbox (Khoảng cách space-y-3 = 12px)
     listContainer.innerHTML = filtered.map(brand => {
         const isSelected = state.filters.brands.includes(String(brand.id));
         return `
             <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer group w-full">
-                <input type="checkbox" value="${escapeAttribute(brand.id)}" 
-                    class="filter-brand-cb w-4 h-4 rounded border-gray-300 text-kn-blue focus:ring-kn-blue cursor-pointer shrink-0"
-                    ${isSelected ? 'checked' : ''}>
-                <span class="truncate ${isSelected ? 'font-bold text-kn-blue' : 'group-hover:text-kn-blue transition-colors'}">
-                    ${escapeHTML(brand.name)}
-                </span>
+                <input type="checkbox" value="${escapeAttribute(brand.id)}" class="filter-brand-cb w-4 h-4 rounded border-gray-300 text-kn-blue focus:ring-kn-blue cursor-pointer shrink-0" ${isSelected ? 'checked' : ''}>
+                <span class="truncate ${isSelected ? 'font-bold text-kn-blue' : 'group-hover:text-kn-blue transition-colors'}">${escapeHTML(brand.name)}</span>
             </label>
         `;
     }).join("");
-
-    // ==========================================
-    // BIND EVENT
-    // ==========================================
     
     if (cbSelectAll) {
         cbSelectAll.addEventListener("change", (e) => {
@@ -881,7 +790,6 @@ function renderBrandsForFilter(keyword = "") {
     });
 }
 
-// Cập nhật State từ DOM (dùng khi Clear Filter)
 function syncFiltersToDOM() {
     if (DOM.search) DOM.search.value = state.filters.search;
     if (DOM.filterCategory) DOM.filterCategory.value = state.filters.category;
@@ -897,13 +805,10 @@ function syncFiltersToDOM() {
     if (DOM.filterHasDatasheet) DOM.filterHasDatasheet.value = state.filters.hasDatasheet;
     if (DOM.filterHasInfo) DOM.filterHasInfo.value = state.filters.hasInfo || "all";
 
-    // Rebuild cascade nhưng giữ SubCategory/Family hiện tại nếu còn hợp lệ.
     updateFilterSubCategories(state.filters.category, true);
-
     renderBrandsForFilter(DOM.filterBrandSearch?.value || "");
 }
 
-// Render chuỗi TAG cho những thuộc tính đang được Lọc
 function renderActiveFilters() {
     if (!DOM.activeFiltersContainer) return;
     const tags = [];
@@ -932,7 +837,6 @@ function renderActiveFilters() {
         tags.push({ key: 'moq', label: `MOQ: ${min} ${max}` });
     }
 
-    // 7 TIÊU CHÍ DATA QUALITY
     if (state.filters.hasBrand === 'no') tags.push({ key: 'hasBrand', label: 'Thiếu Brand' });
     if (state.filters.hasOrigin === 'no') tags.push({ key: 'hasOrigin', label: 'Thiếu Xuất xứ' });
     if (state.filters.hasDesc === 'no') tags.push({ key: 'hasDesc', label: 'Thiếu Mô tả' });
@@ -979,7 +883,6 @@ function renderActiveFilters() {
     }
 }
 
-// Xóa 1 Filter Tag cụ thể hoặc Xóa Tất Cả
 window.removeFilter = function(key, value) {
     if (key === 'all') {
         state.filters = { 
@@ -1033,11 +936,9 @@ async function loadAllDropdowns() {
         state.industries = indRes.data || [];
         state.brands = brandRes.data || [];
 
-        // Cho Form Tạo/Sửa
         populateSelect(DOM.category, state.categories, "-- Chọn danh mục gốc --");
         populateSelect(DOM.industry, state.industries, "-- Chọn ngành hàng --");
         
-        // Cho Bộ Lọc
         populateSelect(DOM.filterCategory, state.categories, "Tất cả danh mục", "all");
         populateSelect(DOM.filterIndustry, state.industries, "Tất cả ngành hàng", "all");
         
@@ -1050,7 +951,7 @@ async function loadAllDropdowns() {
 
         resetCatalogDropdowns();
         refreshBrandDatalist();
-        renderBrandsForFilter(); // Render checkbox brand
+        renderBrandsForFilter();
 
     } catch (error) {
         console.error("Lỗi tải Dropdowns:", error);
@@ -1058,7 +959,6 @@ async function loadAllDropdowns() {
     }
 }
 
-// Logic cũ của Form nhập sản phẩm
 function resetCatalogDropdowns() {
     populateSelect(DOM.subCategory, [], "-- Chọn nhóm hàng --");
     populateSelect(DOM.family, [], "-- Chọn dòng sản phẩm --");
@@ -1188,19 +1088,10 @@ function initBrandOriginDropdowns() {
 
 
 /* =========================================================
-   FETCH & RENDER PRODUCTS BẰNG FILTER MỚI
+   FETCH PRODUCTS
 ========================================================= */
 function addPostgrestLogicFilter(query, expression) {
     if (!expression) return query;
-
-    /*
-     * Supabase/PostgREST hỗ trợ logic tree:
-     * and=(or(...),or(...))
-     *
-     * Dùng URL parameter `and` để giữ đúng:
-     * Search AND Missing/Quality conditions.
-     * Như vậy không còn hiện tượng .or() sau ghi đè .or() trước.
-     */
     query.url.searchParams.set("and", expression);
     return query;
 }
@@ -1219,56 +1110,20 @@ async function fetchProducts() {
 
         const logicGroups = [];
 
-        // Keyword search: SKU OR Name
         if (state.filters.search) {
-            // Lọc luôn cả ngoặc kép và dấu phẩy khách lỡ tay gõ vào để chống gãy chuỗi
-            const keyword = state.filters.search
-                .replace(/[%_",()]/g, "")
-                .trim();
-
+            const keyword = state.filters.search.replace(/[%_",()]/g, "").trim();
             if (keyword) {
-                // FIX BẪY SỐ 2: Bọc thêm ngoặc kép vào "%...%" để an toàn tuyệt đối với khoảng trắng
-                logicGroups.push(
-                    `or(sku.ilike."%${keyword}%",name.ilike."%${keyword}%")`
-                );
+                logicGroups.push(`or(sku.ilike."%${keyword}%",name.ilike."%${keyword}%")`);
             }
         }
 
-        // Missing image
-        if (state.filters.hasImage === "no") {
-            logicGroups.push(
-                'or(image_path.is.null,image_path.eq."")'
-            );
-        }
+        if (state.filters.hasImage === "no") logicGroups.push('or(image_path.is.null,image_path.eq."")');
+        if (state.filters.hasDatasheet === "no") logicGroups.push('or(datasheet_url.is.null,datasheet_url.eq."")');
+        if (state.filters.hasBrand === "no") logicGroups.push("brand_id.is.null");
+        if (state.filters.hasOrigin === "no") logicGroups.push('or(origin.is.null,origin.eq."")');
+        if (state.filters.hasDesc === "no") logicGroups.push('or(description.is.null,description.eq."")');
+        if (state.filters.hasSpecs === "no") logicGroups.push('or(specifications.is.null,specifications.eq."")');
 
-        // Missing datasheet
-        if (state.filters.hasDatasheet === "no") {
-            logicGroups.push(
-                'or(datasheet_url.is.null,datasheet_url.eq."")'
-            );
-        }
-
-        // Missing brand
-        if (state.filters.hasBrand === "no") {
-            logicGroups.push("brand_id.is.null");
-        }
-
-        // Missing origin
-        if (state.filters.hasOrigin === "no") {
-            logicGroups.push('or(origin.is.null,origin.eq."")');
-        }
-
-        // Missing description
-        if (state.filters.hasDesc === "no") {
-            logicGroups.push('or(description.is.null,description.eq."")');
-        }
-
-        // Missing specifications
-        if (state.filters.hasSpecs === "no") {
-            logicGroups.push('or(specifications.is.null,specifications.eq."")');
-        }
-
-        // Missing information = thiếu ÍT NHẤT 1 field bắt buộc.
         if (state.filters.hasInfo === "no") {
             logicGroups.push(
                 'or(' +
@@ -1283,131 +1138,47 @@ async function fetchProducts() {
             );
         }
 
-        // Bắt buộc phải luôn có ngoặc tròn bọc ngoài cùng dù chỉ có 1 điều kiện
         if (logicGroups.length > 0) {
-            query = addPostgrestLogicFilter(
-                query,
-                `(${logicGroups.join(",")})`
-            );
+            query = addPostgrestLogicFilter(query, `(${logicGroups.join(",")})`);
         }
 
-        // hasImage=yes: điều kiện AND bình thường
-        if (state.filters.hasImage === "yes") {
-            query = query
-                .not("image_path", "is", null)
-                .neq("image_path", "");
-        }
+        if (state.filters.hasImage === "yes") query = query.not("image_path", "is", null).neq("image_path", "");
+        if (state.filters.hasDatasheet === "yes") query = query.not("datasheet_url", "is", null).neq("datasheet_url", "");
 
-        // hasDatasheet=yes
-        if (state.filters.hasDatasheet === "yes") {
-            query = query
-                .not("datasheet_url", "is", null)
-                .neq("datasheet_url", "");
-        }
-
-        // hasInfo=yes: tất cả field bắt buộc phải có
         if (state.filters.hasInfo === "yes") {
             query = query
-                .not("name", "is", null)
-                .neq("name", "")
-                .not("sku", "is", null)
-                .neq("sku", "")
+                .not("name", "is", null).neq("name", "")
+                .not("sku", "is", null).neq("sku", "")
                 .not("brand_id", "is", null)
-                .not("origin", "is", null)
-                .neq("origin", "")
-                .not("description", "is", null)
-                .neq("description", "")
-                .not("specifications", "is", null)
-                .neq("specifications", "")
-                .not("image_path", "is", null)
-                .neq("image_path", "");
+                .not("origin", "is", null).neq("origin", "")
+                .not("description", "is", null).neq("description", "")
+                .not("specifications", "is", null).neq("specifications", "")
+                .not("image_path", "is", null).neq("image_path", "");
         }
 
-        // Quick Filters
-        if (state.filters.category !== "all") {
-            query = query.eq("category_id", state.filters.category);
-        }
+        if (state.filters.category !== "all") query = query.eq("category_id", state.filters.category);
+        if (state.filters.industry !== "all") query = query.eq("industry_id", state.filters.industry);
+        if (state.filters.stock === "in_stock") query = query.gt("stock_quantity", 0);
+        if (state.filters.stock === "out_of_stock") query = query.lte("stock_quantity", 0);
+        if (state.filters.subCategory !== "all") query = query.eq("sub_category_id", state.filters.subCategory);
+        if (state.filters.family !== "all") query = query.eq("family_id", state.filters.family);
+        if (state.filters.origin !== "all") query = query.eq("origin", state.filters.origin);
+        if (state.filters.priceMin) query = query.gte("price", state.filters.priceMin);
+        if (state.filters.priceMax) query = query.lte("price", state.filters.priceMax);
+        if (state.filters.brands.length > 0) query = query.in("brand_id", state.filters.brands);
+        if (state.filters.moqMin) query = query.gte("min_order_quantity", state.filters.moqMin);
+        if (state.filters.moqMax) query = query.lte("min_order_quantity", state.filters.moqMax);
 
-        if (state.filters.industry !== "all") {
-            query = query.eq("industry_id", state.filters.industry);
-        }
-
-        if (state.filters.stock === "in_stock") {
-            query = query.gt("stock_quantity", 0);
-        }
-
-        if (state.filters.stock === "out_of_stock") {
-            query = query.lte("stock_quantity", 0);
-        }
-
-        // Advanced Filters
-        if (state.filters.subCategory !== "all") {
-            query = query.eq("sub_category_id", state.filters.subCategory);
-        }
-
-        if (state.filters.family !== "all") {
-            query = query.eq("family_id", state.filters.family);
-        }
-
-        if (state.filters.origin !== "all") {
-            query = query.eq("origin", state.filters.origin);
-        }
-
-        if (state.filters.priceMin) {
-            query = query.gte("price", state.filters.priceMin);
-        }
-
-        if (state.filters.priceMax) {
-            query = query.lte("price", state.filters.priceMax);
-        }
-
-        if (state.filters.brands.length > 0) {
-            query = query.in("brand_id", state.filters.brands);
-        }
-
-        if (state.filters.moqMin) {
-            query = query.gte(
-                "min_order_quantity",
-                state.filters.moqMin
-            );
-        }
-
-        if (state.filters.moqMax) {
-            query = query.lte(
-                "min_order_quantity",
-                state.filters.moqMax
-            );
-        }
-
-        // Sort
         switch (state.filters.sort) {
-            case "newest":
-                query = query.order("created_at", { ascending: false });
-                break;
-            case "oldest":
-                query = query.order("created_at", { ascending: true });
-                break;
-            case "name_asc":
-                query = query.order("name", { ascending: true });
-                break;
-            case "name_desc":
-                query = query.order("name", { ascending: false });
-                break;
-            case "price_asc":
-                query = query.order("price", { ascending: true });
-                break;
-            case "price_desc":
-                query = query.order("price", { ascending: false });
-                break;
-            case "stock_asc":
-                query = query.order("stock_quantity", { ascending: true });
-                break;
-            case "stock_desc":
-                query = query.order("stock_quantity", { ascending: false });
-                break;
-            default:
-                query = query.order("created_at", { ascending: false });
-                break;
+            case "newest": query = query.order("created_at", { ascending: false }); break;
+            case "oldest": query = query.order("created_at", { ascending: true }); break;
+            case "name_asc": query = query.order("name", { ascending: true }); break;
+            case "name_desc": query = query.order("name", { ascending: false }); break;
+            case "price_asc": query = query.order("price", { ascending: true }); break;
+            case "price_desc": query = query.order("price", { ascending: false }); break;
+            case "stock_asc": query = query.order("stock_quantity", { ascending: true }); break;
+            case "stock_desc": query = query.order("stock_quantity", { ascending: false }); break;
+            default: query = query.order("created_at", { ascending: false }); break;
         }
 
         const { data, count, error } = await query.range(from, to);
@@ -1417,9 +1188,7 @@ async function fetchProducts() {
         state.products = data || [];
         state.totalItems = count || 0;
 
-        if (DOM.filteredCountDisplay) {
-            DOM.filteredCountDisplay.textContent = state.totalItems;
-        }
+        if (DOM.filteredCountDisplay) DOM.filteredCountDisplay.textContent = state.totalItems;
 
         updateStatistics();
         renderProducts();
@@ -1427,31 +1196,14 @@ async function fetchProducts() {
 
     } catch (error) {
         console.error("Lỗi tải sản phẩm:", error);
-
-        DOM.tableBody.innerHTML = `
-            <tr>
-                <td colspan="9" class="text-center py-12 text-red-500 font-bold">
-                    Không thể tải danh sách sản phẩm.
-                    <div class="text-xs font-normal mt-1 text-red-400">
-                        ${escapeHTML(error.message)}
-                    </div>
-                </td>
-            </tr>`;
+        DOM.tableBody.innerHTML = `<tr><td colspan="10" class="text-center py-12 text-red-500 font-bold">Không thể tải danh sách sản phẩm.<div class="text-xs font-normal mt-1 text-red-400">${escapeHTML(error.message)}</div></td></tr>`;
     }
 }
 
-
 function renderTableLoading() {
     if (!DOM.tableBody) return;
-    DOM.tableBody.innerHTML = `
-        <tr>
-            <td colspan="9" class="text-center py-12 text-gray-400">
-                <div class="inline-block w-6 h-6 border-2 border-kn-blue border-t-transparent rounded-full animate-spin"></div>
-                <div class="mt-2 text-sm font-medium">Đang tải cấu hình...</div>
-            </td>
-        </tr>`;
+    DOM.tableBody.innerHTML = `<tr><td colspan="10" class="text-center py-12 text-gray-400"><div class="inline-block w-6 h-6 border-2 border-kn-blue border-t-transparent rounded-full animate-spin"></div><div class="mt-2 text-sm font-medium">Đang tải cấu hình...</div></td></tr>`;
 }
-
 
 /* =========================================================
    STATISTICS (Thống kê toàn cục)
@@ -1478,455 +1230,96 @@ async function updateStatistics() {
 }
 
 /* =========================================================
-   PHASE 3.2 — DATA QUALITY DASHBOARD
+   DATA QUALITY DASHBOARD
 ========================================================= */
-
 async function updateDataQuality() {
-
     if (!DOM.dataQualityGrid) return;
 
-    DOM.dataQualityGrid.innerHTML = `
-        <div class="col-span-full text-center py-6 text-gray-400">
-            <i class="fas fa-spinner fa-spin mr-2"></i>
-            Đang kiểm tra chất lượng dữ liệu...
-        </div>
-    `;
+    DOM.dataQualityGrid.innerHTML = `<div class="col-span-full text-center py-6 text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Đang kiểm tra chất lượng dữ liệu...</div>`;
 
     try {
-
-        /*
-         * Lấy toàn bộ catalog.
-         *
-         * KHÔNG phụ thuộc:
-         * - pagination
-         * - search
-         * - category
-         * - stock filter
-         * - advanced filter
-         */
-
-        const {
-            data,
-            error
-        } = await window.supabaseClient
-            .from("products")
-            .select(`
-                id,
-                name,
-                sku,
-                brand_id,
-                origin,
-                description,
-                specifications,
-                image_path,
-                datasheet_url
-            `);
-
-        if (error) {
-            throw error;
-        }
+        const { data, error } = await window.supabaseClient.from("products").select(`id, name, sku, brand_id, origin, description, specifications, image_path, datasheet_url`);
+        if (error) throw error;
 
         const products = data || [];
         const total = products.length;
 
-        /*
-         * Helper kiểm tra field có dữ liệu hay không.
-         */
         const hasValue = value => {
-
-            if (
-                value === null ||
-                value === undefined
-            ) {
-                return false;
-            }
-
-            if (
-                typeof value === "string"
-            ) {
-                return value.trim() !== "";
-            }
-
+            if (value === null || value === undefined) return false;
+            if (typeof value === "string") return value.trim() !== "";
             return true;
         };
 
+        const completeName = products.filter(p => hasValue(p.name)).length;
+        const completeSku = products.filter(p => hasValue(p.sku)).length;
+        const completeBrand = products.filter(p => p.brand_id !== null && p.brand_id !== undefined).length;
+        const completeOrigin = products.filter(p => hasValue(p.origin)).length;
+        const completeDescription = products.filter(p => hasValue(p.description)).length;
+        const completeSpecifications = products.filter(p => hasValue(p.specifications)).length;
+        const completeImage = products.filter(p => hasValue(p.image_path)).length;
+        const completeDatasheet = products.filter(p => hasValue(p.datasheet_url)).length;
 
-        /*
-         * 1. TÊN
-         */
-        const completeName =
-            products.filter(
-                product =>
-                    hasValue(product.name)
-            ).length;
-
-
-        /*
-         * 2. SKU
-         */
-        const completeSku =
-            products.filter(
-                product =>
-                    hasValue(product.sku)
-            ).length;
-
-
-        /*
-         * 3. BRAND
-         */
-        const completeBrand =
-            products.filter(
-                product =>
-                    product.brand_id !== null &&
-                    product.brand_id !== undefined
-            ).length;
-
-
-        /*
-         * 4. ORIGIN
-         */
-        const completeOrigin =
-            products.filter(
-                product =>
-                    hasValue(product.origin)
-            ).length;
-
-
-        /*
-         * 5. DESCRIPTION
-         */
-        const completeDescription =
-            products.filter(
-                product =>
-                    hasValue(product.description)
-            ).length;
-
-
-        /*
-         * 6. SPECIFICATIONS
-         */
-        const completeSpecifications =
-            products.filter(
-                product =>
-                    hasValue(product.specifications)
-            ).length;
-
-
-        /*
-         * 7. IMAGE
-         */
-        const completeImage =
-            products.filter(
-                product =>
-                    hasValue(product.image_path)
-            ).length;
-
-
-        /*
-         * 8. DATASHEET
-         *
-         * Datasheet KHÔNG nằm trong rule
-         * "Đủ thông tin", nhưng vẫn thống kê
-         * riêng để Admin biết tình trạng catalog.
-         */
-        const completeDatasheet =
-            products.filter(
-                product =>
-                    hasValue(product.datasheet_url)
-            ).length;
-
-
-        /*
-         * RULE "ĐỦ THÔNG TIN"
-         *
-         * Bắt buộc:
-         * - name
-         * - sku
-         * - brand
-         * - origin
-         * - description
-         * - specifications
-         * - image
-         *
-         * Không bắt buộc:
-         * - datasheet
-         * - short_description
-         */
-
-        const completeInformation =
-    products.filter(product => {
-        return (
-            hasValue(product.name) &&
-            hasValue(product.sku) &&
-            product.brand_id !== null &&
-            product.brand_id !== undefined &&
-            hasValue(product.origin) &&
-            hasValue(product.description) &&
-            hasValue(product.specifications) &&
-            hasValue(product.image_path)
-        );
-    }).length;
-
-const missingInformation =
-    total - completeInformation;
-
-
-        /*
-         * Render KPI
-         */
+        const completeInformation = products.filter(p => hasValue(p.name) && hasValue(p.sku) && p.brand_id !== null && p.brand_id !== undefined && hasValue(p.origin) && hasValue(p.description) && hasValue(p.specifications) && hasValue(p.image_path)).length;
+        const missingInformation = total - completeInformation;
 
         const metrics = [
+            { key: "brand", label: "Thương hiệu", complete: completeBrand, missing: total - completeBrand, icon: "fa-copyright" },
+            { key: "origin", label: "Xuất xứ", complete: completeOrigin, missing: total - completeOrigin, icon: "fa-globe-asia" },
+            { key: "description", label: "Mô tả", complete: completeDescription, missing: total - completeDescription, icon: "fa-align-left" },
+            { key: "specifications", label: "Thông số", complete: completeSpecifications, missing: total - completeSpecifications, icon: "fa-list-check" },
+            { key: "image", label: "Hình ảnh", complete: completeImage, missing: total - completeImage, icon: "fa-image" },
+            { key: "datasheet", label: "Datasheet", complete: completeDatasheet, missing: total - completeDatasheet, icon: "fa-file-pdf" },
+            { key: "information", label: "Thông tin tổng thể", complete: completeInformation, missing: missingInformation, icon: "fa-clipboard-check" }
+        ];
 
-    {
-        key: "brand",
-        label: "Thương hiệu",
-        complete: completeBrand,
-        missing: total - completeBrand,
-        icon: "fa-copyright"
-    },
+        DOM.dataQualityTotal.textContent = `${formatNumber(total)} sản phẩm`;
 
-    {
-        key: "origin",
-        label: "Xuất xứ",
-        complete: completeOrigin,
-        missing: total - completeOrigin,
-        icon: "fa-globe-asia"
-    },
+        DOM.dataQualityGrid.innerHTML = metrics.map(metric => {
+            const percentage = total > 0 ? Math.round((metric.complete / total) * 100) : 0;
+            const isComplete = metric.missing === 0;
 
-    {
-        key: "description",
-        label: "Mô tả",
-        complete: completeDescription,
-        missing: total - completeDescription,
-        icon: "fa-align-left"
-    },
-
-    {
-        key: "specifications",
-        label: "Thông số",
-        complete: completeSpecifications,
-        missing: total - completeSpecifications,
-        icon: "fa-list-check"
-    },
-
-    {
-        key: "image",
-        label: "Hình ảnh",
-        complete: completeImage,
-        missing: total - completeImage,
-        icon: "fa-image"
-    },
-
-    {
-        key: "datasheet",
-        label: "Datasheet",
-        complete: completeDatasheet,
-        missing: total - completeDatasheet,
-        icon: "fa-file-pdf"
-    },
-
-    {
-        key: "information",
-        label: "Thông tin tổng thể",
-        complete: completeInformation,
-        missing: missingInformation,
-        icon: "fa-clipboard-check"
-    }
-
-];
-
-
-        DOM.dataQualityTotal.textContent =
-            `${formatNumber(total)} sản phẩm`;
-
-
-        DOM.dataQualityGrid.innerHTML =
-            metrics.map(metric => {
-
-                const percentage =
-                    total > 0
-                        ? Math.round(
-                            (metric.complete / total) * 100
-                        )
-                        : 0;
-
-                const isComplete =
-                    metric.missing === 0;
-
-                return `
-                    <button
-                        type="button"
-                        class="
-                            data-quality-card
-                            text-left
-                            border
-                            rounded-lg
-                            p-4
-                            transition
-                            hover:shadow-md
-                            hover:border-kn-blue
-                            bg-white
-                        "
-                        data-quality-key="${metric.key}"
-                    >
-
-                        <div class="flex items-center justify-between">
-
-                            <div class="flex items-center gap-2">
-
-                                <div
-                                    class="
-                                        w-8
-                                        h-8
-                                        rounded-lg
-                                        flex
-                                        items-center
-                                        justify-center
-                                        ${isComplete
-                                            ? "bg-green-50 text-green-600"
-                                            : "bg-orange-50 text-orange-500"}
-                                    "
-                                >
-                                    <i class="fas ${metric.icon} text-sm"></i>
-                                </div>
-
-                                <span class="text-sm font-semibold text-gray-700">
-                                    ${metric.label}
-                                </span>
-
-                            </div>
-
-                            <span
-                                class="
-                                    text-xs
-                                    font-bold
-                                    ${isComplete
-                                        ? "text-green-600"
-                                        : "text-orange-500"}
-                                "
-                            >
-                                ${percentage}%
-                            </span>
-
+            return `
+                <button type="button" class="data-quality-card text-left border rounded-lg p-4 transition hover:shadow-md hover:border-kn-blue bg-white" data-quality-key="${metric.key}">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center ${isComplete ? "bg-green-50 text-green-600" : "bg-orange-50 text-orange-500"}"><i class="fas ${metric.icon} text-sm"></i></div>
+                            <span class="text-sm font-semibold text-gray-700">${metric.label}</span>
                         </div>
-
-
-                        <div class="mt-3 flex items-end justify-between">
-
-                            <div>
-
-                                <div class="text-xl font-bold text-gray-800">
-                                    ${formatNumber(metric.complete)}
-                                    <span class="text-xs font-normal text-gray-400">
-                                        / ${formatNumber(total)}
-                                    </span>
-                                </div>
-
-                                <div class="text-xs text-gray-500 mt-1">
-
-                                    ${
-                                        isComplete
-                                            ? "Đầy đủ"
-                                            : `Thiếu ${formatNumber(metric.missing)}`
-                                    }
-
-                                </div>
-
-                            </div>
-
-                            <i
-                                class="
-                                    fas
-                                    fa-chevron-right
-                                    text-xs
-                                    text-gray-300
-                                "
-                            ></i>
-
+                        <span class="text-xs font-bold ${isComplete ? "text-green-600" : "text-orange-500"}">${percentage}%</span>
+                    </div>
+                    <div class="mt-3 flex items-end justify-between">
+                        <div>
+                            <div class="text-xl font-bold text-gray-800">${formatNumber(metric.complete)} <span class="text-xs font-normal text-gray-400">/ ${formatNumber(total)}</span></div>
+                            <div class="text-xs text-gray-500 mt-1">${isComplete ? "Đầy đủ" : `Thiếu ${formatNumber(metric.missing)}`}</div>
                         </div>
+                        <i class="fas fa-chevron-right text-xs text-gray-300"></i>
+                    </div>
+                    <div class="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div class="h-full rounded-full ${isComplete ? "bg-green-500" : "bg-orange-400"}" style="width:${percentage}%"></div>
+                    </div>
+                </button>
+            `;
+        }).join("");
 
-
-                        <div class="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-
-                            <div
-                                class="
-                                    h-full
-                                    rounded-full
-                                    ${isComplete
-                                        ? "bg-green-500"
-                                        : "bg-orange-400"}
-                                "
-                                style="width:${percentage}%"
-                            ></div>
-
-                        </div>
-
-                    </button>
-                `;
-
-            }).join("");
-
-
-        /*
-         * Click KPI
-         */
-        DOM.dataQualityGrid
-            .querySelectorAll(".data-quality-card")
-            .forEach(card => {
-
-                card.addEventListener(
-                    "click",
-                    () => {
-
-                        handleDataQualityClick(
-                            card.dataset.qualityKey
-                        );
-
-                    }
-                );
-
-            });
-
+        DOM.dataQualityGrid.querySelectorAll(".data-quality-card").forEach(card => {
+            card.addEventListener("click", () => handleDataQualityClick(card.dataset.qualityKey));
+        });
 
     } catch (error) {
-
-        console.error(
-            "Lỗi Data Quality:",
-            error
-        );
-
-        DOM.dataQualityTotal.textContent =
-            "Không thể tải dữ liệu";
-
-        DOM.dataQualityGrid.innerHTML = `
-            <div
-                class="
-                    col-span-full
-                    text-center
-                    py-6
-                    text-red-500
-                "
-            >
-                Không thể kiểm tra chất lượng dữ liệu.
-            </div>
-        `;
+        console.error("Lỗi Data Quality:", error);
+        DOM.dataQualityTotal.textContent = "Không thể tải dữ liệu";
+        DOM.dataQualityGrid.innerHTML = `<div class="col-span-full text-center py-6 text-red-500">Không thể kiểm tra chất lượng dữ liệu.</div>`;
     }
 }
 
 /* =========================================================
-   RENDER PRODUCTS (ĐÃ FIX LỆCH CỘT GIÁ)
+   RENDER PRODUCTS (ĐÃ BỌC DẤU NHÁY ĐƠN CHO ID ĐỂ FIX LỖI)
 ========================================================= */
 function renderProducts() {
     if (!DOM.tableBody) return;
 
     if (state.products.length === 0) {
-        DOM.tableBody.innerHTML = `
-            <tr>
-                <td colspan="9" class="text-center py-14 text-gray-400">
-                    Không tìm thấy sản phẩm.
-                </td>
-            </tr>
-        `;
+        DOM.tableBody.innerHTML = `<tr><td colspan="10" class="text-center py-14 text-gray-400">Không tìm thấy sản phẩm.</td></tr>`;
         return;
     }
 
@@ -1935,6 +1328,9 @@ function renderProducts() {
     DOM.tableBody.innerHTML = state.products.map((item, index) => {
         const brandName = item.brands?.name || "OEM";
         const imageUrl = buildProductImageUrl(item.image_path);
+        
+        // KIỂM TRA TRẠNG THÁI BẬT TẮT
+        const isChecked = item.is_active !== false ? "checked" : "";
 
         const imageHTML = imageUrl
             ? `<img src="${escapeAttribute(imageUrl)}" alt="${escapeAttribute(item.name)}" class="w-10 h-10 object-contain mx-auto border border-gray-200 rounded-lg bg-white" loading="lazy" onerror="this.onerror=null;this.src='../assets/images/world mark.png';">`
@@ -1942,46 +1338,51 @@ function renderProducts() {
 
         return `
             <tr class="border-b border-gray-100 hover:bg-blue-50/30 transition">
-                <td class="px-4 py-3 text-center font-bold text-gray-400 text-xs align-middle">
-                    ${from + index + 1}
+                <td class="px-4 py-3 text-center font-bold text-gray-500 text-xs align-middle border-r border-gray-50 w-12">${from + index + 1}</td>
+                <td class="px-4 py-3 text-center align-middle w-16">${imageHTML}</td>
+                <td class="px-4 py-3 font-mono font-bold text-kn-blue text-xs whitespace-nowrap align-middle">${escapeHTML(item.sku)}</td>
+                <td class="px-4 py-3 font-bold text-gray-800 text-sm align-middle leading-snug">${escapeHTML(item.name)}</td>
+                <td class="px-4 py-3 text-gray-600 text-xs font-bold uppercase align-middle">${escapeHTML(brandName)}</td>
+                <td class="px-4 py-3 align-middle">${renderProductSizes(item)}</td>
+                <td class="px-4 py-3 text-gray-800 font-bold text-sm whitespace-nowrap text-right align-middle">${formatCurrency(item.price)}</td>
+                <td class="px-4 py-3 text-center align-middle"><span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold ${Number(item.stock_quantity) > 0 ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'}">${Number(item.stock_quantity) > 0 ? Number(item.stock_quantity) : "Hết hàng"}</span></td>
+                
+                <!-- CÔNG TẮC GẠT TRẠNG THÁI (Đã bọc dấu nháy '' quanh item.id) -->
+                <td class="px-4 py-3 text-center align-middle w-32">
+                    <label class="relative inline-flex items-center cursor-pointer" title="${item.is_active !== false ? 'Đang hiển thị' : 'Đang ẩn'}">
+                        <input type="checkbox" onchange="toggleProductStatus('${item.id}', ${item.is_active !== false})" class="sr-only peer" ${isChecked}>
+                        <div class="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500 shadow-inner"></div>
+                    </label>
                 </td>
-                <td class="px-4 py-3 text-center align-middle">
-                    ${imageHTML}
-                </td>
-                <td class="px-4 py-3 font-mono font-bold text-kn-blue text-xs whitespace-nowrap align-middle">
-                    ${escapeHTML(item.sku)}
-                </td>
-                <td class="px-4 py-3 font-bold text-gray-800 text-sm align-middle leading-snug">
-                    ${escapeHTML(item.name)}
-                </td>
-                <td class="px-4 py-3 text-gray-600 text-xs font-bold uppercase align-middle">
-                    ${escapeHTML(brandName)}
-                </td>
-                <td class="px-4 py-3 align-middle">
-                    ${renderProductSizes(item)}
-                </td>
-                <td class="px-4 py-3 text-gray-800 font-bold text-sm whitespace-nowrap text-right align-middle">
-                    ${formatCurrency(item.price)}
-                </td>
-                <td class="px-4 py-3 text-center align-middle">
-                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold ${Number(item.stock_quantity) > 0 ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'}">
-                        ${Number(item.stock_quantity) > 0 ? Number(item.stock_quantity) : "Hết hàng"}
-                    </span>
-                </td>
-                <td class="px-4 py-3 text-center whitespace-nowrap align-middle">
+
+                <td class="px-4 py-3 text-center whitespace-nowrap align-middle w-32">
                     <div class="flex items-center justify-center gap-1.5">
-                        <button type="button" data-action="edit" data-id="${escapeAttribute(item.id)}" class="px-2 py-1.5 text-blue-600 hover:bg-blue-100 rounded-lg transition font-bold text-[10px] uppercase">
-                            Sửa
-                        </button>
-                        <button type="button" data-action="delete" data-id="${escapeAttribute(item.id)}" class="px-2 py-1.5 text-red-500 hover:bg-red-50 rounded-lg transition font-bold text-[10px] uppercase">
-                            Xóa
-                        </button>
+                        <button type="button" data-action="edit" data-id="${escapeAttribute(item.id)}" class="px-3 py-2 text-kn-blue hover:bg-blue-50 rounded-lg transition font-bold text-[11px] uppercase">Sửa</button>
+                        <button type="button" data-action="delete" data-id="${escapeAttribute(item.id)}" class="px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg transition font-bold text-[11px] uppercase">Xóa</button>
                     </div>
                 </td>
             </tr>
         `;
     }).join("");
 }
+
+// BỔ SUNG HÀM GẠT CÔNG TẮC BÊN NGOÀI BẢNG
+window.toggleProductStatus = async function (id, currentStatus) {
+    const newStatus = !currentStatus;
+    try {
+        const { error } = await window.supabaseClient.from("products").update({ is_active: newStatus }).eq("id", id);
+        if (error) throw error;
+
+        const idx = state.products.findIndex(p => String(p.id) === String(id));
+        if (idx !== -1) state.products[idx].is_active = newStatus;
+
+        showToast(newStatus ? "Đã BẬT sản phẩm" : "Đã ẨN sản phẩm", "success");
+        renderProducts();
+    } catch (error) {
+        showToast("Lỗi cập nhật trạng thái", "error");
+        renderProducts(); 
+    }
+};
 
 /* =========================================================
    PAGINATION
@@ -2021,26 +1422,18 @@ function showAddForm() {
     if (typeof CKEDITOR !== "undefined" && CKEDITOR.instances.description) CKEDITOR.instances.description.setData("");
     if (DOM.formTitle) DOM.formTitle.textContent = "Nhập Sản Phẩm Mới";
     if (DOM.btnSubmit) DOM.btnSubmit.textContent = "Nhập kho sản phẩm";
-        // Reset SEO
+    
+    // Reset SEO
     if (DOM.slug) DOM.slug.value = "";
     if (DOM.metaTitle) DOM.metaTitle.value = "";
     if (DOM.metaDescription) DOM.metaDescription.value = "";
     if (DOM.isH1) DOM.isH1.checked = true;
-
-    if (DOM.slugSourceLabel) {
-        DOM.slugSourceLabel.textContent = "Tự động";
-    }
-
-    if (DOM.metaTitleCount) {
-        DOM.metaTitleCount.textContent = "0 ký tự";
-    }
-
-    if (DOM.metaDescriptionCount) {
-        DOM.metaDescriptionCount.textContent = "0 ký tự";
-    }
+    if (DOM.slugSourceLabel) DOM.slugSourceLabel.textContent = "Tự động";
+    if (DOM.metaTitleCount) DOM.metaTitleCount.textContent = "0 ký tự";
+    if (DOM.metaDescriptionCount) DOM.metaDescriptionCount.textContent = "0 ký tự";
+    if (DOM.isActive) DOM.isActive.checked = true;
     
     updateSeoPreview();
-
     DOM.listView?.classList.add("hidden");
     DOM.formView?.classList.remove("hidden");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -2052,14 +1445,9 @@ function cancelForm() {
     state.editingId = null;
     state.editingSlugSource = "auto";
     resetMediaInputs();
-
     DOM.formView?.classList.add("hidden");
     DOM.listView?.classList.remove("hidden");
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function updateSeoCounters() {
@@ -2068,53 +1456,26 @@ function updateSeoCounters() {
 
     if (DOM.metaTitleCount) {
         const length = DOM.metaTitle?.value?.length || 0;
-
-        DOM.metaTitleCount.textContent =
-            `${length} / ${META_TITLE_MAX} ký tự`;
-
-        DOM.metaTitleCount.classList.toggle(
-            "is-warning",
-            length > META_TITLE_MAX
-        );
+        DOM.metaTitleCount.textContent = `${length} / ${META_TITLE_MAX} ký tự`;
+        DOM.metaTitleCount.classList.toggle("is-warning", length > META_TITLE_MAX);
     }
 
     if (DOM.metaDescriptionCount) {
         const length = DOM.metaDescription?.value?.length || 0;
-
-        DOM.metaDescriptionCount.textContent =
-            `${length} / ${META_DESCRIPTION_MAX} ký tự`;
-
-        DOM.metaDescriptionCount.classList.toggle(
-            "is-warning",
-            length > META_DESCRIPTION_MAX
-        );
+        DOM.metaDescriptionCount.textContent = `${length} / ${META_DESCRIPTION_MAX} ký tự`;
+        DOM.metaDescriptionCount.classList.toggle("is-warning", length > META_DESCRIPTION_MAX);
     }
 }
 
 function updateSeoPreview() {
     const name = DOM.name?.value?.trim() || "Tên sản phẩm";
     const slug = DOM.slug?.value?.trim() || slugify(name);
+    const title = DOM.metaTitle?.value?.trim() || `${name} - MRO Khang Nam`;
+    const description = DOM.metaDescription?.value?.trim() || "Mô tả SEO sẽ hiển thị tại đây...";
 
-    const title =
-        DOM.metaTitle?.value?.trim() ||
-        `${name} - MRO Khang Nam`;
-
-    const description =
-        DOM.metaDescription?.value?.trim() ||
-        "Mô tả SEO sẽ hiển thị tại đây...";
-
-    if (DOM.seoPreviewTitle) {
-        DOM.seoPreviewTitle.textContent = title;
-    }
-
-    if (DOM.seoPreviewUrl) {
-        DOM.seoPreviewUrl.textContent =
-            `mrokhangnam.vn › san-pham › ${slug}`;
-    }
-
-    if (DOM.seoPreviewDescription) {
-        DOM.seoPreviewDescription.textContent = description;
-    }
+    if (DOM.seoPreviewTitle) DOM.seoPreviewTitle.textContent = title;
+    if (DOM.seoPreviewUrl) DOM.seoPreviewUrl.textContent = `mrokhangnam.vn › san-pham › ${slug}`;
+    if (DOM.seoPreviewDescription) DOM.seoPreviewDescription.textContent = description;
 }
 
 function editProduct(id) {
@@ -2126,36 +1487,18 @@ function editProduct(id) {
     
     document.getElementById("sku").value = item.sku || "";
     document.getElementById("name").value = item.name || "";
-        // SEO
-    if (DOM.slug) {
-        DOM.slug.value = item.slug || "";
-    }
-
-    if (DOM.metaTitle) {
-        DOM.metaTitle.value = item.meta_title || "";
-    }
-
-    if (DOM.metaDescription) {
-        DOM.metaDescription.value = item.meta_description || "";
-    }
-
-    if (DOM.isH1) {
-        DOM.isH1.checked = item.is_h1 !== false;
-    }
-
-    if (DOM.slugSourceLabel) {
-        DOM.slugSourceLabel.textContent =
-            item.slug_source === "manual"
-                ? "Thủ công"
-                : "Tự động";
-    }
+    
+    // SEO
+    if (DOM.slug) DOM.slug.value = item.slug || "";
+    if (DOM.metaTitle) DOM.metaTitle.value = item.meta_title || "";
+    if (DOM.metaDescription) DOM.metaDescription.value = item.meta_description || "";
+    if (DOM.isH1) DOM.isH1.checked = item.is_h1 !== false;
+    if (DOM.slugSourceLabel) DOM.slugSourceLabel.textContent = item.slug_source === "manual" ? "Thủ công" : "Tự động";
+    if (DOM.isActive) DOM.isActive.checked = item.is_active !== false;
 
     updateSeoCounters();
 
-    // Sản phẩm cũ chưa có slug nhưng vẫn đang ở chế độ auto
-    if (getSlugSource() === "auto" && !DOM.slug?.value.trim()) {
-        scheduleAutoSlug();
-    }
+    if (getSlugSource() === "auto" && !DOM.slug?.value.trim()) scheduleAutoSlug();
 
     document.getElementById("origin_input").value = item.origin || "";
     document.getElementById("price").value = item.price ?? "";
@@ -2205,100 +1548,19 @@ function getDescriptionValue() {
 }
 
 async function resolveBrandId() {
+    const brandInput = document.getElementById("brand_input");
+    const name = brandInput ? brandInput.value.trim() : "";
+    const brandName = name || "OEM";
 
-    const brandInput =
-        document.getElementById(
-            "brand_input"
-        );
+    const found = state.brands.find(brand => brand.name.trim().toLowerCase() === brandName.toLowerCase());
+    if (found) return found.id;
 
-    const name =
-        brandInput
-            ? brandInput.value.trim()
-            : "";
+    const { data, error } = await window.supabaseClient.from("brands").insert([{ name: brandName }]).select("id, name").single();
+    if (error) throw new Error("Lỗi khi tạo thương hiệu mới: " + error.message);
 
-    /*
-       BRAND MẶC ĐỊNH:
-       Nếu người dùng bỏ trống Brand
-       → tự động dùng Brand "OEM"
-    */
-    const brandName =
-        name || "OEM";
-
-
-    const found =
-        state.brands.find(
-            brand =>
-                brand.name
-                    .trim()
-                    .toLowerCase() ===
-                brandName.toLowerCase()
-        );
-
-
-    /*
-       Đã có OEM / brand người dùng nhập
-       → dùng lại ID hiện tại
-    */
-    if (
-        found
-    ) {
-
-        return found.id;
-
-    }
-
-
-    /*
-       Nếu chưa có Brand trong database
-       → tạo mới
-       Trường hợp này chủ yếu dành cho OEM
-       nếu database chưa có OEM.
-    */
-    const {
-        data,
-        error
-    } =
-        await window.supabaseClient
-
-            .from(
-                "brands"
-            )
-
-            .insert([
-                {
-                    name: brandName
-                }
-            ])
-
-            .select(
-                "id, name"
-            )
-
-            .single();
-
-
-    if (
-        error
-    ) {
-
-        throw new Error(
-            "Lỗi khi tạo thương hiệu mới: " +
-            error.message
-        );
-
-    }
-
-
-    state.brands.push(
-        data
-    );
-
-
+    state.brands.push(data);
     refreshBrandDatalist();
-
-
     return data.id;
-
 }
 
 function getAvailableSizes() {
@@ -2329,14 +1591,15 @@ function buildProductPayload(brandId) {
         datasheet_url: document.getElementById("inDatasheet").value.trim() || null,
         short_description: document.getElementById("short_description").value.trim() || null,
         specifications: document.getElementById("specifications").value.trim() || null,
-       description: getDescriptionValue() || null,
+        description: getDescriptionValue() || null,
 
-        // SEO
+        // SEO & Status
         slug: DOM.slug?.value.trim() || null,
         slug_source: state.editingSlugSource,
         meta_title: DOM.metaTitle?.value.trim() || null,
         meta_description: DOM.metaDescription?.value.trim() || null,
-        is_h1: DOM.isH1?.checked !== false
+        is_h1: DOM.isH1?.checked !== false,
+        is_active: DOM.isActive ? DOM.isActive.checked : true
     };
 }
 
@@ -2390,29 +1653,15 @@ async function saveProduct(event) {
         btn.textContent = "Đang kiểm tra thương hiệu...";
         const brandId = await resolveBrandId();
 
-        // SEO 2.3 — đảm bảo slug sạch + unique ngay trước khi lưu.
         if (DOM.slug) {
             const rawSlug = DOM.slug.value.trim();
-
             if (rawSlug) {
                 DOM.slug.value = slugify(rawSlug);
                 if (state.editingSlugSource === "auto") {
-                    DOM.slug.value = await ensureUniqueSlug(
-                        DOM.slug.value,
-                        state.editingId
-                    );
+                    DOM.slug.value = await ensureUniqueSlug(DOM.slug.value, state.editingId);
                 } else {
-                    // Slug thủ công vẫn phải unique.
-                    const uniqueManualSlug = await ensureUniqueSlug(
-                        DOM.slug.value,
-                        state.editingId
-                    );
-
-                    if (uniqueManualSlug !== DOM.slug.value) {
-                        throw new Error(
-                            `Slug "${DOM.slug.value}" đã tồn tại. Vui lòng chọn slug khác.`
-                        );
-                    }
+                    const uniqueManualSlug = await ensureUniqueSlug(DOM.slug.value, state.editingId);
+                    if (uniqueManualSlug !== DOM.slug.value) throw new Error(`Slug "${DOM.slug.value}" đã tồn tại. Vui lòng chọn slug khác.`);
                 }
             }
         }
@@ -2575,20 +1824,16 @@ function showToast(message, type = "success") {
    EVENTS BINDING
 ========================================================= */
 function bindEvents() {
-
-    // Gắn sự kiện Xóa chọn Brand
     document.getElementById("btnClearBrands")?.addEventListener("click", () => {
         state.filters.brands = [];
         renderBrandsForFilter(DOM.filterBrandSearch?.value || "");
     });
 
-    // FORM TOGGLE
     DOM.btnAdd?.addEventListener("click", showAddForm);
     DOM.btnBack?.addEventListener("click", cancelForm);
     DOM.btnCancel?.addEventListener("click", cancelForm);
     DOM.form?.addEventListener("submit", saveProduct);
 
-    // FORM CATEGORY CASCADE
     DOM.category?.addEventListener("change", e => updateSubCategories(e.target.value));
     DOM.subCategory?.addEventListener("change", e => updateFamilies(e.target.value));
 
@@ -2599,7 +1844,6 @@ function bindEvents() {
     DOM.name?.addEventListener("input", updateSeoPreview);
     DOM.slug?.addEventListener("input", updateSeoPreview);
 
-    // SEO 2.3 — Auto Slug / Manual Slug Detection
     document.getElementById("name")?.addEventListener("input", () => {
         if (getSlugSource() === "auto") scheduleAutoSlug();
     });
@@ -2608,14 +1852,12 @@ function bindEvents() {
     DOM.btnCopySlug?.addEventListener("click", copyCurrentSlug);
     DOM.btnViewSlug?.addEventListener("click", viewCurrentSlug);
 
-    // ADVANCED FILTER TOGGLE
     DOM.btnToggleAdvanced?.addEventListener("click", () => {
         DOM.advancedPanel?.classList.toggle("hidden");
         renderBrandsForFilter(DOM.filterBrandSearch?.value || "");
     });
     DOM.btnCancelAdvanced?.addEventListener("click", () => DOM.advancedPanel?.classList.add("hidden"));
 
-    // QUICK FILTERS
     let searchTimer;
     DOM.search?.addEventListener("input", event => {
         clearTimeout(searchTimer);
@@ -2646,7 +1888,6 @@ function bindEvents() {
         });
     });
 
-    // ADVANCED FILTER LOGIC
     DOM.filterSubCategory?.addEventListener("change", event => updateFilterFamilies(event.target.value));
     DOM.filterBrandSearch?.addEventListener("input", event => renderBrandsForFilter(event.target.value));
     
@@ -2672,7 +1913,6 @@ function bindEvents() {
 
     DOM.btnClearAllFilters?.addEventListener("click", () => window.removeFilter('all'));
 
-    // TABLE ACTIONS
     DOM.tableBody?.addEventListener("click", event => {
         const btn = event.target.closest("button[data-action]");
         if (!btn) return;
@@ -2680,7 +1920,6 @@ function bindEvents() {
         if (btn.dataset.action === "delete") deleteProduct(btn.dataset.id);
     });
 
-    // PAGINATION
     DOM.pagination?.addEventListener("click", event => {
         const pageBtn = event.target.closest("button[data-page]");
         if (pageBtn) {

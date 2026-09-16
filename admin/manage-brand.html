@@ -47,7 +47,6 @@
         <!-- HEADER (STICKY) -->
         <header class="sticky top-0 z-30 h-16 bg-white border-b border-gray-200 px-6 flex items-center justify-between shrink-0 shadow-sm">
             
-            <!-- LEFT: Title & Mobile Toggle -->
             <div class="flex items-center gap-3 min-w-0">
                 <button type="button" onclick="toggleSidebar()" class="md:hidden p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition shrink-0" aria-label="Mở menu">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -58,7 +57,6 @@
                 </div>
             </div>
 
-            <!-- RIGHT: Add Button -->
             <button type="button" onclick="openBrandModal()" class="shrink-0 inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-lg bg-kn-blue text-white text-sm font-bold shadow-sm hover:bg-blue-800 transition active:scale-[0.98]">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 <span class="hidden sm:inline">Thêm thương hiệu</span>
@@ -78,17 +76,16 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-                        <!-- SORT -->
                         <div class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 w-full sm:w-auto">
                             <span class="text-xs font-bold text-gray-400 uppercase tracking-wider shrink-0">Sắp xếp:</span>
                             <select id="sortBrand" class="w-full sm:w-auto text-sm font-bold text-kn-blue bg-transparent outline-none cursor-pointer">
-                                <option value="newest">Mới nhất</option>
+                                <option value="oldest">ID: Tăng dần</option>
+                                <option value="newest">ID: Giảm dần</option>
                                 <option value="az">Tên: A - Z</option>
                                 <option value="za">Tên: Z - A</option>
                             </select>
                         </div>
 
-                        <!-- SEARCH -->
                         <div class="relative w-full sm:w-72">
                             <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-4.35-4.35m2.35-5.65a8 8 0 11-16 0 8 8 0 0116 0Z"/></svg>
                             <input id="searchBrand" type="search" class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 outline-none focus:bg-white focus:border-kn-blue focus:ring-2 focus:ring-blue-100 transition" placeholder="Tìm thương hiệu..." autocomplete="off">
@@ -114,57 +111,21 @@
                 <!-- TABLE CARD -->
                 <section id="tableWrapper" class="hidden bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden relative z-10">
                     <div class="overflow-x-auto admin-scrollbar">
-                        <table class="w-full min-w-[600px] text-left">
-                            <thead
-                                    class="
-                                        bg-gray-50
-                                        border-b
-                                        border-gray-200
-                                        text-xs
-                                        font-black
-                                        text-gray-500
-                                        uppercase
-                                        tracking-wider
-                                    "
-                                >
-                                    <tr>
-                                        <!-- ID (Chiếm 25% không gian, căn giữa) -->
-                                        <th
-                                            class="
-                                                px-5
-                                                py-4
-                                                w-[25%]
-                                                text-center
-                                            "
-                                        >
-                                            ID
-                                        </th>
-
-                                        <!-- TÊN THƯƠNG HIỆU (Chiếm 50% không gian, căn trái) -->
-                                        <th
-                                            class="
-                                                px-5
-                                                py-4
-                                                w-[50%]
-                                                text-left
-                                            "
-                                        >
-                                            Tên thương hiệu
-                                        </th>
-
-                                        <!-- THAO TÁC (Chiếm 25% không gian, căn phải) -->
-                                        <th
-                                            class="
-                                                px-5
-                                                py-4
-                                                w-[25%]
-                                                text-right
-                                            "
-                                        >
-                                            Thao tác
-                                        </th>
-                                    </tr>
-                                </thead>
+                        <table class="w-full min-w-[700px] text-left">
+                            <thead class="bg-gray-50 border-b border-gray-200 text-xs font-black text-gray-500 uppercase tracking-wider">
+                                <tr>
+                                    <!-- STT -->
+                                    <th class="px-5 py-4 w-16 text-center">STT</th>
+                                    <!-- ID -->
+                                    <th class="px-5 py-4 w-24 text-center">ID</th>
+                                    <!-- TÊN THƯƠNG HIỆU -->
+                                    <th class="px-5 py-4 text-left">Tên thương hiệu</th>
+                                    <!-- TRẠNG THÁI -->
+                                    <th class="px-5 py-4 w-32 text-center">Trạng thái</th>
+                                    <!-- THAO TÁC -->
+                                    <th class="px-5 py-4 w-40 text-right">Thao tác</th>
+                                </tr>
+                            </thead>
                             <tbody id="brandTableBody" class="divide-y divide-gray-100 text-sm">
                                 <!-- JS Render -->
                             </tbody>
@@ -189,7 +150,6 @@
         <!-- MODAL CONTENT -->
         <div class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col transform transition-all">
             
-            <!-- HEADER -->
             <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
                 <div>
                     <h3 id="modalTitle" class="text-lg font-black text-kn-blue">Thêm thương hiệu</h3>
@@ -200,7 +160,6 @@
                 </button>
             </div>
 
-            <!-- FORM -->
             <form id="brandForm" class="p-6 space-y-6">
                 <input type="hidden" id="brandId">
                 
@@ -210,7 +169,18 @@
                     </label>
                     <input type="text" id="brandName" maxlength="100" required placeholder="VD: Bosch, Makita..." autocomplete="off"
                         class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm outline-none focus:border-kn-blue focus:ring-2 focus:ring-blue-100 shadow-sm transition">
-                    <p class="mt-2 text-[11px] text-gray-400 italic">Tối đa 100 ký tự.</p>
+                </div>
+
+                <!-- NÚT GẠT BẬT TẮT -->
+                <div class="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl p-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-800 uppercase tracking-wider">Trạng thái hiển thị</label>
+                        <p class="text-[10px] text-gray-500 mt-0.5">Bật để cho phép hiển thị trên Web</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="brandStatus" class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                    </label>
                 </div>
 
                 <div class="flex justify-end gap-3 pt-2">

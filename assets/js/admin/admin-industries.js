@@ -556,612 +556,107 @@ function renderLoading() {
 
 
 /* =========================================================
-   RENDER TABLE
+   RENDER TABLE (ĐÃ ĐỔI SANG NÚT GẠT & NÚT CHỮ)
 ========================================================= */
-
 function renderIndustries() {
+    if (!DOM.tbody) return;
 
-    if (
-        !DOM.tbody
-    ) {
-
+    if (state.industries.length === 0) {
+        DOM.tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center py-14 text-gray-400">
+                    <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-gray-100 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M19 11H5m14 0a7 7 0 01-14 0m14 0a7 7 0 01-14 0"/></svg>
+                    </div>
+                    <div class="font-bold text-gray-500">Không tìm thấy ngành hàng</div>
+                </td>
+            </tr>
+        `;
         return;
-
     }
 
+    const from = (state.currentPage - 1) * state.itemsPerPage;
 
-    if (
-        state.industries.length === 0
-    ) {
+    DOM.tbody.innerHTML = state.industries.map((item, index) => {
+        const active = item.is_active !== false;
+        const isChecked = active ? "checked" : "";
 
-        DOM.tbody.innerHTML = `
+        const iconHTML = item.icon_url
+            ? `<div class="w-11 h-11 mx-auto rounded-lg border border-gray-200 bg-white flex items-center justify-center overflow-hidden"><img src="${escapeHTML(item.icon_url)}" alt="${escapeHTML(item.name)}" class="max-w-full max-h-full object-contain" loading="lazy" data-image-fallback="icon"></div>`
+            : `<div class="w-11 h-11 mx-auto rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-kn-blue text-xs font-black">IC</div>`;
 
-            <tr>
+        const bannerHTML = item.image_url
+            ? `<div class="w-28 h-14 mx-auto rounded-lg border border-gray-200 bg-gray-100 overflow-hidden"><img src="${escapeHTML(item.image_url)}" alt="${escapeHTML(item.name)}" class="w-full h-full object-cover" loading="lazy" data-image-fallback="banner"></div>`
+            : `<div class="w-28 h-14 mx-auto rounded-lg border border-dashed border-gray-300 bg-gray-50 flex items-center justify-center text-[10px] font-bold text-gray-400">NO BANNER</div>`;
 
-                <td
-                    colspan="7"
-                    class="
-                        text-center
-                        py-14
-                        text-gray-400
-                    "
-                >
-
-                    <div
-                        class="
-                            w-12
-                            h-12
-                            mx-auto
-                            mb-3
-                            rounded-full
-                            bg-gray-100
-                            flex
-                            items-center
-                            justify-center
-                        "
-                    >
-
-                        <svg
-                            class="w-6 h-6 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="1.7"
-                                d="M19 11H5m14 0a7 7 0 01-14 0m14 0a7 7 0 01-14 0"
-                            />
-                        </svg>
-
-                    </div>
-
-
-                    <div
-                        class="
-                            font-bold
-                            text-gray-500
-                        "
-                    >
-                        Không tìm thấy ngành hàng
-                    </div>
-
-
-                    <div
-                        class="
-                            text-xs
-                            mt-1
-                        "
-                    >
-                        Thử thay đổi từ khóa tìm kiếm.
-                    </div>
-
-                </td>
-
-            </tr>
-
+        // ĐỔI SANG CÔNG TẮC GẠT CHO BẢNG
+        const statusHTML = `
+            <label class="relative inline-flex items-center cursor-pointer" title="${active ? 'Đang hiển thị' : 'Đang ẩn'}">
+                <input type="checkbox" onchange="toggleIndustryStatus(${item.id}, ${active})" class="sr-only peer" ${isChecked}>
+                <div class="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500 shadow-inner"></div>
+            </label>
         `;
 
-        return;
-
-    }
-
-
-    const from =
-        (
-            state.currentPage -
-            1
-        ) *
-        state.itemsPerPage;
-
-
-    DOM.tbody.innerHTML =
-        state.industries
-            .map(
-                (
-                    item,
-                    index
-                ) => {
-
-                    const active =
-                        item.is_active !== false;
-
-
-                    const iconHTML =
-                        item.icon_url
-
-                            ? `
-
-                                <div
-                                    class="
-                                        w-11
-                                        h-11
-                                        mx-auto
-                                        rounded-lg
-                                        border
-                                        border-gray-200
-                                        bg-white
-                                        flex
-                                        items-center
-                                        justify-center
-                                        overflow-hidden
-                                    "
-                                >
-
-                                    <img
-                                        src="${escapeHTML(
-                                            item.icon_url
-                                        )}"
-                                        alt="${escapeHTML(
-                                            item.name
-                                        )}"
-                                        class="
-                                            max-w-full
-                                            max-h-full
-                                            object-contain
-                                        "
-                                        loading="lazy"
-                                        data-image-fallback="icon"
-                                    >
-
-                                </div>
-
-                            `
-
-                            : `
-
-                                <div
-                                    class="
-                                        w-11
-                                        h-11
-                                        mx-auto
-                                        rounded-lg
-                                        bg-blue-50
-                                        border
-                                        border-blue-100
-                                        flex
-                                        items-center
-                                        justify-center
-                                        text-kn-blue
-                                        text-xs
-                                        font-black
-                                    "
-                                >
-                                    IC
-                                </div>
-
-                            `;
-
-
-                    const bannerHTML =
-                        item.image_url
-
-                            ? `
-
-                                <div
-                                    class="
-                                        w-28
-                                        h-14
-                                        mx-auto
-                                        rounded-lg
-                                        border
-                                        border-gray-200
-                                        bg-gray-100
-                                        overflow-hidden
-                                    "
-                                >
-
-                                    <img
-                                        src="${escapeHTML(
-                                            item.image_url
-                                        )}"
-                                        alt="${escapeHTML(
-                                            item.name
-                                        )}"
-                                        class="
-                                            w-full
-                                            h-full
-                                            object-cover
-                                        "
-                                        loading="lazy"
-                                        data-image-fallback="banner"
-                                    >
-
-                                </div>
-
-                            `
-
-                            : `
-
-                                <div
-                                    class="
-                                        w-28
-                                        h-14
-                                        mx-auto
-                                        rounded-lg
-                                        border
-                                        border-dashed
-                                        border-gray-300
-                                        bg-gray-50
-                                        flex
-                                        items-center
-                                        justify-center
-                                        text-[10px]
-                                        font-bold
-                                        text-gray-400
-                                    "
-                                >
-                                    NO BANNER
-                                </div>
-
-                            `;
-
-
-                    const statusHTML =
-                        active
-
-                            ? `
-
-                                <span
-                                    class="
-                                        inline-flex
-                                        items-center
-                                        gap-1.5
-                                        px-2.5
-                                        py-1.5
-                                        rounded-lg
-                                        bg-green-50
-                                        border
-                                        border-green-100
-                                        text-green-700
-                                        text-[10px]
-                                        font-black
-                                    "
-                                >
-
-                                    <span
-                                        class="
-                                            w-1.5
-                                            h-1.5
-                                            rounded-full
-                                            bg-green-500
-                                        "
-                                    ></span>
-
-                                    HIỂN THỊ
-
-                                </span>
-
-                            `
-
-                            : `
-
-                                <span
-                                    class="
-                                        inline-flex
-                                        items-center
-                                        gap-1.5
-                                        px-2.5
-                                        py-1.5
-                                        rounded-lg
-                                        bg-gray-100
-                                        border
-                                        border-gray-200
-                                        text-gray-500
-                                        text-[10px]
-                                        font-black
-                                    "
-                                >
-
-                                    <span
-                                        class="
-                                            w-1.5
-                                            h-1.5
-                                            rounded-full
-                                            bg-gray-400
-                                        "
-                                    ></span>
-
-                                    ĐANG ẨN
-
-                                </span>
-
-                            `;
-
-
-                    return `
-
-                        <tr
-                            class="
-                                group
-                                hover:bg-blue-50/40
-                                transition-colors
-                            "
-                        >
-
-
-                            <!-- INDEX -->
-
-                            <td
-                                class="
-                                    px-4
-                                    py-4
-                                    text-center
-                                    text-xs
-                                    font-mono
-                                    font-bold
-                                    text-gray-400
-                                "
-                            >
-                                ${from + index + 1}
-                            </td>
-
-
-                            <!-- ICON -->
-
-                            <td
-                                class="
-                                    px-4
-                                    py-4
-                                    text-center
-                                "
-                            >
-
-                                ${iconHTML}
-
-                            </td>
-
-
-                            <!-- BANNER -->
-
-                            <td
-                                class="
-                                    px-4
-                                    py-4
-                                    text-center
-                                "
-                            >
-
-                                ${bannerHTML}
-
-                            </td>
-
-
-                            <!-- NAME -->
-
-                            <td
-                                class="
-                                    px-4
-                                    py-4
-                                "
-                            >
-
-                                <div
-                                    class="
-                                        font-black
-                                        text-gray-900
-                                        leading-5
-                                    "
-                                >
-                                    ${escapeHTML(
-                                        item.name
-                                    )}
-                                </div>
-
-
-                                <div
-                                    class="
-                                        text-[10px]
-                                        text-gray-400
-                                        mt-1
-                                        font-mono
-                                    "
-                                >
-                                    ID #${escapeHTML(
-                                        item.id
-                                    )}
-                                </div>
-
-                            </td>
-
-
-                            <!-- DESCRIPTION -->
-
-                            <td
-                                class="
-                                    px-4
-                                    py-4
-                                "
-                            >
-
-                                <p
-                                    class="
-                                        text-xs
-                                        text-gray-500
-                                        leading-5
-                                        line-clamp-3
-                                    "
-                                >
-                                    ${
-                                        item.description
-                                            ? escapeHTML(
-                                                item.description
-                                            )
-                                            : "Chưa có mô tả."
-                                    }
-                                </p>
-
-
-                                ${
-                                    Array.isArray(
-                                        item.features
-                                    ) &&
-                                    item.features.length
-
-                                        ? `
-
-                                            <div
-                                                class="
-                                                    flex
-                                                    flex-wrap
-                                                    gap-1
-                                                    mt-2
-                                                "
-                                            >
-
-                                                ${item.features
-                                                    .slice(
-                                                        0,
-                                                        3
-                                                    )
-                                                    .map(
-                                                        feature => `
-
-                                                            <span
-                                                                class="
-                                                                    px-1.5
-                                                                    py-0.5
-                                                                    rounded
-                                                                    bg-blue-50
-                                                                    text-blue-600
-                                                                    text-[9px]
-                                                                    font-bold
-                                                                "
-                                                            >
-                                                                ${escapeHTML(
-                                                                    feature
-                                                                )}
-                                                            </span>
-
-                                                        `
-                                                    )
-                                                    .join("")}
-
-                                            </div>
-
-                                        `
-
-                                        : ""
-                                }
-
-                            </td>
-
-
-                            <!-- STATUS -->
-
-                            <td
-                                class="
-                                    px-4
-                                    py-4
-                                    text-center
-                                "
-                            >
-
-                                ${statusHTML}
-
-                            </td>
-
-
-                            <!-- ACTIONS -->
-
-                            <td
-                                class="
-                                    px-4
-                                    py-4
-                                "
-                            >
-
-                                <div
-                                    class="
-                                        flex
-                                        justify-end
-                                        items-center
-                                        gap-1
-                                    "
-                                >
-
-                                    <button
-                                        type="button"
-                                        data-action="edit"
-                                        data-id="${escapeHTML(
-                                            item.id
-                                        )}"
-                                        class="
-                                            p-2
-                                            rounded-lg
-                                            text-blue-600
-                                            hover:bg-blue-50
-                                            transition
-                                        "
-                                        title="Chỉnh sửa"
-                                    >
-
-                                        <svg
-                                            class="w-4 h-4"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652l-9.193 9.193a4.5 4.5 0 01-1.897 1.13l-2.052.616.616-2.052a4.5 4.5 0 011.13-1.897l9.193-9.193z"
-                                            />
-                                        </svg>
-
-                                    </button>
-
-
-                                    <button
-                                        type="button"
-                                        data-action="delete"
-                                        data-id="${escapeHTML(
-                                            item.id
-                                        )}"
-                                        class="
-                                            p-2
-                                            rounded-lg
-                                            text-red-500
-                                            hover:bg-red-50
-                                            transition
-                                        "
-                                        title="Xóa"
-                                    >
-
-                                        <svg
-                                            class="w-4 h-4"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4V4a1 1 0 011-1h4a1 1 0 011 1v3m5 0H4"
-                                            />
-                                        </svg>
-
-                                    </button>
-
-                                </div>
-
-                            </td>
-
-                        </tr>
-
-                    `;
-
-                }
-            )
-            .join("");
-
+        const featuresHTML = (Array.isArray(item.features) && item.features.length)
+            ? `<div class="flex flex-wrap gap-1 mt-2">${item.features.slice(0, 3).map(feature => `<span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 text-[9px] font-bold">${escapeHTML(feature)}</span>`).join("")}</div>`
+            : "";
+
+        return `
+            <tr class="group hover:bg-blue-50/40 transition-colors border-b border-gray-100">
+                <td class="px-4 py-4 text-center text-xs font-mono font-bold text-gray-500 align-middle w-14 border-r border-gray-50">${from + index + 1}</td>
+                <td class="px-4 py-4 text-center align-middle w-20">${iconHTML}</td>
+                <td class="px-4 py-4 text-center align-middle w-36">${bannerHTML}</td>
+                <td class="px-4 py-4 align-middle">
+                    <div class="font-black text-gray-900 leading-5">${escapeHTML(item.name)}</div>
+                    <div class="text-[10px] text-gray-400 mt-1 font-mono">ID #${escapeHTML(item.id)}</div>
+                </td>
+                <td class="px-4 py-4 align-middle">
+                    <p class="text-xs text-gray-500 leading-5 line-clamp-3">${item.description ? escapeHTML(item.description) : "Chưa có mô tả."}</p>
+                    ${featuresHTML}
+                </td>
+                <td class="px-4 py-4 text-center align-middle w-32">${statusHTML}</td>
+                
+                <!-- ĐỔI ICON THÀNH NÚT CHỮ SỬA / XÓA -->
+                <td class="px-4 py-4 align-middle w-28 text-right">
+                    <div class="flex justify-end items-center gap-1.5">
+                        <button type="button" data-action="edit" data-id="${escapeHTML(item.id)}" class="px-3 py-2 text-kn-blue hover:bg-blue-50 rounded-lg transition font-bold text-[11px] uppercase">
+                            Sửa
+                        </button>
+                        <button type="button" data-action="delete" data-id="${escapeHTML(item.id)}" class="px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg transition font-bold text-[11px] uppercase">
+                            Xóa
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join("");
 
     bindImageFallbacks();
-
 }
+
+// BỔ SUNG HÀM GẠT CÔNG TẮC BÊN NGOÀI BẢNG (Dán ngay dưới hàm renderIndustries)
+window.toggleIndustryStatus = async function (id, currentStatus) {
+    const newStatus = !currentStatus;
+    try {
+        const { error } = await window.supabaseClient.from("industries").update({ is_active: newStatus }).eq("id", id);
+        if (error) throw error;
+
+        // Cập nhật local state
+        const idx = state.industries.findIndex(i => Number(i.id) === Number(id));
+        if (idx !== -1) state.industries[idx].is_active = newStatus;
+
+        showToast(newStatus ? "Đã BẬT ngành hàng" : "Đã ẨN ngành hàng", "success");
+        
+        // Cập nhật lại số liệu Đang Hiện / Đang Ẩn trên đầu trang
+        updateStatistics(); 
+        
+        // Render lại bảng
+        renderIndustries();
+    } catch (error) {
+        showToast("Lỗi cập nhật trạng thái", "error");
+        renderIndustries(); // Reset nút gạt nếu bị lỗi mạng
+    }
+};
 
 
 /* =========================================================

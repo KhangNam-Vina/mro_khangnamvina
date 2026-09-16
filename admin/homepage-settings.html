@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cấu hình Homepage - KN Admin</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { 'kn-blue': '#00479b', 'kn-orange': '#ff5e00' } } }
+        }
+    </script>
+    
+    <style>
+        .homepage-toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .homepage-toast { padding: 12px 20px; border-radius: 8px; color: white; font-size: 14px; font-weight: bold; opacity: 0; transform: translateY(20px); transition: all 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .homepage-toast.show { opacity: 1; transform: translateY(0); }
+        .homepage-toast-success { background-color: #10b981; }
+        .homepage-toast-error { background-color: #ef4444; }
+        .homepage-toast-info { background-color: #3b82f6; }
+        .is-disabled { opacity: 0.5; pointer-events: none; filter: grayscale(100%); }
+        /* Hiệu ứng xoay icon khi mở Accordion */
+        .chevron-icon { transition: transform 0.3s ease; }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 flex h-screen overflow-hidden">
+    
+    <!-- SIDEBAR -->
+    <aside id="adminSidebar" class="w-64 bg-gray-900 text-white flex flex-col hidden md:flex shrink-0"></aside>
+
+    <main class="dashboard-main flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-6" id="homepageSettingsForm">
+    <div class="max-w-[1600px] mx-auto space-y-4 pb-8">
+            
+            <!-- HEADER -->
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-gray-200 pb-4 mb-6">
+                <div>
+                    <h1 class="text-2xl font-black text-gray-900">Cấu hình Trang chủ</h1>
+                    <p class="text-sm text-gray-500 mt-1">Quản lý nội dung, hình ảnh và bật/tắt các khu vực hiển thị.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button type="button" data-action="preview-homepage" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-50 transition shadow-sm">Xem thử ↗</button>
+                    <button type="button" data-action="save-homepage" class="px-4 py-2 bg-kn-blue text-white rounded-lg text-sm font-bold hover:bg-blue-800 transition shadow-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Lưu tất cả
+                    </button>
+                </div>
+            </div>
+
+            <!-- CẢNH BÁO CÓ THAY ĐỔI -->
+            <div id="homepageDirtyIndicator" class="text-xs font-bold text-orange-600 hidden bg-orange-50 p-3 rounded-lg border border-orange-200 mb-4">
+                ⚠️ Cảnh báo: Có thay đổi chưa được lưu. Hãy bấm "Lưu tất cả" để áp dụng lên website!
+            </div>
+
+            <!-- ==========================================================
+                 01. HERO BANNER
+            =========================================================== -->
+            <section id="heroSettingsSection" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="accordion-header px-5 py-4 flex items-center justify-between bg-white hover:bg-gray-50 cursor-pointer select-none border-b border-gray-100">
+                    <div class="flex items-center gap-4">
+                        <span class="w-8 h-8 rounded-md bg-blue-50 flex items-center justify-center text-sm font-black text-kn-blue">01</span>
+                        <div>
+                            <h2 class="font-black text-gray-900 text-base flex items-center gap-2">
+                                Hero Banner 
+                                <svg class="w-4 h-4 text-gray-400 chevron-icon transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </h2>
+                            <p class="text-[11px] text-gray-500">Khu vực banner chính trên cùng.</p>
+                        </div>
+                    </div>
+                    <label class="toggle-switch relative inline-flex items-center cursor-pointer" title="Bật/Tắt khu vực này">
+                        <input type="checkbox" id="heroEnabled" data-homepage-section-toggle class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                    </label>
+                </div>
+                
+                <div class="accordion-content p-5 bg-gray-50/50">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Badge (Nhãn nổi bật)</label>
+                                <input type="text" id="heroBadge" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none" placeholder="VD: ĐỐI TÁC CUNG ỨNG MRO">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">Tiêu đề chính</label>
+                                    <input type="text" id="heroTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">Chữ nhấn mạnh</label>
+                                    <input type="text" id="heroHighlight" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Mô tả</label>
+                                <textarea id="heroDescription" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none"></textarea>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <!-- THAY THẾ KHỐI NHẬP HÌNH ẢNH MINH HỌA -->
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-2">Hình ảnh minh họa (Live Preview)</label>
+                                
+                                <!-- Khung Preview Ảnh -->
+                                <div class="mb-3 border border-gray-200 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center h-[160px] relative shadow-inner">
+                                    <img id="heroImagePreview" src="" class="h-full w-full object-contain hidden" alt="Preview">
+                                    <div id="heroImagePlaceholder" class="text-xs text-gray-400 flex flex-col items-center">
+                                        <svg class="w-8 h-8 mb-1 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        Chưa có hình ảnh
+                                    </div>
+                                </div>
+                                
+                                <!-- Ô Nhập Link -->
+                                <input type="text" id="heroImagePath" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none" placeholder="Nhập link (https://...) hoặc assets/images/...">
+                                <p class="text-[10px] text-gray-500 mt-1">Dán URL ảnh trực tiếp từ Supabase hoặc đường dẫn file nội bộ.</p>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 4 LỢI ĐIỂM BÁN HÀNG (USPs) -->
+                    <div class="p-4 bg-white border border-gray-200 rounded-lg">
+                        <h3 class="text-xs font-black text-gray-800 mb-3 uppercase">4 Lợi Điểm Bán Hàng (USPs)</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- USP 1 -->
+                            <div class="flex gap-2">
+                                <input type="text" id="usp1Title" class="w-1/3 px-2 py-1.5 border border-gray-300 rounded text-xs focus:border-kn-blue outline-none" placeholder="Tiêu đề 1">
+                                <input type="text" id="usp1Description" class="w-2/3 px-2 py-1.5 border border-gray-300 rounded text-xs focus:border-kn-blue outline-none" placeholder="Mô tả 1">
+                            </div>
+                            <!-- USP 2 -->
+                            <div class="flex gap-2">
+                                <input type="text" id="usp2Title" class="w-1/3 px-2 py-1.5 border border-gray-300 rounded text-xs focus:border-kn-blue outline-none" placeholder="Tiêu đề 2">
+                                <input type="text" id="usp2Description" class="w-2/3 px-2 py-1.5 border border-gray-300 rounded text-xs focus:border-kn-blue outline-none" placeholder="Mô tả 2">
+                            </div>
+                            <!-- USP 3 -->
+                            <div class="flex gap-2">
+                                <input type="text" id="usp3Title" class="w-1/3 px-2 py-1.5 border border-gray-300 rounded text-xs focus:border-kn-blue outline-none" placeholder="Tiêu đề 3">
+                                <input type="text" id="usp3Description" class="w-2/3 px-2 py-1.5 border border-gray-300 rounded text-xs focus:border-kn-blue outline-none" placeholder="Mô tả 3">
+                            </div>
+                            <!-- USP 4 -->
+                            <div class="flex gap-2">
+                                <input type="text" id="usp4Title" class="w-1/3 px-2 py-1.5 border border-gray-300 rounded text-xs focus:border-kn-blue outline-none" placeholder="Tiêu đề 4">
+                                <input type="text" id="usp4Description" class="w-2/3 px-2 py-1.5 border border-gray-300 rounded text-xs focus:border-kn-blue outline-none" placeholder="Mô tả 4">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==========================================================
+                 02. CATEGORIES
+            =========================================================== -->
+            <section id="categoriesSettingsSection" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="accordion-header px-5 py-4 flex items-center justify-between bg-white hover:bg-gray-50 cursor-pointer select-none border-b border-gray-100">
+                    <div class="flex items-center gap-4">
+                        <span class="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center text-sm font-black text-gray-600">02</span>
+                        <div>
+                            <h2 class="font-black text-gray-900 text-base flex items-center gap-2">Tất Cả Danh Mục <svg class="w-4 h-4 text-gray-400 chevron-icon transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></h2>
+                            <p class="text-[11px] text-gray-500">Hệ thống ô hiển thị các ngành hàng.</p>
+                        </div>
+                    </div>
+                    <label class="toggle-switch relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="categoriesEnabled" data-homepage-section-toggle class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                    </label>
+                </div>
+                
+                <div class="accordion-content hidden p-5 bg-gray-50/50">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Tiêu đề khu vực</label>
+                            <input type="text" id="categoriesTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Số danh mục con / ô</label>
+                            <p class="text-[10px] text-gray-500 mb-1">Quy định mỗi ô hiện bao nhiêu dòng ngành hàng con.</p>
+                            <input type="number" id="subcategoryLimit" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Chọn Danh mục hiển thị</label>
+                        <p class="text-[10px] text-gray-500 mb-2">Tick chọn các ngành hàng muốn đưa ra Trang chủ (Nếu không chọn, hệ thống sẽ lấy tất cả).</p>
+                        <!-- Khung cuộn chứa các checkbox -->
+                        <div id="categoriesCheckboxContainer" class="h-[400px] overflow-y-auto border border-gray-300 rounded-xl p-4 grid grid-cols-1 md:grid-cols-2 gap-3 bg-gray-100 shadow-inner">
+                            <div class="text-xs text-gray-400">Đang tải danh sách...</div>
+                        </div>
+                        </div>
+                </div>
+            </div>
+            </section>
+
+            <!-- ==========================================================
+                 03. BEST SELLING
+            =========================================================== -->
+            <section id="bestSellingSettingsSection" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="accordion-header px-5 py-4 flex items-center justify-between bg-white hover:bg-gray-50 cursor-pointer select-none border-b border-gray-100">
+                    <div class="flex items-center gap-4">
+                        <span class="w-8 h-8 rounded-md bg-orange-50 flex items-center justify-center text-sm font-black text-kn-orange">03</span>
+                        <div>
+                            <h2 class="font-black text-gray-900 text-base flex items-center gap-2">Sản Phẩm Bán Chạy <svg class="w-4 h-4 text-gray-400 chevron-icon transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></h2>
+                            <p class="text-[11px] text-gray-500">Tự động đẩy sản phẩm doanh số cao lên.</p>
+                        </div>
+                    </div>
+                    <label class="toggle-switch relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="bestSellingEnabled" data-homepage-section-toggle class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                    </label>
+                </div>
+                
+                <div class="accordion-content hidden p-5 bg-gray-50/50">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Tiêu đề</label>
+                                <input type="text" id="bestSellingTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Mô tả</label>
+                                <textarea id="bestSellingDescription" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none"></textarea>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Số lượng sản phẩm</label>
+                                <input type="number" id="bestSellingLimit" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none">
+                            </div>
+                            <div class="p-3 bg-white border border-gray-200 rounded-md mt-2">
+                                <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-gray-800">
+                                    <input type="checkbox" id="bestSellingFallback" class="w-4 h-4 rounded text-kn-blue">
+                                    Bật Fallback (Chữa cháy)
+                                </label>
+                                <p class="text-[10px] text-gray-500 mt-1 ml-6">Nếu web mới chưa có ai mua hàng, tự động lấy Sản phẩm mới nhất đắp vào.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==========================================================
+                 04 & 05. SHOWCASE 1 & 2
+            =========================================================== -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                
+                <!-- SHOWCASE 1 -->
+                <section id="categoryShowcase1SettingsSection" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div class="accordion-header px-5 py-4 flex items-center justify-between bg-white hover:bg-gray-50 cursor-pointer select-none border-b border-gray-100">
+                        <div class="flex items-center gap-4">
+                            <span class="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center text-sm font-black text-gray-600">04</span>
+                            <div>
+                                <h2 class="font-black text-gray-900 text-sm flex items-center gap-1">Showcase 1 <svg class="w-4 h-4 text-gray-400 chevron-icon transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></h2>
+                                <p class="text-[10px] text-gray-500">Danh mục nổi bật #1</p>
+                            </div>
+                        </div>
+                        <label class="toggle-switch relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="categoryShowcase1Enabled" data-homepage-section-toggle class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                        </label>
+                    </div>
+                    <div class="accordion-content hidden p-4 bg-gray-50/50 space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Chỉ định Danh mục</label>
+                            <select id="categoryShowcase1" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-bold focus:border-kn-blue outline-none cursor-pointer">
+                                <option value="">-- Tự động chọn --</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="col-span-2">
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Tiêu đề (Tùy chọn)</label>
+                                <input type="text" id="categoryShowcase1Title" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Mô tả (Tùy chọn)</label>
+                                <input type="text" id="categoryShowcase1Description" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Số lượng SP</label>
+                                <input type="number" id="categoryShowcase1Limit" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Thứ tự ưu tiên (Rank)</label>
+                                <input type="number" id="categoryShowcase1Rank" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SHOWCASE 2 -->
+                <section id="categoryShowcase2SettingsSection" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div class="accordion-header px-5 py-4 flex items-center justify-between bg-white hover:bg-gray-50 cursor-pointer select-none border-b border-gray-100">
+                        <div class="flex items-center gap-4">
+                            <span class="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center text-sm font-black text-gray-600">05</span>
+                            <div>
+                                <h2 class="font-black text-gray-900 text-sm flex items-center gap-1">Showcase 2 <svg class="w-4 h-4 text-gray-400 chevron-icon transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></h2>
+                                <p class="text-[10px] text-gray-500">Danh mục nổi bật #2</p>
+                            </div>
+                        </div>
+                        <label class="toggle-switch relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="categoryShowcase2Enabled" data-homepage-section-toggle class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                        </label>
+                    </div>
+                    <div class="accordion-content hidden p-4 bg-gray-50/50 space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Chỉ định Danh mục</label>
+                            <select id="categoryShowcase2" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-bold focus:border-kn-blue outline-none cursor-pointer">
+                                <option value="">-- Tự động chọn (Top 2) --</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="col-span-2">
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Tiêu đề (Tùy chọn)</label>
+                                <input type="text" id="categoryShowcase2Title" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Mô tả (Tùy chọn)</label>
+                                <input type="text" id="categoryShowcase2Description" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Số lượng SP</label>
+                                <input type="number" id="categoryShowcase2Limit" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 mb-1">Thứ tự ưu tiên (Rank)</label>
+                                <input type="number" id="categoryShowcase2Rank" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ==========================================================
+                 06. INDUSTRIES
+            =========================================================== -->
+            <section id="industriesSettingsSection" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="accordion-header px-5 py-4 flex items-center justify-between bg-white hover:bg-gray-50 cursor-pointer select-none border-b border-gray-100">
+                    <div class="flex items-center gap-4">
+                        <span class="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center text-sm font-black text-gray-600">06</span>
+                        <div>
+                            <h2 class="font-black text-gray-900 text-base flex items-center gap-2">Ngành Hàng Phục Vụ <svg class="w-4 h-4 text-gray-400 chevron-icon transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></h2>
+                            <p class="text-[11px] text-gray-500">Hồ sơ năng lực, các lĩnh vực công nghiệp.</p>
+                        </div>
+                    </div>
+                    <label class="toggle-switch relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="industriesEnabled" data-homepage-section-toggle class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                    </label>
+                </div>
+                
+                <div class="accordion-content hidden p-5 bg-gray-50/50">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Tiêu đề khu vực</label>
+                            <input type="text" id="industriesTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Chọn Ngành hàng hiển thị</label>
+                            <p class="text-[10px] text-gray-500 mb-2">Tick chọn các ngành muốn đưa ra Trang chủ (Bỏ trống = lấy mặc định).</p>
+                            <div id="industriesCheckboxContainer" class="h-[400px] overflow-y-auto border border-gray-300 rounded-xl p-4 grid grid-cols-1 md:grid-cols-2 gap-3 bg-gray-100 shadow-inner">
+                                <div class="text-xs text-gray-400">Đang tải danh sách...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==========================================================
+                 07 & 08. BRANDS VÀ BLOG
+            =========================================================== -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <!-- BRANDS -->
+                <section id="brandsSettingsSection" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div class="accordion-header px-5 py-4 flex items-center justify-between bg-white hover:bg-gray-50 cursor-pointer select-none border-b border-gray-100">
+                        <div class="flex items-center gap-4">
+                            <span class="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center text-sm font-black text-gray-600">07</span>
+                            <div>
+                                <h2 class="font-black text-gray-900 text-sm flex items-center gap-1">Thương Hiệu Nổi Bật <svg class="w-4 h-4 text-gray-400 chevron-icon transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></h2>
+                                <p class="text-[10px] text-gray-500">Logo đối tác chạy trượt</p>
+                            </div>
+                        </div>
+                        <label class="toggle-switch relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="brandsEnabled" data-homepage-section-toggle class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                        </label>
+                    </div>
+                    <div class="accordion-content hidden p-4 bg-gray-50/50 space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Tiêu đề khu vực</label>
+                            <input type="text" id="brandsTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Chọn Thương hiệu hiển thị</label>
+                            <div id="brandsCheckboxContainer" class="h-[400px] overflow-y-auto border border-gray-300 rounded-xl p-4 grid grid-cols-1 md:grid-cols-2 gap-3 bg-gray-100 shadow-inner">
+                                <div class="text-xs text-gray-400">Đang tải danh sách...</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- BLOG -->
+                <section id="blogSettingsSection" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div class="accordion-header px-5 py-4 flex items-center justify-between bg-white hover:bg-gray-50 cursor-pointer select-none border-b border-gray-100">
+                        <div class="flex items-center gap-4">
+                            <span class="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center text-sm font-black text-gray-600">08</span>
+                            <div>
+                                <h2 class="font-black text-gray-900 text-sm flex items-center gap-1">Tin Tức & Công Nghệ <svg class="w-4 h-4 text-gray-400 chevron-icon transform rotate-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></h2>
+                                <p class="text-[10px] text-gray-500">Các bài viết Blog mới nhất</p>
+                            </div>
+                        </div>
+                        <label class="toggle-switch relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="blogEnabled" data-homepage-section-toggle class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                        </label>
+                    </div>
+                    <div class="accordion-content hidden p-4 bg-gray-50/50 space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Tiêu đề khu vực</label>
+                            <input type="text" id="blogTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Chọn Bài viết hiển thị</label>
+                            <div id="blogsCheckboxContainer" class="h-[400px] overflow-y-auto border border-gray-300 rounded-xl p-4 grid grid-cols-1 md:grid-cols-2 gap-3 bg-gray-100 shadow-inner">
+                                <div class="text-xs text-gray-400">Đang tải danh sách...</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/common/supabase.js"></script>
+    <script src="../assets/js/common/utils.js"></script>
+    <script src="../assets/js/admin/admin-core.js"></script>
+    <script src="../assets/js/admin/admin-nav.js"></script>
+    <script src="../assets/js/admin/homepage-settings.js"></script>
+    
+    <!-- SCRIPT TẠO HIỆU ỨNG ACCORDION ĐÓNG MỞ -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const headers = document.querySelectorAll('.accordion-header');
+            headers.forEach(header => {
+                header.addEventListener('click', (e) => {
+                    // Chặn nếu click trúng toggle switch
+                    if(e.target.closest('.toggle-switch')) return; 
+                    
+                    const content = header.nextElementSibling;
+                    const icon = header.querySelector('.chevron-icon');
+                    
+                    if(content) {
+                        content.classList.toggle('hidden');
+                        if (content.classList.contains('hidden')) {
+                            icon.style.transform = 'rotate(0deg)'; // Đóng
+                        } else {
+                            icon.style.transform = 'rotate(180deg)'; // Mở
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

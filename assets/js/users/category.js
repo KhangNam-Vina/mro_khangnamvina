@@ -23,6 +23,7 @@ async function loadCategories() {
         const { data: categories, error: categoryError } = await window.supabaseClient
             .from('categories')
             .select('id, name, slug') 
+            .eq('is_active', true)
             .order('name', { ascending: true });
 
         if (categoryError) throw categoryError;
