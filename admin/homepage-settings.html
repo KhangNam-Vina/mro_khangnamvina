@@ -96,25 +96,33 @@
                             </div>
                         </div>
                         <div class="space-y-4">
-                            <!-- THAY THẾ KHỐI NHẬP HÌNH ẢNH MINH HỌA -->
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-700 mb-2">Hình ảnh minh họa (Live Preview)</label>
-                                
-                                <!-- Khung Preview Ảnh -->
-                                <div class="mb-3 border border-gray-200 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center h-[160px] relative shadow-inner">
-                                    <img id="heroImagePreview" src="" class="h-full w-full object-contain hidden" alt="Preview">
-                                    <div id="heroImagePlaceholder" class="text-xs text-gray-400 flex flex-col items-center">
-                                        <svg class="w-8 h-8 mb-1 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                        Chưa có hình ảnh
+                            <!-- KHỐI NHẬP HÌNH ẢNH & UPLOAD -->
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 mb-2">Hình ảnh minh họa (Live Preview)</label>
+                                    
+                                    <!-- Khung Preview Ảnh -->
+                                    <div class="mb-3 border border-gray-200 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center h-[160px] relative shadow-inner">
+                                        <img id="heroImagePreview" src="" class="h-full w-full object-contain hidden" alt="Preview">
+                                        <div id="heroImagePlaceholder" class="text-xs text-gray-400 flex flex-col items-center">
+                                            <svg class="w-8 h-8 mb-1 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                            Chưa có hình ảnh
+                                        </div>
                                     </div>
+                                    
+                                    <!-- Ô Nhập Link & Nút Upload -->
+                                    <div class="flex gap-2">
+                                        <input type="text" id="heroImagePath" class="flex-1 w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none" placeholder="Nhập link (https://...)">
+                                        
+                                        <label for="heroImageUpload" id="btnUploadHeroLabel" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-md text-sm font-bold text-gray-700 cursor-pointer transition flex items-center justify-center shrink-0">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                            Tải ảnh lên
+                                        </label>
+                                        <input type="file" id="heroImageUpload" accept="image/*" class="hidden">
+                                    </div>
+                                    <p class="text-[10px] text-gray-500 mt-1">Hỗ trợ tải lên tự động. Ảnh sẽ được lưu trữ an toàn trên Supabase.</p>
                                 </div>
-                                
-                                <!-- Ô Nhập Link -->
-                                <input type="text" id="heroImagePath" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:border-kn-blue outline-none" placeholder="Nhập link (https://...) hoặc assets/images/...">
-                                <p class="text-[10px] text-gray-500 mt-1">Dán URL ảnh trực tiếp từ Supabase hoặc đường dẫn file nội bộ.</p>
                             </div>
-                        </div>
                         </div>
                     </div>
                     

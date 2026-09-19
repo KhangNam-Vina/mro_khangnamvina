@@ -1,6 +1,6 @@
 // ============================================================
 // FILE: assets/js/admin/homepage-settings.js
-// QUẢN LÝ HOMEPAGE - MRO KHANG NAM
+// QUẢN LÝ HOMEPAGE - MRO KHANG NAM (TÍCH HỢP UPLOAD ẢNH)
 // ============================================================
 
 "use strict";
@@ -83,7 +83,7 @@ const DEFAULT_SETTINGS = [
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         await waitForSupabase();
-        await loadAllSelectableData(); // Lấy tất cả danh mục, ngành hàng, brand, blog
+        await loadAllSelectableData(); 
         await loadHomepageSettings();
         bindEvents();
     } catch (error) {
@@ -106,7 +106,6 @@ function waitForSupabase(timeout = 10000) {
 // LẤY DỮ LIỆU ĐỔ VÀO CHECKBOX/DROPDOWN TỪ 4 BẢNG
 async function loadAllSelectableData() {
     try {
-        // Class dùng chung để phóng to các ô tick (UI dạng Thẻ Card)
         const labelClass = "flex items-center gap-3 cursor-pointer p-3 bg-white border border-gray-200 hover:border-kn-blue hover:bg-blue-50 rounded-lg transition shadow-sm";
         const checkboxClass = "w-5 h-5 rounded text-kn-blue focus:ring-kn-blue cursor-pointer";
 
@@ -129,7 +128,7 @@ async function loadAllSelectableData() {
             });
         }
 
-        // 2. Industries (ĐÃ FIX: Dùng .eq('is_active', true) cho đồng bộ)
+        // 2. Industries 
         const { data: inds } = await window.supabaseClient.from("industries").select("id, name").eq("is_active", true).order("id", { ascending: true });
         const indContainer = document.getElementById("industriesCheckboxContainer");
         if (indContainer) {
@@ -139,7 +138,7 @@ async function loadAllSelectableData() {
             });
         }
 
-        // 3. Brands (ĐÃ FIX: Thêm .eq('is_active', true) để chặn brand bị ẩn)
+        // 3. Brands 
         const { data: brands } = await window.supabaseClient.from("brands").select("id, name").eq("is_active", true).order("name", { ascending: true });
         const brandContainer = document.getElementById("brandsCheckboxContainer");
         if (brandContainer) {
@@ -159,7 +158,6 @@ async function loadAllSelectableData() {
             });
         }
 
-        // Gắn sự kiện thay đổi cho toàn bộ checkbox vừa sinh ra
         document.querySelectorAll('.cat-select-checkbox, .ind-select-checkbox, .brand-select-checkbox, .blog-select-checkbox').forEach(cb => {
             cb.addEventListener('change', markDirty);
         });
@@ -202,7 +200,7 @@ function mergeWithDefaults(data) {
     });
 }
 
-// BƠM DATA TỪ DB VÀO FORM (Gắn tick vào Checkbox)
+// BƠM DATA TỪ DB VÀO FORM 
 function fillForm(settings) {
     const getSection = key => settings.find(item => item.section_key === key);
 
@@ -377,13 +375,78 @@ function bindEvents() {
     document.querySelectorAll("[data-action='save-homepage']").forEach(btn => btn.addEventListener("click", saveHomepageSettings));
     document.querySelectorAll("[data-action='reset-homepage']").forEach(btn => btn.addEventListener("click", resetHomepageSettings));
     document.querySelectorAll("[data-action='preview-homepage']").forEach(btn => btn.addEventListener("click", previewHomepage));
-    document.querySelectorAll("[data-homepage-section-toggle]").forEach(cb => cb.addEventListener("change", () => { updateSectionVisibility(); markDirty(); })); updateHeroImagePreview();
+    document.querySelectorAll("[data-homepage-section-toggle]").forEach(cb => cb.addEventListener("change", () => { updateSectionVisibility(); markDirty(); })); 
+    
+    updateHeroImagePreview();
+    
     document.querySelectorAll("#homepageSettingsForm input[type='text'], #homepageSettingsForm input[type='number'], #homepageSettingsForm textarea, #homepageSettingsForm select").forEach(element => {
         element.addEventListener("input", markDirty); element.addEventListener("change", markDirty);
     });
+
+    // Bắt sự kiện thay đổi cho input Upload Ảnh
+    const heroUpload = document.getElementById("heroImageUpload");
+    if(heroUpload) heroUpload.addEventListener("change", handleHeroImageUpload);
 }
 
-// CẬP NHẬT TRẠNG THÁI ẨN/HIỆN SECTION (ĐÃ FIX LỖI LIỆT CÔNG TẮC)
+// ========================================================
+// HÀM XỬ LÝ UPLOAD ẢNH LÊN SUPABASE
+// ========================================================
+async function handleHeroImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+        showToast("Vui lòng chọn file hình ảnh hợp lệ (JPG, PNG, WEBP...).", "error");
+        return;
+    }
+
+    const uploadBtnLabel = document.getElementById("btnUploadHeroLabel");
+    const originalHtml = uploadBtnLabel.innerHTML;
+
+    try {
+        // Đổi giao diện nút thành Đang tải...
+        uploadBtnLabel.innerHTML = `<svg class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Đang xử lý...`;
+        uploadBtnLabel.classList.add("opacity-70", "cursor-not-allowed");
+
+        // Đặt tên file và đường dẫn (Lưu vào thư mục 'homepage' trong bucket 'product-images')
+        const fileExt = file.name.split('.').pop().toLowerCase();
+        const fileName = `hero-banner-${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+        const filePath = `homepage/${fileName}`; 
+
+        // Upload lên Supabase Storage
+        const { error } = await window.supabaseClient.storage
+            .from('product-images')
+            .upload(filePath, file, { cacheControl: "31536000", upsert: true });
+
+        if (error) throw error;
+
+        // Lấy Public URL của tấm ảnh vừa up
+        const { data } = window.supabaseClient.storage
+            .from('product-images')
+            .getPublicUrl(filePath);
+
+        // Bơm URL vào ô input và kích hoạt preview
+        const pathInput = document.getElementById("heroImagePath");
+        if (pathInput) {
+            pathInput.value = data.publicUrl;
+            pathInput.dispatchEvent(new Event('input')); // Tự động kích hoạt hàm updateHeroImagePreview
+            markDirty();
+        }
+
+        showToast("Tải ảnh lên thành công!", "success");
+
+    } catch (error) {
+        console.error("Lỗi upload ảnh:", error);
+        showToast("Lỗi khi tải ảnh: " + error.message, "error");
+    } finally {
+        // Phục hồi lại nút Upload
+        uploadBtnLabel.innerHTML = originalHtml;
+        uploadBtnLabel.classList.remove("opacity-70", "cursor-not-allowed");
+        event.target.value = ""; // Reset để có thể chọn lại cùng 1 file nếu cần
+    }
+}
+
+// CẬP NHẬT TRẠNG THÁI ẨN/HIỆN SECTION 
 function updateSectionVisibility() {
     const mappings = [
         ["heroEnabled", "heroSettingsSection"], 
@@ -403,17 +466,14 @@ function updateSectionVisibility() {
         if (cb && sec) {
             const isOff = !cb.checked;
             
-            // 1. Dọn dẹp class is-disabled (thủ phạm gây liệt chuột)
             sec.classList.remove("is-disabled"); 
             
-            // 2. Làm mờ Section bằng class của Tailwind cho thân thiện
             if (isOff) {
                 sec.classList.add("opacity-50", "grayscale");
             } else {
                 sec.classList.remove("opacity-50", "grayscale");
             }
 
-            // 3. Khóa tất cả input/button bên trong (TRỪ CÁI CÔNG TẮC) để khỏi bị sửa nhầm
             const formElements = sec.querySelectorAll("input, select, textarea, button");
             formElements.forEach(el => {
                 if (el.id !== checkboxId) {
@@ -468,8 +528,8 @@ function updateHeroImagePreview() {
     const placeholderEl = document.getElementById("heroImagePlaceholder");
     
     if (url) {
-        // Vì file admin nằm trong thư mục con (/admin/...), nên nếu dùng ảnh nội bộ phải lùi 1 cấp (../)
         let finalUrl = url;
+        // Xử lý link nội bộ an toàn
         if (!/^https?:\/\//i.test(url) && url.startsWith('assets/')) {
             finalUrl = '../' + url;
         }

@@ -121,12 +121,32 @@ async function loadBrandsToMarquee() {
 }
 
 const INDEX_IMAGE_CDN_BASE = "https://mrokhangnam-image.khangnamvn.workers.dev";
+
 function buildIndexImageUrl(imagePath) {
     if (!imagePath) return "assets/images/world mark.png";
-    const p = String(imagePath).trim();
+    let p = String(imagePath).trim();
     if (!p) return "assets/images/world mark.png";
+
+    // Xử lý trường hợp URL bị bọc trong JSON Array (VD: '["https://..."]')
+    try {
+        const parsed = JSON.parse(p);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+            p = String(parsed[0]).trim();
+        }
+    } catch (e) {
+        // Không phải JSON, bỏ qua
+    }
+
     if (/^https?:\/\//i.test(p)) return p;
-    if (p.startsWith('assets/')) return p;
+
+    if (p.startsWith('../assets/')) {
+        return p.replace('../', '');
+    }
+
+    if (p.startsWith('assets/')) {
+        return p;
+    }
+
     return `${INDEX_IMAGE_CDN_BASE}/${p.replace(/^\/+/, "")}`;
 }
 
