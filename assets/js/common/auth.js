@@ -1,6 +1,7 @@
 // ========================================================
 // FILE: assets/js/common/auth.js
 // AUTH SERVICE - KHÁCH HÀNG (CORE)
+// ĐÃ TÍCH HỢP BẢO MẬT: ĐÁ VĂNG TÀI KHOẢN BỊ KHÓA
 // ========================================================
 
 (function () {
@@ -37,6 +38,7 @@
         return data;
     }
 
+    // Đã mở khóa phòng hờ nếu khách bấm nhầm
     async function loginWithGoogle() {
         const client = getClient();
         const { data, error } = await client.auth.signInWithOAuth({
@@ -103,6 +105,53 @@
             callback(event, session);
         });
     }
+
+    // ====================================================
+    // LỚP BẢO VỆ 2: TUẦN TRA (CHẶN KHÁCH ĐANG LƯỚT WEB)
+    // ====================================================
+    window.checkCustomerAuth = async function () {
+        if (!window.supabaseClient) return null;
+
+        try {
+            const { data, error } = await window.supabaseClient.auth.getSession();
+            if (error || !data?.session) {
+                localStorage.removeItem("kn_customer_session");
+                return null;
+            }
+
+            const user = data.session.user;
+            
+            // Soát vé xem tài khoản có bị khóa không
+            const { data: profile } = await window.supabaseClient
+                .from("profiles")
+                .select("status")
+                .eq("id", user.id)
+                .maybeSingle();
+                
+            // Nếu bị khóa -> Ép đăng xuất
+            if (profile && profile.status === 'locked') {
+                await window.supabaseClient.auth.signOut();
+                localStorage.removeItem("kn_customer_session");
+                
+                // Nếu đang ở trang đòi hỏi bảo mật (Profile, Checkout...) thì đá văng ra login
+                const restrictedPaths = ["my-", "profile", "checkout"];
+                if (restrictedPaths.some(p => window.location.pathname.toLowerCase().includes(p))) {
+                    alert("Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin.");
+                    window.location.href = "login.html";
+                }
+                return null;
+            }
+
+            localStorage.setItem("kn_customer_session", JSON.stringify({
+                access_token: data.session.access_token,
+                expires_at: data.session.expires_at
+            }));
+
+            return user;
+        } catch (err) {
+            return null;
+        }
+    };
 
     window.Auth = {
         getSession,

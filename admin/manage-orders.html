@@ -23,22 +23,71 @@ tailwind.config={theme:{extend:{colors:{'kn-blue':'#00479b','kn-orange':'#ff5e00
       <h1 class="text-xl font-black text-gray-900">Quản lý Đơn hàng</h1>
       <p class="text-xs text-gray-500 mt-1">Theo dõi và xử lý các đơn hàng từ khách hàng.</p>
     </div>
-    <!-- ĐƯA NÚT LÀM MỚI LÊN ĐÂY -->
-    <button id="btnRefreshOrders" type="button" class="px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-        Làm mới
-    </button>
+    
+    <div class="flex items-center gap-3">
+        <!-- BỘ LỌC THỜI GIAN TOÀN CỤC (MỚI THÊM) -->
+        <select id="globalTimeFilter" class="bg-blue-50 border border-blue-200 text-kn-blue rounded-lg px-4 py-2.5 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-200 shadow-sm cursor-pointer transition hover:bg-blue-100">
+            <option value="this_month">Tháng này</option>
+            <option value="last_month">Tháng trước</option>
+            <option value="7_days">7 ngày qua</option>
+            <option value="today">Hôm nay</option>
+            <option value="all">Tất cả thời gian</option>
+        </select>
+
+        <!-- NÚT LÀM MỚI -->
+        <button id="btnRefreshOrders" type="button" class="px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <span class="hidden sm:inline">Làm mới</span>
+        </button>
+    </div>
   </div>
 </header>
 
 <main class="flex-1 overflow-y-auto bg-gray-50 p-6">
 <div class="max-w-[1600px] mx-auto space-y-5">
 
-<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5"><p class="text-xs uppercase tracking-wider text-gray-400 font-black">Tổng đơn hàng</p><p id="kpiTotal" class="text-3xl font-black mt-2">0</p></div>
-  <div class="bg-white rounded-xl border border-orange-200 shadow-sm p-5"><p class="text-xs uppercase tracking-wider text-orange-500 font-black">Chờ xử lý</p><p id="kpiPending" class="text-3xl font-black text-orange-600 mt-2">0</p></div>
-  <div class="bg-white rounded-xl border border-blue-200 shadow-sm p-5"><p class="text-xs uppercase tracking-wider text-blue-500 font-black">Đang xử lý</p><p id="kpiProcessing" class="text-3xl font-black text-kn-blue mt-2">0</p></div>
-  <div class="bg-white rounded-xl border border-green-200 shadow-sm p-5"><p class="text-xs uppercase tracking-wider text-green-500 font-black">Đã giao</p><p id="kpiDelivered" class="text-3xl font-black text-green-600 mt-2">0</p></div>
+<section class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3">
+  <!-- Tổng đơn -->
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+    <p class="text-[10px] uppercase tracking-wider text-gray-400 font-black whitespace-nowrap">Tổng đơn</p>
+    <p id="kpiTotal" class="text-2xl font-black mt-1">0</p>
+  </div>
+  
+  <!-- Chờ xử lý -->
+  <div class="bg-white rounded-xl border border-orange-200 shadow-sm p-4">
+    <p class="text-[10px] uppercase tracking-wider text-orange-500 font-black whitespace-nowrap">Chờ xử lý</p>
+    <p id="kpiPending" class="text-2xl font-black text-orange-600 mt-1">0</p>
+  </div>
+
+  <!-- Đã xác nhận -->
+  <div class="bg-white rounded-xl border border-blue-200 shadow-sm p-4">
+    <p class="text-[10px] uppercase tracking-wider text-blue-500 font-black whitespace-nowrap">Đã xác nhận</p>
+    <p id="kpiConfirmed" class="text-2xl font-black text-blue-600 mt-1">0</p>
+  </div>
+  
+  <!-- Đang xử lý -->
+  <div class="bg-white rounded-xl border border-purple-200 shadow-sm p-4">
+    <p class="text-[10px] uppercase tracking-wider text-purple-500 font-black whitespace-nowrap">Đang xử lý</p>
+    <p id="kpiProcessing" class="text-2xl font-black text-purple-600 mt-1">0</p>
+  </div>
+
+  <!-- Đang giao -->
+  <div class="bg-white rounded-xl border border-indigo-200 shadow-sm p-4">
+    <p class="text-[10px] uppercase tracking-wider text-indigo-500 font-black whitespace-nowrap">Đang giao</p>
+    <p id="kpiShipped" class="text-2xl font-black text-indigo-600 mt-1">0</p>
+  </div>
+  
+  <!-- Đã giao -->
+  <div class="bg-white rounded-xl border border-green-200 shadow-sm p-4">
+    <p class="text-[10px] uppercase tracking-wider text-green-500 font-black whitespace-nowrap">Đã giao</p>
+    <p id="kpiDelivered" class="text-2xl font-black text-green-600 mt-1">0</p>
+  </div>
+
+  <!-- Đã hủy -->
+  <div class="bg-white rounded-xl border border-red-200 shadow-sm p-4">
+    <p class="text-[10px] uppercase tracking-wider text-red-500 font-black whitespace-nowrap">Đã hủy</p>
+    <p id="kpiCancelled" class="text-2xl font-black text-red-600 mt-1">0</p>
+  </div>
 </section>
 
 <section class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">

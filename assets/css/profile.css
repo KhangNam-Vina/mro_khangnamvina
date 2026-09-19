@@ -205,3 +205,15 @@
     .profile-card { border: 0; box-shadow: none; }
 }
 
+/* Trạng thái khóa ô Input (Read-only) */
+.profile-form-input[readonly],
+.profile-form-input:disabled {
+    background-color: #f3f4f6;
+    color: #6b7280;
+    cursor: not-allowed;
+    border-color: #e5e7eb;
+}
+.profile-form-input[readonly]:focus {
+    box-shadow: none;
+    border-color: #e5e7eb;
+}

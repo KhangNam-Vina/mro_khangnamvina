@@ -83,8 +83,8 @@
                 <section class="profile-content">
                     <div class="profile-card">
                         <div class="profile-card-header">
-                            <h2 class="profile-card-title">Hồ Sơ Doanh Nghiệp</h2>
-                            <p class="profile-card-description">Thông tin này sẽ được tự động điền vào các yêu cầu báo giá mới của bạn.</p>
+                            <h2 class="profile-card-title">Thông tin tài khoản</h2>
+                            <p class="profile-card-description">Thông tin này sẽ được tự động điền vào các yêu cầu báo giá và đơn đặt hàng mới của bạn.</p>
                         </div>
 
                         <form id="profileForm" class="profile-form">
@@ -100,41 +100,53 @@
                                 </div>
                             </div>
 
-                            <div class="profile-form-group profile-form-group-full">
-                                <label for="profEmail" class="profile-form-label">
-                                    Email liên hệ
-                                </label>
-                                <input
-                                    type="email"
-                                    id="profEmail"
-                                    class="profile-form-input"
-                                    autocomplete="email"
-                                    readonly
-                                >
+                            <!-- EMAIL & NÚT ĐỔI MẬT KHẨU (Nằm cạnh nhau cho hợp lý) -->
+                            <div class="profile-form-group profile-form-group-full" style="display: flex; gap: 16px; align-items: flex-end;">
+                                <div style="flex: 1;">
+                                    <label for="profEmail" class="profile-form-label">Email liên hệ (Tài khoản đăng nhập)</label>
+                                    <input type="email" id="profEmail" class="profile-form-input" autocomplete="email" readonly>
+                                </div>
+                                <button type="button" onclick="openPasswordModal()" style="min-height: 42px; padding: 0 16px; border: 1px solid #d1d5db; background: #fff; border-radius: 7px; font-size: 13px; font-weight: 700; color: #374151; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='#fff'">
+                                    🔑 Đổi mật khẩu
+                                </button>
                             </div>
 
                             <div class="profile-form-divider"></div>
 
                             <!-- COMPANY -->
                             <div class="profile-form-section">
-                                <div class="profile-form-group">
-                                    <label for="profCompany" class="profile-form-label">Tên Công ty / Nhà máy <span class="required">*</span></label>
-                                    <input type="text" id="profCompany" class="profile-form-input" required>
+                                <div class="profile-form-grid">
+                                    <div class="profile-form-group" style="margin-top: 0;">
+                                        <label for="profCompany" class="profile-form-label">Tên Công ty / Nhà máy <span class="required">*</span></label>
+                                        <input type="text" id="profCompany" class="profile-form-input" required>
+                                    </div>
+                                    <div class="profile-form-group" style="margin-top: 0;">
+                                        <label for="profTaxId" class="profile-form-label">Mã số thuế</label>
+                                        <input type="text" id="profTaxId" class="profile-form-input">
+                                    </div>
                                 </div>
-                                <div class="profile-form-group">
-                                    <label for="profTaxId" class="profile-form-label">Mã số thuế</label>
-                                    <input type="text" id="profTaxId" class="profile-form-input">
-                                </div>
+                                
                                 <div class="profile-form-group">
                                     <label for="profAddress" class="profile-form-label">Địa chỉ giao hàng mặc định</label>
-                                    <textarea id="profAddress" rows="3" class="profile-form-input profile-form-textarea"></textarea>
+                                    <textarea id="profAddress" rows="2" class="profile-form-input profile-form-textarea"></textarea>
+                                </div>
+
+                                <div class="profile-form-group" style="margin-top: 0;">
+                                    <label class="profile-form-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer; text-transform: none; color: #00479b;">
+                                        <input type="checkbox" id="chkSameAddress" style="width: 16px; height: 16px; accent-color: #00479b; cursor: pointer;">
+                                        Địa chỉ xuất hóa đơn giống địa chỉ giao hàng
+                                    </label>
+                                </div>
+                                <div class="profile-form-group" id="billingAddressGroup" style="margin-top: 0;">
+                                    <label for="profBillingAddress" class="profile-form-label">Địa chỉ xuất hóa đơn</label>
+                                    <textarea id="profBillingAddress" rows="2" class="profile-form-input profile-form-textarea"></textarea>
                                 </div>
                             </div>
 
                             <!-- ACTION -->
                             <div class="profile-form-actions">
                                 <button type="submit" id="btnSaveProfile" class="profile-save-button">
-                                    <svg class="profile-save-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 01-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 01-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                                    <svg class="profile-save-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 01-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 01-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
                                     <span id="saveButtonText">Cập nhật thông tin</span>
                                 </button>
                             </div>
@@ -144,6 +156,30 @@
             </div>
         </div>
     </main>
+
+    <!-- MODAL ĐỔI MẬT KHẨU -->
+    <div id="passwordModal" class="is-hidden" style="position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 16px;">
+        <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);" onclick="closePasswordModal()"></div>
+        <div style="position: relative; width: 100%; max-width: 400px; background: #fff; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden;">
+            <div style="padding: 20px 24px; border-b: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; font-size: 18px; font-weight: 800; color: #111827;">Thay đổi mật khẩu</h3>
+                <button type="button" onclick="closePasswordModal()" style="background: none; border: none; font-size: 24px; color: #9ca3af; cursor: pointer; line-height: 1;">&times;</button>
+            </div>
+            <form id="passwordForm" style="padding: 24px;">
+                <div class="profile-form-group" style="margin-top: 0;">
+                    <label for="newPassword" class="profile-form-label">Mật khẩu mới <span class="required">*</span></label>
+                    <input type="password" id="newPassword" class="profile-form-input" required placeholder="Ít nhất 6 ký tự">
+                </div>
+                <div class="profile-form-group" style="margin-top: 16px;">
+                    <label for="confirmPassword" class="profile-form-label">Xác nhận mật khẩu <span class="required">*</span></label>
+                    <input type="password" id="confirmPassword" class="profile-form-input" required placeholder="Nhập lại mật khẩu mới">
+                </div>
+                <button type="submit" id="btnSavePassword" style="width: 100%; margin-top: 24px; min-height: 42px; background: #00479b; color: #fff; border: none; border-radius: 7px; font-size: 13px; font-weight: 800; text-transform: uppercase; cursor: pointer; transition: background 0.2s;">
+                    Xác nhận đổi
+                </button>
+            </form>
+        </div>
+    </div>
 
     <!-- FOOTER -->
     <div id="app-footer"></div>

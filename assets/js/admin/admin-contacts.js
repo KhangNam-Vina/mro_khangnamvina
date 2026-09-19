@@ -1,6 +1,6 @@
 // ========================================================
 // FILE: assets/js/admin-contacts.js
-// QUẢN LÝ LIÊN HỆ - TÍCH HỢP TAB, CONFIG & TRẠNG THÁI
+// QUẢN LÝ LIÊN HỆ - TÍCH HỢP TAB, CONFIG, TRẠNG THÁI & THỐNG KÊ
 // ========================================================
 
 // 1. STATE & DOM CACHE
@@ -19,7 +19,14 @@ const DOM = {
     pagination: document.getElementById('paginationContainer'),
     searchInput: document.getElementById('searchContactInput'),
     filterSelect: document.getElementById('filterDateSelect'),
-    toastContainer: document.getElementById('toastContainer')
+    btnRefresh: document.getElementById('btnRefresh'),
+    toastContainer: document.getElementById('toastContainer'),
+    
+    // Stats DOM
+    statTotal: document.getElementById('statTotalContacts'),
+    statPending: document.getElementById('statPendingContacts'),
+    statProcessed: document.getElementById('statProcessedContacts'),
+    statToday: document.getElementById('statTodayContacts')
 };
 
 // 2. UTILS
@@ -27,13 +34,7 @@ const utils = {
     escapeHTML: (str) => {
         if (!str) return '';
         return str.replace(/[&<>'"]/g, 
-            tag => ({
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                "'": '&#39;',
-                '"': '&quot;'
-            }[tag] || tag)
+            tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
         );
     },
     formatDate: (dateString) => {
@@ -64,15 +65,23 @@ const utils = {
 
 // 3. INIT & TAB SWITCHER
 window.addEventListener('load', () => {
+    bindEvents();
+    fetchInboxData(); // Load List & KPIs
+});
+
+function bindEvents() {
     if (DOM.searchInput) {
-        DOM.searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
+        let searchTimer;
+        DOM.searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
                 state.searchQuery = e.target.value.trim();
                 state.currentPage = 1;
                 fetchContacts();
-            }
+            }, 300);
         });
     }
+
     if (DOM.filterSelect) {
         DOM.filterSelect.addEventListener('change', (e) => {
             state.dateFilter = e.target.value;
@@ -80,15 +89,38 @@ window.addEventListener('load', () => {
             fetchContacts();
         });
     }
-    fetchContacts();
-});
+
+    if (DOM.btnRefresh) {
+        DOM.btnRefresh.addEventListener('click', async () => {
+            const originalHtml = DOM.btnRefresh.innerHTML;
+            DOM.btnRefresh.disabled = true;
+            DOM.btnRefresh.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Đang tải...`;
+            
+            // Nếu đang ở Tab config thì load config, ngược lại load inbox
+            if (!document.getElementById('tabInbox').classList.contains('hidden')) {
+                // Reset filter
+                state.searchQuery = '';
+                state.dateFilter = 'all';
+                state.currentPage = 1;
+                if(DOM.searchInput) DOM.searchInput.value = '';
+                if(DOM.filterSelect) DOM.filterSelect.value = 'all';
+                
+                await fetchInboxData();
+            } else {
+                await loadContactConfig();
+            }
+            
+            DOM.btnRefresh.disabled = false;
+            DOM.btnRefresh.innerHTML = originalHtml;
+        });
+    }
+}
 
 window.switchTab = function(tabId) {
     const btnInbox = document.getElementById('tabInboxBtn');
     const btnConfig = document.getElementById('tabConfigBtn');
     const contentInbox = document.getElementById('tabInbox');
     const contentConfig = document.getElementById('tabConfig');
-    const headerFilters = document.getElementById('headerFilters');
 
     const activeClass = "py-3 text-kn-blue border-b-2 border-kn-blue font-bold text-sm transition";
     const inactiveClass = "py-3 text-gray-500 border-b-2 border-transparent hover:text-kn-blue font-bold text-sm transition";
@@ -98,26 +130,51 @@ window.switchTab = function(tabId) {
         btnConfig.className = inactiveClass;
         contentInbox.classList.remove('hidden');
         contentConfig.classList.add('hidden');
-        if (headerFilters) {
-            headerFilters.style.opacity = '1';
-            headerFilters.style.pointerEvents = 'auto';
-        }
     } else {
         btnConfig.className = activeClass;
         btnInbox.className = inactiveClass;
         contentConfig.classList.remove('hidden');
         contentInbox.classList.add('hidden');
-        if (headerFilters) {
-            headerFilters.style.opacity = '0';
-            headerFilters.style.pointerEvents = 'none';
-        }
         if (!state.isConfigLoaded) loadContactConfig();
     }
 }
 
 // ==========================================
-// PHẦN 1: LOGIC QUẢN LÝ INBOX
+// PHẦN 1: LOGIC QUẢN LÝ INBOX & KPI
 // ==========================================
+async function fetchInboxData() {
+    await Promise.all([
+        fetchContacts(),
+        loadContactKPIs()
+    ]);
+}
+
+async function loadContactKPIs() {
+    if (!window.supabaseClient) return;
+    try {
+        const todayStart = new Date();
+        todayStart.setHours(0,0,0,0);
+
+        const [totalRes, processedRes, todayRes] = await Promise.all([
+            window.supabaseClient.from('contacts').select('id', { count: 'exact', head: true }),
+            window.supabaseClient.from('contacts').select('id', { count: 'exact', head: true }).eq('status', 'processed'),
+            window.supabaseClient.from('contacts').select('id', { count: 'exact', head: true }).gte('created_at', todayStart.toISOString())
+        ]);
+
+        const total = totalRes.count || 0;
+        const processed = processedRes.count || 0;
+        const pending = total - processed;
+        const today = todayRes.count || 0;
+
+        if (DOM.statTotal) DOM.statTotal.textContent = total;
+        if (DOM.statProcessed) DOM.statProcessed.textContent = processed;
+        if (DOM.statPending) DOM.statPending.textContent = pending;
+        if (DOM.statToday) DOM.statToday.textContent = today;
+    } catch (error) {
+        console.error("Lỗi tải KPI liên hệ:", error);
+    }
+}
+
 async function fetchContacts() {
     if (DOM.tbody) {
         DOM.tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10"><div class="w-8 h-8 border-4 border-kn-blue border-t-transparent rounded-full animate-spin mx-auto mb-2"></div><span class="text-gray-500 font-bold">Đang tải dữ liệu...</span></td></tr>`;
@@ -157,7 +214,6 @@ async function fetchContacts() {
     }
 }
 
-// HÀM MỚI: ĐÁNH DẤU ĐÃ XỬ LÝ
 window.markAsProcessed = async function(id) {
     if (!confirm("Đánh dấu liên hệ này đã được xử lý xong?")) return;
     
@@ -178,11 +234,12 @@ window.markAsProcessed = async function(id) {
         
         utils.showToast("Cập nhật trạng thái thành công!", "success");
         
-        // Cập nhật lại UI ngay lập tức không cần fetch lại database
+        // Cập nhật lại UI list & KPI ngay lập tức
         const index = state.contacts.findIndex(c => c.id == id);
         if(index !== -1) {
             state.contacts[index].status = 'processed';
             renderContacts();
+            loadContactKPIs();
         }
 
     } catch (error) {
@@ -209,7 +266,8 @@ window.deleteContact = async function(id) {
         if (error) throw error;
         utils.showToast("Xóa thành công", "success");
         if (state.contacts.length === 1 && state.currentPage > 1) state.currentPage--;
-        fetchContacts();
+        
+        await fetchInboxData();
     } catch (error) {
         utils.showToast("Lỗi xóa: " + error.message, "error");
         if (btn) {
@@ -233,39 +291,35 @@ function renderContacts() {
         const safeMessage = utils.escapeHTML(item.message);
         const dateStr = utils.formatDate(item.created_at);
         
-        // Logic kiểm tra trạng thái - ĐÃ BỎ ICON
         const isProcessed = item.status === 'processed';
         const statusBadge = isProcessed 
-            ? `<span class="inline-block mt-2 px-2 py-0.5 bg-green-100 text-green-700 text-[10px] rounded border border-green-200 font-bold uppercase tracking-wider">Đã xử lý</span>`
-            : `<span class="inline-block mt-2 px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] rounded border border-orange-200 font-bold uppercase tracking-wider">Chờ xử lý</span>`;
+            ? `<span class="inline-block mt-2 px-2.5 py-1 bg-green-100 text-green-700 text-[10px] rounded-full border border-green-200 font-bold uppercase tracking-wider">Đã xử lý</span>`
+            : `<span class="inline-block mt-2 px-2.5 py-1 bg-orange-100 text-orange-700 text-[10px] rounded-full border border-orange-200 font-bold uppercase tracking-wider">Chờ xử lý</span>`;
 
         return `
             <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
-                <td class="p-4 text-center font-bold text-gray-500">${from + index + 1}</td>
+                <td class="p-4 text-center font-bold text-gray-400 text-xs border-r border-gray-50">${from + index + 1}</td>
                 <td class="p-4">
-                    <p class="font-bold text-gray-800">${safeName}</p>
-                    <p class="text-xs text-gray-500 bg-gray-200 inline-block px-2 py-0.5 rounded mt-1">${safeCompany}</p>
+                    <p class="font-black text-gray-800">${safeName}</p>
+                    <p class="text-[11px] text-gray-500 bg-gray-200 inline-block px-2 py-0.5 rounded mt-1">${safeCompany}</p>
                     <br>${statusBadge}
                 </td>
-                <td class="p-4 text-sm">
+                <td class="p-4 text-sm font-mono text-gray-600">
                     <div class="flex items-center space-x-2 group">
-                        <a href="mailto:${safeEmail}" class="text-kn-blue hover:underline line-clamp-1">${safeEmail}</a>
-                        <!-- NÚT COPY THÀNH CHỮ -->
+                        <a href="mailto:${safeEmail}" class="hover:underline line-clamp-1">${safeEmail}</a>
                         <button onclick="utils.copyText('${item.email}')" class="text-gray-500 bg-gray-200 hover:bg-gray-300 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase opacity-0 group-hover:opacity-100 transition" title="Copy Email">Copy</button>
                     </div>
                     <div class="flex items-center space-x-2 mt-1 group">
-                        <a href="tel:${safePhone}" class="text-gray-600 font-bold hover:text-kn-blue">${safePhone}</a>
-                        <!-- NÚT COPY THÀNH CHỮ -->
+                        <a href="tel:${safePhone}" class="hover:text-kn-blue">${safePhone}</a>
                         <button onclick="utils.copyText('${item.phone}')" class="text-gray-500 bg-gray-200 hover:bg-gray-300 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase opacity-0 group-hover:opacity-100 transition" title="Copy SĐT">Copy</button>
                     </div>
                 </td>
-                <td class="p-4 text-sm text-gray-600 break-words max-w-xs leading-relaxed">${safeMessage}</td>
-                <td class="p-4 text-xs text-gray-500 font-medium">${dateStr}</td>
-                <td class="p-4 text-right">
-                    <div class="flex justify-end space-x-2">
-                        <!-- NÚT XONG VÀ XÓA ĐÃ BỎ ICON -->
-                        ${!isProcessed ? `<button id="btnProcess_${item.id}" onclick="markAsProcessed('${item.id}')" class="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded font-bold hover:bg-green-200 transition shadow-sm whitespace-nowrap">Xong</button>` : ''}
-                        <button id="btnDelete_${item.id}" onclick="deleteContact('${item.id}')" class="text-xs bg-red-100 text-red-700 px-3 py-1.5 rounded font-bold hover:bg-red-200 transition shadow-sm whitespace-nowrap">Xóa</button>
+                <td class="p-4 text-sm text-gray-600 break-words max-w-xs leading-relaxed whitespace-normal">${safeMessage}</td>
+                <td class="p-4 text-[11px] text-gray-500 font-medium whitespace-nowrap">${dateStr}</td> 
+                <td class="p-4 text-right align-middle">
+                    <div class="flex items-center justify-end gap-1.5">
+                        ${!isProcessed ? `<button id="btnProcess_${item.id}" onclick="markAsProcessed('${item.id}')" class="px-3 py-2 text-green-600 hover:bg-green-50 rounded-lg transition font-bold text-[11px] uppercase whitespace-nowrap">Đã xử lý</button>` : ''}
+                        <button id="btnDelete_${item.id}" onclick="deleteContact('${item.id}')" class="px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg transition font-bold text-[11px] uppercase whitespace-nowrap">Xóa</button>
                     </div>
                 </td>
             </tr>
@@ -274,8 +328,7 @@ function renderContacts() {
 }
 
 function renderEmpty() { 
-    // Bỏ icon hòm thư trống
-    DOM.tbody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-gray-500"><div class="font-bold">Không tìm thấy liên hệ nào!</div></td></tr>`; 
+    DOM.tbody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-gray-500"><div class="font-bold">Không tìm thấy liên hệ nào!</div><div class="text-xs text-gray-400 mt-1">Thử thay đổi từ khóa hoặc khoảng thời gian.</div></td></tr>`; 
 }
 function renderError(msg) { 
     DOM.tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-red-500 font-bold">Lỗi: ${msg}</td></tr>`; 
@@ -288,12 +341,12 @@ function renderPagination() {
     if (totalPages <= 1) return;
 
     let html = '';
-    if (state.currentPage > 1) html += `<button onclick="state.currentPage--; fetchContacts()" class="px-3 py-1 bg-white border rounded text-sm text-gray-600 hover:bg-gray-50">&laquo;</button>`;
+    if (state.currentPage > 1) html += `<button onclick="state.currentPage--; fetchContacts()" class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-500 hover:bg-gray-50">&laquo;</button>`;
     for (let i = 1; i <= totalPages; i++) {
-        if (i === state.currentPage) html += `<button class="px-3 py-1 bg-kn-orange text-white border border-kn-orange rounded text-sm font-bold">${i}</button>`;
-        else html += `<button onclick="state.currentPage = ${i}; fetchContacts()" class="px-3 py-1 bg-white border rounded text-sm text-kn-blue hover:bg-blue-50">${i}</button>`;
+        if (i === state.currentPage) html += `<button class="px-3 py-1.5 bg-kn-blue text-white border border-kn-blue rounded-lg text-sm font-bold">${i}</button>`;
+        else html += `<button onclick="state.currentPage = ${i}; fetchContacts()" class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-50">${i}</button>`;
     }
-    if (state.currentPage < totalPages) html += `<button onclick="state.currentPage++; fetchContacts()" class="px-3 py-1 bg-white border rounded text-sm text-gray-600 hover:bg-gray-50">&raquo;</button>`;
+    if (state.currentPage < totalPages) html += `<button onclick="state.currentPage++; fetchContacts()" class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-500 hover:bg-gray-50">&raquo;</button>`;
     DOM.pagination.innerHTML = html;
 }
 
@@ -388,7 +441,6 @@ window.addProofRow = function(value = '') {
     const row = document.createElement('div');
     row.className = 'flex items-center space-x-3 proof-row';
     
-    // Nút Xóa ở Tab 2 cũng được chuyển thành chữ
     row.innerHTML = `
         <span class="bg-green-100 text-green-700 p-1.5 rounded-full cursor-move">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -404,7 +456,6 @@ window.addProofRow = function(value = '') {
 window.checkEmptyProofs = function() {
     const container = document.getElementById('proofsContainer');
     const emptyMsg = document.getElementById('emptyProofMsg');
-    // Nếu không còn thẻ con nào -> Hiện thông báo "Chưa có điểm uy tín"
     if (container && container.children.length === 0 && emptyMsg) {
         emptyMsg.classList.remove('hidden');
     }

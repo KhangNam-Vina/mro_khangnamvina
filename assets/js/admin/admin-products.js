@@ -1272,7 +1272,10 @@ async function updateDataQuality() {
             { key: "information", label: "Thông tin tổng thể", complete: completeInformation, missing: missingInformation, icon: "fa-clipboard-check" }
         ];
 
-        DOM.dataQualityTotal.textContent = `${formatNumber(total)} sản phẩm`;
+        // ADDED FIX HERE
+        if (DOM.dataQualityTotal) {
+            DOM.dataQualityTotal.textContent = `${formatNumber(total)} sản phẩm`;
+        }
 
         DOM.dataQualityGrid.innerHTML = metrics.map(metric => {
             const percentage = total > 0 ? Math.round((metric.complete / total) * 100) : 0;
@@ -1307,13 +1310,18 @@ async function updateDataQuality() {
 
     } catch (error) {
         console.error("Lỗi Data Quality:", error);
-        DOM.dataQualityTotal.textContent = "Không thể tải dữ liệu";
+        
+        // ADDED FIX HERE
+        if (DOM.dataQualityTotal) {
+            DOM.dataQualityTotal.textContent = "Không thể tải dữ liệu";
+        }
+        
         DOM.dataQualityGrid.innerHTML = `<div class="col-span-full text-center py-6 text-red-500">Không thể kiểm tra chất lượng dữ liệu.</div>`;
     }
 }
 
 /* =========================================================
-   RENDER PRODUCTS (ĐÃ BỌC DẤU NHÁY ĐƠN CHO ID ĐỂ FIX LỖI)
+   RENDER PRODUCTS
 ========================================================= */
 function renderProducts() {
     if (!DOM.tableBody) return;
@@ -1329,7 +1337,6 @@ function renderProducts() {
         const brandName = item.brands?.name || "OEM";
         const imageUrl = buildProductImageUrl(item.image_path);
         
-        // KIỂM TRA TRẠNG THÁI BẬT TẮT
         const isChecked = item.is_active !== false ? "checked" : "";
 
         const imageHTML = imageUrl
@@ -1347,7 +1354,6 @@ function renderProducts() {
                 <td class="px-4 py-3 text-gray-800 font-bold text-sm whitespace-nowrap text-right align-middle">${formatCurrency(item.price)}</td>
                 <td class="px-4 py-3 text-center align-middle"><span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold ${Number(item.stock_quantity) > 0 ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'}">${Number(item.stock_quantity) > 0 ? Number(item.stock_quantity) : "Hết hàng"}</span></td>
                 
-                <!-- CÔNG TẮC GẠT TRẠNG THÁI (Đã bọc dấu nháy '' quanh item.id) -->
                 <td class="px-4 py-3 text-center align-middle w-32">
                     <label class="relative inline-flex items-center cursor-pointer" title="${item.is_active !== false ? 'Đang hiển thị' : 'Đang ẩn'}">
                         <input type="checkbox" onchange="toggleProductStatus('${item.id}', ${item.is_active !== false})" class="sr-only peer" ${isChecked}>
@@ -1366,7 +1372,6 @@ function renderProducts() {
     }).join("");
 }
 
-// BỔ SUNG HÀM GẠT CÔNG TẮC BÊN NGOÀI BẢNG
 window.toggleProductStatus = async function (id, currentStatus) {
     const newStatus = !currentStatus;
     try {

@@ -12,85 +12,102 @@
 </head>
 <body class="bg-gray-50 font-sans text-gray-800 flex h-screen overflow-hidden relative">
 
-    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none"></div>
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-2 pointer-events-none"></div>
 
-   <aside
-    id="adminSidebar"
-    class="
-        w-64
-        shrink-0
-        bg-gray-900
-        text-white
-        hidden
-        md:flex
-        flex-col
-        sticky
-        top-0
-        h-screen
-        self-start
-    "
-></aside>
+    <aside id="adminSidebar" class="w-64 shrink-0 bg-gray-900 text-white hidden md:flex flex-col sticky top-0 h-screen self-start"></aside>
+    
     <div class="flex-1 flex flex-col h-screen overflow-hidden">
-        <header class="bg-white shadow-sm px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200">
+        <header class="bg-white shadow-sm px-6 py-4 flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200 z-10 sticky top-0">
             <div>
-                <h2 class="text-xl font-bold text-gray-900">Quản lý Bài viết Blog</h2>
+                <h2 class="text-xl font-black text-gray-900">Quản lý Bài viết Blog</h2>
                 <p class="text-xs text-gray-500 mt-1">Tin tức kỹ thuật, hướng dẫn chọn vật tư & tài liệu MRO</p>
             </div>
-            <button onclick="showCreateBlogForm()" class="bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-lg text-sm font-bold shadow transition flex items-center mt-3 md:mt-0">
-                <span class="mr-2 text-lg leading-none">+</span> Viết bài mới
+            <button onclick="showCreateBlogForm()" class="bg-kn-blue hover:bg-blue-800 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition flex items-center mt-3 md:mt-0 gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Viết bài mới
             </button>
         </header>
 
         <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
             
+            <!-- VIEW: DANH SÁCH BÀI VIẾT -->
             <div id="blogListView">
                 <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-4">
-                    <table class="w-full text-left text-sm text-gray-600">
-                        <thead class="bg-gray-50 text-gray-700 font-bold border-b border-gray-200 text-xs uppercase tracking-wider">
-                            <tr>
-                                <th class="p-4 text-center w-12">#</th>
-                                <th class="p-4 w-20">Ảnh</th>
-                                <th class="p-4">Tiêu đề & Danh mục</th>
-                                <th class="p-4 w-28 text-center whitespace-nowrap">Trạng thái</th>
-                                <th class="p-4 w-32 text-center">Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody id="blogTableBody" class="divide-y divide-gray-100 bg-white">
-                            <tr><td colspan="5" class="text-center py-8 text-gray-400">Đang tải danh sách bài viết...</td></tr>
-                        </tbody>
-                    </table>
+                    
+                    <!-- BỘ LỌC VÀ TÌM KIẾM -->
+                    <div class="px-6 py-4 border-b border-gray-200 flex flex-wrap justify-between items-center gap-4 bg-gray-50/50">
+                        <div>
+                            <h2 class="font-black text-gray-900">Danh sách bài viết</h2>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                </div>
+                                <input id="searchBlogInput" type="text" placeholder="Tìm tiêu đề, url..." class="bg-white border border-gray-300 rounded-lg pl-9 pr-3 py-2 text-sm w-64 outline-none focus:border-kn-blue shadow-sm">
+                            </div>
+                            <select id="filterBlogCategory" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-bold outline-none focus:border-kn-blue shadow-sm cursor-pointer">
+                                <option value="">Tất cả danh mục</option>
+                                <option value="bảo trì">Bảo trì</option>
+                                <option value="vật tư">Vật tư</option>
+                                <option value="an toàn">An toàn (Safety)</option>
+                            </select>
+                            <select id="filterBlogStatus" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-bold outline-none focus:border-kn-blue shadow-sm cursor-pointer">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="active">Đang hiển thị</option>
+                                <option value="inactive">Đang ẩn</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- BẢNG DỮ LIỆU -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-gray-600 min-w-[1000px]">
+                            <thead class="bg-gray-50 text-gray-500 font-black border-b border-gray-200 text-[11px] uppercase tracking-wider">
+                                <tr>
+                                    <th class="p-4 text-center w-12">#</th>
+                                    <th class="p-4 w-24 text-center">Ảnh</th>
+                                    <th class="p-4">Tiêu đề & Danh mục</th>
+                                    <th class="p-4 w-32 text-center whitespace-nowrap">Trạng thái</th>
+                                    <th class="p-4 w-32 text-center">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="blogTableBody" class="divide-y divide-gray-100 bg-white">
+                                <tr><td colspan="5" class="text-center py-8 text-gray-400">Đang tải danh sách bài viết...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div id="paginationContainer" class="flex justify-between items-center text-sm py-2"></div>
+                <div id="paginationContainer" class="flex justify-between items-center text-sm py-3 px-5 bg-white border border-gray-200 rounded-xl shadow-sm"></div>
             </div>
 
+            <!-- VIEW: FORM THÊM/SỬA BÀI VIẾT (Đã xóa công tắc ẩn hiện) -->
             <div id="blogFormView" class="hidden bg-white rounded-xl border border-gray-200 shadow-sm p-6 max-w-5xl mx-auto mb-10">
                 <div class="flex justify-between items-center border-b pb-4 mb-6 border-gray-100">
-                    <h3 id="formTitle" class="text-lg font-bold text-gray-900">Viết Bài Mới</h3>
-                    <button type="button" onclick="cancelEdit()" class="text-gray-400 hover:text-gray-600 text-sm font-bold">✕ Đóng</button>
+                    <h3 id="formTitle" class="text-xl font-black text-gray-900">Viết Bài Mới</h3>
+                    <button type="button" onclick="cancelEdit()" class="text-gray-500 hover:text-gray-800 text-sm font-bold px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition shadow-sm">✕ Đóng</button>
                 </div>
 
                 <form id="blogForm" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Tiêu đề bài viết <span class="text-red-500">*</span></label>
-                            <input type="text" id="inTitle" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue" placeholder="Nhập tiêu đề...">
+                            <label class="block text-xs font-bold uppercase text-gray-700 mb-2 tracking-wide">Tiêu đề bài viết <span class="text-red-500">*</span></label>
+                            <input type="text" id="inTitle" required class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-kn-blue shadow-sm" placeholder="Nhập tiêu đề...">
                         </div>
                         
-                        <!-- BỔ SUNG: Ô TÓM TẮT BỊ THIẾU -->
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Tóm tắt bài viết (Summary) <span class="text-red-500">*</span></label>
-                            <textarea id="inSummary" rows="3" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue resize-none" placeholder="Đoạn mô tả ngắn hiển thị ở trang chủ Blog..."></textarea>
+                            <label class="block text-xs font-bold uppercase text-gray-700 mb-2 tracking-wide">Tóm tắt bài viết (Summary) <span class="text-red-500">*</span></label>
+                            <textarea id="inSummary" rows="3" required class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-kn-blue resize-none shadow-sm" placeholder="Đoạn mô tả ngắn hiển thị ở trang chủ Blog..."></textarea>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Đường dẫn (Slug) <span class="text-red-500">*</span></label>
-                            <input type="text" id="inSlug" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue bg-gray-50" placeholder="duong-dan-bai-viet">
+                            <label class="block text-xs font-bold uppercase text-gray-700 mb-2 tracking-wide">Đường dẫn (Slug) <span class="text-red-500">*</span></label>
+                            <input type="text" id="inSlug" required class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-kn-blue bg-gray-50 shadow-sm" placeholder="duong-dan-bai-viet">
                         </div>
 
-                        <!-- BỔ SUNG: CHỌN DANH MỤC -->
                         <div>
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Phân loại danh mục</label>
-                            <select id="inCategory" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue">
+                            <label class="block text-xs font-bold uppercase text-gray-700 mb-2 tracking-wide">Phân loại danh mục</label>
+                            <select id="inCategory" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-kn-blue shadow-sm cursor-pointer">
                                 <option value="ALL">Khác (Chung)</option>
                                 <option value="bảo trì">Bảo trì</option>
                                 <option value="vật tư">Vật tư</option>
@@ -99,28 +116,24 @@
                         </div>
 
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Link Ảnh Thumbnail (URL) <span class="text-red-500">*</span></label>
+                            <label class="block text-xs font-bold uppercase text-gray-700 mb-2 tracking-wide">Link Ảnh Thumbnail (URL) <span class="text-red-500">*</span></label>
                             <div class="flex items-start space-x-3">
-                                <input type="url" id="inThumbnail" required class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-kn-blue" placeholder="https://...">
-                                <img id="thumbnailPreview" class="hidden w-16 h-10 object-cover rounded-md shadow-sm border border-gray-200">
+                                <input type="url" id="inThumbnail" required class="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-kn-blue shadow-sm" placeholder="https://...">
+                                <img id="thumbnailPreview" class="hidden w-20 h-12 object-cover rounded-md shadow-sm border border-gray-200">
                             </div>
                         </div>
 
-                        <!-- BỔ SUNG: ẨN HIỆN -->
-                        <div class="md:col-span-2 flex items-center pt-2 pb-2">
-                            <input type="checkbox" id="inActive" class="w-4 h-4 text-kn-blue border-gray-300 rounded focus:ring-kn-blue cursor-pointer" checked>
-                            <label for="inActive" class="ml-2 text-sm font-bold text-gray-700 cursor-pointer">Cho phép hiển thị trên Website (is_active)</label>
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <label class="block text-xs font-bold uppercase text-gray-700 mb-1">Nội dung bài viết <span class="text-red-500">*</span></label>
+                        <div class="md:col-span-2 mt-4">
+                            <label class="block text-xs font-bold uppercase text-gray-700 mb-2 tracking-wide">Nội dung bài viết <span class="text-red-500">*</span></label>
                             <textarea id="inContent" name="inContent" required></textarea>
                         </div>
                     </div>
 
-                    <div class="pt-4 border-t border-gray-100 flex justify-end space-x-3">
-                        <button type="button" onclick="cancelEdit()" class="px-5 py-2 border border-gray-300 text-gray-700 rounded-lg font-bold text-sm hover:bg-gray-50 transition">Hủy Bỏ</button>
-                        <button type="button" onclick="saveBlog(event)" id="btnSaveBlog" class="px-6 py-2 bg-gray-900 text-white rounded-lg font-bold text-sm hover:bg-black transition shadow">Lưu Bài Viết</button>
+                    <div class="pt-6 border-t border-gray-100 flex justify-end space-x-3">
+                        <button type="button" onclick="cancelEdit()" class="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-bold text-sm hover:bg-gray-50 transition shadow-sm">Hủy Bỏ</button>
+                        <button type="button" onclick="saveBlog(event)" id="btnSaveBlog" class="px-6 py-2.5 bg-kn-blue text-white rounded-lg font-bold text-sm hover:bg-blue-800 transition shadow-sm flex items-center gap-2">
+                            Lưu Bài Viết
+                        </button>
                     </div>
                 </form>
             </div>
@@ -149,7 +162,6 @@
     <script src="../assets/js/common/utils.js"></script>
     <script src="../assets/js/admin/admin-core.js"></script>
     <script src="../assets/js/admin/admin-nav.js"></script>
-    <script src="../assets/js/services/blogService.js"></script>
     <script src="../assets/js/admin/admin-blog.js"></script>
 </body>
 </html>

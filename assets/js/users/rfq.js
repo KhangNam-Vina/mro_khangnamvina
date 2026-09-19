@@ -1,8 +1,7 @@
 // ========================================================
 // FILE: assets/js/users/rfq.js
 // RFQ CENTER - MRO KHANG NAM
-// ĐÃ FIX: CHƯA ĐĂNG NHẬP VẪN XEM ĐƯỢC GIỎ HÀNG
-// TÍCH HỢP AUTO-FILL FORM KHI ĐÃ ĐĂNG NHẬP
+// ĐÃ FIX: BẢO VỆ FORM - CHẶN KÝ TỰ & KIỂM TRA ĐÚNG ĐỊNH DẠNG SĐT
 // ========================================================
 
 let cartItems = [];
@@ -273,7 +272,6 @@ window.submitRFQ = async function () {
 
     const { data: { session } } = await window.supabaseClient.auth.getSession();
 
-    // KIỂM TRA ĐĂNG NHẬP Ở ĐÂY, NẾU CHƯA THÌ BẮT LƯU LẠI LINK VÀ TỚI TRANG LOGIN
     if (!session) {
         alert("Kho hàng B2B chỉ dành cho đối tác. Vui lòng đăng nhập để gửi đơn báo giá!");
         localStorage.setItem("redirect_after_login", "rfq.html");
@@ -290,6 +288,14 @@ window.submitRFQ = async function () {
 
     if (!company || !name || !phone || !email) {
         alert("Vui lòng điền đầy đủ các thông tin có dấu (*) trước khi gửi!");
+        return;
+    }
+
+    // [BỔ SUNG]: KIỂM TRA ĐỊNH DẠNG SỐ ĐIỆN THOẠI (10 - 11 SỐ, BẮT ĐẦU BẰNG 0)
+    const phoneRegex = /^0[0-9]{9,10}$/;
+    if (!phoneRegex.test(phone)) {
+        alert("Số điện thoại không hợp lệ! Vui lòng nhập đúng 10-11 chữ số bắt đầu bằng số 0.");
+        document.getElementById("phone").focus();
         return;
     }
 
@@ -378,8 +384,16 @@ window.submitRFQ = async function () {
 ======================================================== */
 document.addEventListener("DOMContentLoaded", async () => {
 
-    // 1. LUÔN LOAD GIỎ HÀNG RA MÀN HÌNH NGAY LẬP TỨC 
     loadCartFromStorage();
+
+    // [BỔ SUNG]: ÉP BUỘC CHỈ ĐƯỢC NHẬP SỐ VÀ TỐI ĐA 11 SỐ VÀO Ô ĐIỆN THOẠI
+    const phoneInput = document.getElementById("phone");
+    if (phoneInput) {
+        phoneInput.addEventListener("input", function() {
+            // Xóa mọi ký tự không phải là số (0-9) và cắt chuỗi không cho quá 11 số
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);
+        });
+    }
 
     try {
         if (!window.supabaseClient) {
@@ -387,15 +401,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        // 2. CHECK XEM KHÁCH ĐÃ ĐĂNG NHẬP CHƯA
         const { data: { session } } = await window.supabaseClient.auth.getSession();
 
         if (session) {
             const currentUser = session.user;
 
-            // 3. TỰ ĐỘNG ĐIỀN THÔNG TIN (AUTO-FILL)
             try {
-                // Quét toàn bộ bảng profile tránh lỗi sai tên cột
                 const { data: profile, error } = await window.supabaseClient
                     .from('profiles')
                     .select('*')
@@ -404,30 +415,29 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 if (error) console.error("Lỗi khi kéo data từ Supabase:", error.message);
 
-                // Trỏ tới các ô Input trên form HTML
                 const companyInput = document.getElementById("company");
                 const nameInput = document.getElementById("name");
-                const phoneInput = document.getElementById("phone");
                 const emailInput = document.getElementById("email");
 
-                // Lấy data với nhiều phương án dự phòng
                 const profileCompany = profile?.company_name || profile?.company || "";
                 const profileName = profile?.full_name || profile?.name || profile?.contact_name || profile?.contact_person || "";
                 const profilePhone = profile?.phone || profile?.phone_number || "";
                 const profileEmail = profile?.email || currentUser.email || "";
                 const fallbackName = currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || "";
 
-                // Bơm dữ liệu vào ô Input (Chỉ bơm khi ô đang trống để không ghi đè nếu khách tự gõ trước đó)
                 if (companyInput && !companyInput.value) companyInput.value = profileCompany;
                 if (nameInput && !nameInput.value) nameInput.value = profileName || fallbackName;
-                if (phoneInput && !phoneInput.value) phoneInput.value = profilePhone || currentUser.phone || "";
                 if (emailInput && !emailInput.value) emailInput.value = profileEmail;
+                
+                // Điền số điện thoại với biến đã chặn sẵn ở trên
+                if (phoneInput && !phoneInput.value) {
+                    phoneInput.value = (profilePhone || currentUser.phone || "").replace(/[^0-9]/g, '').slice(0, 11);
+                }
                 
             } catch (err) {
                 console.error("Lỗi tự động điền thông tin profile:", err);
             }
 
-            // 4. BẬT NÚT TÀI KHOẢN TRÊN HEADER
             try {
                 const guestBtn = document.getElementById("btnGuestLogin");
                 if (guestBtn) guestBtn.classList.add("is-hidden", "hidden");

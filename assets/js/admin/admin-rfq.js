@@ -1,6 +1,6 @@
 // ============================================================
 // FILE: assets/js/admin/admin-rfq.js
-// QUẢN LÝ DANH SÁCH BÁO GIÁ (CÓ TÌM KIẾM, LỌC TRẠNG THÁI & NGÀY)
+// QUẢN LÝ DANH SÁCH BÁO GIÁ (CÓ TÌM KIẾM, LỌC TRẠNG THÁI, NGÀY THÁNG, THỜI GIAN TOÀN CỤC)
 // ============================================================
 
 "use strict";
@@ -9,7 +9,8 @@ const rfqState = {
     allData: [],
     filteredData: [],
     page: 1,
-    pageSize: 10
+    pageSize: 10,
+    timeRange: "this_month" // <-- Trạng thái thời gian toàn cục
 };
 
 const rfqDOM = {
@@ -17,7 +18,8 @@ const rfqDOM = {
     emptyState: document.getElementById("emptyState"),
     searchInput: document.getElementById("searchInput"),
     statusFilter: document.getElementById("statusFilter"),
-    dateFilter: document.getElementById("dateFilter"), // <-- Lấy DOM của bộ lọc ngày
+    dateFilter: document.getElementById("dateFilter"),
+    globalTimeFilter: document.getElementById("globalTimeFilter"), // <-- DOM MỚI
     btnRefresh: document.getElementById("btnRefresh"),
     btnPrev: document.getElementById("btnPrev"),
     btnNext: document.getElementById("btnNext"),
@@ -30,50 +32,93 @@ const rfqDOM = {
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
+    if (rfqDOM.globalTimeFilter) rfqDOM.globalTimeFilter.value = rfqState.timeRange;
     bindEvents();
     await loadRfqs();
 });
 
+// LẤY KHOẢNG THỜI GIAN THEO LỰA CHỌN
+function getTimeRangeDates(range) {
+    const now = new Date();
+    let start, end;
+    
+    if (range === 'today') {
+        start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        end = new Date(start.getTime() + 24 * 60 * 60 * 1000 - 1);
+    } else if (range === '7_days') {
+        start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
+        end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    } else if (range === 'this_month') {
+        start = new Date(now.getFullYear(), now.getMonth(), 1);
+        end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+    } else if (range === 'last_month') {
+        start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        end = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+    } else {
+        return null; // All time
+    }
+    return { start: start.toISOString(), end: end.toISOString() };
+}
+
 // ============================================================
-// EVENTS (Lắng nghe Tìm kiếm, Chọn trạng thái, Chọn ngày)
+// EVENTS (Lắng nghe Tìm kiếm, Trạng thái, Ngày, Thời gian chung)
 // ============================================================
 function bindEvents() {
+    
+    // GÕ TÌM KIẾM
     if (rfqDOM.searchInput) {
         let searchTimer;
         rfqDOM.searchInput.addEventListener("input", () => {
             clearTimeout(searchTimer);
             searchTimer = setTimeout(() => {
                 rfqState.page = 1;
-                applyFilters();
+                applyFilters(); // Text Search thì lọc cục bộ
             }, 300);
         });
     }
 
+    // LỌC THEO TRẠNG THÁI
     if (rfqDOM.statusFilter) {
         rfqDOM.statusFilter.addEventListener("change", () => {
             rfqState.page = 1;
-            applyFilters();
+            applyFilters(); // Trạng thái thì lọc cục bộ
         });
     }
 
-    // BỘ LỌC THEO NGÀY
+    // BỘ LỌC THEO NGÀY CỤ THỂ (Dưới bảng)
     if (rfqDOM.dateFilter) {
         rfqDOM.dateFilter.addEventListener("change", () => {
             rfqState.page = 1;
-            applyFilters();
+            loadRfqs(); // Thay đổi ngày cụ thể thì tải lại Data từ Server để KPI tự update
         });
     }
 
+    // BỘ LỌC THỜI GIAN TOÀN CỤC (Header)
+    if (rfqDOM.globalTimeFilter) {
+        rfqDOM.globalTimeFilter.addEventListener("change", () => {
+            rfqState.timeRange = rfqDOM.globalTimeFilter.value;
+            
+            // Xóa ngày cụ thể để tránh xung đột
+            if (rfqDOM.dateFilter) rfqDOM.dateFilter.value = ""; 
+            
+            rfqState.page = 1;
+            loadRfqs(); // Tải lại Data từ Server
+        });
+    }
+
+    // NÚT LÀM MỚI TỔNG LỰC
     if (rfqDOM.btnRefresh) {
         rfqDOM.btnRefresh.addEventListener("click", async () => {
             const originalHtml = rfqDOM.btnRefresh.innerHTML;
             rfqDOM.btnRefresh.disabled = true;
             rfqDOM.btnRefresh.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Đang tải...`;
 
-            // Reset tất cả Form khi ấn Làm mới
+            // Reset Form
             if (rfqDOM.searchInput) rfqDOM.searchInput.value = "";
             if (rfqDOM.statusFilter) rfqDOM.statusFilter.value = "";
             if (rfqDOM.dateFilter) rfqDOM.dateFilter.value = "";
+            if (rfqDOM.globalTimeFilter) rfqDOM.globalTimeFilter.value = "this_month";
+            rfqState.timeRange = "this_month";
             rfqState.page = 1;
 
             await loadRfqs();
@@ -104,7 +149,7 @@ function bindEvents() {
 }
 
 // ============================================================
-// LOAD DATA (Tải TOÀN BỘ dữ liệu về để Lọc Cục Bộ)
+// LOAD DATA TỪ SERVER (Có áp dụng Lọc Thời Gian Toàn Cục)
 // ============================================================
 async function loadRfqs() {
     if (!window.supabaseClient) {
@@ -115,17 +160,29 @@ async function loadRfqs() {
     setLoading();
 
     try {
-        const { data, error } = await window.supabaseClient
+        let query = window.supabaseClient
             .from("rfqs")
             .select(`id, created_at, rfq_code, company_name, contact_person, phone, email, notes, status, items, user_id, rejection_reason`)
             .order("created_at", { ascending: false });
 
+        // Lọc trên Server theo Ngày cụ thể hoặc Thời gian toàn cục
+        const dateFilterVal = rfqDOM.dateFilter?.value || "";
+        if (dateFilterVal) {
+            const startDate = new Date(`${dateFilterVal}T00:00:00`).toISOString();
+            const endDate = new Date(`${dateFilterVal}T23:59:59.999`).toISOString();
+            query = query.gte("created_at", startDate).lte("created_at", endDate);
+        } else {
+            const tr = getTimeRangeDates(rfqState.timeRange);
+            if (tr) query = query.gte("created_at", tr.start).lte("created_at", tr.end);
+        }
+
+        const { data, error } = await query;
         if (error) throw error;
 
         rfqState.allData = Array.isArray(data) ? data : [];
 
-        updateStats();
-        applyFilters();
+        updateStats(); // Cập nhật KPI dựa trên số liệu vừa kéo về
+        applyFilters(); // Cập nhật List
 
     } catch (error) {
         console.error("[admin-rfq] Load RFQ error:", error);
@@ -134,12 +191,11 @@ async function loadRfqs() {
 }
 
 // ============================================================
-// LỌC CỤC BỘ (SEARCH + STATUS + DATE)
+// LỌC CỤC BỘ (SEARCH + STATUS)
 // ============================================================
 function applyFilters() {
     const keyword = (rfqDOM.searchInput?.value || "").trim().toLowerCase();
     const status = rfqDOM.statusFilter?.value || "";
-    const dateFilter = rfqDOM.dateFilter?.value || ""; // "YYYY-MM-DD"
 
     rfqState.filteredData = rfqState.allData.filter((rfq) => {
         // Lọc Chữ
@@ -149,19 +205,7 @@ function applyFilters() {
         // Lọc Trạng thái
         const matchesStatus = !status || normalizeStatus(rfq.status) === normalizeStatus(status);
 
-        // Lọc Ngày tháng
-        let matchesDate = true;
-        if (dateFilter && rfq.created_at) {
-            const dateObj = new Date(rfq.created_at);
-            const yyyy = dateObj.getFullYear();
-            const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-            const dd = String(dateObj.getDate()).padStart(2, '0');
-            const rfqDateString = `${yyyy}-${mm}-${dd}`;
-            
-            matchesDate = (rfqDateString === dateFilter);
-        }
-
-        return matchesKeyword && matchesStatus && matchesDate;
+        return matchesKeyword && matchesStatus;
     });
 
     renderTable();
@@ -183,7 +227,7 @@ function updateStats() {
 }
 
 // ============================================================
-// RENDER TABLE & ROWS (Đồng bộ giao diện với Orders)
+// RENDER TABLE & ROWS
 // ============================================================
 function renderTable() {
     if (!rfqDOM.tableBody) return;
@@ -265,12 +309,12 @@ function renderStatusBadge(status) {
     const normalized = normalizeStatus(status);
 
     if (normalized === "đã báo giá") {
-        return `<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-green-100 text-green-700 border border-green-200 font-black text-[11px] whitespace-nowrap">● Đã báo giá</span>`;
+        return `<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-green-100 text-green-700 border border-green-200 font-black text-[11px] whitespace-nowrap">Đã báo giá</span>`;
     }
     if (normalized === "từ chối") {
-        return `<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-red-100 text-red-700 border border-red-200 font-black text-[11px] whitespace-nowrap">● Từ chối</span>`;
+        return `<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-red-100 text-red-700 border border-red-200 font-black text-[11px] whitespace-nowrap">Từ chối</span>`;
     }
-    return `<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-orange-100 text-orange-700 border border-orange-200 font-black text-[11px] whitespace-nowrap">● Chờ xử lý</span>`;
+    return `<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-orange-100 text-orange-700 border border-orange-200 font-black text-[11px] whitespace-nowrap">Chờ xử lý</span>`;
 }
 
 function updatePagination() {

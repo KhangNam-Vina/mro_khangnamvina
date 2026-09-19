@@ -76,10 +76,17 @@ function renderRfqTable(dataList) {
         return `
             <tr class="rfq-table-row">
                 <td class="rfq-col-code">${escapeHTML(item.rfq_code || "RFQ-N/A")}</td>
-                <td class="rfq-col-date"><span>${formattedDate}</span><span class="rfq-time">${formattedTime}</span></td>
+                <td class="rfq-col-date">
+                    <span>${formattedDate}</span>
+                    <span class="rfq-time">${formattedTime}</span>
+                </td>
                 <td class="rfq-col-company">${escapeHTML(item.company_name || "Khách hàng")}</td>
-                <td class="rfq-col-status"><span class="rfq-badge ${statusClass}"><span class="rfq-badge-dot"></span>${escapeHTML(status)}</span></td>
-                <td class="rfq-col-action"><a href="my-rfq-detail.html?id=${encodeURIComponent(item.id)}" class="btn-view-detail">Xem</a></td>
+                <td class="rfq-col-status">
+                    <span class="rfq-badge ${statusClass}">${escapeHTML(status)}</span>
+                </td>
+                <td class="rfq-col-action">
+                    <a href="my-rfq-detail.html?id=${encodeURIComponent(item.id)}" class="btn-view-detail">Xem</a>
+                </td>
             </tr>
         `;
     }).join("");

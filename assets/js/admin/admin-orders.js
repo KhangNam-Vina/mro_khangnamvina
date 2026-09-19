@@ -1,6 +1,6 @@
 // ========================================================
 // FILE: admin-orders.js
-// QUẢN LÝ ĐƠN HÀNG (CÓ BỘ LỌC TÌM KIẾM, TRẠNG THÁI, NGÀY THÁNG)
+// QUẢN LÝ ĐƠN HÀNG (CÓ BỘ LỌC TÌM KIẾM, TRẠNG THÁI, NGÀY THÁNG, THỜI GIAN TOÀN CỤC)
 // ========================================================
 
 const orderState = {
@@ -9,7 +9,8 @@ const orderState = {
     totalItems: 0,
     searchQuery: "",
     status: "all",
-    date: "", // <-- Trạng thái lọc ngày
+    date: "", // Ngày cụ thể
+    timeRange: "this_month", // Thời gian toàn cục (Mặc định: Tháng này)
     orders: []
 };
 
@@ -23,28 +24,25 @@ function cacheOrderDOM() {
     orderDOM.pagination = document.getElementById("paginationContainer");
     orderDOM.search = document.getElementById("searchOrderInput");
     orderDOM.status = document.getElementById("statusFilter");
-    orderDOM.date = document.getElementById("dateFilter"); // <-- DOM của ngày
+    orderDOM.date = document.getElementById("dateFilter"); 
+    orderDOM.globalTimeFilter = document.getElementById("globalTimeFilter"); // <-- DOM MỚI
     orderDOM.refresh = document.getElementById("btnRefreshOrders");
     
     orderDOM.kpiTotal = document.getElementById("kpiTotal");
     orderDOM.kpiPending = document.getElementById("kpiPending");
+    orderDOM.kpiConfirmed = document.getElementById("kpiConfirmed"); 
     orderDOM.kpiProcessing = document.getElementById("kpiProcessing");
+    orderDOM.kpiShipped = document.getElementById("kpiShipped"); 
     orderDOM.kpiDelivered = document.getElementById("kpiDelivered");
+    orderDOM.kpiCancelled = document.getElementById("kpiCancelled"); 
 }
 
 // ========================================================
-// 2. ESCAPE HTML & FORMATTERS
+// 2. UTILS & TIME RANGES
 // ========================================================
 function escapeOrderHTML(value) {
-    if (window.utils && typeof window.utils.escapeHTML === "function") {
-        return window.utils.escapeHTML(value ?? "");
-    }
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    if (window.utils && typeof window.utils.escapeHTML === "function") return window.utils.escapeHTML(value ?? "");
+    return String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
 function formatOrderMoney(value) {
@@ -73,24 +71,76 @@ function getOrderStatusMeta(status) {
     return statuses[normalized] || { label: status || "Không xác định", className: "bg-gray-100 text-gray-600 border-gray-200" };
 }
 
+// LẤY KHOẢNG THỜI GIAN THEO LỰA CHỌN
+function getTimeRangeDates(range) {
+    const now = new Date();
+    let start, end;
+    
+    if (range === 'today') {
+        start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        end = new Date(start.getTime() + 24 * 60 * 60 * 1000 - 1);
+    } else if (range === '7_days') {
+        start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
+        end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    } else if (range === 'this_month') {
+        start = new Date(now.getFullYear(), now.getMonth(), 1);
+        end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+    } else if (range === 'last_month') {
+        start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        end = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+    } else {
+        return null; // All time
+    }
+    return { start: start.toISOString(), end: end.toISOString() };
+}
+
+// ÉP QUERY CHẠY THEO THỜI GIAN
+function applyTimeRange(query, timeRangeObj) {
+    if (!timeRangeObj) return query;
+    return query.gte("created_at", timeRangeObj.start).lte("created_at", timeRangeObj.end);
+}
+
 // ========================================================
-// 3. KPI
+// 3. KPI (ĐÃ TÍCH HỢP LỌC THEO THỜI GIAN TOÀN CỤC HOẶC NGÀY CỤ THỂ)
 // ========================================================
 async function loadOrderKPIs() {
     if (!window.supabaseClient) return;
 
     try {
-        const [totalResult, pendingResult, processingResult, deliveredResult] = await Promise.all([
-            window.supabaseClient.from("orders").select("id", { count: "exact", head: true }),
-            window.supabaseClient.from("orders").select("id", { count: "exact", head: true }).eq("status", "pending"),
-            window.supabaseClient.from("orders").select("id", { count: "exact", head: true }).eq("status", "processing"),
-            window.supabaseClient.from("orders").select("id", { count: "exact", head: true }).eq("status", "delivered")
+        let tr = null;
+        
+        // Nếu chọn ngày cụ thể ở dưới bảng -> Tính KPI cho đúng ngày đó
+        if (orderState.date) {
+            tr = {
+                start: new Date(`${orderState.date}T00:00:00`).toISOString(),
+                end: new Date(`${orderState.date}T23:59:59.999`).toISOString()
+            };
+        } 
+        // Nếu không, tính KPI theo bộ lọc ở trên Header (Tháng này, Tháng trước...)
+        else {
+            tr = getTimeRangeDates(orderState.timeRange);
+        }
+
+        const [
+            totalRes, pendingRes, confirmedRes, processingRes, 
+            shippedRes, deliveredRes, cancelledRes
+        ] = await Promise.all([
+            applyTimeRange(window.supabaseClient.from("orders").select("id", { count: "exact", head: true }), tr),
+            applyTimeRange(window.supabaseClient.from("orders").select("id", { count: "exact", head: true }).eq("status", "pending"), tr),
+            applyTimeRange(window.supabaseClient.from("orders").select("id", { count: "exact", head: true }).eq("status", "confirmed"), tr),
+            applyTimeRange(window.supabaseClient.from("orders").select("id", { count: "exact", head: true }).eq("status", "processing"), tr),
+            applyTimeRange(window.supabaseClient.from("orders").select("id", { count: "exact", head: true }).eq("status", "shipped"), tr),
+            applyTimeRange(window.supabaseClient.from("orders").select("id", { count: "exact", head: true }).eq("status", "delivered"), tr),
+            applyTimeRange(window.supabaseClient.from("orders").select("id", { count: "exact", head: true }).eq("status", "cancelled"), tr)
         ]);
 
-        if (orderDOM.kpiTotal) orderDOM.kpiTotal.textContent = totalResult.count || 0;
-        if (orderDOM.kpiPending) orderDOM.kpiPending.textContent = pendingResult.count || 0;
-        if (orderDOM.kpiProcessing) orderDOM.kpiProcessing.textContent = processingResult.count || 0;
-        if (orderDOM.kpiDelivered) orderDOM.kpiDelivered.textContent = deliveredResult.count || 0;
+        if (orderDOM.kpiTotal) orderDOM.kpiTotal.textContent = totalRes.count || 0;
+        if (orderDOM.kpiPending) orderDOM.kpiPending.textContent = pendingRes.count || 0;
+        if (orderDOM.kpiConfirmed) orderDOM.kpiConfirmed.textContent = confirmedRes.count || 0;
+        if (orderDOM.kpiProcessing) orderDOM.kpiProcessing.textContent = processingRes.count || 0;
+        if (orderDOM.kpiShipped) orderDOM.kpiShipped.textContent = shippedRes.count || 0;
+        if (orderDOM.kpiDelivered) orderDOM.kpiDelivered.textContent = deliveredRes.count || 0;
+        if (orderDOM.kpiCancelled) orderDOM.kpiCancelled.textContent = cancelledRes.count || 0;
 
     } catch (error) {
         console.error("Lỗi tải KPI đơn hàng:", error);
@@ -98,7 +148,7 @@ async function loadOrderKPIs() {
 }
 
 // ========================================================
-// 4. LOAD ORDERS
+// 4. LOAD ORDERS (TÍCH HỢP TÌM KIẾM ĐA TẦNG)
 // ========================================================
 async function fetchOrders() {
     if (!window.supabaseClient) {
@@ -118,19 +168,22 @@ async function fetchOrders() {
             .order("created_at", { ascending: false })
             .range(from, to);
 
-        // Lọc trạng thái
+        // 1. Lọc Trạng thái
         if (orderState.status !== "all") {
             query = query.eq("status", orderState.status);
         }
 
-        // Lọc ngày (Chuyển đổi timezone chuẩn)
+        // 2. Lọc Thời gian
         if (orderState.date) {
             const startDate = new Date(`${orderState.date}T00:00:00`).toISOString();
             const endDate = new Date(`${orderState.date}T23:59:59.999`).toISOString();
             query = query.gte("created_at", startDate).lte("created_at", endDate);
+        } else {
+            const tr = getTimeRangeDates(orderState.timeRange);
+            if (tr) query = query.gte("created_at", tr.start).lte("created_at", tr.end);
         }
 
-        // Lọc Text
+        // 3. Lọc Theo Chữ
         const keyword = orderState.searchQuery.trim();
         if (keyword) {
             query = query.or(`order_code.ilike.%${keyword}%,shipping_name.ilike.%${keyword}%,shipping_phone.ilike.%${keyword}%`);
@@ -152,7 +205,7 @@ async function fetchOrders() {
 }
 
 // ========================================================
-// 5. RENDER TABLE
+// 5. RENDER TABLE & COMPONENTS
 // ========================================================
 function renderOrders() {
     if (!orderDOM.tableBody) return;
@@ -213,9 +266,6 @@ function renderOrders() {
     }).join("");
 }
 
-// ========================================================
-// 6. PAGINATION
-// ========================================================
 function renderOrderPagination() {
     if (!orderDOM.pagination) return;
 
@@ -227,7 +277,6 @@ function renderOrderPagination() {
     }
 
     let html = "";
-
     if (orderState.currentPage > 1) {
         html += `<button type="button" onclick="changeOrderPage(${orderState.currentPage - 1})" class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-500 hover:bg-gray-50">&laquo;</button>`;
     }
@@ -265,11 +314,11 @@ function renderOrderMessage(message, isError = false) {
 }
 
 // ========================================================
-// 7. EVENTS
+// 6. EVENT BINDING
 // ========================================================
 function bindOrderEvents() {
-
-    // Sự kiện Gõ phím tìm kiếm
+    
+    // GÕ TÌM KIẾM
     if (orderDOM.search) {
         let searchTimer = null;
         orderDOM.search.addEventListener("input", () => {
@@ -282,7 +331,7 @@ function bindOrderEvents() {
         });
     }
 
-    // Sự kiện đổi trạng thái
+    // LỌC THEO TRẠNG THÁI
     if (orderDOM.status) {
         orderDOM.status.addEventListener("change", () => {
             orderState.status = orderDOM.status.value;
@@ -291,44 +340,63 @@ function bindOrderEvents() {
         });
     }
 
-    // Sự kiện đổi ngày
+    // BỘ LỌC NGÀY TRÊN BẢNG (Ghi đè Header)
     if (orderDOM.date) {
-        orderDOM.date.addEventListener("change", () => {
+        orderDOM.date.addEventListener("change", async () => {
             orderState.date = orderDOM.date.value;
             orderState.currentPage = 1;
-            fetchOrders();
+            
+            // Tải lại KPI & Bảng theo ngày vừa chọn
+            await Promise.all([fetchOrders(), loadOrderKPIs()]);
         });
     }
 
-    // Sự kiện click nút Tải lại
+    // BỘ LỌC THỜI GIAN Ở HEADER
+    if (orderDOM.globalTimeFilter) {
+        orderDOM.globalTimeFilter.value = orderState.timeRange; // Set lúc mới vào là Tháng Này
+        orderDOM.globalTimeFilter.addEventListener("change", async () => {
+            orderState.timeRange = orderDOM.globalTimeFilter.value;
+            
+            // Khi thao tác trên Header, xóa cái chọn ngày cụ thể bên dưới để tránh cãi nhau
+            orderState.date = "";
+            if (orderDOM.date) orderDOM.date.value = "";
+            
+            orderState.currentPage = 1;
+            
+            orderDOM.globalTimeFilter.disabled = true;
+            await Promise.all([fetchOrders(), loadOrderKPIs()]);
+            orderDOM.globalTimeFilter.disabled = false;
+        });
+    }
+
+    // NÚT LÀM MỚI TỔNG LỰC
     if (orderDOM.refresh) {
         orderDOM.refresh.addEventListener("click", async () => {
             orderDOM.refresh.disabled = true;
             orderDOM.refresh.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Đang tải...`;
 
-            // Reset tất cả bộ lọc khi ấn Làm mới
+            // Reset Sạch Sẽ Mọi Thứ Về Điểm Xuất Phát
             orderState.searchQuery = "";
             orderState.status = "all";
             orderState.date = "";
+            orderState.timeRange = "this_month"; // Đưa về Tháng này
             orderState.currentPage = 1;
 
             if (orderDOM.search) orderDOM.search.value = "";
             if (orderDOM.status) orderDOM.status.value = "all";
             if (orderDOM.date) orderDOM.date.value = "";
+            if (orderDOM.globalTimeFilter) orderDOM.globalTimeFilter.value = "this_month";
 
-            await Promise.all([
-                fetchOrders(),
-                loadOrderKPIs()
-            ]);
+            await Promise.all([fetchOrders(), loadOrderKPIs()]);
 
             orderDOM.refresh.disabled = false;
-            orderDOM.refresh.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Làm mới`;
+            orderDOM.refresh.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> <span class="hidden sm:inline">Làm mới</span>`;
         });
     }
 }
 
 // ========================================================
-// 8. INIT
+// 7. INIT
 // ========================================================
 document.addEventListener("DOMContentLoaded", async () => {
     cacheOrderDOM();

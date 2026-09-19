@@ -27,11 +27,23 @@
                     <h1 class="text-xl font-black text-gray-900">Quản lý Báo giá</h1>
                     <p class="text-xs text-gray-500 mt-1">Theo dõi và xử lý các yêu cầu báo giá từ khách hàng.</p>
                 </div>
-                <!-- NÚT LÀM MỚI -->
-                <button id="btnRefresh" type="button" class="px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                    Làm mới
-                </button>
+                
+                <div class="flex items-center gap-3">
+                    <!-- BỘ LỌC THỜI GIAN TOÀN CỤC (MỚI THÊM) -->
+                    <select id="globalTimeFilter" class="bg-blue-50 border border-blue-200 text-kn-blue rounded-lg px-4 py-2.5 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-200 shadow-sm cursor-pointer transition hover:bg-blue-100">
+                        <option value="this_month">Tháng này</option>
+                        <option value="last_month">Tháng trước</option>
+                        <option value="7_days">7 ngày qua</option>
+                        <option value="today">Hôm nay</option>
+                        <option value="all">Tất cả thời gian</option>
+                    </select>
+
+                    <!-- NÚT LÀM MỚI -->
+                    <button id="btnRefresh" type="button" class="px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        <span class="hidden sm:inline">Làm mới</span>
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -39,24 +51,33 @@
         <main class="flex-1 overflow-y-auto bg-gray-50 p-6">
             <div class="max-w-[1600px] mx-auto space-y-5">
 
-                <!-- 4 STATS CARDS -->
-                <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-                        <p class="text-xs font-black text-gray-400 uppercase tracking-wider mb-2">Tổng RFQ</p>
-                        <h3 id="statTotal" class="text-3xl font-black text-kn-blue">0</h3>
+                <!-- 4 STATS CARDS (ĐÃ ĐỒNG BỘ UI VỚI TRANG ĐƠN HÀNG) -->
+                <section class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    
+                    <!-- Tổng RFQ -->
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+                        <p class="text-[10px] uppercase tracking-wider text-gray-400 font-black whitespace-nowrap">Tổng RFQ</p>
+                        <p id="statTotal" class="text-2xl font-black mt-1 text-kn-blue">0</p>
                     </div>
-                    <div class="bg-white rounded-xl border border-orange-200 shadow-sm p-5">
-                        <p class="text-xs font-black text-orange-500 uppercase tracking-wider mb-2">Chờ xử lý</p>
-                        <h3 id="statPending" class="text-3xl font-black text-orange-600">0</h3>
+
+                    <!-- Chờ xử lý -->
+                    <div class="bg-white rounded-xl border border-orange-200 shadow-sm p-4">
+                        <p class="text-[10px] uppercase tracking-wider text-orange-500 font-black whitespace-nowrap">Chờ xử lý</p>
+                        <p id="statPending" class="text-2xl font-black text-orange-600 mt-1">0</p>
                     </div>
-                    <div class="bg-white rounded-xl border border-green-200 shadow-sm p-5">
-                        <p class="text-xs font-black text-green-500 uppercase tracking-wider mb-2">Đã báo giá</p>
-                        <h3 id="statQuoted" class="text-3xl font-black text-green-600">0</h3>
+
+                    <!-- Đã báo giá -->
+                    <div class="bg-white rounded-xl border border-green-200 shadow-sm p-4">
+                        <p class="text-[10px] uppercase tracking-wider text-green-500 font-black whitespace-nowrap">Đã báo giá</p>
+                        <p id="statQuoted" class="text-2xl font-black text-green-600 mt-1">0</p>
                     </div>
-                    <div class="bg-white rounded-xl border border-red-200 shadow-sm p-5">
-                        <p class="text-xs font-black text-red-500 uppercase tracking-wider mb-2">Từ chối</p>
-                        <h3 id="statRejected" class="text-3xl font-black text-red-600">0</h3>
+
+                    <!-- Từ chối -->
+                    <div class="bg-white rounded-xl border border-red-200 shadow-sm p-4">
+                        <p class="text-[10px] uppercase tracking-wider text-red-500 font-black whitespace-nowrap">Từ chối</p>
+                        <p id="statRejected" class="text-2xl font-black text-red-600 mt-1">0</p>
                     </div>
+
                 </section>
 
                 <!-- BẢNG VÀ BỘ LỌC -->

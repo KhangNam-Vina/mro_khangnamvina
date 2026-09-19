@@ -1,13 +1,14 @@
 // ========================================================
 // FILE: assets/js/admin/admin-about.js
-// QUẢN LÝ TRANG GIỚI THIỆU
+// QUẢN LÝ TRANG GIỚI THIỆU (AUTO UPLOAD + AUTO CLEANUP ẢNH)
 // ========================================================
 
 const state = {
     editor: null,
     recordId: 1,
     isLoading: false,
-    isSaving: false
+    isSaving: false,
+    oldHtmlContent: "" // <-- Biến mới: Dùng để ghi nhớ nội dung cũ trước khi sửa
 };
 
 const DOM = {
@@ -54,7 +55,6 @@ function getNumber(element) {
     return Number.isFinite(value) ? Math.max(0, value) : 0;
 }
 
-// Tận dụng utils chung của toàn hệ thống
 function showToast(msg, type = "success") {
     if (window.utils && typeof window.utils.showToast === 'function') {
         window.utils.showToast(msg, type);
@@ -101,13 +101,64 @@ function initSeoCounters() {
 }
 
 /* ========================================================
-   CKEDITOR 5
+   BỘ NÃO 1: AUTO UPLOAD ẢNH LÊN SUPABASE
+======================================================== */
+class SupabaseUploadAdapter {
+    constructor(loader) {
+        this.loader = loader;
+    }
+
+    upload() {
+        return this.loader.file.then(
+            file =>
+                new Promise(async (resolve, reject) => {
+                    try {
+                        if (!window.supabaseClient) throw new Error("Supabase chưa kết nối");
+
+                        const fileExt = file.name.split('.').pop();
+                        const fileName = `about_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+                        const filePath = `uploads/${fileName}`; 
+
+                        const { data, error } = await window.supabaseClient.storage
+                            .from('product-images')
+                            .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+                        if (error) throw error;
+
+                        const { data: publicUrlData } = window.supabaseClient.storage
+                            .from('product-images')
+                            .getPublicUrl(filePath);
+
+                        if (!publicUrlData || !publicUrlData.publicUrl) {
+                            throw new Error("Không lấy được URL ảnh");
+                        }
+
+                        resolve({ default: publicUrlData.publicUrl });
+                    } catch (error) {
+                        console.error("Lỗi upload ảnh CKEditor:", error);
+                        reject(error.message || "Không thể upload ảnh");
+                    }
+                })
+        );
+    }
+    abort() {}
+}
+
+function SupabaseUploadAdapterPlugin(editor) {
+    editor.plugins.get('FileRepository').createUploadAdapter = loader => {
+        return new SupabaseUploadAdapter(loader);
+    };
+}
+
+/* ========================================================
+   CKEDITOR 5 INIT
 ======================================================== */
 async function initEditor() {
     if (!DOM.editorContainer) throw new Error("Không tìm thấy CKEditor container.");
     if (typeof CKEDITOR === "undefined") throw new Error("CKEditor chưa được tải.");
 
     state.editor = await CKEDITOR.ClassicEditor.create(DOM.editorContainer, {
+        extraPlugins: [SupabaseUploadAdapterPlugin],
         toolbar: {
             items: [
                 "sourceEditing", "|", "heading", "|", "bold", "italic", "underline", "strikethrough", "removeFormat", "|",
@@ -143,7 +194,6 @@ async function loadAboutData() {
             return;
         }
 
-        // Điền data vào Form
         if (DOM.metaTitle) { DOM.metaTitle.value = data.meta_title || ""; DOM.metaTitle.dispatchEvent(new Event("input")); }
         if (DOM.metaDesc) { DOM.metaDesc.value = data.meta_description || ""; DOM.metaDesc.dispatchEvent(new Event("input")); }
         if (DOM.heroHeading) DOM.heroHeading.value = data.hero_heading || "";
@@ -152,7 +202,10 @@ async function loadAboutData() {
         if (DOM.kpiBrands) DOM.kpiBrands.value = data.kpi_brands ?? 0;
         if (DOM.kpiSkus) DOM.kpiSkus.value = data.kpi_skus ?? 0;
         if (DOM.kpiCustomers) DOM.kpiCustomers.value = data.kpi_customers ?? 0;
-        if (state.editor) state.editor.setData(data.html_content || "");
+        
+        // Lưu lại nội dung cũ để sau này đối chiếu dọn rác
+        state.oldHtmlContent = data.html_content || "";
+        if (state.editor) state.editor.setData(state.oldHtmlContent);
 
     } catch (error) {
         console.error("Lỗi tải About:", error);
@@ -163,7 +216,30 @@ async function loadAboutData() {
 }
 
 /* ========================================================
-   SAVE DATA
+   BỘ NÃO 2: HÀM LỌC ĐƯỜNG DẪN ẢNH TỪ HTML
+======================================================== */
+function extractSupabaseImagePaths(htmlString) {
+    const paths = [];
+    // Regex tìm tất cả các thẻ <img> và bóc tách thuộc tính src
+    const regex = /<img[^>]+src="([^">]+)"/g;
+    let match;
+
+    while ((match = regex.exec(htmlString)) !== null) {
+        const url = match[1];
+        // Chỉ bóc những ảnh thuộc bucket của mình (chứa /product-images/uploads/)
+        if (url.includes('/storage/v1/object/public/product-images/uploads/')) {
+            const parts = url.split('/product-images/');
+            if (parts.length > 1) {
+                paths.push(parts[1]); // Kết quả: "uploads/about_123456_abc.jpg"
+            }
+        }
+    }
+    return paths;
+}
+
+
+/* ========================================================
+   SAVE DATA & AUTO CLEANUP
 ======================================================== */
 function buildPayload() {
     return {
@@ -186,7 +262,6 @@ window.saveContent = async function () {
 
     const payload = buildPayload();
     
-    // Validate nhanh
     if (payload.meta_title.length > 60) return showToast("Meta Title không được vượt quá 60 ký tự.", "warning");
     if (payload.meta_description.length > 160) return showToast("Meta Description không được vượt quá 160 ký tự.", "warning");
     if (!payload.hero_heading) return showToast("Vui lòng nhập tiêu đề Hero.", "warning");
@@ -195,9 +270,29 @@ window.saveContent = async function () {
     setSaveLoading(true);
 
     try {
+        // --- BƯỚC 1: DỌN RÁC (TÌM VÀ XÓA ẢNH ĐÃ BỊ LOẠI BỎ) ---
+        const oldImagePaths = extractSupabaseImagePaths(state.oldHtmlContent);
+        const newImagePaths = extractSupabaseImagePaths(payload.html_content);
+        
+        // Tìm những ảnh có ở nội dung cũ nhưng KHÔNG CÓ ở nội dung mới
+        const pathsToDelete = oldImagePaths.filter(path => !newImagePaths.includes(path));
+
+        if (pathsToDelete.length > 0) {
+            console.log("Phát hiện ảnh rác, tiến hành dọn dẹp:", pathsToDelete);
+            const { error: removeError } = await window.supabaseClient.storage
+                .from('product-images')
+                .remove(pathsToDelete);
+            if (removeError) console.error("Lỗi khi xóa ảnh thừa:", removeError);
+        }
+
+        // --- BƯỚC 2: LƯU NỘI DUNG MỚI VÀO DATABASE ---
         const { error } = await window.supabaseClient.from("about").upsert(payload);
         if (error) throw error;
-        showToast("Lưu nội dung thành công!", "success");
+        
+        // Cập nhật lại HTML cũ bằng HTML mới để chuẩn bị cho lần sửa tiếp theo
+        state.oldHtmlContent = payload.html_content;
+
+        showToast("Lưu nội dung thành công! Đã dọn dẹp hệ thống.", "success");
     } catch (error) {
         console.error("Lỗi lưu About:", error);
         showToast(`Lỗi khi lưu: ${error.message}`, "error");

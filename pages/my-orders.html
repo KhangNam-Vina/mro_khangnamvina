@@ -11,45 +11,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- GOOGLE FONT -->
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
-
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-        rel="stylesheet"
-    >
 
     <!-- CSS CHUNG -->
-    <link
-        rel="stylesheet"
-        href="../assets/css/style.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="../assets/css/header.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="../assets/css/footer.css"
-    >
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/header.css">
+    <link rel="stylesheet" href="../assets/css/footer.css">
 
     <!-- CSS RIÊNG -->
-    <link
-        rel="stylesheet"
-        href="../assets/css/my-orders.css"
-    >
+    <link rel="stylesheet" href="../assets/css/my-orders.css">
 </head>
 <body class="profile-page-wrapper">
 
@@ -68,7 +37,7 @@
                 <span class="breadcrumb-current">Đơn hàng mua trực tiếp</span>
             </nav>
             <h1 class="profile-hero-title">Quản lý Đơn hàng</h1>
-            <p class="my-rfq-hero-description">Theo dõi toàn bộ yêu đơn hàng đã mua, kiểm tra trạng thái xử lý và xem lại chi tiết từng đơn hàng.</p>
+            <p class="profile-hero-description">Theo dõi toàn bộ yêu đơn hàng đã mua, kiểm tra trạng thái xử lý và xem lại chi tiết từng đơn hàng.</p>
         </div>
     </section>
 
@@ -77,8 +46,7 @@
         <div class="profile-layout-grid">
             
             <!-- CỘT TRÁI: SIDEBAR MENU -->
-            <aside class="profile-sidebar">
-
+            <aside class="profile-sidebar no-print">
                 <div class="profile-sidebar-profile">
                     <div id="userAvatarInitials" class="profile-avatar">KN</div>
                     <p id="sidebarUserName" class="profile-sidebar-name">Đang tải...</p>
@@ -108,46 +76,79 @@
                         <span>Đăng xuất</span>
                     </button>
                 </nav>
-
             </aside>
 
             <!-- CỘT PHẢI: BẢNG DANH SÁCH ĐƠN HÀNG -->
             <div class="profile-content-area">
-                <div class="content-card">
-                    <div class="content-card-header">
-                        <!-- Nhóm Tiêu đề & Số lượng -->
-                        <div class="orders-header-left">
-                            <h2 class="content-title">Danh sách Đơn hàng</h2>
-                            <span id="totalOrdersCount" class="content-badge">0 đơn hàng</span>
+                
+                <!-- HEADER ĐỒNG BỘ -->
+                <div class="orders-content-header">
+                    <h2 class="orders-content-title">
+                        Danh sách Đơn hàng
+                    </h2>
+                    <a href="products.html" class="orders-create-btn">
+                        Tiếp Tục Mua Sắm
+                    </a>
+                </div>
+
+                <!-- DASHBOARD THỐNG KÊ -->
+                <div class="orders-stats-grid">
+                    <div class="orders-stat-card">
+                        <div class="orders-stat-label">Tổng đơn hàng</div>
+                        <div id="statTotal" class="orders-stat-value stat-total">0</div>
+                    </div>
+                    <div class="orders-stat-card">
+                        <div class="orders-stat-label">Đang xử lý</div>
+                        <div id="statPending" class="orders-stat-value stat-pending">0</div>
+                    </div>
+                    <div class="orders-stat-card">
+                        <div class="orders-stat-label">Đang giao</div>
+                        <div id="statShipped" class="orders-stat-value stat-shipped">0</div>
+                    </div>
+                    <div class="orders-stat-card">
+                        <div class="orders-stat-label">Đã hoàn thành</div>
+                        <div id="statDelivered" class="orders-stat-value stat-delivered">0</div>
+                    </div>
+                </div>
+
+                <!-- BẢNG DỮ LIỆU & BỘ LỌC -->
+                <div class="orders-card-wrapper">
+                    <!-- FILTER BAR (GIỐNG RFQ) -->
+                    <div class="orders-filter-bar no-print">
+                        <div class="orders-filter-tabs">
+                            <button type="button" onclick="filterOrdersByStatus('ALL', this)" class="order-status-btn is-active">Tất cả</button>
+                            <button type="button" onclick="filterOrdersByStatus('Đang xử lý', this)" class="order-status-btn">Đang xử lý</button>
+                            <button type="button" onclick="filterOrdersByStatus('Đang giao', this)" class="order-status-btn">Đang giao</button>
+                            <button type="button" onclick="filterOrdersByStatus('Đã hoàn thành', this)" class="order-status-btn">Đã hoàn thành</button>
+                            <button type="button" onclick="filterOrdersByStatus('Đã hủy', this)" class="order-status-btn">Đã hủy</button>
                         </div>
                         
-                        <!-- Thanh tìm kiếm mini -->
-                        <div class="my-orders-search no-print">
-                            <input type="text" id="searchOrderInput" class="my-orders-search-input" placeholder="Tìm theo Mã đơn hàng...">
-                            <svg class="my-orders-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
+                        <div class="orders-search">
+                            <input type="text" id="searchOrderInput" class="orders-search-input" placeholder="Tìm theo Mã đơn hàng..." autocomplete="off">
+                            <svg class="orders-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
                     </div>
                     
-                    <div class="content-card-body">
+                    <div class="orders-card-body">
                         <!-- Khung chờ Load -->
-                        <div id="ordersLoading" class="state-container">
-                            <div class="loading-spinner"></div>
-                            <p class="state-text">Đang tải danh sách đơn hàng...</p>
+                        <div id="ordersLoading" class="orders-state-container">
+                            <div class="orders-loading-spinner"></div>
+                            <p class="orders-state-text">Đang tải danh sách đơn hàng...</p>
                         </div>
 
                         <!-- Khung trống -->
-                        <div id="emptyOrdersState" class="state-container d-none">
-                            <svg class="state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                            <h3 class="state-heading">Chưa có đơn hàng nào</h3>
-                            <p class="state-desc">Bạn chưa thực hiện đơn mua hàng trực tiếp nào trên hệ thống.</p>
-                            <a href="products.html" class="btn-primary mt-3">Đi đến Cửa hàng</a>
+                        <div id="emptyOrdersState" class="orders-state-container d-none">
+                            <div class="orders-empty-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                            </div>
+                            <h3 class="orders-empty-heading">Chưa có đơn hàng nào</h3>
+                            <p class="orders-empty-desc">Bạn chưa thực hiện đơn mua hàng trực tiếp nào trên hệ thống.</p>
+                            <a href="products.html" class="orders-create-btn" style="margin-top: 20px;">Đi đến Cửa hàng</a>
                         </div>
 
                         <!-- Bảng dữ liệu -->
                         <div class="table-responsive d-none" id="ordersTableWrapper">
-                            <table class="mro-data-table">
+                            <table class="orders-data-table">
                                 <thead>
                                     <tr>
                                         <th>Mã Đơn</th>
@@ -165,7 +166,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </main>
 
