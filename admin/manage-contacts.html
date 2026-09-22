@@ -132,6 +132,13 @@
                                 <option value="7days">7 ngày qua</option>
                                 <option value="30days">30 ngày qua</option>
                             </select>
+
+                            <!-- STATUS TABS (MỚI BỔ SUNG) -->
+                            <div class="flex items-center p-1 bg-gray-200/70 rounded-lg border border-gray-200 shadow-inner overflow-x-auto max-w-[100vw] sm:max-w-full">
+                                <button type="button" onclick="filterContactStatus('all', this)" class="contact-status-btn px-4 py-1.5 rounded-md text-[13px] font-bold bg-white text-kn-blue shadow-sm transition whitespace-nowrap">Tất cả</button>
+                                <button type="button" onclick="filterContactStatus('pending', this)" class="contact-status-btn px-4 py-1.5 rounded-md text-[13px] font-bold text-gray-500 hover:text-gray-800 hover:bg-white/50 transition whitespace-nowrap">Chờ xử lý</button>
+                                <button type="button" onclick="filterContactStatus('processed', this)" class="contact-status-btn px-4 py-1.5 rounded-md text-[13px] font-bold text-gray-500 hover:text-gray-800 hover:bg-white/50 transition whitespace-nowrap">Đã xử lý</button>
+                            </div>
                         </div>
                     </div>
 

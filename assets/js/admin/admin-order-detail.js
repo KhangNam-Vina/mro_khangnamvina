@@ -281,13 +281,10 @@ function renderStatusProgress() {
         const isCurrent = status === currentStatus;
         const isFuture = currentIndex !== -1 && index > currentIndex;
         
-        // Nhận diện bước cuối cùng (số 5)
         const isLast = index === ORDER_STATUS_FLOW.length - 1;
 
         const wrapper = document.createElement("div");
-        
-        // FIX LỖI: Bước cuối không dùng flex-1 để nó không tạo khoảng trống vô hình bên phải
-        wrapper.className = isLast ? "relative" : "flex-1 relative pr-2";
+        wrapper.className = isLast ? "relative" : "flex-1 relative pr-2 min-w-[120px]";
         
         wrapper.innerHTML = `
             <div class="flex items-center">
@@ -302,16 +299,12 @@ function renderStatusProgress() {
     });
 
     if (description) {
-        if (currentStatus === "cancelled") description.textContent = "Đơn hàng đã bị hủy và không thể tiếp tục xử lý.";
+        if (currentStatus === "cancelled") {
+            // Đổi text thành màu đỏ, xóa luôn cục nhãn dư thừa chèn vào flexbox
+            description.innerHTML = `<span class="text-red-500">Đơn hàng đã bị hủy và không thể tiếp tục xử lý.</span>`;
+        }
         else if (currentStatus === "delivered") description.textContent = "Đơn hàng đã hoàn tất.";
         else description.textContent = getOrderDetailStatusMeta(currentStatus).description;
-    }
-
-    if (currentStatus === "cancelled") {
-        const cancelled = document.createElement("div");
-        cancelled.className = "mt-4 pt-4 border-t border-gray-200";
-        cancelled.innerHTML = `<div class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-red-200 bg-red-50 text-red-700 text-xs font-black"><span class="w-2 h-2 rounded-full bg-red-500"></span>Đơn hàng đã hủy</div>`;
-        container.appendChild(cancelled);
     }
 }
 

@@ -96,10 +96,26 @@
                             <label for="inCompanyName" class="form-label">Tên công ty / thương hiệu</label>
                             <input type="text" id="inCompanyName" class="form-input" placeholder="Nhập tên công ty...">
                         </div>
+                        <!-- KHỐI UPLOAD LOGO MỚI -->
                         <div>
-                            <label for="inLogoUrl" class="form-label">Link Logo</label>
-                            <input type="url" id="inLogoUrl" class="form-input" placeholder="https://...">
-                            <p class="mt-2 text-[11px] text-gray-400 italic">URL hình ảnh logo đang sử dụng.</p>
+                            <label class="form-label">Logo Website</label>
+                            <div class="flex items-center gap-4 mt-1">
+                                <!-- Khung xem trước ảnh -->
+                                <div class="w-16 h-16 shrink-0 bg-white border border-gray-200 rounded-xl flex items-center justify-center overflow-hidden shadow-sm">
+                                    <img id="logoPreview" src="../assets/images/world mark.png" alt="Logo Preview" class="w-full h-full object-contain p-1">
+                                </div>
+                                
+                                <!-- Nút tải ảnh -->
+                                <div class="flex-1">
+                                    <input type="file" id="inLogoFile" accept="image/png, image/jpeg, image/svg+xml, image/webp" class="hidden">
+                                    <button type="button" onclick="document.getElementById('inLogoFile').click()" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-xs font-bold text-gray-700 hover:bg-white hover:border-kn-blue hover:text-kn-blue transition shadow-sm">
+                                        Tải ảnh lên
+                                    </button>
+                                    <p class="mt-2 text-[10px] sm:text-[11px] text-gray-400 italic leading-relaxed">Hỗ trợ PNG, JPG, SVG. Khuyên dùng ảnh nền trong suốt để hiển thị đẹp nhất.</p>
+                                </div>
+                            </div>
+                            <!-- Input ẩn để lưu link public sau khi upload -->
+                            <input type="hidden" id="inLogoUrl" class="form-input">
                         </div>
                     </div>
                 </section>
@@ -123,7 +139,7 @@
                             <input type="email" id="inEmail" class="form-input" placeholder="contact@example.com">
                         </div>
                         <div>
-                            <label for="inZalo" class="form-label">Zalo / Viber</label>
+                            <label for="inZalo" class="form-label">Zalo</label>
                             <input type="text" id="inZalo" class="form-input" placeholder="Số điện thoại hoặc link...">
                         </div>
                         <div>
@@ -169,29 +185,23 @@
                     </div>
                     <div class="p-5 sm:p-6 space-y-6">
                         <div>
-                            <label for="inMetaTitle" class="form-label">Meta Title</label>
-                            <input type="text" id="inMetaTitle" maxlength="60" class="form-input" placeholder="Tiêu đề hiển thị trên Google...">
+                            <div class="flex justify-between items-center mb-2">
+                                <label for="inMetaTitle" class="form-label !mb-0">Meta Title</label>
+                                <span id="metaTitleCount" class="text-xs font-mono font-bold text-gray-400">0 / 60</span>
+                            </div>
+                            <input type="text" id="inMetaTitle" class="form-input" placeholder="Tiêu đề hiển thị trên Google...">
                             <p class="mt-2 text-[11px] text-gray-400 italic">Khuyến nghị tối đa khoảng 60 ký tự.</p>
                         </div>
                         <div>
                             <div class="flex justify-between items-center mb-2">
-                                <label for="inMetaDesc" class="form-label mb-0">Meta Description</label>
+                                <label for="inMetaDesc" class="form-label !mb-0">Meta Description</label>
                                 <span id="metaDescCount" class="text-xs font-mono font-bold text-gray-400">0 / 160</span>
                             </div>
-                            <textarea id="inMetaDesc" rows="4" maxlength="160" class="form-input resize-y" placeholder="Mô tả tóm tắt doanh nghiệp để Google hiển thị..."></textarea>
+                            <textarea id="inMetaDesc" rows="4" class="form-input resize-y" placeholder="Mô tả tóm tắt doanh nghiệp để Google hiển thị..."></textarea>
                             <p class="mt-2 text-[11px] text-gray-400 italic">Khuyến nghị tối đa khoảng 160 ký tự.</p>
                         </div>
                     </div>
                 </section>
-
-                <!-- BOTTOM SAVE -->
-                <div class="flex justify-end pt-4 pb-8">
-                    <button type="button" id="btnSaveSettings" onclick="saveSettings()" class="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-kn-blue text-white text-sm font-black shadow-md hover:bg-blue-800 active:scale-[0.98] transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        Lưu toàn bộ cấu hình
-                    </button>
-                </div>
-
             </form>
 
         </main>

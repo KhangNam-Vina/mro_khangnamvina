@@ -104,13 +104,13 @@
                                 <input id="dateFilter" type="date" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none focus:border-kn-blue shadow-sm cursor-pointer">
                             </div>
 
-                            <!-- STATUS SELECT -->
-                            <select id="statusFilter" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-bold outline-none focus:border-kn-blue shadow-sm cursor-pointer">
-                                <option value="">Tất cả trạng thái</option>
-                                <option value="Chờ xử lý">Chờ xử lý</option>
-                                <option value="Đã báo giá">Đã báo giá</option>
-                                <option value="Từ chối">Từ chối</option>
-                            </select>
+                            <!-- STATUS TABS (THAY CHO SELECT CŨ) -->
+                            <div class="flex items-center p-1 bg-gray-200/70 rounded-lg border border-gray-200 shadow-inner">
+                                <button type="button" onclick="filterByStatus('', this)" class="rfq-status-btn px-4 py-1.5 rounded-md text-[13px] font-bold bg-white text-kn-blue shadow-sm transition">Tất cả</button>
+                                <button type="button" onclick="filterByStatus('Chờ xử lý', this)" class="rfq-status-btn px-4 py-1.5 rounded-md text-[13px] font-bold text-gray-500 hover:text-gray-800 hover:bg-white/50 transition">Chờ xử lý</button>
+                                <button type="button" onclick="filterByStatus('Đã báo giá', this)" class="rfq-status-btn px-4 py-1.5 rounded-md text-[13px] font-bold text-gray-500 hover:text-gray-800 hover:bg-white/50 transition">Đã báo giá</button>
+                                <button type="button" onclick="filterByStatus('Từ chối', this)" class="rfq-status-btn px-4 py-1.5 rounded-md text-[13px] font-bold text-gray-500 hover:text-gray-800 hover:bg-white/50 transition">Từ chối</button>
+                            </div>
                         </div>
                     </div>
 

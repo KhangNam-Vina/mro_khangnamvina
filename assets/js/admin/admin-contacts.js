@@ -1,6 +1,6 @@
 // ========================================================
-// FILE: assets/js/admin-contacts.js
-// QUẢN LÝ LIÊN HỆ - TÍCH HỢP TAB, CONFIG, TRẠNG THÁI & THỐNG KÊ
+// FILE: assets/js/admin/admin-contacts.js
+// QUẢN LÝ LIÊN HỆ - TÍCH HỢP TAB TRẠNG THÁI, CONFIG & THỐNG KÊ
 // ========================================================
 
 // 1. STATE & DOM CACHE
@@ -11,6 +11,7 @@ const state = {
     totalItems: 0,
     searchQuery: '',
     dateFilter: 'all',
+    statusFilter: 'all', // Biến lưu trạng thái Tab
     isConfigLoaded: false
 };
 
@@ -22,7 +23,6 @@ const DOM = {
     btnRefresh: document.getElementById('btnRefresh'),
     toastContainer: document.getElementById('toastContainer'),
     
-    // Stats DOM
     statTotal: document.getElementById('statTotalContacts'),
     statPending: document.getElementById('statPendingContacts'),
     statProcessed: document.getElementById('statProcessedContacts'),
@@ -66,8 +66,27 @@ const utils = {
 // 3. INIT & TAB SWITCHER
 window.addEventListener('load', () => {
     bindEvents();
-    fetchInboxData(); // Load List & KPIs
+    fetchInboxData();
 });
+
+// ==========================================
+// HÀM CLICK CHỌN TAB TRẠNG THÁI
+// ==========================================
+window.filterContactStatus = function(status, btn) {
+    // Trả các nút về xám
+    document.querySelectorAll('.contact-status-btn').forEach(b => {
+        b.classList.remove('bg-white', 'text-kn-blue', 'shadow-sm');
+        b.classList.add('text-gray-500', 'hover:text-gray-800', 'hover:bg-white/50');
+    });
+    // Sáng nút được click
+    if(btn) {
+        btn.classList.remove('text-gray-500', 'hover:text-gray-800', 'hover:bg-white/50');
+        btn.classList.add('bg-white', 'text-kn-blue', 'shadow-sm');
+    }
+    state.statusFilter = status;
+    state.currentPage = 1;
+    fetchContacts();
+};
 
 function bindEvents() {
     if (DOM.searchInput) {
@@ -96,14 +115,25 @@ function bindEvents() {
             DOM.btnRefresh.disabled = true;
             DOM.btnRefresh.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Đang tải...`;
             
-            // Nếu đang ở Tab config thì load config, ngược lại load inbox
             if (!document.getElementById('tabInbox').classList.contains('hidden')) {
                 // Reset filter
                 state.searchQuery = '';
                 state.dateFilter = 'all';
+                state.statusFilter = 'all';
                 state.currentPage = 1;
                 if(DOM.searchInput) DOM.searchInput.value = '';
                 if(DOM.filterSelect) DOM.filterSelect.value = 'all';
+                
+                // Trả Tabs về "Tất cả"
+                document.querySelectorAll('.contact-status-btn').forEach((b, idx) => {
+                    if (idx === 0) {
+                        b.classList.add('bg-white', 'text-kn-blue', 'shadow-sm');
+                        b.classList.remove('text-gray-500', 'hover:text-gray-800', 'hover:bg-white/50');
+                    } else {
+                        b.classList.remove('bg-white', 'text-kn-blue', 'shadow-sm');
+                        b.classList.add('text-gray-500', 'hover:text-gray-800', 'hover:bg-white/50');
+                    }
+                });
                 
                 await fetchInboxData();
             } else {
@@ -201,6 +231,14 @@ async function fetchContacts() {
             query = query.gte('created_at', pastDate.toISOString());
         }
 
+        // LỌC THEO TABS TRẠNG THÁI
+        if (state.statusFilter === 'processed') {
+            query = query.eq('status', 'processed');
+        } else if (state.statusFilter === 'pending') {
+            // Chờ xử lý là những contact rỗng status hoặc ghi rõ pending
+            query = query.or('status.eq.pending,status.is.null'); 
+        }
+
         const { data, count, error } = await query;
         if (error) throw error;
 
@@ -234,13 +272,17 @@ window.markAsProcessed = async function(id) {
         
         utils.showToast("Cập nhật trạng thái thành công!", "success");
         
-        // Cập nhật lại UI list & KPI ngay lập tức
-        const index = state.contacts.findIndex(c => c.id == id);
-        if(index !== -1) {
-            state.contacts[index].status = 'processed';
-            renderContacts();
-            loadContactKPIs();
+        // Nếu đang ở Tab "Chờ xử lý", sau khi xử lý xong thì xóa luôn khỏi list cho sạch
+        if (state.statusFilter === 'pending') {
+            state.contacts = state.contacts.filter(c => c.id != id);
+            state.totalItems--;
+        } else {
+            const index = state.contacts.findIndex(c => c.id == id);
+            if(index !== -1) state.contacts[index].status = 'processed';
         }
+        
+        renderContacts();
+        loadContactKPIs();
 
     } catch (error) {
         utils.showToast("Lỗi cập nhật: " + error.message, "error");
@@ -328,7 +370,7 @@ function renderContacts() {
 }
 
 function renderEmpty() { 
-    DOM.tbody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-gray-500"><div class="font-bold">Không tìm thấy liên hệ nào!</div><div class="text-xs text-gray-400 mt-1">Thử thay đổi từ khóa hoặc khoảng thời gian.</div></td></tr>`; 
+    DOM.tbody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-gray-500"><div class="font-bold">Không tìm thấy liên hệ nào!</div><div class="text-xs text-gray-400 mt-1">Thử thay đổi từ khóa, khoảng thời gian hoặc trạng thái.</div></td></tr>`; 
 }
 function renderError(msg) { 
     DOM.tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-red-500 font-bold">Lỗi: ${msg}</td></tr>`; 
@@ -370,7 +412,6 @@ async function loadContactConfig() {
             document.getElementById('cfgSupportTime').value = data.support_time || '';
             document.getElementById('cfgMapUrl').value = data.map_iframe_url || '';
             
-            // XỬ LÝ DYNAMIC PROOFS (Mảng JSON)
             const proofs = data.proofs || [];
             renderProofs(proofs);
         }
@@ -385,11 +426,8 @@ window.saveContactConfig = async function() {
     btn.disabled = true;
     btn.innerHTML = "Đang lưu...";
 
-    // THU THẬP MẢNG PROOFS (Bỏ qua các input để trống)
     const proofInputs = document.querySelectorAll('.proof-input');
-    const proofsArray = Array.from(proofInputs)
-        .map(input => input.value.trim())
-        .filter(val => val !== '');
+    const proofsArray = Array.from(proofInputs).map(input => input.value.trim()).filter(val => val !== '');
 
     const payload = {
         id: 1,
@@ -398,15 +436,12 @@ window.saveContactConfig = async function() {
         address: document.getElementById('cfgAddress').value.trim(),
         support_time: document.getElementById('cfgSupportTime').value.trim(),
         map_iframe_url: document.getElementById('cfgMapUrl').value.trim(),
-        proofs: proofsArray, // <--- Bơm mảng JSON vào database
+        proofs: proofsArray, 
         updated_at: new Date().toISOString()
     };
 
     try {
-        const { error } = await window.supabaseClient
-            .from('contact_page')
-            .upsert(payload);
-
+        const { error } = await window.supabaseClient.from('contact_page').upsert(payload);
         if (error) throw error;
         utils.showToast("Lưu cấu hình thành công!", "success");
     } catch (err) {
@@ -417,20 +452,13 @@ window.saveContactConfig = async function() {
     }
 }
 
-// ==========================================
-// CÁC HÀM HỖ TRỢ XỬ LÝ DYNAMIC PROOFS
-// ==========================================
-
 function renderProofs(proofsArray) {
     const container = document.getElementById('proofsContainer');
     if (!container) return;
     
-    container.innerHTML = ''; // Xóa rỗng trước khi render
-    if (proofsArray.length === 0) {
-        checkEmptyProofs();
-    } else {
-        proofsArray.forEach(proof => addProofRow(proof));
-    }
+    container.innerHTML = '';
+    if (proofsArray.length === 0) checkEmptyProofs();
+    else proofsArray.forEach(proof => addProofRow(proof));
 }
 
 window.addProofRow = function(value = '') {

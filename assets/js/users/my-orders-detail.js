@@ -1,11 +1,33 @@
 // ========================================================
 // FILE: assets/js/users/my-orders-detail.js
-// CHI TIẾT ĐƠN HÀNG MUA TRỰC TIẾP
+// CHI TIẾT ĐƠN HÀNG MUA TRỰC TIẾP (ĐỒNG BỘ VỚI ADMIN)
 // ========================================================
 
 let currentUser = null;
 let currentOrderItems = [];
 let currentOrder = null;
+
+// ========================================================
+// STATUS WORKFLOW
+// ========================================================
+const ORDER_STATUS_FLOW = ["pending", "confirmed", "processing", "shipped", "delivered"];
+const ORDER_STATUS_META = {
+    pending: { label: "Chờ xử lý", class: "status-pending", description: "Đơn hàng mới được tạo và đang chờ xác nhận." },
+    confirmed: { label: "Đã xác nhận", class: "status-processing", description: "Đơn hàng đã được xác nhận." },
+    processing: { label: "Đang xử lý", class: "status-processing", description: "Đơn hàng đang được chuẩn bị." },
+    shipped: { label: "Đang giao", class: "status-completed", description: "Đơn hàng đã được bàn giao cho đơn vị vận chuyển." },
+    delivered: { label: "Đã giao", class: "status-completed", description: "Đơn hàng đã giao thành công." },
+    cancelled: { label: "Đã hủy", class: "status-cancelled", description: "Đơn hàng đã bị hủy." }
+};
+
+function getOrderStatusMeta(status) {
+    const normalized = String(status || "").trim().toLowerCase();
+    return ORDER_STATUS_META[normalized] || { label: "Không xác định", class: "status-pending", description: "Trạng thái đơn hàng không xác định." };
+}
+
+function getStatusIndex(status) { 
+    return ORDER_STATUS_FLOW.indexOf(String(status || "").trim().toLowerCase()); 
+}
 
 // ========================================================
 // CÁC HÀM TIỆN ÍCH
@@ -43,15 +65,6 @@ function showOrderError(message) {
     document.getElementById("orderError")?.classList.remove("d-none");
     const errorText = document.getElementById("orderErrorMessage");
     if (errorText) errorText.textContent = message;
-}
-
-function getOrderStatusMeta(status) {
-    const safeStatus = String(status || "").toLowerCase().trim();
-    if (safeStatus.includes("pending")) return { label: "Chờ xác nhận", class: "status-pending" };
-    if (safeStatus.includes("confirmed") || safeStatus.includes("processing")) return { label: "Đã xác nhận", class: "status-processing" };
-    if (safeStatus.includes("shipping") || safeStatus.includes("delivered") || safeStatus.includes("shipped") || safeStatus.includes("completed")) return { label: "Đã giao", class: "status-completed" };
-    if (safeStatus.includes("cancel") || safeStatus.includes("hủy")) return { label: "Đã hủy", class: "status-cancelled" };
-    return { label: status || "Chờ xác nhận", class: "status-pending" };
 }
 
 // ========================================================
@@ -110,9 +123,10 @@ async function loadOrderDetail() {
 
     if (!orderId) { showOrderError("Không tìm thấy mã đơn hàng."); return; }
 
+    // ĐÃ BỔ SUNG LẤY cancel_reason
     const { data: order, error: orderError } = await window.supabaseClient
         .from("orders")
-        .select(`id, user_id, order_code, status, subtotal, shipping_fee, total, shipping_name, shipping_phone, shipping_address, note, created_at, payment_method`)
+        .select(`id, user_id, order_code, status, subtotal, shipping_fee, total, shipping_name, shipping_phone, shipping_address, note, created_at, payment_method, cancel_reason`)
         .eq("id", orderId)
         .eq("user_id", currentUser.id)
         .maybeSingle();
@@ -148,10 +162,14 @@ function renderOrderDetail(order, items) {
     if (orderCode) orderCode.textContent = order.order_code || "-";
     if (orderDate) orderDate.textContent = formatDateTime(order.created_at);
 
-    // STATUS
+    // STATUS BASIC TEXT
     const status = getOrderStatusMeta(order.status);
     if (statusText) statusText.textContent = status.label;
     if (itemCount) itemCount.textContent = formatItemCount(items);
+
+    // RENDER TIMELINE & CANCELLATION (ĐỒNG BỘ)
+    renderStatusProgress();
+    renderCancellationReason();
 
     // SHIPPING INFO & PAYMENT METHOD
     const shipName = document.getElementById("shippingName");
@@ -175,7 +193,7 @@ function renderOrderDetail(order, items) {
         paymentMethodEl.textContent = pmMap[order.payment_method] || order.payment_method || "Thanh toán khi nhận hàng (COD)";
     }
 
-    // CHI TIẾT TỔNG TIỀN (CHỈ TÍNH TIỀN HÀNG)
+    // CHI TIẾT TỔNG TIỀN
     const totalBottom = document.getElementById("orderTotalBottom");
     const totalTop = document.getElementById("orderTotal");
     
@@ -187,6 +205,74 @@ function renderOrderDetail(order, items) {
     // RENDER SẢN PHẨM & CÁC NÚT HỦY
     renderOrderItems(items);
     updateCancelButton(order.status);
+}
+
+// ========================================================
+// RENDER THANH TIẾN TRÌNH VÀ LÝ DO HỦY (STYLE GIỐNG ADMIN)
+// ========================================================
+function renderStatusProgress() {
+    const container = document.getElementById("orderStatusProgress");
+    const description = document.getElementById("orderStatusDescription");
+    if (!container || !currentOrder) return;
+
+    const currentStatus = String(currentOrder.status || "").trim().toLowerCase();
+    const currentIndex = getStatusIndex(currentStatus);
+    container.innerHTML = "";
+
+    ORDER_STATUS_FLOW.forEach((status, index) => {
+        const meta = getOrderStatusMeta(status);
+        const isCompleted = currentIndex !== -1 && index < currentIndex;
+        const isCurrent = status === currentStatus;
+        const isFuture = currentIndex !== -1 && index > currentIndex;
+        const isLast = index === ORDER_STATUS_FLOW.length - 1;
+
+        const circleColor = isCurrent ? "background:#00479b; border-color:#00479b; color:#fff;" : 
+                            isCompleted ? "background:#22c55e; border-color:#22c55e; color:#fff;" : 
+                            "background:#fff; border-color:#d1d5db; color:#9ca3af;";
+                            
+        const lineColor = index < currentIndex ? "background:#22c55e;" : "background:#e5e7eb;";
+        const textColor = isCurrent ? "color:#00479b;" : isFuture ? "color:#9ca3af;" : "color:#4b5563;";
+
+        const wrapper = document.createElement("div");
+        wrapper.style.cssText = isLast ? "position:relative;" : "flex:1; position:relative; padding-right:8px; min-width: 120px;";
+        
+        wrapper.innerHTML = `
+            <div style="display:flex; align-items:center;">
+                <div style="width:32px; height:32px; flex-shrink:0; border-radius:50%; border:2px solid; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:900; z-index:10; ${circleColor}">
+                    ${isCompleted ? "✓" : index + 1}
+                </div>
+                ${!isLast ? `<div style="height:2px; flex:1; margin-left:8px; ${lineColor}"></div>` : ""}
+            </div>
+            <p style="font-size:11px; margin:10px 0 0 0; font-weight:900; text-transform:uppercase; letter-spacing:0.05em; ${textColor} ${isLast ? 'margin-left:-6px;' : ''}">${escapeHtml(meta.label)}</p>
+        `;
+        container.appendChild(wrapper);
+    });
+
+    if (description) {
+        if (currentStatus === "cancelled") {
+            // Đổi text thành màu đỏ, xóa luôn cục nhãn dư thừa chèn vào flexbox
+            description.innerHTML = `<span style="color:#ef4444;">Đơn hàng đã bị hủy và không thể tiếp tục xử lý.</span>`;
+        }
+        else if (currentStatus === "delivered") description.textContent = "Đơn hàng đã hoàn tất.";
+        else description.textContent = getOrderStatusMeta(currentStatus).description;
+    }
+}
+
+function renderCancellationReason() {
+    const section = document.getElementById("orderCancellationSection");
+    const reason = document.getElementById("orderCancellationReason");
+    if (!section || !reason || !currentOrder) return;
+
+    const status = String(currentOrder.status || "").trim().toLowerCase();
+    if (status !== "cancelled") { 
+        section.classList.add("d-none"); 
+        reason.textContent = ""; 
+        return; 
+    }
+
+    const cancellationReason = String(currentOrder.cancel_reason || "").trim();
+    section.classList.remove("d-none");
+    reason.textContent = cancellationReason || "Không có lý do hủy được ghi nhận.";
 }
 
 function updateCancelButton(status) {

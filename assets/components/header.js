@@ -1,7 +1,7 @@
 // ========================================================
 // FILE: assets/components/header.js
 // COMPONENT HEADER & MENU DÙNG CHUNG TOÀN BỘ WEBSITE
-// CSS TĨNH - 100% KHÔNG TAILWIND
+// ĐÃ TÍCH HỢP TỰ ĐỘNG CẬP NHẬT LOGO & FAVICON TỪ ADMIN
 // ========================================================
 
 const renderHeader = () => {
@@ -29,7 +29,7 @@ const renderHeader = () => {
 
                     <!-- LOGO -->
                     <a href="${rootPath}index.html" class="header-logo" aria-label="MRO Khang Nam - Trang chủ">
-                        <img src="${rootPath}assets/images/world mark.png" alt="MRO Khang Nam Logo">
+                        <img id="mainSiteLogo" src="${rootPath}assets/images/world mark.png" alt="MRO Khang Nam Logo">
                     </a>
 
                     <!-- ==================================================
@@ -105,7 +105,6 @@ const renderHeader = () => {
                         <div class="nav-actions-right">
 
                             <!-- BÁO GIÁ -->
-                            <!-- Thêm class cart-action để chứa badge và định vị thẻ badge vào góc phải -->
                             <a href="${pagesPath}rfq.html" class="nav-action-item cart-action" aria-label="Trung tâm báo giá">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                 <span class="action-text">Báo Giá</span>
@@ -154,6 +153,9 @@ const renderHeader = () => {
     headerContainer.innerHTML = headerHTML;
     headerContainer.classList.remove('site-header-placeholder');
 
+    // GỌI HÀM CẬP NHẬT LOGO TỪ DATABASE SAU KHI RENDER HTML XONG
+    applyDynamicHeaderSettings();
+
     // ====================================================
     // SEARCH
     // ====================================================
@@ -193,6 +195,39 @@ const renderHeader = () => {
     if (typeof window.updateHeaderCartCount === 'function') window.updateHeaderCartCount();
     if (typeof window.updateHeaderRFQCount === 'function') window.updateHeaderRFQCount();
 };
+
+// ========================================================
+// HÀM LẤY LOGO TỪ DATABASE VÀ CẬP NHẬT
+// ========================================================
+async function applyDynamicHeaderSettings() {
+    if (!window.supabaseClient) return;
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('website_settings')
+            .select('logo_url')
+            .eq('id', 1)
+            .maybeSingle();
+
+        if (data && data.logo_url && data.logo_url.trim() !== "") {
+            // Thay đổi Logo trên Header
+            const mainLogo = document.getElementById('mainSiteLogo');
+            if (mainLogo) {
+                mainLogo.src = data.logo_url;
+            }
+            
+            // Thay đổi luôn Favicon (Icon trên tab trình duyệt)
+            let link = document.querySelector("link[rel~='icon']");
+            if (!link) {
+                link = document.createElement('link');
+                link.rel = 'icon';
+                document.head.appendChild(link);
+            }
+            link.href = data.logo_url;
+        }
+    } catch (error) {
+        console.error('Lỗi tải logo từ cấu hình:', error);
+    }
+}
 
 // ========================================================
 // SEARCH
@@ -252,7 +287,7 @@ window.updateHeaderCartCount = function () {
 };
 
 // ========================================================
-// UPDATE RFQ COUNT (NEW)
+// UPDATE RFQ COUNT
 // ========================================================
 window.updateHeaderRFQCount = function () {
     const rfqCart = JSON.parse(localStorage.getItem('mro_rfq_cart')) || [];
@@ -285,9 +320,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         let isUserLoggedIn = false;
 
-        // ==================================================
-        // XÁC ĐỊNH TRẠNG THÁI ĐĂNG NHẬP
-        // ==================================================
         if (typeof window.checkCustomerAuth === 'function') {
             isUserLoggedIn = !!(await window.checkCustomerAuth());
         } else if (typeof Auth !== 'undefined' && typeof Auth.getCurrentUser === 'function') {
@@ -297,32 +329,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             isUserLoggedIn = !!data?.session;
         }
 
-        // ==================================================
-        // HEADER BUTTONS
-        // ==================================================
         const guestBtn = document.getElementById('btnGuestLogin');
         const userProfileBtn = document.getElementById('btnUserProfile');
 
-        // ==================================================
-        // ĐÃ ĐĂNG NHẬP
-        // ==================================================
         if (isUserLoggedIn) {
             if (userProfileBtn) userProfileBtn.classList.remove('d-none');
             if (guestBtn) guestBtn.classList.add('d-none');
-        } 
-        // ==================================================
-        // CHƯA ĐĂNG NHẬP
-        // ==================================================
-        else {
+        } else {
             if (guestBtn) guestBtn.classList.remove('d-none');
             if (userProfileBtn) userProfileBtn.classList.add('d-none');
         }
     } catch (err) {
         console.error('Lỗi đồng bộ Header:', err);
-        // ==================================================
-        // FALLBACK
-        // Nếu auth check lỗi → hiện Đăng nhập
-        // ==================================================
         const guestBtn = document.getElementById('btnGuestLogin');
         const userProfileBtn = document.getElementById('btnUserProfile');
 

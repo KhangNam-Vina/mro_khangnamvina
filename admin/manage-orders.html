@@ -113,16 +113,16 @@ tailwind.config={theme:{extend:{colors:{'kn-blue':'#00479b','kn-orange':'#ff5e00
             <input id="dateFilter" type="date" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none focus:border-kn-blue shadow-sm cursor-pointer">
         </div>
         
-        <!-- LỌC TRẠNG THÁI -->
-        <select id="statusFilter" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm font-bold outline-none focus:border-kn-blue shadow-sm cursor-pointer">
-            <option value="all">Tất cả trạng thái</option>
-            <option value="pending">Chờ xử lý</option>
-            <option value="confirmed">Đã xác nhận</option>
-            <option value="processing">Đang xử lý</option>
-            <option value="shipped">Đang giao</option>
-            <option value="delivered">Đã giao</option>
-            <option value="cancelled">Đã hủy</option>
-        </select>
+        <!-- STATUS TABS (THAY CHO SELECT CŨ) -->
+        <div class="flex items-center p-1 bg-gray-200/70 rounded-lg border border-gray-200 shadow-inner overflow-x-auto max-w-[100vw] sm:max-w-full">
+            <button type="button" onclick="filterByStatus('all', this)" class="order-status-btn px-4 py-1.5 rounded-md text-[13px] font-bold bg-white text-kn-blue shadow-sm transition whitespace-nowrap">Tất cả</button>
+            <button type="button" onclick="filterByStatus('pending', this)" class="order-status-btn px-4 py-1.5 rounded-md text-[13px] font-bold text-gray-500 hover:text-gray-800 hover:bg-white/50 transition whitespace-nowrap">Chờ xử lý</button>
+            <button type="button" onclick="filterByStatus('confirmed', this)" class="order-status-btn px-4 py-1.5 rounded-md text-[13px] font-bold text-gray-500 hover:text-gray-800 hover:bg-white/50 transition whitespace-nowrap">Đã xác nhận</button>
+            <button type="button" onclick="filterByStatus('processing', this)" class="order-status-btn px-4 py-1.5 rounded-md text-[13px] font-bold text-gray-500 hover:text-gray-800 hover:bg-white/50 transition whitespace-nowrap">Đang xử lý</button>
+            <button type="button" onclick="filterByStatus('shipped', this)" class="order-status-btn px-4 py-1.5 rounded-md text-[13px] font-bold text-gray-500 hover:text-gray-800 hover:bg-white/50 transition whitespace-nowrap">Đang giao</button>
+            <button type="button" onclick="filterByStatus('delivered', this)" class="order-status-btn px-4 py-1.5 rounded-md text-[13px] font-bold text-gray-500 hover:text-gray-800 hover:bg-white/50 transition whitespace-nowrap">Đã giao</button>
+            <button type="button" onclick="filterByStatus('cancelled', this)" class="order-status-btn px-4 py-1.5 rounded-md text-[13px] font-bold text-gray-500 hover:text-gray-800 hover:bg-white/50 transition whitespace-nowrap">Đã hủy</button>
+        </div>
     </div>
   </div>
 

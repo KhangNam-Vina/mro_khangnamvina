@@ -1,5 +1,6 @@
 // ========================================================
 // FILE: assets/js/admin/admin-rfq-detail.js 
+// ĐÃ ĐỒNG BỘ MÀU TRẠNG THÁI CHUẨN
 // ========================================================
 
 const state = {
@@ -10,8 +11,6 @@ const state = {
 const DOM = {
     emptyState: document.getElementById('emptyState'),
     rfqDetailContent: document.getElementById('rfqDetailContent'),
-    
-    // Thông tin cơ bản
     lblRfqCode: document.getElementById('lblRfqCode'),
     lblDate: document.getElementById('lblDate'),
     lblStatus: document.getElementById('lblStatus'),
@@ -20,13 +19,9 @@ const DOM = {
     lblPhone: document.getElementById('lblPhone'),
     lblEmail: document.getElementById('lblEmail'),
     lblNotes: document.getElementById('lblNotes'),
-    
-    // Bảng vật tư & Ô tìm kiếm
     itemList: document.getElementById('itemList'),
     searchInput: document.getElementById('searchInput'),
     btnSearch: document.getElementById('btnSearchRfq'),
-
-    // Nút thao tác
     btnReject: document.getElementById('btnRejectRfq'),
     btnApprove: document.getElementById('btnApproveRfq')
 };
@@ -35,26 +30,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     state.rfqId = urlParams.get('id');
 
-    // Sự kiện tìm kiếm
     if (DOM.btnSearch && DOM.searchInput) {
         DOM.btnSearch.addEventListener('click', searchRFQ);
-        DOM.searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') searchRFQ();
-        });
+        DOM.searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') searchRFQ(); });
     }
 
-    // Sự kiện cập nhật trạng thái
-    if (DOM.btnReject) {
-    DOM.btnReject.addEventListener(
-        'click',
-        () => updateRfqStatus('Từ chối')
-    );
-}
-    if (DOM.btnApprove) {
-        DOM.btnApprove.addEventListener('click', () => updateRfqStatus('Đã báo giá'));
-    }
+    if (DOM.btnReject) DOM.btnReject.addEventListener('click', () => updateRfqStatus('Từ chối'));
+    if (DOM.btnApprove) DOM.btnApprove.addEventListener('click', () => updateRfqStatus('Đã báo giá'));
 
-    // Sự kiện Logout
     const btnLogout = document.getElementById('btnAdminLogout');
     if (btnLogout) {
         btnLogout.addEventListener('click', async () => {
@@ -75,21 +58,13 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchRfqDetail();
 
     const btnExport = document.getElementById("btnExportPdf");
-    if(btnExport){
-        btnExport.addEventListener("click", exportPDF);
-    }
+    if(btnExport) btnExport.addEventListener("click", exportPDF);
 });
 
-// --------------------------------------------------------
-// GỌI API & ĐỔ DỮ LIỆU
-// --------------------------------------------------------
 async function fetchRfqDetail() {
     try {
         const { data, error } = await window.supabaseClient
-        .from('rfqs')
-        .select('*') 
-        .eq('id', state.rfqId)
-        .single();
+            .from('rfqs').select('*').eq('id', state.rfqId).single();
         
         if (error) throw error;
         if (!data) throw new Error("Không tìm thấy dữ liệu yêu cầu.");
@@ -106,194 +81,52 @@ async function fetchRfqDetail() {
 }
 
 async function updateRfqStatus(newStatus) {
-
-    // ====================================================
-    // 1. XÁC NHẬN THAO TÁC
-    // ====================================================
-
-    if (
-        !confirm(
-            `Xác nhận chuyển trạng thái RFQ thành: ${newStatus}?`
-        )
-    ) {
-        return;
-    }
-
-
-    // ====================================================
-    // 2. NẾU TỪ CHỐI → BẮT BUỘC NHẬP LÝ DO
-    // ====================================================
+    if (!confirm(`Xác nhận chuyển trạng thái RFQ thành: ${newStatus}?`)) return;
 
     let rejectionReason = null;
-
-
     if (newStatus === 'Từ chối') {
-
-        rejectionReason = prompt(
-            'Nhập lý do từ chối RFQ:'
-        );
-
-
-        // Admin bấm Cancel
-        if (rejectionReason === null) {
-            return;
-        }
-
-
-        // Xóa khoảng trắng đầu/cuối
-        rejectionReason =
-            rejectionReason.trim();
-
-
-        // Không cho lý do rỗng
-        if (!rejectionReason) {
-
-            alert(
-                'Vui lòng nhập lý do từ chối.'
-            );
-
-            return;
-        }
-
+        rejectionReason = prompt('Nhập lý do từ chối RFQ:');
+        if (rejectionReason === null) return;
+        rejectionReason = rejectionReason.trim();
+        if (!rejectionReason) { alert('Vui lòng nhập lý do từ chối.'); return; }
     }
 
-
-    // ====================================================
-    // 3. CHUẨN BỊ DATA UPDATE
-    // ====================================================
-
-    const updateData = {
-        status: newStatus
-    };
-
-
-    // Nếu từ chối → lưu lý do
-    if (newStatus === 'Từ chối') {
-
-        updateData.rejection_reason =
-            rejectionReason;
-
-    } else {
-
-        // Nếu chuyển sang trạng thái khác
-        // → xóa lý do từ chối cũ
-
-        updateData.rejection_reason = null;
-
-    }
-
-
-    // ====================================================
-    // 4. UPDATE SUPABASE
-    // ====================================================
+    const updateData = { status: newStatus };
+    if (newStatus === 'Từ chối') updateData.rejection_reason = rejectionReason;
+    else updateData.rejection_reason = null;
 
     try {
+        const { error } = await window.supabaseClient.from('rfqs').update(updateData).eq('id', state.rfqId);
+        if (error) throw error;
 
-        const { error } =
-            await window.supabaseClient
+        if (window.utils && window.utils.showToast) window.utils.showToast('Cập nhật trạng thái thành công!', 'success');
+        else alert('Cập nhật trạng thái thành công!');
 
-                .from('rfqs')
-
-                .update(updateData)
-
-                .eq(
-                    'id',
-                    state.rfqId
-                );
-
-
-        if (error) {
-            throw error;
-        }
-
-
-        // ====================================================
-        // 5. THÔNG BÁO THÀNH CÔNG
-        // ====================================================
-
-        if (
-            window.utils &&
-            window.utils.showToast
-        ) {
-
-            window.utils.showToast(
-                'Cập nhật trạng thái thành công!',
-                'success'
-            );
-
-        } else {
-
-            alert(
-                'Cập nhật trạng thái thành công!'
-            );
-
-        }
-
-
-        // ====================================================
-        // 6. CẬP NHẬT STATE
-        // ====================================================
-
-        state.rfqData.status =
-            newStatus;
-
-        state.rfqData.rejection_reason =
-            rejectionReason;
-
-
-        // ====================================================
-        // 7. RENDER LẠI GIAO DIỆN
-        // ====================================================
-
+        state.rfqData.status = newStatus;
+        state.rfqData.rejection_reason = rejectionReason;
         renderRfqInfo();
-
-
     } catch (error) {
-
-        console.error(
-            '[admin-rfq-detail] Update status error:',
-            error
-        );
-
-
-        if (
-            window.utils &&
-            window.utils.showToast
-        ) {
-
-            window.utils.showToast(
-                'Lỗi cập nhật: ' +
-                error.message,
-                'error'
-            );
-
-        } else {
-
-            alert(
-                'Lỗi cập nhật: ' +
-                error.message
-            );
-
-        }
-
+        console.error('[admin-rfq-detail] Update status error:', error);
+        if (window.utils && window.utils.showToast) window.utils.showToast('Lỗi cập nhật: ' + error.message, 'error');
+        else alert('Lỗi cập nhật: ' + error.message);
     }
-
 }
 
-// --------------------------------------------------------
-// TÌM KIẾM DỘI NGƯỢC VỀ DASHBOARD
-// --------------------------------------------------------
 function searchRFQ() {
     if(!DOM.searchInput) return;
     const val = DOM.searchInput.value.trim();
-    if (val) {
-        window.location.href = `dashboard.html?search=${encodeURIComponent(val)}`;
-    }
+    if (val) window.location.href = `dashboard.html?search=${encodeURIComponent(val)}`;
 }
 
-// --------------------------------------------------------
-// XỬ LÝ GIAO DIỆN (UI)
-// --------------------------------------------------------
+// ĐỒNG BỘ MÀU CHUNG
+function getAdminRFQStatusMeta(status) {
+    const s = String(status || "Chờ xử lý").trim().toLowerCase();
+    if (s.includes("từ chối") || s.includes("hủy")) return { label: status, class: "bg-red-100 text-red-700 border-red-200" };
+    if (s.includes("đã báo giá") || s.includes("thành công")) return { label: status, class: "bg-green-100 text-green-700 border-green-200" };
+    if (s.includes("đang xử lý")) return { label: status, class: "bg-blue-100 text-blue-700 border-blue-200" };
+    return { label: status || "Chờ xử lý", class: "bg-orange-100 text-orange-700 border-orange-200" };
+}
+
 function renderRfqInfo() {
     const data = state.rfqData;
     if (!data) return;
@@ -313,31 +146,23 @@ function renderRfqInfo() {
     if (DOM.lblEmail) DOM.lblEmail.textContent = escapeHTML(data.email) || '-';
     if (DOM.lblNotes) DOM.lblNotes.textContent = escapeHTML(data.notes || data.note) || 'Không có ghi chú';
     
+    // GẮN CHUẨN MÀU TỪ HÀM GỘP
     if (DOM.lblStatus) {
-        const status = escapeHTML(data.status) || 'Chờ xử lý';
-        DOM.lblStatus.textContent = status;
-        DOM.lblStatus.className = "px-4 py-1.5 rounded-full text-sm font-bold border ";
-        
-        if (status === 'Chờ xử lý') DOM.lblStatus.className += "bg-orange-100 text-orange-600 border-orange-200";
-        else if (status === 'Đã báo giá') DOM.lblStatus.className += "bg-blue-100 text-blue-700 border-blue-200";
-        else if (status === 'Từ chối') DOM.lblStatus.className += "bg-red-100 text-red-600 border-red-200";
-        else DOM.lblStatus.className += "bg-gray-100 text-gray-600 border-gray-200";
+        const meta = getAdminRFQStatusMeta(data.status);
+        DOM.lblStatus.textContent = escapeHTML(meta.label);
+        DOM.lblStatus.className = `px-4 py-1.5 rounded-full text-sm font-bold border ${meta.class}`;
     }
 
     const actionButtons = document.getElementById('actionButtons');
     if (actionButtons) {
         const currentStatus = data.status || 'Chờ xử lý';
-        if (currentStatus !== 'Chờ xử lý') {
-            actionButtons.classList.add('hidden');
-        } else {
-            actionButtons.classList.remove('hidden');
-        }
+        if (currentStatus !== 'Chờ xử lý') actionButtons.classList.add('hidden');
+        else actionButtons.classList.remove('hidden');
     }
 }
 
 function renderProducts() {
     if (!DOM.itemList) return;
-    
     const items = state.rfqData.items || [];
     
     if (items.length === 0) {
@@ -345,7 +170,6 @@ function renderProducts() {
         return;
     }
 
-    // Hàm bọc escape an toàn
     const safeEscape = (val) => {
         const str = String(val ?? "");
         if (window.utils && window.utils.escapeHTML) return window.utils.escapeHTML(str);
@@ -353,7 +177,6 @@ function renderProducts() {
     };
 
     DOM.itemList.innerHTML = items.map((item, index) => {
-        // Đã FIX chống lỗi crash bằng String()
         const safeName = safeEscape(String(item.name ?? "Sản phẩm không xác định"));
         const sku = safeEscape(String(item.sku ?? "-"));
         const size = safeEscape(String(item.size ?? "-"));
@@ -371,17 +194,9 @@ function renderProducts() {
     }).join('');
 }
 
-// --------------------------------------------------------
-// XUẤT FILE PDF
-// --------------------------------------------------------
 async function exportPDF() {
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4"
-    });
-
+    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const data = state.rfqData;
 
     pdf.setFontSize(20);
@@ -401,16 +216,8 @@ async function exportPDF() {
     pdf.text(data.notes || "Khong co", 15, 112);
 
     const rows = [];
-
-    // Cập nhật PDF thêm cột SIZE
     (data.items || []).forEach((item, index) => {
-        rows.push([
-            String(index + 1),
-            String(item.sku || ""),
-            String(item.name || ""),
-            String(item.size || "-"),
-            String(item.qty ?? item.quantity ?? 1)
-        ]);
+        rows.push([ String(index + 1), String(item.sku || ""), String(item.name || ""), String(item.size || "-"), String(item.qty ?? item.quantity ?? 1) ]);
     });
 
     pdf.autoTable({
@@ -418,9 +225,7 @@ async function exportPDF() {
         head: [["STT", "SKU", "Ten san pham", "Size", "SL"]],
         body: rows,
         theme: "grid",
-        headStyles: {
-            fillColor: [0, 71, 155]
-        }
+        headStyles: { fillColor: [0, 71, 155] }
     });
 
     pdf.save(`${data.rfq_code || data.id}.pdf`);

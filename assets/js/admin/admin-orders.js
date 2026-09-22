@@ -1,6 +1,6 @@
 // ========================================================
 // FILE: admin-orders.js
-// QUẢN LÝ ĐƠN HÀNG (CÓ BỘ LỌC TÌM KIẾM, TRẠNG THÁI, NGÀY THÁNG, THỜI GIAN TOÀN CỤC)
+// QUẢN LÝ ĐƠN HÀNG (GIAO DIỆN TAB TRẠNG THÁI MỚI)
 // ========================================================
 
 const orderState = {
@@ -23,9 +23,8 @@ function cacheOrderDOM() {
     orderDOM.tableBody = document.getElementById("orderTableBody");
     orderDOM.pagination = document.getElementById("paginationContainer");
     orderDOM.search = document.getElementById("searchOrderInput");
-    orderDOM.status = document.getElementById("statusFilter");
     orderDOM.date = document.getElementById("dateFilter"); 
-    orderDOM.globalTimeFilter = document.getElementById("globalTimeFilter"); // <-- DOM MỚI
+    orderDOM.globalTimeFilter = document.getElementById("globalTimeFilter");
     orderDOM.refresh = document.getElementById("btnRefreshOrders");
     
     orderDOM.kpiTotal = document.getElementById("kpiTotal");
@@ -94,14 +93,35 @@ function getTimeRangeDates(range) {
     return { start: start.toISOString(), end: end.toISOString() };
 }
 
-// ÉP QUERY CHẠY THEO THỜI GIAN
 function applyTimeRange(query, timeRangeObj) {
     if (!timeRangeObj) return query;
     return query.gte("created_at", timeRangeObj.start).lte("created_at", timeRangeObj.end);
 }
 
 // ========================================================
-// 3. KPI (ĐÃ TÍCH HỢP LỌC THEO THỜI GIAN TOÀN CỤC HOẶC NGÀY CỤ THỂ)
+// HÀM CLICK CHỌN TAB TRẠNG THÁI TỪ HTML
+// ========================================================
+window.filterByStatus = function(statusValue, btn) {
+    // Đổi màu các nút Tab (Trả về trạng thái xám)
+    document.querySelectorAll('.order-status-btn').forEach(b => {
+        b.classList.remove('bg-white', 'text-kn-blue', 'shadow-sm');
+        b.classList.add('text-gray-500', 'hover:text-gray-800', 'hover:bg-white/50');
+    });
+    
+    // Nút vừa click cho sáng lên (Nổi bật)
+    if(btn) {
+        btn.classList.remove('text-gray-500', 'hover:text-gray-800', 'hover:bg-white/50');
+        btn.classList.add('bg-white', 'text-kn-blue', 'shadow-sm');
+    }
+
+    orderState.status = statusValue;
+    orderState.currentPage = 1;
+    fetchOrders();
+};
+
+
+// ========================================================
+// 3. KPI (LỌC THỜI GIAN TOÀN CỤC HOẶC NGÀY CỤ THỂ)
 // ========================================================
 async function loadOrderKPIs() {
     if (!window.supabaseClient) return;
@@ -109,15 +129,12 @@ async function loadOrderKPIs() {
     try {
         let tr = null;
         
-        // Nếu chọn ngày cụ thể ở dưới bảng -> Tính KPI cho đúng ngày đó
         if (orderState.date) {
             tr = {
                 start: new Date(`${orderState.date}T00:00:00`).toISOString(),
                 end: new Date(`${orderState.date}T23:59:59.999`).toISOString()
             };
-        } 
-        // Nếu không, tính KPI theo bộ lọc ở trên Header (Tháng này, Tháng trước...)
-        else {
+        } else {
             tr = getTimeRangeDates(orderState.timeRange);
         }
 
@@ -168,7 +185,7 @@ async function fetchOrders() {
             .order("created_at", { ascending: false })
             .range(from, to);
 
-        // 1. Lọc Trạng thái
+        // 1. Lọc Trạng thái (từ Tabs)
         if (orderState.status !== "all") {
             query = query.eq("status", orderState.status);
         }
@@ -331,36 +348,22 @@ function bindOrderEvents() {
         });
     }
 
-    // LỌC THEO TRẠNG THÁI
-    if (orderDOM.status) {
-        orderDOM.status.addEventListener("change", () => {
-            orderState.status = orderDOM.status.value;
-            orderState.currentPage = 1;
-            fetchOrders();
-        });
-    }
-
-    // BỘ LỌC NGÀY TRÊN BẢNG (Ghi đè Header)
+    // BỘ LỌC NGÀY TRÊN BẢNG
     if (orderDOM.date) {
         orderDOM.date.addEventListener("change", async () => {
             orderState.date = orderDOM.date.value;
             orderState.currentPage = 1;
-            
-            // Tải lại KPI & Bảng theo ngày vừa chọn
             await Promise.all([fetchOrders(), loadOrderKPIs()]);
         });
     }
 
     // BỘ LỌC THỜI GIAN Ở HEADER
     if (orderDOM.globalTimeFilter) {
-        orderDOM.globalTimeFilter.value = orderState.timeRange; // Set lúc mới vào là Tháng Này
+        orderDOM.globalTimeFilter.value = orderState.timeRange;
         orderDOM.globalTimeFilter.addEventListener("change", async () => {
             orderState.timeRange = orderDOM.globalTimeFilter.value;
-            
-            // Khi thao tác trên Header, xóa cái chọn ngày cụ thể bên dưới để tránh cãi nhau
             orderState.date = "";
             if (orderDOM.date) orderDOM.date.value = "";
-            
             orderState.currentPage = 1;
             
             orderDOM.globalTimeFilter.disabled = true;
@@ -375,17 +378,20 @@ function bindOrderEvents() {
             orderDOM.refresh.disabled = true;
             orderDOM.refresh.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Đang tải...`;
 
-            // Reset Sạch Sẽ Mọi Thứ Về Điểm Xuất Phát
+            // Reset Sạch Sẽ Mọi Thứ
             orderState.searchQuery = "";
             orderState.status = "all";
             orderState.date = "";
-            orderState.timeRange = "this_month"; // Đưa về Tháng này
+            orderState.timeRange = "this_month";
             orderState.currentPage = 1;
 
             if (orderDOM.search) orderDOM.search.value = "";
-            if (orderDOM.status) orderDOM.status.value = "all";
             if (orderDOM.date) orderDOM.date.value = "";
             if (orderDOM.globalTimeFilter) orderDOM.globalTimeFilter.value = "this_month";
+            
+            // Reset tab UI về nút "Tất cả"
+            const allBtn = document.querySelector('.order-status-btn');
+            if (allBtn) window.filterByStatus("all", allBtn);
 
             await Promise.all([fetchOrders(), loadOrderKPIs()]);
 
