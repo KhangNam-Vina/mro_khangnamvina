@@ -636,3 +636,27 @@
     }
 
 }
+
+/* =======================================================
+   ANIMATION: HIỆU ỨNG RUNG (WIGGLE) CHO FLOATING BUTTONS
+   ======================================================= */
+
+@keyframes wiggle {
+    0% { transform: translateY(-3px) rotate(0deg); }
+    15% { transform: translateY(-3px) rotate(-10deg); }
+    30% { transform: translateY(-3px) rotate(10deg); }
+    45% { transform: translateY(-3px) rotate(-10deg); }
+    60% { transform: translateY(-3px) rotate(10deg); }
+    75% { transform: translateY(-3px) rotate(-5deg); }
+    85% { transform: translateY(-3px) rotate(5deg); }
+    100% { transform: translateY(-3px) rotate(0deg); }
+}
+
+/* Áp dụng hiệu ứng wiggle khi hover vào các nút nổi */
+.floating-action:hover {
+    box-shadow: 0 7px 18px rgba(0, 0, 0, 0.2);
+    /* Gọi animation wiggle. Thời gian chạy 0.6s, chạy 1 lần */
+    animation: wiggle 0.6s ease-in-out 1;
+    /* Đảm bảo sau khi chạy xong nó giữ nguyên trạng thái bay nhẹ lên */
+    transform: translateY(-3px); 
+}

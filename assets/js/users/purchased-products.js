@@ -1,31 +1,29 @@
 // ========================================================
-// PURCHASED PRODUCTS LOGIC
+// PURCHASED PRODUCTS LOGIC (CÓ PHÂN TRANG & FIX LỖI ẢNH)
 // ========================================================
 "use strict";
 
 let allPurchasedProducts = [];
+let currentFilteredProducts = []; // Danh sách đang hiển thị (sau khi tìm kiếm)
+let currentPage = 1;
+const itemsPerPage = 10; // Giới hạn 10 sản phẩm 1 trang
 
-const PURCHASED_IMAGE_CDN_BASE =
-    "https://mrokhangnam-image.khangnamvn.workers.dev";
+const PURCHASED_IMAGE_CDN_BASE = "https://mrokhangnam-image.khangnamvn.workers.dev";
 
+// HÀM RÚT GỌN LẤY ẢNH (Bảo vệ JSON parse)
 function buildPurchasedImageUrl(imagePath) {
+    if (!imagePath) return "../assets/images/no-image.png";
+    let cleanPath = String(imagePath).trim();
+    if (!cleanPath) return "../assets/images/no-image.png";
 
-    if (!imagePath) {
-        return "../assets/images/no-image.png";
-    }
+    try {
+        const parsed = JSON.parse(cleanPath);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+            cleanPath = String(parsed[0]).trim();
+        }
+    } catch (e) {}
 
-    const cleanPath =
-        String(imagePath).trim();
-
-    if (!cleanPath) {
-        return "../assets/images/no-image.png";
-    }
-
-    // Giữ an toàn cho dữ liệu cũ nếu còn URL đầy đủ
-    if (/^https?:\/\//i.test(cleanPath)) {
-        return cleanPath;
-    }
-
+    if (/^https?:\/\//i.test(cleanPath)) return cleanPath;
     return `${PURCHASED_IMAGE_CDN_BASE}/${cleanPath.replace(/^\/+/, "")}`;
 }
 
@@ -59,13 +57,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 function handlePurchasedSearch(event) {
     const keyword = String(event.target.value || "").toLowerCase().trim();
-    if (!keyword) { renderProductGrid(allPurchasedProducts); return; }
+    currentPage = 1; // Reset về trang 1 khi tìm kiếm
 
-    const filtered = allPurchasedProducts.filter(p => 
-        String(p.sku || "").toLowerCase().includes(keyword) || 
-        String(p.name || "").toLowerCase().includes(keyword)
-    );
-    renderProductGrid(filtered);
+    if (!keyword) { 
+        currentFilteredProducts = [...allPurchasedProducts];
+    } else {
+        currentFilteredProducts = allPurchasedProducts.filter(p => 
+            String(p.sku || "").toLowerCase().includes(keyword) || 
+            String(p.name || "").toLowerCase().includes(keyword)
+        );
+    }
+    
+    renderProductPage();
 }
 
 async function fetchPurchasedHistory(userId) {
@@ -103,13 +106,33 @@ async function fetchPurchasedHistory(userId) {
         if (productError) throw productError;
 
         allPurchasedProducts = Array.isArray(products) ? products : [];
-        if (countElement) countElement.textContent = allPurchasedProducts.length;
-
-        renderProductGrid(allPurchasedProducts);
+        currentFilteredProducts = [...allPurchasedProducts];
+        
+        renderProductPage();
 
     } catch (error) {
         if (grid) grid.innerHTML = `<div class="purchased-message is-error">Lỗi tải dữ liệu. Vui lòng thử lại sau.</div>`;
     }
+}
+
+// LOGIC PHÂN TRANG
+function renderProductPage() {
+    const totalItems = currentFilteredProducts.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    // Cập nhật số đếm
+    const countElement = document.getElementById("totalItemsCount");
+    if (countElement) countElement.textContent = totalItems;
+
+    // Giữ vị trí trang hợp lệ
+    if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pageItems = currentFilteredProducts.slice(startIndex, endIndex);
+
+    renderProductGrid(pageItems);
+    renderPaginationUI(totalItems, totalPages);
 }
 
 function renderProductGrid(products) {
@@ -135,9 +158,7 @@ function renderProductGrid(products) {
 
         const productForCart = { id: item.id, sku: item.sku, name: item.name, brand: brandName, unit: item.unit || "Cái", qty: 1 };
         const productJSON = JSON.stringify(productForCart).replace(/'/g, "&#39;");
-        const safeImage = escapeHTML(
-    buildPurchasedImageUrl(item.image_path)
-);
+        const safeImage = escapeHTML(buildPurchasedImageUrl(item.image_path));
         const safeSku = escapeHTML(item.sku || "");
         const safeName = escapeHTML(item.name || "Sản phẩm");
         const safeBrand = escapeHTML(brandName);
@@ -164,6 +185,58 @@ function renderProductGrid(products) {
     });
     grid.innerHTML = html;
 }
+
+// VẼ NÚT PHÂN TRANG (Tương thích CSS tĩnh)
+function renderPaginationUI(totalItems, totalPages) {
+    const container = document.getElementById("purchasedPagination");
+    if (!container) return;
+
+    if (totalPages <= 1) {
+        container.innerHTML = "";
+        return;
+    }
+
+    const baseBtnStyle = "padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s;";
+    const activeBtnStyle = baseBtnStyle + " background: #00479b; color: #fff; border: 1px solid #00479b;";
+    const inactiveBtnStyle = baseBtnStyle + " background: #fff; color: #4b5563; border: 1px solid #d1d5db;";
+    const disabledBtnStyle = baseBtnStyle + " background: #f9fafb; color: #9ca3af; border: 1px solid #e5e7eb; cursor: not-allowed;";
+
+    let html = "";
+
+    // Nút "Trước"
+    const prevStyle = currentPage === 1 ? disabledBtnStyle : inactiveBtnStyle;
+    const prevDisabled = currentPage === 1 ? "disabled" : "";
+    html += `<button type="button" onclick="goToPage(${currentPage - 1})" style="${prevStyle}" ${prevDisabled}>← Trước</button>`;
+
+    // Các số trang
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + 4);
+    if (endPage - startPage < 4) {
+        startPage = Math.max(1, endPage - 4);
+    }
+
+    for (let p = startPage; p <= endPage; p++) {
+        const style = p === currentPage ? activeBtnStyle : inactiveBtnStyle;
+        html += `<button type="button" onclick="goToPage(${p})" style="${style}">${p}</button>`;
+    }
+
+    // Nút "Sau"
+    const nextStyle = currentPage === totalPages ? disabledBtnStyle : inactiveBtnStyle;
+    const nextDisabled = currentPage === totalPages ? "disabled" : "";
+    html += `<button type="button" onclick="goToPage(${currentPage + 1})" style="${nextStyle}" ${nextDisabled}>Sau →</button>`;
+
+    container.innerHTML = html;
+}
+
+window.goToPage = function(page) {
+    const totalPages = Math.ceil(currentFilteredProducts.length / itemsPerPage);
+    if (page >= 1 && page <= totalPages) {
+        currentPage = page;
+        renderProductPage();
+        // Cuộn mượt mà lên đầu danh sách
+        document.querySelector('.purchased-toolbar').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+};
 
 window.reorderProduct = function (product) {
     if (!product || !product.sku) return;

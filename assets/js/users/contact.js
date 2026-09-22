@@ -20,12 +20,11 @@ async function loadContactConfig() {
             throw new Error("Chưa kết nối được hệ thống.");
         }
 
-        const { data, error } =
-            await window.supabaseClient
-                .from("contact_page")
-                .select("*")
-                .eq("id", 1)
-                .maybeSingle();
+        const { data, error } = await window.supabaseClient
+            .from("contact_page")
+            .select("*")
+            .eq("id", 1)
+            .maybeSingle();
 
         if (error) {
             throw error;
@@ -35,164 +34,92 @@ async function loadContactConfig() {
             return;
         }
 
-
         // ------------------------------------------------
         // HOTLINE
         // ------------------------------------------------
-
         if (data.hotline) {
-            const hotline =
-                document.getElementById("txtHotline");
+            const hotline = document.getElementById("txtHotline");
+            const hotlineCTA = document.getElementById("txtHotlineCTA");
+            const hotlineLink = document.getElementById("linkHotlineCTA");
 
-            const hotlineCTA =
-                document.getElementById("txtHotlineCTA");
-
-            const hotlineLink =
-                document.getElementById("linkHotlineCTA");
-
-            if (hotline) {
-                hotline.textContent =
-                    data.hotline;
-            }
-
-            if (hotlineCTA) {
-                hotlineCTA.textContent =
-                    data.hotline;
-            }
-
-            if (hotlineLink) {
-                hotlineLink.href =
-                    `tel:${data.hotline.replace(/\s+/g, "")}`;
-            }
+            if (hotline) hotline.textContent = data.hotline;
+            if (hotlineCTA) hotlineCTA.textContent = data.hotline;
+            if (hotlineLink) hotlineLink.href = `tel:${data.hotline.replace(/\s+/g, "")}`;
         }
-
 
         // ------------------------------------------------
         // EMAIL
         // ------------------------------------------------
-
         if (data.email_sales) {
-            const email =
-                document.getElementById("txtEmail");
-
-            if (email) {
-                email.textContent =
-                    data.email_sales;
-            }
+            const email = document.getElementById("txtEmail");
+            if (email) email.textContent = data.email_sales;
         }
-
 
         // ------------------------------------------------
         // ADDRESS
         // ------------------------------------------------
-
         if (data.address) {
-            const address =
-                document.getElementById("txtAddress");
-
-            if (address) {
-                address.textContent =
-                    data.address;
-            }
+            const address = document.getElementById("txtAddress");
+            if (address) address.textContent = data.address;
         }
-
 
         // ------------------------------------------------
         // SUPPORT TIME
         // ------------------------------------------------
-
         if (data.support_time) {
-            const supportTime =
-                document.getElementById("txtSupportTime");
-
-            if (supportTime) {
-                supportTime.textContent =
-                    data.support_time;
-            }
+            const supportTime = document.getElementById("txtSupportTime");
+            if (supportTime) supportTime.textContent = data.support_time;
         }
-
 
         // ------------------------------------------------
         // MAP
         // ------------------------------------------------
-
         if (data.map_iframe_url) {
-            const map =
-                document.getElementById("mapIframe");
-
-            if (map) {
-                map.src =
-                    data.map_iframe_url;
-            }
+            const map = document.getElementById("mapIframe");
+            if (map) map.src = data.map_iframe_url;
         }
-
 
         // ------------------------------------------------
         // SOCIAL PROOF
         // ------------------------------------------------
-
         const proofList = document.getElementById("contactProofList");
 
-if (proofList) {
-    proofList.innerHTML = "";
+        if (proofList) {
+            proofList.innerHTML = "";
 
-    const proofs = Array.isArray(data.proofs)
-        ? data.proofs
-        : [];
+            const proofs = Array.isArray(data.proofs) ? data.proofs : [];
 
-    proofs
-        .filter(proof => typeof proof === "string" && proof.trim())
-        .forEach(proof => {
-            const li = document.createElement("li");
-            li.className = "contact-proof-item";
+            proofs
+                .filter(proof => typeof proof === "string" && proof.trim())
+                .forEach(proof => {
+                    const li = document.createElement("li");
+                    li.className = "contact-proof-item";
 
-            li.innerHTML = `
-                <svg
-                    class="contact-proof-icon"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    ></path>
-                </svg>
+                    li.innerHTML = `
+                        <svg
+                            class="contact-proof-icon"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            ></path>
+                        </svg>
+                        <span></span>
+                    `;
 
-                <span></span>
-            `;
-
-            li.querySelector("span").textContent = proof;
-            proofList.appendChild(li);
-        });
-}
-
-        Object.entries(proofMap).forEach(
-            ([field, elementId]) => {
-
-                if (!data[field]) {
-                    return;
-                }
-
-                const element =
-                    document.getElementById(elementId);
-
-                if (element) {
-                    element.textContent =
-                        data[field];
-                }
-            }
-        );
-
+                    li.querySelector("span").textContent = proof;
+                    proofList.appendChild(li);
+                });
+        }
+        
     } catch (error) {
-
-        console.error(
-            "Lỗi tải cấu hình trang liên hệ:",
-            error
-        );
+        console.error("Lỗi tải cấu hình trang liên hệ:", error);
     }
 }
 

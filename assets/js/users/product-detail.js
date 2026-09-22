@@ -732,7 +732,6 @@ pdSetJsonLd(productJsonLd);
         if (salesMode === "BOTH" || salesMode === "RFQ") {
             actionHtml += `
                 <button type="button" onclick="addToRFQCart()" class="product-action-button action-rfq">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     Thêm Yêu Cầu Báo Giá
                 </button>
             `;
@@ -741,7 +740,7 @@ pdSetJsonLd(productJsonLd);
         if ((salesMode === "BOTH" || salesMode === "BUY") && Number(item.price) > 0) {
             actionHtml += `
                 <button type="button" onclick="addToShoppingCart()" class="product-action-button action-buy">
-                    <span aria-hidden="true">🛒</span> ${isEditingCart ? "Cập nhật Giỏ hàng" : "Mua Ngay"}
+                    <span aria-hidden="true"></span> ${isEditingCart ? "Cập nhật Giỏ hàng" : "Mua Ngay"}
                 </button>
             `;
         }
@@ -1154,7 +1153,7 @@ function initMagnifierZoom() {
 }
 
 /* ========================================================
-   HIỆU ỨNG TỰ ĐỘNG CHUYỂN ẢNH (AUTO SLIDER)
+   HIỆU ỨNG TỰ ĐỘNG CHUYỂN ẢNH (AUTO SLIDER) - FIX LỖI CUỘN TRANG
 ======================================================== */
 let autoSlideTimer;
 
@@ -1162,7 +1161,6 @@ function initAutoImageSlider() {
     const wrapper = document.querySelector('.product-main-image-wrapper');
     const thumbList = document.getElementById('thumbnailList');
     
-    // Đợi 1 chút để DOM render xong danh sách ảnh
     setTimeout(() => {
         const thumbnails = document.querySelectorAll('.thumbnail-item');
 
@@ -1170,26 +1168,29 @@ function initAutoImageSlider() {
         if (!wrapper || thumbnails.length <= 1) return;
 
         function nextSlide() {
-            // Tìm ảnh đang sáng (active) hiện tại
             const currentActive = document.querySelector('.thumbnail-item.is-active');
             if (!currentActive) return;
 
-            // Tìm vị trí của nó trong danh sách
             const thumbsArray = Array.from(document.querySelectorAll('.thumbnail-item'));
             let currentIndex = thumbsArray.indexOf(currentActive);
-
-            // Tính vị trí ảnh tiếp theo (nếu đang ở ảnh cuối thì quay lại ảnh đầu)
             let nextIndex = (currentIndex + 1) % thumbsArray.length;
 
-            // Tự động kích hoạt click vào ảnh tiếp theo
+            // Kích hoạt click vào ảnh tiếp theo
             thumbsArray[nextIndex].click();
             
-            // Cuộn thanh thumbnail để ảnh luôn nằm trong tầm nhìn
-            thumbsArray[nextIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            // FIX LỖI NHẢY TRANG: 
+            // Cuộn thủ công bằng scrollLeft thay vì dùng scrollIntoView
+            if (thumbList) {
+                const targetThumb = thumbsArray[nextIndex];
+                const scrollPos = targetThumb.offsetLeft - (thumbList.offsetWidth / 2) + (targetThumb.offsetWidth / 2);
+                thumbList.scrollTo({
+                    left: scrollPos,
+                    behavior: 'smooth'
+                });
+            }
         }
 
         function startSlide() {
-            // Đổi ảnh mỗi 3.5 giây (3500ms)
             autoSlideTimer = setInterval(nextSlide, 3500);
         }
 
@@ -1197,14 +1198,11 @@ function initAutoImageSlider() {
             clearInterval(autoSlideTimer);
         }
 
-        // 1. Bắt đầu chạy Slide
         startSlide();
 
-        // 2. DỪNG LẠI khi khách rê chuột vào xem kính lúp
         wrapper.addEventListener('mouseenter', stopSlide);
         wrapper.addEventListener('mouseleave', startSlide);
 
-        // 3. RESET thời gian nếu khách tự bấm tay vào hình nhỏ
         if (thumbList) {
             thumbList.addEventListener('click', function(e) {
                 if (e.target.closest('.thumbnail-item')) {
@@ -1213,7 +1211,7 @@ function initAutoImageSlider() {
                 }
             });
         }
-    }, 500); // Trễ 0.5s để đảm bảo ảnh đã load xong từ Database
+    }, 500);
 }
 
 /* ========================================================

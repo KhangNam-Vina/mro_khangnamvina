@@ -91,14 +91,13 @@
                 <!-- ORDER CONTENT -->
                 <div id="orderDetailContent" class="order-detail-content d-none">
 
-                    <!-- HEADER ĐƠN -->
+                    <!-- HEADER ĐƠN (Đã xóa nhãn góc phải) -->
                     <section class="order-detail-card">
                         <div class="order-detail-card-header">
                             <div>
                                 <p class="order-detail-eyebrow">Đơn hàng</p>
                                 <h2 id="orderCode" class="order-detail-code">-</h2>
                             </div>
-                            <span id="orderStatus" class="status-badge status-pending">Đang tải</span>
                         </div>
 
                         <div class="order-summary-grid">
@@ -115,33 +114,44 @@
                                 <strong id="orderItemCount" class="order-summary-value">0</strong>
                             </div>
                             <div class="order-summary-item">
-                                <span class="order-summary-label">Tổng tiền</span>
+                                <span class="order-summary-label">Tổng tiền hàng</span>
                                 <strong id="orderTotal" class="order-summary-value order-summary-total">0 đ</strong>
                             </div>
                         </div>
                     </section>
 
-                    <!-- SHIPPING -->
+                    <!-- SHIPPING & PAYMENT -->
                     <section class="order-detail-card">
                         <div class="order-detail-section-header">
-                            <h2 class="order-detail-section-title">Thông tin giao hàng</h2>
+                            <h2 class="order-detail-section-title" style="text-transform: uppercase;">Thông tin giao hàng & Thanh toán</h2>
                         </div>
-                        <div class="shipping-info-grid">
+                        
+                        <div class="shipping-info-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 24px; padding: 24px;">
                             <div class="shipping-info-item">
-                                <span class="shipping-info-label">Người nhận</span>
-                                <strong id="shippingName" class="shipping-info-value">-</strong>
+                                <span class="shipping-info-label" style="display: block; font-size: 10px; font-weight: 800; color: #6b7280; text-transform: uppercase; margin-bottom: 6px;">Người nhận</span>
+                                <strong id="shippingName" class="shipping-info-value" style="font-size: 13px; font-weight: 700; color: #111827;">-</strong>
                             </div>
+                            
                             <div class="shipping-info-item">
-                                <span class="shipping-info-label">Số điện thoại</span>
-                                <strong id="shippingPhone" class="shipping-info-value">-</strong>
+                                <span class="shipping-info-label" style="display: block; font-size: 10px; font-weight: 800; color: #6b7280; text-transform: uppercase; margin-bottom: 6px;">Số điện thoại</span>
+                                <strong id="shippingPhone" class="shipping-info-value" style="font-size: 13px; font-weight: 700; color: #111827;">-</strong>
                             </div>
-                            <div class="shipping-info-item">
-                                <span class="shipping-info-label">Địa chỉ giao hàng</span>
-                                <strong id="shippingAddress" class="shipping-info-value">-</strong>
+                            
+                            <div class="shipping-info-item" style="grid-column: 1 / -1;">
+                                <span class="shipping-info-label" style="display: block; font-size: 10px; font-weight: 800; color: #6b7280; text-transform: uppercase; margin-bottom: 6px;">Địa chỉ giao hàng</span>
+                                <strong id="shippingAddress" class="shipping-info-value" style="font-size: 13px; font-weight: 700; color: #111827; line-height: 1.5;">-</strong>
                             </div>
-                            <div class="shipping-info-item">
-                                <span class="shipping-info-label">Ghi chú đơn hàng</span>
-                                <strong id="shippingNote" class="shipping-info-value">-</strong>
+                            
+                            <!-- Ghi chú nằm ở cột trái -->
+                            <div class="shipping-info-item" style="border-top: 1px dashed #e5e7eb; padding-top: 20px; margin-top: 4px;">
+                                <span class="shipping-info-label" style="display: block; font-size: 10px; font-weight: 800; color: #6b7280; text-transform: uppercase; margin-bottom: 6px;">Ghi chú đơn hàng</span>
+                                <strong id="shippingNote" class="shipping-info-value" style="font-size: 13px; font-weight: 700; color: #111827; line-height: 1.5;">-</strong>
+                            </div>
+                            
+                            <!-- Thanh toán nằm ở cột phải -->
+                            <div class="shipping-info-item" style="border-top: 1px dashed #e5e7eb; padding-top: 20px; margin-top: 4px;">
+                                <span class="shipping-info-label" style="display: block; font-size: 10px; font-weight: 800; color: #6b7280; text-transform: uppercase; margin-bottom: 6px;">Phương thức thanh toán</span>
+                                <strong id="paymentMethod" class="shipping-info-value" style="color: #00479b; font-size: 13px; font-weight: 800;">-</strong>
                             </div>
                         </div>
                     </section>
@@ -149,29 +159,32 @@
                     <!-- PRODUCTS -->
                     <section class="order-detail-card">
                         <div class="order-detail-section-header">
-                            <h2 class="order-detail-section-title">Sản phẩm trong đơn hàng</h2>
+                            <h2 class="order-detail-section-title" style="text-transform: uppercase;">Sản phẩm trong đơn hàng</h2>
                             <p class="order-detail-section-desc">Danh sách sản phẩm đã được ghi nhận tại thời điểm đặt hàng.</p>
                         </div>
 
-                        <div class="order-items-table-wrapper">
-                            <table class="order-items-table" style="width: 100%; border-collapse: collapse;">
-                                <thead style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+                        <div class="order-items-table-wrapper" style="overflow-x: auto;">
+                            <table class="order-items-table" style="width: 100%; min-width: 700px; border-collapse: collapse;">
+                                <thead style="background: #f9fafb; border-bottom: 1px solid #e5e7eb; border-top: 1px solid #e5e7eb;">
                                     <tr>
-                                        <th style="padding: 16px; text-align: left; font-size: 11px; text-transform: uppercase; font-weight: 900; color: #6b7280;">Sản phẩm</th>
-                                        <th style="padding: 16px; text-align: left; font-size: 11px; text-transform: uppercase; font-weight: 900; color: #6b7280;">SKU</th>
-                                        <th style="padding: 16px; text-align: center; font-size: 11px; text-transform: uppercase; font-weight: 900; color: #6b7280;">Size</th>
-                                        <th style="padding: 16px; text-align: right; font-size: 11px; text-transform: uppercase; font-weight: 900; color: #6b7280;">Đơn giá</th>
-                                        <th style="padding: 16px; text-align: center; font-size: 11px; text-transform: uppercase; font-weight: 900; color: #6b7280;">SL</th>
-                                        <th style="padding: 16px; text-align: right; font-size: 11px; text-transform: uppercase; font-weight: 900; color: #6b7280;">Thành tiền</th>
+                                        <th style="padding: 14px 16px; text-align: left; font-size: 11px; text-transform: uppercase; font-weight: 800; color: #6b7280;">Sản phẩm</th>
+                                        <th style="padding: 14px 16px; text-align: left; font-size: 11px; text-transform: uppercase; font-weight: 800; color: #6b7280;">SKU</th>
+                                        <th style="padding: 14px 16px; text-align: center; font-size: 11px; text-transform: uppercase; font-weight: 800; color: #6b7280;">Size</th>
+                                        <th style="padding: 14px 16px; text-align: right; font-size: 11px; text-transform: uppercase; font-weight: 800; color: #6b7280;">Đơn giá</th>
+                                        <th style="padding: 14px 16px; text-align: center; font-size: 11px; text-transform: uppercase; font-weight: 800; color: #6b7280;">SL</th>
+                                        <th style="padding: 14px 16px; text-align: right; font-size: 11px; text-transform: uppercase; font-weight: 800; color: #6b7280;">Thành tiền</th>
                                     </tr>
                                 </thead>
                                 <tbody id="orderItemsBody"></tbody>
                             </table>
                         </div>
 
-                        <div class="order-total-box">
-                            <span>Tổng tiền đơn hàng</span>
-                            <strong id="orderTotalBottom">0 đ</strong>
+                        <!-- CHI TIẾT TỔNG TIỀN (Chỉ hiển thị tổng tiền hàng) -->
+                        <div class="order-total-box" style="display: flex; justify-content: flex-end; padding: 24px; background: #fff; border-top: 1px solid #e5e7eb;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 380px;">
+                                <span style="font-size: 14px; font-weight: 900; color: #111827; text-transform: uppercase;">Tổng tiền hàng:</span>
+                                <strong id="orderTotalBottom" style="font-size: 20px; color: #ff5e00; font-weight: 900;">0 đ</strong>
+                            </div>
                         </div>
                     </section>
 
@@ -190,39 +203,40 @@
                 </div>
             </div>
         </div>
-        <!-- MODAL LÝ DO HỦY ĐƠN HÀNG (BƠM VÀO TRƯỚC THẺ </main>) -->
-    <div id="cancelOrderModal" class="cancel-modal-overlay d-none no-print">
-        <div class="cancel-modal-box">
-            <h3 class="cancel-modal-title">Lý do hủy đơn hàng</h3>
-            <p class="cancel-modal-desc">Vui lòng cho Khang Nam biết lý do bạn muốn hủy đơn hàng này nhé:</p>
-            
-            <form id="cancelOrderForm">
-                <label class="cancel-reason-label">
-                    <input type="radio" name="cancel_reason" value="Thay đổi ý định mua hàng" checked>
-                    <span>Thay đổi ý định mua hàng</span>
-                </label>
-                <label class="cancel-reason-label">
-                    <input type="radio" name="cancel_reason" value="Tìm thấy giá rẻ hơn ở nơi khác">
-                    <span>Tìm thấy giá rẻ hơn ở nơi khác</span>
-                </label>
-                <label class="cancel-reason-label">
-                    <input type="radio" name="cancel_reason" value="Đặt nhầm sản phẩm / số lượng">
-                    <span>Đặt nhầm sản phẩm / số lượng</span>
-                </label>
-                <label class="cancel-reason-label">
-                    <input type="radio" name="cancel_reason" value="Khác">
-                    <span>Lý do khác...</span>
-                </label>
+        
+        <!-- MODAL LÝ DO HỦY ĐƠN HÀNG -->
+        <div id="cancelOrderModal" class="cancel-modal-overlay d-none no-print">
+            <div class="cancel-modal-box">
+                <h3 class="cancel-modal-title">Lý do hủy đơn hàng</h3>
+                <p class="cancel-modal-desc">Vui lòng cho Khang Nam biết lý do bạn muốn hủy đơn hàng này nhé:</p>
                 
-                <textarea id="cancelReasonOther" class="cancel-reason-textarea d-none" placeholder="Nhập lý do của bạn (Tùy chọn)..."></textarea>
+                <form id="cancelOrderForm">
+                    <label class="cancel-reason-label">
+                        <input type="radio" name="cancel_reason" value="Thay đổi ý định mua hàng" checked>
+                        <span>Thay đổi ý định mua hàng</span>
+                    </label>
+                    <label class="cancel-reason-label">
+                        <input type="radio" name="cancel_reason" value="Tìm thấy giá rẻ hơn ở nơi khác">
+                        <span>Tìm thấy giá rẻ hơn ở nơi khác</span>
+                    </label>
+                    <label class="cancel-reason-label">
+                        <input type="radio" name="cancel_reason" value="Đặt nhầm sản phẩm / số lượng">
+                        <span>Đặt nhầm sản phẩm / số lượng</span>
+                    </label>
+                    <label class="cancel-reason-label">
+                        <input type="radio" name="cancel_reason" value="Khác">
+                        <span>Lý do khác...</span>
+                    </label>
+                    
+                    <textarea id="cancelReasonOther" class="cancel-reason-textarea d-none" placeholder="Nhập lý do của bạn (Tùy chọn)..."></textarea>
 
-                <div class="cancel-modal-actions">
-                    <button type="button" class="btn-cancel-modal" onclick="closeCancelModal()">Không, giữ lại đơn</button>
-                    <button type="submit" class="btn-confirm-modal" id="btnConfirmCancel">Xác nhận Hủy</button>
-                </div>
-            </form>
+                    <div class="cancel-modal-actions">
+                        <button type="button" class="btn-cancel-modal" onclick="closeCancelModal()">Không, giữ lại đơn</button>
+                        <button type="submit" class="btn-confirm-modal" id="btnConfirmCancel">Xác nhận Hủy</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
     </main>
 
     <div id="app-footer" class="no-print"></div>

@@ -60,16 +60,15 @@
                             <p id="orderCreatedAt" class="text-sm text-gray-500 mt-2">-</p>
                         </div>
                         <div class="flex flex-wrap items-center gap-3">
-                            <span id="orderStatusBadge" class="inline-flex px-3 py-1.5 rounded-full border text-xs font-black">-</span>
                             <select id="orderStatusSelect" class="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm font-bold outline-none focus:border-kn-blue cursor-pointer"></select>
                             <button id="btnUpdateOrderStatus" type="button" class="px-4 py-2 rounded-lg bg-kn-orange text-white hover:bg-orange-600 text-sm font-black transition">Cập nhật trạng thái</button>
                         </div>
                     </div>
                 </section>
 
-                <!-- STATUS PROGRESS -->
+                <!-- STATUS PROGRESS (THANH TIẾN TRÌNH 1-5 ĐƯỢC KHÔI PHỤC TẠI ĐÂY) -->
                 <section class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-                    <div id="orderStatusProgress" class="flex items-start gap-2 overflow-x-auto"></div>
+                    <div id="orderStatusProgress" class="flex items-start justify-between gap-2 overflow-x-auto w-full"></div>
                     <div id="orderStatusDescription" class="mt-5 pt-4 border-t border-gray-200 text-sm font-medium text-gray-500"></div>
                 </section>
 
@@ -90,66 +89,49 @@
                     <!-- LEFT COLUMN (Chiếm 2/3) -->
                     <div class="lg:col-span-2 space-y-6">
 
-                        <!-- KHỐI KHÁCH HÀNG & GIAO HÀNG -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- KHỐI THÔNG TIN GIAO HÀNG & THANH TOÁN -->
+                        <div class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6">
+                            <h3 class="font-black text-gray-900 text-sm uppercase tracking-wider mb-5 pb-3 border-b border-gray-100">Thông tin giao hàng & Thanh toán</h3>
                             
-                            <!-- 1. KHÁCH HÀNG -->
-                            <section class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-5 flex flex-col justify-between">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
                                 <div>
-                                    <div class="mb-4 pb-3 border-b border-gray-100">
-                                        <h3 class="font-black text-kn-blue text-sm uppercase tracking-wide">Người đặt hàng</h3>
-                                    </div>
-                                    <div class="space-y-3">
-                                        <div>
-                                            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Họ & Tên</p>
-                                            <p id="customerName" class="text-base font-black text-gray-900 mt-0.5">-</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Số điện thoại</p>
-                                            <p id="customerPhone" class="text-sm font-bold text-gray-800 font-mono mt-0.5">-</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Email</p>
-                                            <p id="customerEmail" class="text-xs font-semibold text-gray-600 mt-0.5 break-all">-</p>
-                                        </div>
-                                    </div>
+                                    <p class="text-[10px] font-black text-gray-500 uppercase tracking-wider mb-1.5">Người nhận</p>
+                                    <p id="shippingName" class="text-[13px] font-bold text-gray-900">-</p>
                                 </div>
-                            </section>
-
-                            <!-- 2. GIAO HÀNG -->
-                            <section class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-5 flex flex-col justify-between">
+                                
                                 <div>
-                                    <div class="mb-4 pb-3 border-b border-gray-100">
-                                        <h3 class="font-black text-kn-orange text-sm uppercase tracking-wide">Địa chỉ nhận hàng</h3>
-                                    </div>
-                                    <div class="space-y-3">
-                                        <div class="flex justify-between items-start gap-2">
-                                            <div>
-                                                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Người nhận</p>
-                                                <p id="shippingName" class="text-sm font-black text-gray-900 mt-0.5">-</p>
-                                            </div>
-                                            <div class="text-right">
-                                                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">SĐT Nhận</p>
-                                                <p id="shippingPhone" class="text-sm font-bold text-gray-800 font-mono mt-0.5">-</p>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Địa chỉ chi tiết</p>
-                                            <p id="shippingAddress" class="text-xs font-semibold text-gray-700 mt-1 leading-relaxed bg-gray-50 p-2.5 rounded-lg border border-gray-100">-</p>
-                                        </div>
-                                    </div>
+                                    <p class="text-[10px] font-black text-gray-500 uppercase tracking-wider mb-1.5">Số điện thoại</p>
+                                    <p id="shippingPhone" class="text-[13px] font-bold text-gray-900">-</p>
                                 </div>
-                            </section>
-
+                                
+                                <div class="col-span-1 md:col-span-2">
+                                    <p class="text-[10px] font-black text-gray-500 uppercase tracking-wider mb-1.5">Địa chỉ giao hàng</p>
+                                    <p id="shippingAddress" class="text-[13px] font-bold text-gray-900 leading-relaxed">-</p>
+                                </div>
+                                
+                                <!-- Ghi chú ép vào cột trái -->
+                                <div class="col-span-1 border-t border-dashed border-gray-200 pt-5 mt-1">
+                                    <p class="text-[10px] font-black text-gray-500 uppercase tracking-wider mb-1.5">Ghi chú đơn hàng</p>
+                                    <p id="shippingNote" class="text-[13px] font-bold text-gray-900 leading-relaxed">-</p>
+                                </div>
+                                
+                                <!-- Thanh toán ép vào cột phải -->
+                                <div class="col-span-1 border-t border-dashed border-gray-200 pt-5 mt-1">
+                                    <p class="text-[10px] font-black text-gray-500 uppercase tracking-wider mb-1.5">Phương thức thanh toán</p>
+                                    <p id="paymentMethod" class="text-[13px] font-black text-kn-blue">-</p>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- ITEMS: SẢN PHẨM TRONG ĐƠN -->
                         <section class="bg-white border border-gray-200/80 rounded-2xl shadow-sm overflow-hidden">
-                            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
                                 <h3 class="font-black text-gray-900 text-sm uppercase tracking-wider">
-                                    Danh mục vật tư đặt mua
+                                    Sản phẩm trong đơn hàng
                                 </h3>
+                                <p class="text-[11px] text-gray-500 mt-1">Danh sách sản phẩm đã được ghi nhận tại thời điểm đặt hàng.</p>
                             </div>
+                            
                             <div class="overflow-x-auto">
                                 <table class="w-full min-w-[700px]">
                                     <thead class="bg-gray-50/80 border-b border-gray-100">
@@ -165,86 +147,73 @@
                                     <tbody id="orderItemsBody" class="divide-y divide-gray-100 text-sm"></tbody>
                                 </table>
                             </div>
-                        </section>
 
-                        <!-- NOTE GHI CHÚ -->
-                        <section id="orderNoteSection" class="hidden bg-amber-50/60 border border-amber-200/70 rounded-2xl p-5">
-                            <div class="mb-2 text-amber-800">
-                                <h3 class="text-xs font-black uppercase tracking-wider">Ghi chú từ khách hàng</h3>
+                            <!-- CHI TIẾT TỔNG TIỀN -->
+                            <div class="p-6 bg-white border-t border-gray-200 flex flex-col items-end gap-3">
+                                <div class="flex justify-between items-center w-full max-w-[380px]">
+                                    <span class="text-xs font-bold text-gray-500 uppercase">Tổng tiền hàng:</span>
+                                    <strong id="orderSubtotalBottom" class="text-sm font-black text-gray-900">0 ₫</strong>
+                                </div>
+                                <div class="flex justify-between items-center w-full max-w-[380px]">
+                                    <span class="text-xs font-bold text-gray-500 uppercase">Phí vận chuyển:</span>
+                                    <strong class="text-sm font-black text-gray-600">Liên hệ sau</strong>
+                                </div>
+                                <div class="flex justify-between items-center w-full max-w-[380px]">
+                                    <span class="text-xs font-bold text-gray-500 uppercase">Thuế VAT (8-10%):</span>
+                                    <strong class="text-sm font-black text-gray-600">Chưa bao gồm</strong>
+                                </div>
+                                <div class="flex justify-between items-center w-full max-w-[380px] border-t border-gray-200 pt-4 mt-1">
+                                    <span class="text-sm font-black text-gray-900 uppercase">Tổng thanh toán:</span>
+                                    <strong id="orderTotalBottom" class="text-xl font-black text-kn-orange">0 ₫</strong>
+                                </div>
                             </div>
-                            <p id="orderNote" class="text-sm text-amber-900 font-medium leading-relaxed bg-white/70 p-3 rounded-xl border border-amber-100"></p>
                         </section>
                     </div>
 
                     <!-- RIGHT COLUMN (Chiếm 1/3) -->
-                    <div class="space-y-5">
+                    <div class="space-y-6">
 
-                        <!-- 1. THÔNG TIN ĐƠN -->
-                        <section class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-5">
-                            <h3 class="font-black text-gray-900 text-sm uppercase tracking-wider mb-4 pb-2 border-b border-gray-100">
-                                Thông tin đơn
+                        <!-- 1. THÔNG TIN KHÁCH HÀNG (Người đặt hàng) -->
+                        <section class="bg-white border border-gray-200/80 rounded-2xl shadow-sm p-6">
+                            <h3 class="font-black text-gray-900 text-sm uppercase tracking-wider mb-4 pb-3 border-b border-gray-100">
+                                Tài khoản đặt hàng
                             </h3>
-                            <div class="space-y-3.5">
-                                <div class="flex justify-between items-center py-1">
-                                    <span class="text-xs font-bold text-gray-400 uppercase">Mã đơn</span>
+                            <div class="space-y-4">
+                                <div>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Họ & Tên</p>
+                                    <p id="customerName" class="text-sm font-black text-gray-900">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Số điện thoại</p>
+                                    <p id="customerPhone" class="text-[13px] font-bold text-gray-800 font-mono">-</p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Email</p>
+                                    <p id="customerEmail" class="text-[13px] font-semibold text-gray-600 break-all">-</p>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- 2. THÔNG TIN ĐƠN NHANH -->
+                        <section class="bg-blue-50/40 border border-blue-100 rounded-2xl p-6">
+                            <h3 class="font-black text-kn-blue text-sm uppercase tracking-wider mb-4 pb-3 border-b border-blue-100/60">
+                                Tóm tắt đơn hàng
+                            </h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-bold text-gray-500 uppercase">Mã đơn</span>
                                     <span id="quickOrderCode" class="text-sm font-black text-kn-blue font-mono">-</span>
                                 </div>
-                                <div class="flex justify-between items-center py-1 border-t border-gray-50">
-                                    <span class="text-xs font-bold text-gray-400 uppercase">Ngày tạo</span>
-                                    <span id="quickCreatedAt" class="text-xs font-bold text-gray-700">-</span>
+                                <div class="flex justify-between items-center border-t border-blue-100/40 pt-3">
+                                    <span class="text-xs font-bold text-gray-500 uppercase">Ngày tạo</span>
+                                    <span id="quickCreatedAt" class="text-xs font-bold text-gray-800">-</span>
                                 </div>
-                                <div class="flex justify-between items-center py-1 border-t border-gray-50">
-                                    <span class="text-xs font-bold text-gray-400 uppercase">Tổng số lượng</span>
-                                    <span id="quickItemsCount" class="text-xs font-black bg-gray-100 px-2 py-0.5 rounded text-gray-800">0</span>
-                                </div>
-                            </div>
-                        </section>
-
-                        <!-- 2. VẬN CHUYỂN & THANH TOÁN -->
-                        <section class="bg-blue-50/40 border border-blue-100 rounded-2xl p-5">
-                            <h3 class="font-black text-kn-blue text-sm uppercase tracking-wider mb-4 pb-2 border-b border-blue-100/60">
-                                Thanh toán & Vận chuyển
-                            </h3>
-                            <div class="space-y-3.5 text-xs">
-                                <div>
-                                    <p class="font-bold text-gray-400 uppercase text-[10px]">Phương thức thanh toán</p>
-                                    <p class="text-xs font-black text-gray-800 mt-1">Chuyển khoản / Công nợ B2B</p>
-                                </div>
-                                <div class="pt-2 border-t border-blue-100/40 flex items-center justify-between">
-                                    <span class="font-bold text-gray-500">Trạng thái:</span>
-                                    <span class="inline-flex px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 font-black text-[10px] border border-orange-200">
-                                        Chưa thanh toán
-                                    </span>
-                                </div>
-                                <div class="pt-2 border-t border-blue-100/40">
-                                    <p class="font-bold text-gray-400 uppercase text-[10px]">Hình thức giao hàng</p>
-                                    <p class="text-xs font-black text-gray-800 mt-1">Giao hàng tiêu chuẩn (Xe tải KN)</p>
+                                <div class="flex justify-between items-center border-t border-blue-100/40 pt-3">
+                                    <span class="text-xs font-bold text-gray-500 uppercase">Tổng số lượng</span>
+                                    <span id="quickItemsCount" class="text-xs font-black bg-white px-2 py-0.5 rounded border border-gray-200 text-gray-800">0</span>
                                 </div>
                             </div>
                         </section>
-
-                        <!-- 3. TỔNG ĐƠN HÀNG -->
-                        <section class="bg-gradient-to-b from-white to-gray-50 border-2 border-orange-200 rounded-2xl shadow-md p-5">
-                            <h3 class="font-black text-gray-900 text-sm uppercase tracking-wider mb-4">
-                                Tổng thanh toán
-                            </h3>
-                            <div class="space-y-3 text-sm">
-                                <div class="flex justify-between items-center text-gray-500 text-xs font-bold">
-                                    <span>Tạm tính hàng</span>
-                                    <span id="orderSubtotal" class="text-gray-900 font-bold font-mono">0 ₫</span>
-                                </div>
-                                <div class="flex justify-between items-center text-gray-500 text-xs font-bold">
-                                    <span>Phí vận chuyển</span>
-                                    <span id="orderShippingFee" class="text-gray-900 font-bold font-mono">0 ₫</span>
-                                </div>
-                                <div class="border-t border-orange-100 pt-4 mt-2 flex justify-between items-end">
-                                    <div>
-                                        <span class="block text-[11px] font-black uppercase text-gray-400">Tổng cộng</span>
-                                    </div>
-                                    <strong id="orderTotal" class="text-2xl font-black text-kn-orange font-mono">0 ₫</strong>
-                                </div>
-                            </div>
-                        </section>  
 
                     </div>
                 </div>
@@ -253,9 +222,7 @@
     </main>
 </div>
 
-<!-- =========================================================
-     CANCEL ORDER MODAL (GIỮ NGUYÊN)
-========================================================= -->
+<!-- CANCEL ORDER MODAL -->
 <div id="cancelOrderModal" class="hidden fixed inset-0 z-[100] items-center justify-center p-4">
     <div id="cancelOrderOverlay" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
     <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden">
