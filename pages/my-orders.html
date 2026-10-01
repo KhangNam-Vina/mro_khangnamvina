@@ -113,7 +113,7 @@
 
                 <!-- BẢNG DỮ LIỆU & BỘ LỌC -->
                 <div class="orders-card-wrapper">
-                    <!-- FILTER BAR (GIỐNG RFQ) -->
+                    <!-- FILTER BAR -->
                     <div class="orders-filter-bar no-print">
                         <div class="orders-filter-tabs">
                             <button type="button" onclick="filterOrdersByStatus('ALL', this)" class="order-status-btn is-active">Tất cả</button>
@@ -162,6 +162,9 @@
                                     <!-- Dữ liệu được JS bơm vào đây -->
                                 </tbody>
                             </table>
+                            
+                            <!-- BỘ PHÂN TRANG -->
+                            <div id="ordersPagination" class="no-print" style="display: flex; justify-content: center; gap: 6px; margin-top: 20px; padding: 20px 0 24px 0; border-top: 1px solid #f3f4f6;"></div>
                         </div>
                     </div>
                 </div>

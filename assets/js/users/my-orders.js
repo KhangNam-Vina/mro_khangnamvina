@@ -1,15 +1,19 @@
 // ========================================================
 // FILE: assets/js/users/my-orders.js
-// QUẢN LÝ LỊCH SỬ ĐƠN HÀNG MUA TRỰC TIẾP (TÍCH HỢP TABS ĐỒNG BỘ RFQ)
+// QUẢN LÝ LỊCH SỬ ĐƠN HÀNG MUA TRỰC TIẾP (CÓ PHÂN TRANG)
 // ========================================================
 
 let currentUser = null;
 let allOrdersData = [];
 
+// Biến phân trang
+let currentOrderFiltered = [];
+let currentOrderPage = 1;
+const ORDERS_PER_PAGE = 10;
+
 // ========================================================
 // INIT
 // ========================================================
-
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         currentUser = await getCurrentCustomer();
@@ -34,7 +38,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 // ========================================================
 // AUTH
 // ========================================================
-
 async function getCurrentCustomer() {
     if (typeof window.checkCustomerAuth === "function") {
         const user = await window.checkCustomerAuth();
@@ -50,7 +53,6 @@ async function getCurrentCustomer() {
 // ========================================================
 // SIDEBAR PROFILE
 // ========================================================
-
 async function loadSidebarProfile() {
     const nameEl = document.getElementById("sidebarUserName");
     const emailEl = document.getElementById("sidebarUserEmail");
@@ -65,9 +67,7 @@ async function loadSidebarProfile() {
             .maybeSingle();
 
         if (profile?.full_name) fullName = profile.full_name;
-    } catch (error) {
-        console.warn("[MY ORDERS] Lỗi profile:", error);
-    }
+    } catch (error) {}
 
     if (nameEl) nameEl.textContent = fullName;
     if (emailEl) emailEl.textContent = currentUser.email || "-";
@@ -84,7 +84,6 @@ async function loadSidebarProfile() {
 // ========================================================
 // LOAD ORDERS
 // ========================================================
-
 async function loadMyOrders() {
     const loadingUI = document.getElementById("ordersLoading");
     const emptyUI = document.getElementById("emptyOrdersState");
@@ -160,11 +159,9 @@ function updateDashboardStats(data) {
 // FILTER TABS LOGIC
 // ========================================================
 window.filterOrdersByStatus = function (statusValue, btn) {
-    // Đổi màu tab đang active
     document.querySelectorAll(".order-status-btn").forEach(b => b.classList.remove("is-active"));
     if (btn) btn.classList.add("is-active");
 
-    // Xóa nội dung tìm kiếm khi đổi Tab
     const searchInput = document.getElementById("searchOrderInput");
     if (searchInput) searchInput.value = "";
 
@@ -176,12 +173,10 @@ window.filterOrdersByStatus = function (statusValue, btn) {
     const target = statusValue.toLowerCase();
     const filtered = allOrdersData.filter(order => {
         const curr = String(order.status || "").toLowerCase();
-
         if (target === "đang xử lý") return ["pending", "confirmed", "processing"].includes(curr);
         if (target === "đang giao") return curr === "shipped";
         if (target === "đã hoàn thành") return curr === "delivered";
         if (target === "đã hủy") return curr === "cancelled";
-        
         return false;
     });
 
@@ -191,15 +186,12 @@ window.filterOrdersByStatus = function (statusValue, btn) {
 // ========================================================
 // SEARCH
 // ========================================================
-
 function setupSearchLogic() {
     const searchInput = document.getElementById("searchOrderInput");
     if (!searchInput) return;
 
     searchInput.addEventListener("input", event => {
         const keyword = String(event.target.value || "").toLowerCase().trim();
-
-        // Gõ tìm kiếm thì reset các Tab lọc về trạng thái bình thường
         document.querySelectorAll(".order-status-btn").forEach(b => b.classList.remove("is-active"));
 
         if (!keyword) {
@@ -217,19 +209,35 @@ function setupSearchLogic() {
 }
 
 // ========================================================
-// RENDER TABLE
+// RENDER TABLE & PHÂN TRANG
 // ========================================================
-
 function renderOrdersTable(dataList) {
+    currentOrderFiltered = dataList || [];
+    currentOrderPage = 1; // Luôn quay về trang 1 khi lọc/tìm kiếm mới
+    renderOrderPage();
+}
+
+function renderOrderPage() {
     const tableBody = document.getElementById("ordersTableBody");
+    const paginationEl = document.getElementById("ordersPagination");
     if (!tableBody) return;
 
-    if (!Array.isArray(dataList) || dataList.length === 0) {
+    if (currentOrderFiltered.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding:30px; color:#6b7280;">Không tìm thấy đơn hàng nào.</td></tr>`;
+        if (paginationEl) paginationEl.innerHTML = "";
         return;
     }
 
-    tableBody.innerHTML = dataList.map(order => {
+    // Tính toán phân trang
+    const totalPages = Math.ceil(currentOrderFiltered.length / ORDERS_PER_PAGE);
+    if (currentOrderPage < 1) currentOrderPage = 1;
+    if (currentOrderPage > totalPages) currentOrderPage = totalPages;
+
+    const startIndex = (currentOrderPage - 1) * ORDERS_PER_PAGE;
+    const endIndex = startIndex + ORDERS_PER_PAGE;
+    const pageData = currentOrderFiltered.slice(startIndex, endIndex);
+
+    tableBody.innerHTML = pageData.map(order => {
         const dateStr = formatDateTime(order.created_at);
         const total = Number(order.total) || 0;
         const totalFormat = new Intl.NumberFormat("vi-VN").format(total) + " đ";
@@ -253,12 +261,53 @@ function renderOrdersTable(dataList) {
             </tr>
         `;
     }).join("");
+
+    renderOrderPaginationControls(totalPages);
 }
+
+function renderOrderPaginationControls(totalPages) {
+    const paginationEl = document.getElementById("ordersPagination");
+    if (!paginationEl) return;
+    
+    if (totalPages <= 1) {
+        paginationEl.innerHTML = "";
+        return;
+    }
+
+    let html = "";
+    const btnStyle = "padding: 6px 12px; border-radius: 6px; border: 1px solid #e5e7eb; background: #fff; cursor: pointer; font-size: 13px; font-weight: 600; color: #374151; transition: all 0.2s;";
+    const activeStyle = "background: #00479b; color: #fff; border-color: #00479b;";
+
+    // Nút Prev
+    if (currentOrderPage > 1) {
+        html += `<button type="button" style="${btnStyle}" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='#fff'" onclick="changeOrderPage(${currentOrderPage - 1})">«</button>`;
+    }
+
+    // Các số trang
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === currentOrderPage) {
+            html += `<button type="button" style="${btnStyle} ${activeStyle}">${i}</button>`;
+        } else {
+            html += `<button type="button" style="${btnStyle}" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='#fff'" onclick="changeOrderPage(${i})">${i}</button>`;
+        }
+    }
+
+    // Nút Next
+    if (currentOrderPage < totalPages) {
+        html += `<button type="button" style="${btnStyle}" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='#fff'" onclick="changeOrderPage(${currentOrderPage + 1})">»</button>`;
+    }
+
+    paginationEl.innerHTML = html;
+}
+
+window.changeOrderPage = function(page) {
+    currentOrderPage = page;
+    renderOrderPage(); // Chuyển trang và render lại bảng
+};
 
 // ========================================================
 // STATUS & FORMATTERS
 // ========================================================
-
 function getOrderStatusConfig(status) {
     const normalized = String(status || "").trim().toLowerCase();
     const configs = {

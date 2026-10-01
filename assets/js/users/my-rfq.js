@@ -1,10 +1,19 @@
 // ========================================================
-// MY RFQ LOGIC
+// FILE: assets/js/users/my-rfq.js
+// QUẢN LÝ LỊCH SỬ BÁO GIÁ (CÓ PHÂN TRANG)
 // ========================================================
 "use strict";
 
 let allRFQsData = [];
 
+// Biến phân trang
+let currentRfqFiltered = [];
+let currentRfqPage = 1;
+const RFQS_PER_PAGE = 10;
+
+// ========================================================
+// INIT
+// ========================================================
 document.addEventListener("DOMContentLoaded", async () => {
     setupSearch();
     await loadMyRFQs();
@@ -47,20 +56,40 @@ async function loadMyRFQs() {
     }
 }
 
+// ========================================================
+// RENDER TABLE & PHÂN TRANG
+// ========================================================
 function renderRfqTable(dataList) {
+    currentRfqFiltered = dataList || [];
+    currentRfqPage = 1; // Luôn về trang 1 khi lọc
+    renderRfqPage();
+}
+
+function renderRfqPage() {
     const tbody = document.getElementById("rfqTableBody");
     const emptyState = document.getElementById("emptyState");
+    const paginationEl = document.getElementById("rfqPagination");
     if (!tbody) return;
 
-    if (!Array.isArray(dataList) || dataList.length === 0) {
+    if (currentRfqFiltered.length === 0) {
         tbody.innerHTML = "";
         if (emptyState) emptyState.classList.remove("is-hidden");
+        if (paginationEl) paginationEl.innerHTML = "";
         return;
     }
 
     if (emptyState) emptyState.classList.add("is-hidden");
 
-    tbody.innerHTML = dataList.map(item => {
+    // Tính toán số trang
+    const totalPages = Math.ceil(currentRfqFiltered.length / RFQS_PER_PAGE);
+    if (currentRfqPage < 1) currentRfqPage = 1;
+    if (currentRfqPage > totalPages) currentRfqPage = totalPages;
+
+    const startIndex = (currentRfqPage - 1) * RFQS_PER_PAGE;
+    const endIndex = startIndex + RFQS_PER_PAGE;
+    const pageData = currentRfqFiltered.slice(startIndex, endIndex);
+
+    tbody.innerHTML = pageData.map(item => {
         const dateObj = new Date(item.created_at);
         const formattedDate = dateObj.toLocaleDateString("vi-VN");
         const formattedTime = dateObj.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
@@ -90,8 +119,53 @@ function renderRfqTable(dataList) {
             </tr>
         `;
     }).join("");
+
+    renderRfqPaginationControls(totalPages);
 }
 
+function renderRfqPaginationControls(totalPages) {
+    const paginationEl = document.getElementById("rfqPagination");
+    if (!paginationEl) return;
+    
+    if (totalPages <= 1) {
+        paginationEl.innerHTML = "";
+        return;
+    }
+
+    let html = "";
+    const btnStyle = "padding: 6px 12px; border-radius: 6px; border: 1px solid #e5e7eb; background: #fff; cursor: pointer; font-size: 13px; font-weight: 600; color: #374151; transition: all 0.2s;";
+    const activeStyle = "background: #00479b; color: #fff; border-color: #00479b;";
+
+    // Nút Prev
+    if (currentRfqPage > 1) {
+        html += `<button type="button" style="${btnStyle}" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='#fff'" onclick="changeRfqPage(${currentRfqPage - 1})">«</button>`;
+    }
+
+    // Các số trang
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === currentRfqPage) {
+            html += `<button type="button" style="${btnStyle} ${activeStyle}">${i}</button>`;
+        } else {
+            html += `<button type="button" style="${btnStyle}" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='#fff'" onclick="changeRfqPage(${i})">${i}</button>`;
+        }
+    }
+
+    // Nút Next
+    if (currentRfqPage < totalPages) {
+        html += `<button type="button" style="${btnStyle}" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='#fff'" onclick="changeRfqPage(${currentRfqPage + 1})">»</button>`;
+    }
+
+    paginationEl.innerHTML = html;
+}
+
+window.changeRfqPage = function(page) {
+    currentRfqPage = page;
+    renderRfqPage();
+};
+
+// ========================================================
+// KPI STATS
+// ========================================================
 function updateDashboardStats(data) {
     const totalEl = document.getElementById("statTotal");
     const pendingEl = document.getElementById("statPending");
@@ -113,6 +187,9 @@ function updateDashboardStats(data) {
     if (canceledEl) canceledEl.innerText = c;
 }
 
+// ========================================================
+// FILTER TABS & SEARCH
+// ========================================================
 window.filterByStatus = function (statusValue, btn) {
     document.querySelectorAll(".status-btn").forEach(b => b.classList.remove("is-active"));
     if (btn) btn.classList.add("is-active");
@@ -153,6 +230,9 @@ function setupSearch() {
     });
 }
 
+// ========================================================
+// SIDEBAR & LOGOUT
+// ========================================================
 async function loadSidebarProfile(user) {
     try {
         const { data } = await window.supabaseClient.from("profiles").select("full_name").eq("id", user.id).maybeSingle();

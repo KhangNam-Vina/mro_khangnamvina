@@ -3501,3 +3501,7 @@
     font-weight: 500;
     margin: 0; /* Reset margin để bám sát viền box */
 }
+/* Ẩn badge trạng thái phía trên nhưng vẫn giữ DOM để JS xử lý */
+#rfqStatusBadge {
+    display: none !important;
+}

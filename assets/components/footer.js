@@ -7,7 +7,7 @@
 let COMPANY_CONFIG = {
     logo: "", // Bổ sung biến chứa link Logo
     hotline: "0919699942",
-    hotlineDisplay: "0919 699 942",
+    hotlineDisplay: "0919 102 207",
     zalo: "0919699942",
     email: "khangnam2022@gmail.com",
     address: "Khu Công Nghệ Cao, TP. Thủ Đức, TP. Hồ Chí Minh",

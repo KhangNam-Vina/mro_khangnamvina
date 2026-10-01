@@ -1,818 +1,117 @@
 // ========================================================
 // FILE: assets/js/users/cart.js
 // QUẢN LÝ GIỎ HÀNG MUA SẮM
-//
-// QUY TẮC:
-// 1. Cùng product ID + cùng SIZE => cùng 1 dòng
-// 2. Cùng product ID + khác SIZE => 2 dòng khác nhau
-// 3. Size được lưu trực tiếp trong localStorage
-// 4. Không thay đổi database
 // ========================================================
 
 "use strict";
 
-
-// ========================================================
-// 1. CONSTANT
-// ========================================================
-
-const CART_STORAGE_KEY =
-    "mro_shopping_cart";
-
-    const CART_IMAGE_CDN_BASE =
-    "https://mrokhangnam-image.khangnamvn.workers.dev";
-
-    const CART_MIN_QTY = 1;
-
-    const CART_MAX_QTY = 1000000;
-
-function getCartProductPrice(product) {
-
-    if (!product) {
-        return 0;
-    }
-
-    const discountPrice =
-        Number(
-            product.discount_price
-        );
-
-    const regularPrice =
-        Number(
-            product.price
-        );
-
-    if (
-        Number.isFinite(discountPrice) &&
-        discountPrice > 0
-    ) {
-        return discountPrice;
-    }
-
-    return Number.isFinite(
-        regularPrice
-    )
-        ? regularPrice
-        : 0;
-}
+const CART_STORAGE_KEY = "mro_shopping_cart";
+const CART_IMAGE_CDN_BASE = "https://mrokhangnam-image.khangnamvn.workers.dev";
+const CART_MAX_QTY = 1000000;
 
 function buildCartImageUrl(imagePath) {
-
-    if (!imagePath) {
-        return "../assets/images/no-image.png";
-    }
-
-    const cleanPath =
-        String(imagePath).trim();
-
-    if (!cleanPath) {
-        return "../assets/images/no-image.png";
-    }
-
-    // Giữ an toàn nếu localStorage cũ còn URL đầy đủ
-    if (/^https?:\/\//i.test(cleanPath)) {
-        return cleanPath;
-    }
-
+    if (!imagePath) return "../assets/images/world mark.png";
+    const cleanPath = String(imagePath).trim();
+    if (!cleanPath || cleanPath.includes("via.placeholder.com")) return "../assets/images/world mark.png";
+    if (/^https?:\/\//i.test(cleanPath)) return cleanPath;
     return `${CART_IMAGE_CDN_BASE}/${cleanPath.replace(/^\/+/, "")}`;
 }
 
-function getSelectedProductSize(product) {
-
-    /*
-     * =====================================================
-     * ƯU TIÊN 1:
-     * Lấy trực tiếp Size đang được chọn trên giao diện.
-     *
-     * product-detail.js đang đánh dấu:
-     *
-     * .product-size-btn.is-active
-     *
-     * và lưu Size trong:
-     *
-     * data-size="S"
-     * data-size="M"
-     * data-size="L"
-     * =====================================================
-     */
-
-    const activeSizeButton =
-        document.querySelector(
-            ".product-size-btn.is-active"
-        );
-
-
-    if (activeSizeButton) {
-
-        const activeSize =
-            activeSizeButton.dataset.size ||
-            activeSizeButton.getAttribute(
-                "data-size"
-            ) ||
-            "";
-
-
-        if (
-            String(
-                activeSize
-            ).trim()
-        ) {
-
-            return String(
-                activeSize
-            ).trim();
-        }
+// ĐÃ FIX: Hàm đọc giá tiền tương thích cả SP cũ và Biến thể mới
+function getCartProductPrice(item) {
+    if (!item) return 0;
+    if (item.unit_price) return Number(item.unit_price);
+    
+    const discountPrice = Number(item.discount_price);
+    const regularPrice = Number(item.price);
+    if (Number.isFinite(discountPrice) && discountPrice > 0 && discountPrice < regularPrice) {
+        return discountPrice;
     }
-
-
-    /*
-     * =====================================================
-     * ƯU TIÊN 2:
-     * Nếu product đã có selectedSize.
-     * =====================================================
-     */
-
-    if (
-        product &&
-        product.selectedSize !== undefined &&
-        product.selectedSize !== null
-    ) {
-
-        return String(
-            product.selectedSize
-        ).trim();
-    }
-
-
-    /*
-     * =====================================================
-     * ƯU TIÊN 3:
-     * Nếu product đã có size.
-     * =====================================================
-     */
-
-    if (
-        product &&
-        product.size !== undefined &&
-        product.size !== null
-    ) {
-
-        return String(
-            product.size
-        ).trim();
-    }
-
-
-    /*
-     * =====================================================
-     * ƯU TIÊN 4:
-     * Fallback cũ.
-     * =====================================================
-     */
-
-    if (
-        window.selectedProductSize !== undefined &&
-        window.selectedProductSize !== null
-    ) {
-
-        return String(
-            window.selectedProductSize
-        ).trim();
-    }
-
-
-    /*
-     * =====================================================
-     * Không có Size.
-     * =====================================================
-     */
-
-    return "";
+    return Number.isFinite(regularPrice) ? regularPrice : 0;
 }
-
-
-// ========================================================
-// 3. CHUẨN HÓA SIZE
-// ========================================================
 
 function normalizeCartSize(size) {
-
-    if (
-        size === undefined ||
-        size === null
-    ) {
-
-        return "";
-    }
-
-
-    return String(size)
-        .trim()
-        .replace(/\s+/g, " ")
-        .toUpperCase();
+    if (size === undefined || size === null) return "";
+    return String(size).trim().replace(/\s+/g, " ").toUpperCase();
 }
 
-
-// ========================================================
-// 4. TẠO CART KEY
-// ========================================================
-
-function getCartItemKey(
-    id,
-    size
-) {
-
-    const normalizedId =
-        String(id ?? "").trim();
-
-
-    const normalizedSize =
-        normalizeCartSize(size);
-
-
-    /*
-     * ID + SIZE chính là identity
-     * của một dòng trong giỏ hàng.
-     */
-    return (
-        `${normalizedId}__SIZE__${normalizedSize}`
-    );
+function getCartItemKey(id, size) {
+    const normalizedId = String(id ?? "").trim();
+    const normalizedSize = normalizeCartSize(size);
+    return `${normalizedId}__SIZE__${normalizedSize}`;
 }
 
-
-// ========================================================
-// 5. THÊM / CẬP NHẬT SẢN PHẨM TRONG GIỎ
-// ========================================================
-
-window.addToShoppingCart =
-function () {
-
-    if (!window.currentProductData) {
-
-        console.error(
-            "Chưa tải được dữ liệu sản phẩm."
-        );
-
-        alert(
-            "Hệ thống đang tải dữ liệu, vui lòng thử lại sau giây lát!"
-        );
-
-        return;
-    }
-
-
-    const product =
-        window.currentProductData;
-
-
-    const qtyInput =
-        document.getElementById(
-            "buyQty"
-        );
-
-
-    const rawQty =
-    Number(
-        qtyInput
-            ? qtyInput.value
-            : 1
-    );
-
-    if (
-        !Number.isInteger(rawQty) ||
-        rawQty < CART_MIN_QTY ||
-        rawQty > CART_MAX_QTY
-    ) {
-
-        alert(
-            `Số lượng phải là số nguyên từ ${CART_MIN_QTY.toLocaleString("vi-VN")} đến ${CART_MAX_QTY.toLocaleString("vi-VN")}.`
-        );
-
-        return;
-    }
-
-    const qty =
-        rawQty;
-
-
-    /*
-     * =====================================================
-     * LẤY SIZE HIỆN TẠI
-     * =====================================================
-     */
-
-    const selectedSize =
-        normalizeCartSize(
-            getSelectedProductSize(
-                product
-            )
-        );
-
-
-    /*
-     * =====================================================
-     * CART KEY MỚI
-     * =====================================================
-     */
-
-    const newCartKey =
-        getCartItemKey(
-            product.id,
-            selectedSize
-        );
-
-
-    let shoppingCart =
-        getShoppingCart();
-
-
-    /*
-     * =====================================================
-     * KIỂM TRA CÓ ĐANG EDIT KHÔNG
-     *
-     * URL:
-     *
-     * product-detail.html
-     * ?id=123
-     * &edit_cart_key=123__SIZE__2.2MM
-     * =====================================================
-     */
-
-    const urlParams =
-        new URLSearchParams(
-            window.location.search
-        );
-
-
-    const encodedEditCartKey =
-        urlParams.get(
-            "edit_cart_key"
-        );
-
-
-    const editCartKey =
-        encodedEditCartKey
-            ? decodeURIComponent(
-                encodedEditCartKey
-            )
-            : null;
-
-
-    /*
-     * =====================================================
-     * CHẾ ĐỘ CHỈNH SỬA
-     * =====================================================
-     */
-
-    if (editCartKey) {
-
-        const oldIndex =
-            shoppingCart.findIndex(
-                item => {
-
-                    const itemKey =
-                        item.cartKey ||
-                        getCartItemKey(
-                            item.id,
-                            item.size
-                        );
-
-                    return (
-                        itemKey ===
-                        editCartKey
-                    );
-                }
-            );
-
-
-        /*
-         * Không tìm thấy item cũ
-         */
-        if (
-            oldIndex === -1
-        ) {
-
-            console.warn(
-                "Không tìm thấy item cũ để chỉnh sửa:",
-                editCartKey
-            );
-
-        } else {
-
-            const oldItem =
-                shoppingCart[
-                    oldIndex
-                ];
-
-
-            /*
-             * =================================================
-             * TRƯỜNG HỢP:
-             *
-             * Size KHÔNG thay đổi
-             *
-             * → chỉ cập nhật Qty
-             * =================================================
-             */
-
-            if (
-                newCartKey ===
-                editCartKey
-            ) {
-
-                shoppingCart[
-                    oldIndex
-                ] = {
-
-                    ...oldItem,
-
-                    id:
-                        product.id,
-
-                    cartKey:
-                        newCartKey,
-
-                    sku:
-                        product.sku,
-
-                    name:
-                        product.name,
-
-                    price:
-                        getCartProductPrice(
-                            product
-                        ),
-
-                    image:
-                        buildCartImageUrl(
-                            product.image_path
-                        ),
-
-                    unit:
-                        product.unit ||
-                        "Cái",
-
-                    size:
-                        selectedSize,
-
-                    /*
-                     * Giữ Qty mà người dùng
-                     * đang nhập trên detail.
-                     */
-                    qty:
-                        qty
-                };
-
-            }
-
-
-            /*
-             * =================================================
-             * TRƯỜNG HỢP:
-             *
-             * Size ĐÃ THAY ĐỔI
-             * =================================================
-             */
-
-            else {
-
-                /*
-                 * Kiểm tra Size mới đã tồn tại
-                 * trong cart hay chưa.
-                 */
-                const existingNewIndex =
-                    shoppingCart.findIndex(
-                        (item, index) => {
-
-                            if (
-                                index ===
-                                oldIndex
-                            ) {
-                                return false;
-                            }
-
-                            const itemKey =
-                                item.cartKey ||
-                                getCartItemKey(
-                                    item.id,
-                                    item.size
-                                );
-
-                            return (
-                                itemKey ===
-                                newCartKey
-                            );
-                        }
-                    );
-
-
-                /*
-                 * =================================================
-                 * SIZE MỚI ĐÃ CÓ TRONG CART
-                 *
-                 * → Gộp Qty
-                 * → Xóa dòng cũ
-                 * =================================================
-                 */
-
-                if (
-                    existingNewIndex !== -1
-                ) {
-
-                    shoppingCart[
-                        existingNewIndex
-                    ].qty =
-                        Math.min(
-                            CART_MAX_QTY,
-                            (
-                                Number(
-                                    shoppingCart[
-                                        existingNewIndex
-                                    ].qty
-                                ) || 0
-                            ) + qty
-                        );
-
-
-                    /*
-                     * Xóa item cũ.
-                     */
-                    shoppingCart.splice(
-                        oldIndex,
-                        1
-                    );
-
-                }
-
-
-                /*
-                 * =================================================
-                 * SIZE MỚI CHƯA CÓ
-                 *
-                 * → Thay item cũ bằng item mới
-                 * =================================================
-                 */
-
-                else {
-
-                    shoppingCart[
-                        oldIndex
-                    ] = {
-
-                        cartKey:
-                            newCartKey,
-
-                        id:
-                            product.id,
-
-                        sku:
-                            product.sku,
-
-                        name:
-                            product.name,
-
-                        price:
-                            getCartProductPrice(
-                                product
-                            ),
-
-                        image:
-                            buildCartImageUrl(
-                                product.image_path
-                            ),
-
-                        unit:
-                            product.unit ||
-                            "Cái",
-
-                        size:
-                            selectedSize,
-
-                        qty:
-                            qty
-                    };
-                }
-            }
-        }
-
-
-        /*
-         * =====================================================
-         * SAVE
-         * =====================================================
-         */
-
-        saveShoppingCart(
-            shoppingCart
-        );
-
-
-        /*
-         * =====================================================
-         * THÔNG BÁO
-         * =====================================================
-         */
-
-        const sizeText =
-            selectedSize
-                ? ` - Size ${selectedSize}`
-                : "";
-
-
-        const message =
-            `Đã cập nhật ${qty} ${
-                product.unit || "Cái"
-            }${sizeText} trong Giỏ hàng!`;
-
-
-        if (
-            window.utils &&
-            typeof window.utils.showToast ===
-                "function"
-        ) {
-
-            window.utils.showToast(
-                message,
-                "success"
-            );
-
-        }
-
-
-        /*
-         * =====================================================
-         * QUAY LẠI CART
-         * =====================================================
-         */
-
-        setTimeout(
-            () => {
-
-                window.location.href =
-                    "cart.html";
-
-            },
-            300
-        );
-
-
-        return;
-    }
-
-
-    /*
-     * =====================================================
-     * CHẾ ĐỘ THÊM MỚI
-     * =====================================================
-     */
-
-    const existingIndex =
-        shoppingCart.findIndex(
-            item => {
-
-                const itemKey =
-                    item.cartKey ||
-                    getCartItemKey(
-                        item.id,
-                        item.size
-                    );
-
-                return (
-                    itemKey ===
-                    newCartKey
-                );
-            }
-        );
-
-
-    /*
-     * ĐÃ CÓ CÙNG PRODUCT + SIZE
-     *
-     * → cộng Qty
-     */
-    if (
-        existingIndex > -1
-    ) {
-
-        shoppingCart[
-            existingIndex
-        ].qty =
-            Math.min(
-                CART_MAX_QTY,
-                (
-                    Number(
-                        shoppingCart[
-                            existingIndex
-                        ].qty
-                    ) || 0
-                ) + qty
-            );
-
-
-        shoppingCart[
-            existingIndex
-        ].cartKey =
-            newCartKey;
-
-    }
-
-
-    /*
-     * CHƯA CÓ
-     *
-     * → tạo item mới
-     */
-    else {
-
-        shoppingCart.push({
-
-            cartKey:
-                newCartKey,
-
-            id:
-                product.id,
-
-            sku:
-                product.sku,
-
-            name:
-                product.name,
-
-           price:
-                getCartProductPrice(
-                    product
-                ),
-
-            image:
-                buildCartImageUrl(
-                    product.image_path
-                ),
-
-            unit:
-                product.unit ||
-                "Cái",
-
-            size:
-                selectedSize,
-
-            qty:
-                qty
+function getShoppingCart() {
+    try {
+        const raw = localStorage.getItem(CART_STORAGE_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+
+        return parsed.map(item => {
+            const rawQty = Number(item.qty);
+            const minQty = Number(item.min_order_quantity) || 1;
+            const safeQty = Number.isInteger(rawQty) ? Math.max(minQty, rawQty) : minQty;
+
+            return {
+                ...item,
+                qty: safeQty,
+                size: normalizeCartSize(item.size),
+                cartKey: item.cartKey || getCartItemKey(item.product_id || item.id, item.size)
+            };
         });
+    } catch (error) {
+        console.error("Lỗi đọc giỏ hàng:", error);
+        return [];
     }
+}
 
+function saveShoppingCart(cart) {
+    const normalizedCart = Array.isArray(cart) ? cart.map(item => ({
+        ...item,
+        size: normalizeCartSize(item.size),
+        cartKey: item.cartKey || getCartItemKey(item.product_id || item.id, item.size)
+    })) : [];
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(normalizedCart));
+}
 
-    /*
-     * SAVE
-     */
-
-    saveShoppingCart(
-        shoppingCart
-    );
-
-
-    /*
-     * TOAST
-     */
-
-    const sizeText =
-        selectedSize
-            ? ` - Size ${selectedSize}`
-            : "";
-
-
-    const message =
-        `Đã thêm ${qty} ${
-            product.unit || "Cái"
-        }${sizeText} vào Giỏ hàng!`;
-
-
-    if (
-        window.utils &&
-        typeof window.utils.showToast ===
-            "function"
-    ) {
-
-        window.utils.showToast(
-            message,
-            "success"
-        );
-
-    } else {
-
-        alert(
-            `🛒 ${message}`
-        );
+function updateHeaderCart() {
+    if (typeof updateHeaderCartCount === "function") {
+        updateHeaderCartCount();
     }
+}
 
+function setCheckoutState(button, disabled) {
+    if (!button) return;
+    button.disabled = disabled;
+    if (disabled) button.classList.add("is-disabled");
+    else button.classList.remove("is-disabled");
+}
 
-    updateHeaderCart();
-};
+function formatCurrency(value) {
+    return new Intl.NumberFormat("vi-VN").format(Number(value) || 0) + " đ";
+}
 
+function setText(element, value) {
+    if (element) element.textContent = value ?? "";
+}
+
+function escapeHTML(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function escapeAttribute(value) {
+    return escapeHTML(value);
+}
 
 // ========================================================
-// 6. RENDER GIỎ HÀNG (ĐÃ FIX INLINE LAYOUT)
+// RENDER GIỎ HÀNG CHÍNH
 // ========================================================
-
 function renderCartItems() {
     const container = document.getElementById("cartItemsContainer");
     const emptyState = document.getElementById("emptyCartState");
@@ -825,7 +124,6 @@ function renderCartItems() {
 
     const shoppingCart = getShoppingCart();
 
-    /* GIỎ TRỐNG */
     if (shoppingCart.length === 0) {
         container.innerHTML = "";
         container.classList.add("is-hidden");
@@ -837,7 +135,6 @@ function renderCartItems() {
         return;
     }
 
-    /* CÓ SẢN PHẨM */
     container.classList.remove("is-hidden");
     if (emptyState) emptyState.classList.add("is-hidden");
     setCheckoutState(checkoutButton, false);
@@ -847,8 +144,10 @@ function renderCartItems() {
     let totalItems = 0;
 
     shoppingCart.forEach(item => {
-        const price = Number(item.price) || 0;
-        const qty = Math.max(1, Number(item.qty) || 1);
+        // ĐÃ FIX: Lấy chuẩn giá tiền và số lượng B2B
+        const price = getCartProductPrice(item);
+        const minQty = Number(item.min_order_quantity) || 1;
+        const qty = Math.max(minQty, Number(item.qty) || 1);
         const itemTotal = price * qty;
 
         subtotal += itemTotal;
@@ -856,9 +155,12 @@ function renderCartItems() {
 
         const priceFormat = formatCurrency(price);
         const itemTotalFormat = formatCurrency(itemTotal);
-        const image = item.image || "https://via.placeholder.com/150?text=No+Image";
-        const cartKey = item.cartKey || getCartItemKey(item.id, item.size);
+        const image = buildCartImageUrl(item.image);
+        
+        const productId = item.product_id || item.id;
+        const cartKey = item.cartKey || getCartItemKey(productId, item.size);
         const encodedCartKey = encodeURIComponent(cartKey);
+        
         const safeName = escapeHTML(item.name || "Sản phẩm");
         const safeSku = escapeHTML(item.sku || "-");
         const safeUnit = escapeHTML(item.unit || "Cái");
@@ -871,59 +173,45 @@ function renderCartItems() {
 
         html += `
             <article class="cart-item" data-cart-key="${escapeAttribute(cartKey)}">
-                
                 <div class="cart-item-image">
-                    <img src="${escapeAttribute(image)}" alt="${safeName}" loading="lazy">
+                    <img src="${escapeAttribute(image)}" alt="${safeName}" loading="lazy" onerror="this.src='../assets/images/world mark.png'">
                 </div>
-
                 <div class="cart-item-content">
-                    
-                    <!-- DÒNG TRÊN: THÔNG TIN SẢN PHẨM -->
                     <div class="cart-item-info">
                         <span class="cart-item-sku">SKU: ${safeSku}</span>
-                        <a href="product-detail.html?id=${encodeURIComponent(item.id)}" class="cart-item-name">
+                        <a href="product-detail.html?id=${encodeURIComponent(productId)}" class="cart-item-name">
                             ${safeName}
                         </a>
                         ${sizeHTML}
                     </div>
 
-                    <!-- DÒNG DƯỚI: BẢNG ĐIỀU KHIỂN GỘP CHUNG (INLINE) -->
                     <div class="cart-item-inline-controls">
-                        
-                        <!-- BÊN TRÁI: GIÁ, SL, THÀNH TIỀN -->
                         <div class="cart-controls-left">
                             <div class="cart-inline-price">
                                 ${priceFormat} <span>/ ${safeUnit}</span>
                             </div>
-
                             <div class="cart-quantity-control">
                                 <button type="button" class="cart-quantity-button" onclick="updateCartQty('${encodedCartKey}', -1)" aria-label="Giảm">-</button>
                                 <input type="text" class="cart-quantity-input" value="${qty}" readonly aria-label="Số lượng">
                                 <button type="button" class="cart-quantity-button" onclick="updateCartQty('${encodedCartKey}', 1)" aria-label="Tăng">+</button>
                             </div>
-
                             <div class="cart-inline-total" title="Thành tiền">
                                 ${itemTotalFormat}
                             </div>
                         </div>
 
-                        <!-- BÊN PHẢI: SỬA, XÓA ĐỒNG BỘ ĐỊNH DẠNG -->
                         <div class="cart-inline-actions">
-                            <button type="button" class="cart-btn-action cart-btn-edit" onclick="editShoppingCartItem('${encodedCartKey}')" title="Đổi Size">
+                            <button type="button" class="cart-btn-action cart-btn-edit" onclick="editShoppingCartItem('${encodedCartKey}')" title="Chỉnh sửa">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L8 18l-4 1 1-4L16.5 3.5Z"/></svg>
                                 <span>Chỉnh sửa</span>
                             </button>
-
                             <div class="cart-action-divider"></div>
-
                             <button type="button" class="cart-btn-action cart-btn-delete" onclick="removeCartItem('${encodedCartKey}')" title="Xóa khỏi giỏ">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                 <span>Xóa bỏ</span>
                             </button>
                         </div>
-
                     </div>
-
                 </div>
             </article>
         `;
@@ -937,563 +225,72 @@ function renderCartItems() {
 }
 
 // ========================================================
-// CHỈNH SỬA SẢN PHẨM TRONG GIỎ
+// CÁC THAO TÁC CART (SỬA / XÓA / TĂNG GIẢM)
 // ========================================================
+window.editShoppingCartItem = function (encodedCartKey) {
+    const cartKey = decodeURIComponent(encodedCartKey);
+    const shoppingCart = getShoppingCart();
+    const item = shoppingCart.find(cartItem => (cartItem.cartKey || getCartItemKey(cartItem.product_id || cartItem.id, cartItem.size)) === cartKey);
 
-window.editShoppingCartItem =
-function (encodedCartKey) {
+    if (!item) return;
 
-    const cartKey =
-        decodeURIComponent(
-            encodedCartKey
-        );
-
-    const shoppingCart =
-        getShoppingCart();
-
-    const item =
-        shoppingCart.find(
-            cartItem => {
-
-                const itemKey =
-                    cartItem.cartKey ||
-                    getCartItemKey(
-                        cartItem.id,
-                        cartItem.size
-                    );
-
-                return (
-                    itemKey ===
-                    cartKey
-                );
-            }
-        );
-
-    if (!item) {
-
-        console.error(
-            "Không tìm thấy sản phẩm cần chỉnh sửa:",
-            cartKey
-        );
-
-        return;
-    }
-
-
-    /*
-     * Product ID thật.
-     *
-     * Ưu tiên id mới,
-     * fallback product_id cho dữ liệu cũ.
-     */
-    const productId =
-        item.id ??
-        item.product_id;
-
-
+    const productId = item.product_id ?? item.id;
     if (!productId) {
-
-        alert(
-            "Không xác định được sản phẩm để chỉnh sửa."
-        );
-
+        alert("Không xác định được sản phẩm để chỉnh sửa.");
         return;
     }
 
-
-    /*
-     * Encode toàn bộ cartKey.
-     *
-     * cartKey có thể chứa Size:
-     *
-     * 123__SIZE__2.2MM
-     */
-    const editKey =
-        encodeURIComponent(
-            cartKey
-        );
-
-
-    /*
-     * Chuyển sang Product Detail
-     *
-     * edit_cart_key dùng để báo cho
-     * product-detail.js biết đây là
-     * chế độ CHỈNH SỬA.
-     */
-    window.location.href =
-        `product-detail.html?id=${encodeURIComponent(
-            productId
-        )}&edit_cart_key=${editKey}`;
+    const editKey = encodeURIComponent(cartKey);
+    window.location.href = `product-detail.html?id=${encodeURIComponent(productId)}&edit_cart_key=${editKey}`;
 };
 
-// ========================================================
-// 7. CẬP NHẬT SỐ LƯỢNG
-// ========================================================
+window.updateCartQty = function (encodedCartKey, change) {
+    const cartKey = decodeURIComponent(encodedCartKey);
+    let shoppingCart = getShoppingCart();
+    
+    const itemIndex = shoppingCart.findIndex(item => (item.cartKey || getCartItemKey(item.product_id || item.id, item.size)) === cartKey);
+    if (itemIndex === -1) return;
 
-window.updateCartQty =
-function (
-    encodedCartKey,
-    change
-) {
+    const item = shoppingCart[itemIndex];
+    const currentQty = Number(item.qty) || 1;
+    const numericChange = Number(change);
+    if (!Number.isFinite(numericChange)) return;
 
-    const cartKey =
-        decodeURIComponent(
-            encodedCartKey
-        );
+    const minQty = Number(item.min_order_quantity) || 1;
+    const stockQty = Number(item.stock_quantity) || 0;
+    const maxQty = stockQty > 0 ? stockQty : CART_MAX_QTY;
 
+    let newQty = currentQty + numericChange;
+    newQty = Math.min(maxQty, Math.max(minQty, Math.trunc(newQty)));
 
-    let shoppingCart =
-        getShoppingCart();
+    shoppingCart[itemIndex].qty = newQty;
+    shoppingCart[itemIndex].cartKey = item.cartKey || cartKey;
 
-
-    const itemIndex =
-        shoppingCart.findIndex(
-            item => {
-
-                const itemKey =
-                    item.cartKey ||
-                    getCartItemKey(
-                        item.id,
-                        item.size
-                    );
-
-
-                return (
-                    itemKey ===
-                    cartKey
-                );
-            }
-        );
-
-
-    if (
-        itemIndex ===
-        -1
-    ) {
-        return;
-    }
-
-
-    const currentQty =
-        Number(
-            shoppingCart[
-                itemIndex
-            ].qty
-        ) || 1;
-
-
-    const numericChange =
-    Number(change);
-
-if (
-    !Number.isFinite(
-        numericChange
-    )
-) {
-    return;
-}
-
-let newQty =
-    currentQty +
-    numericChange;
-
-newQty =
-    Math.min(
-        CART_MAX_QTY,
-        Math.max(
-            CART_MIN_QTY,
-            Math.trunc(newQty)
-        )
-    );
-
-
-    shoppingCart[
-        itemIndex
-    ].qty =
-        newQty;
-
-
-    /*
-     * Chuẩn hóa cartKey.
-     */
-    shoppingCart[
-        itemIndex
-    ].cartKey =
-        shoppingCart[
-            itemIndex
-        ].cartKey ||
-        cartKey;
-
-
-    saveShoppingCart(
-        shoppingCart
-    );
-
-
+    saveShoppingCart(shoppingCart);
     renderCartItems();
-
     updateHeaderCart();
 };
 
-
-// ========================================================
-// 8. XÓA SẢN PHẨM
-// ========================================================
-
-window.removeCartItem =
-function (
-    encodedCartKey
-) {
-
-    const cartKey =
-        decodeURIComponent(
-            encodedCartKey
-        );
-
-
-    let shoppingCart =
-        getShoppingCart();
-
-
-    shoppingCart =
-        shoppingCart.filter(
-            item => {
-
-                const itemKey =
-                    item.cartKey ||
-                    getCartItemKey(
-                        item.id,
-                        item.size
-                    );
-
-
-                return (
-                    itemKey !==
-                    cartKey
-                );
-            }
-        );
-
-
-    saveShoppingCart(
-        shoppingCart
-    );
-
-
+window.removeCartItem = function (encodedCartKey) {
+    const cartKey = decodeURIComponent(encodedCartKey);
+    let shoppingCart = getShoppingCart();
+    shoppingCart = shoppingCart.filter(item => (item.cartKey || getCartItemKey(item.product_id || item.id, item.size)) !== cartKey);
+    
+    saveShoppingCart(shoppingCart);
     renderCartItems();
-
     updateHeaderCart();
 };
 
-
-// ========================================================
-// 9. CHUYỂN CHECKOUT
-// ========================================================
-
-window.proceedToCheckout =
-function () {
-
-    const shoppingCart =
-        getShoppingCart();
-
-
-    if (
-        shoppingCart.length ===
-        0
-    ) {
-
-        return;
-    }
-
-
-    window.location.href =
-        "checkout.html";
+window.proceedToCheckout = function () {
+    const shoppingCart = getShoppingCart();
+    if (shoppingCart.length === 0) return;
+    window.location.href = "checkout.html";
 };
 
-
 // ========================================================
-// 10. STORAGE HELPERS
+// INIT
 // ========================================================
-
-function getShoppingCart() {
-
-    try {
-
-        const raw =
-            localStorage.getItem(
-                CART_STORAGE_KEY
-            );
-
-
-        if (!raw) {
-            return [];
-        }
-
-
-        const parsed =
-            JSON.parse(
-                raw
-            );
-
-
-        if (
-            !Array.isArray(
-                parsed
-            )
-        ) {
-
-            return [];
-        }
-
-
-        /*
-         * MIGRATION NHẸ:
-         * Các item cũ chưa có cartKey
-         * vẫn được tính bằng ID + SIZE.
-         */
-        return parsed.map(
-    item => {
-
-        const rawQty =
-            Number(item.qty);
-
-        const safeQty =
-            Number.isInteger(rawQty)
-                ? Math.min(
-                    CART_MAX_QTY,
-                    Math.max(
-                        CART_MIN_QTY,
-                        rawQty
-                    )
-                )
-                : CART_MIN_QTY;
-
-        return {
-
-            ...item,
-
-            qty:
-                safeQty,
-
-            size:
-                normalizeCartSize(
-                    item.size
-                ),
-
-            cartKey:
-                item.cartKey ||
-                getCartItemKey(
-                    item.id,
-                    item.size
-                )
-        };
-    }
-);
-
-    } catch (error) {
-
-        console.error(
-            "Lỗi đọc giỏ hàng:",
-            error
-        );
-
-        return [];
-    }
-}
-
-
-// ========================================================
-// 11. SAVE CART
-// ========================================================
-
-function saveShoppingCart(
-    cart
-) {
-
-    const normalizedCart =
-        Array.isArray(cart)
-            ? cart.map(
-                item => ({
-
-                    ...item,
-
-                    size:
-                        normalizeCartSize(
-                            item.size
-                        ),
-
-                    cartKey:
-                        item.cartKey ||
-                        getCartItemKey(
-                            item.id,
-                            item.size
-                        )
-                })
-            )
-            : [];
-
-
-    localStorage.setItem(
-        CART_STORAGE_KEY,
-        JSON.stringify(
-            normalizedCart
-        )
-    );
-}
-
-
-// ========================================================
-// 12. HEADER CART COUNT
-// ========================================================
-
-function updateHeaderCart() {
-
-    if (
-        typeof updateHeaderCartCount ===
-        "function"
-    ) {
-
-        updateHeaderCartCount();
-    }
-}
-
-
-// ========================================================
-// 13. CHECKOUT BUTTON STATE
-// ========================================================
-
-function setCheckoutState(
-    button,
-    disabled
-) {
-
-    if (!button) {
-        return;
-    }
-
-
-    button.disabled =
-        disabled;
-
-
-    if (disabled) {
-
-        button.classList.add(
-            "is-disabled"
-        );
-
-    } else {
-
-        button.classList.remove(
-            "is-disabled"
-        );
-    }
-}
-
-
-// ========================================================
-// 14. CURRENCY
-// ========================================================
-
-function formatCurrency(
-    value
-) {
-
-    return (
-        new Intl.NumberFormat(
-            "vi-VN"
-        ).format(
-            Number(value) || 0
-        ) +
-        " đ"
-    );
-}
-
-
-// ========================================================
-// 15. DOM HELPERS
-// ========================================================
-
-function setText(
-    element,
-    value
-) {
-
-    if (element) {
-
-        element.textContent =
-            value ?? "";
-    }
-}
-
-
-// ========================================================
-// 16. ESCAPE HELPERS
-// ========================================================
-
-function escapeHTML(
-    value
-) {
-
-    if (
-        window.utils &&
-        typeof window.utils.escapeHTML ===
-            "function"
-    ) {
-
-        return window.utils.escapeHTML(
-            value ?? ""
-        );
-    }
-
-
-    return String(
-        value ?? ""
-    )
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-}
-
-
-function escapeAttribute(
-    value
-) {
-
-    return escapeHTML(
-        value
-    );
-}
-
-
-// ========================================================
-// 17. INIT
-// ========================================================
-
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-        renderCartItems();
-
-        updateHeaderCart();
-    }
-);
+document.addEventListener("DOMContentLoaded", () => {
+    renderCartItems();
+    updateHeaderCart();
+});

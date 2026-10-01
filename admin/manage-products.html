@@ -789,7 +789,7 @@
                                         <th class="px-4 py-4 text-xs font-black text-gray-500 uppercase tracking-wider w-32">SKU</th>
                                         <th class="px-4 py-4 text-xs font-black text-gray-500 uppercase tracking-wider min-w-[220px]">Sản Phẩm</th>
                                         <th class="px-4 py-4 text-xs font-black text-gray-500 uppercase tracking-wider w-32">Thương Hiệu</th>
-                                        <th class="px-4 py-4 text-xs font-black text-gray-500 uppercase tracking-wider min-w-[180px]">Size</th>
+                                        <th class="px-4 py-4 text-xs font-black text-gray-500 uppercase tracking-wider min-w-[180px]">Quy cách bán</th>
                                         <th class="px-4 py-4 text-xs font-black text-gray-500 uppercase tracking-wider text-right w-28">Giá</th>
                                         <th class="px-4 py-4 text-xs font-black text-gray-500 uppercase tracking-wider text-center w-28">Tồn Kho</th>
                                         <th class="px-4 py-4 text-xs font-black text-gray-500 uppercase tracking-wider text-center w-32">Trạng thái</th>
@@ -1103,18 +1103,6 @@
                                             </div>
 
                                         </div>
-                                        
-                                        <!-- TRẠNG THÁI HIỂN THỊ -->
-                                <div class="flex items-center justify-between p-5 bg-gray-50 border border-gray-200 rounded-xl mt-6">
-                                    <div>
-                                        <div class="text-sm font-bold text-gray-800">Hiển thị trên Website</div>
-                                        <div class="text-xs text-gray-500 mt-0.5">Bật để cho phép khách hàng nhìn thấy và đặt mua sản phẩm này.</div>
-                                    </div>
-                                    <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                                        <input type="checkbox" id="is_active" class="sr-only peer" checked>
-                                        <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500 shadow-inner"></div>
-                                    </label>
-                                </div>
 
                                     </div>
 
@@ -1352,7 +1340,7 @@
                                         3
                                     </span>
 
-                                    Giá & Kho hàng
+                                    Giá & Kho mặc định
 
                                 </h3>
 
@@ -1498,6 +1486,286 @@
                                             </option>
 
                                         </select>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                                                <!-- =================================================
+                             3.5 BIẾN THỂ SẢN PHẨM
+                        ================================================== -->
+
+                        <div
+                            class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+
+                            <div
+                                class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+
+                                <div>
+                                    <h3
+                                        class="text-sm font-black text-kn-blue uppercase tracking-wider flex items-center gap-2">
+
+                                        <span
+                                            class="bg-blue-100 text-kn-blue w-6 h-6 rounded-full flex items-center justify-center text-xs">
+                                            3.5
+                                        </span>
+
+                                        Biến thể sản phẩm
+                                    </h3>
+
+                                    <p class="text-xs text-gray-400 mt-1">
+                                        Quản lý SKU, Size, giá, tồn kho và giá theo số lượng.
+                                    </p>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    id="btnAddVariant"
+                                    class="px-4 py-2 rounded-lg bg-kn-blue text-white text-xs font-bold hover:bg-blue-800 transition shadow-sm">
+                                    + Thêm biến thể
+                                </button>
+
+                            </div>
+
+                            <div class="p-6">
+
+                                <!-- EMPTY STATE -->
+                                <div
+                                    id="variantEmptyState"
+                                    class="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl">
+
+                                    <div class="text-sm font-bold text-gray-500">
+                                        Chưa có biến thể
+                                    </div>
+
+                                    <p class="text-xs text-gray-400 mt-1">
+                                        Sản phẩm không có variant vẫn sử dụng giá và tồn kho ở cấp sản phẩm.
+                                    </p>
+
+                                </div>
+
+                                <!-- VARIANT LIST -->
+                                <div
+                                    id="variantList"
+                                    class="hidden space-y-4">
+                                </div>
+
+                                <!-- VARIANT FORM -->
+                                <div
+                                    id="variantForm"
+                                    class="hidden mt-6 border border-blue-200 rounded-xl bg-blue-50/30 p-5">
+
+                                    <div class="flex items-center justify-between mb-5">
+                                        <div>
+                                            <h4 class="text-sm font-black text-gray-800">
+                                                Thêm / chỉnh sửa quy cách bán
+                                            </h4>
+                                            <p class="text-xs text-gray-400 mt-1">
+                                                Mỗi quy cách là một cách bán riêng của sản phẩm, có thể có SKU riêng.
+                                            </p>
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            id="btnCancelVariant"
+                                            class="text-xs font-bold text-gray-500 hover:text-gray-800">
+                                            Hủy
+                                        </button>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                                        <!-- Selling configuration name -->
+                                        <div>
+                                            <label class="block text-xs font-bold text-gray-700 mb-1">
+                                                Tên quy cách bán *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                id="variantName"
+                                                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                                                placeholder="Ví dụ: Cái, Hộp, Thùng hoặc Đen - Hộp">
+                                            <p class="mt-1 text-[11px] text-gray-400">
+                                                Với sản phẩm đơn giản, chỉ cần nhập Cái / Hộp / Thùng.
+                                            </p>
+                                        </div>
+
+                                        <!-- SKU -->
+                                        <div>
+                                            <label class="block text-xs font-bold text-gray-700 mb-1">
+                                                SKU
+                                            </label>
+                                            <input
+                                                type="text"
+                                                id="variantSku"
+                                                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm uppercase focus:ring-2 focus:ring-blue-500"
+                                                placeholder="Có thể để trống">
+                                        </div>
+
+                                        <!-- Optional attributes -->
+                                        <div class="md:col-span-2 border border-gray-200 rounded-xl bg-white p-4">
+                                            <div class="flex items-center justify-between gap-3 mb-2">
+                                                <div>
+                                                    <label class="block text-sm font-bold text-gray-700">
+                                                        Thuộc tính phân loại <span class="font-normal text-gray-400">(không bắt buộc)</span>
+                                                    </label>
+                                                    <p class="text-[11px] text-gray-400 mt-1">
+                                                        Chỉ dùng khi sản phẩm có Màu, Chất liệu, Model... Không cần điền nếu chỉ có Cái / Hộp / Thùng.
+                                                    </p>
+                                                </div>
+
+                                                <button
+                                                    type="button"
+                                                    id="btnAddVariantAttribute"
+                                                    class="shrink-0 px-3 py-1.5 rounded-lg border border-blue-200 text-blue-600 text-xs font-bold hover:bg-blue-50">
+                                                    + Thêm thuộc tính
+                                                </button>
+                                            </div>
+
+                                            <div id="variantAttributeList" class="space-y-2"></div>
+                                        </div>
+
+                                        <!-- Unit -->
+                                        <div>
+                                            <label class="block text-xs font-bold text-gray-700 mb-1">
+                                                Đơn vị bán *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                id="variantUnit"
+                                                list="variantUnitOptions"
+                                                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                                                placeholder="Ví dụ: Cái, Hộp, Thùng">
+                                            <datalist id="variantUnitOptions">
+                                                <option value="Cái"></option>
+                                                <option value="Hộp"></option>
+                                                <option value="Thùng"></option>
+                                                <option value="Bộ"></option>
+                                                <option value="Chai"></option>
+                                                <option value="Can"></option>
+                                                <option value="Cuộn"></option>
+                                                <option value="Kg"></option>
+                                            </datalist>
+                                            <p class="mt-1 text-[11px] text-gray-400">
+                                                Số lượng đặt hàng luôn tính theo đơn vị này.
+                                            </p>
+                                        </div>
+
+                                        <!-- Price -->
+                                        <div>
+                                            <label class="block text-xs font-bold text-gray-700 mb-1">
+                                                Giá niêm yết (VNĐ)
+                                            </label>
+                                            <input
+                                                type="number"
+                                                id="variantPrice"
+                                                min="0"
+                                                step="1"
+                                                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                                                placeholder="0">
+                                        </div>
+
+                                        <!-- Discount price -->
+                                        <div>
+                                            <label class="block text-xs font-bold text-gray-700 mb-1">
+                                                Giá khuyến mãi (VNĐ)
+                                            </label>
+                                            <input
+                                                type="number"
+                                                id="variantDiscountPrice"
+                                                min="0"
+                                                step="1"
+                                                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                                                placeholder="Để trống nếu không có">
+                                        </div>
+
+                                        <!-- Stock -->
+                                        <div>
+                                            <label class="block text-xs font-bold text-gray-700 mb-1">
+                                                Tồn kho
+                                            </label>
+                                            <input
+                                                type="number"
+                                                id="variantStock"
+                                                min="0"
+                                                step="1"
+                                                value="0"
+                                                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+                                            <p class="mt-1 text-[11px] text-gray-400">Tồn kho tính theo đơn vị bán.</p>
+                                        </div>
+
+                                        <!-- MOQ -->
+                                        <div>
+                                            <label class="block text-xs font-bold text-gray-700 mb-1">
+                                                Mua tối thiểu (MOQ)
+                                            </label>
+                                            <input
+                                                type="number"
+                                                id="variantMinOrderQuantity"
+                                                min="1"
+                                                step="1"
+                                                value="1"
+                                                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+                                            <p class="mt-1 text-[11px] text-gray-400">Ví dụ: 1 = mua tối thiểu 1 Cái / Hộp / Thùng.</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Active -->
+                                    <div class="mt-4 flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            id="variantIsActive"
+                                            checked
+                                            class="w-4 h-4 rounded border-gray-300">
+                                        <label
+                                            for="variantIsActive"
+                                            class="text-xs font-bold text-gray-700">
+                                            Cho phép hiển thị và đặt mua quy cách này
+                                        </label>
+                                    </div>
+
+                                    <!-- Tier pricing -->
+                                    <div class="mt-6 border-t border-blue-100 pt-5">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <div>
+                                                <h5 class="text-xs font-black text-gray-800 uppercase">
+                                                    Giá theo số lượng
+                                                </h5>
+                                                <p class="text-[11px] text-gray-400 mt-1">
+                                                    Ví dụ: mua từ 10 Hộp trở lên thì áp dụng đơn giá thấp hơn.
+                                                </p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                id="btnAddVariantTier"
+                                                class="px-3 py-1.5 rounded-lg border border-blue-300 text-blue-700 text-xs font-bold hover:bg-blue-50">
+                                                + Thêm mức giá
+                                            </button>
+                                        </div>
+
+                                        <div id="variantTierList" class="space-y-2"></div>
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="mt-6 flex justify-end gap-2">
+
+                                        <button
+                                            type="button"
+                                            id="btnCancelVariantBottom"
+                                            class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-xs font-bold text-gray-600 hover:bg-gray-50">
+                                            Hủy
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            id="btnSaveVariant"
+                                            class="px-5 py-2 rounded-lg bg-kn-blue text-white text-xs font-bold hover:bg-blue-800 shadow-sm">
+                                            Lưu biến thể
+                                        </button>
 
                                     </div>
 

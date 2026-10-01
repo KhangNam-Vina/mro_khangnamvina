@@ -78,16 +78,32 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.replace('../index.html');
 
         } catch (error) {
-            console.error('Lỗi đăng nhập:', error);
-            let message = 'Đăng nhập thất bại. Vui lòng thử lại sau.';
+    console.error('Lỗi đăng nhập:', error);
 
-            if (error.message?.includes('Invalid login credentials')) {
-                message = '<strong>Sai Email hoặc Mật khẩu.</strong> Vui lòng kiểm tra lại!';
-            } else if (error.message?.includes('Email not confirmed')) {
-                message = 'Vui lòng xác thực email trong hòm thư trước khi đăng nhập.';
-            }
+    let message = 'Đăng nhập thất bại. Vui lòng thử lại sau.';
 
-            showError(message);
+    // ====================================================
+    // RATE LIMIT — SUPABASE TRẢ 429
+    // ====================================================
+    if (error?.status === 429) {
+        message = '<strong>Bạn đăng nhập quá nhiều lần.</strong> Vui lòng thử lại sau ít phút.';
+    }
+
+    // ====================================================
+    // SAI EMAIL / MẬT KHẨU
+    // ====================================================
+    else if (error.message?.includes('Invalid login credentials')) {
+        message = '<strong>Sai Email hoặc Mật khẩu.</strong> Vui lòng kiểm tra lại!';
+    }
+
+    // ====================================================
+    // EMAIL CHƯA XÁC THỰC
+    // ====================================================
+    else if (error.message?.includes('Email not confirmed')) {
+        message = 'Vui lòng xác thực email trong hòm thư trước khi đăng nhập.';
+    }
+
+    showError(message);
             
         } finally {
             if (btn) {

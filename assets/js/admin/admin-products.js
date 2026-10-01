@@ -69,7 +69,11 @@ const state = {
         removedGallery: [],
         pendingMainFile: null,
         pendingExtraFiles: []
-    }
+    },
+
+    variants: [],
+    editingVariantId: null,
+    deletedVariantIds: [],
 };
 
 /* =========================================================
@@ -152,6 +156,30 @@ const DOM = {
     filterHasImage: document.getElementById("filterHasImage"),
     filterHasDatasheet: document.getElementById("filterHasDatasheet"),
     filterHasInfo: document.getElementById("filterHasInfo"),
+    
+    // Variant
+    btnAddVariant: document.getElementById("btnAddVariant"),
+    variantEmptyState: document.getElementById("variantEmptyState"),
+    variantList: document.getElementById("variantList"),
+    variantForm: document.getElementById("variantForm"),
+    variantName: document.getElementById("variantName"),
+    variantSku: document.getElementById("variantSku"),
+    variantAttributeList: document.getElementById("variantAttributeList"),
+    btnAddVariantAttribute: document.getElementById("btnAddVariantAttribute"),
+    variantUnit: document.getElementById("variantUnit"),
+    // Đã fix lỗi trùng DOM element variantUnit
+    variantPrice: document.getElementById("variantPrice"),
+    variantDiscountPrice: document.getElementById("variantDiscountPrice"),
+    variantStock: document.getElementById("variantStock"),
+    variantMinOrderQuantity: document.getElementById("variantMinOrderQuantity"),
+    variantIsActive: document.getElementById("variantIsActive"),
+
+    btnAddVariantTier: document.getElementById("btnAddVariantTier"),
+    variantTierList: document.getElementById("variantTierList"),
+
+    btnCancelVariant: document.getElementById("btnCancelVariant"),
+    btnCancelVariantBottom: document.getElementById("btnCancelVariantBottom"),
+    btnSaveVariant: document.getElementById("btnSaveVariant"),
 };
 
 /* =========================================================
@@ -328,6 +356,384 @@ function viewCurrentSlug() {
         return;
     }
     window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function addVariantAttributeRow(name = "", value = "") {
+    const row = document.createElement("div");
+
+    row.className = "variant-attribute-row grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-2 items-end";
+
+    row.innerHTML = `
+        <div>
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Tên thuộc tính</label>
+            <input type="text" class="variant-attribute-name w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" value="${escapeAttribute(name)}" placeholder="Ví dụ: Màu">
+        </div>
+        <div>
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Giá trị</label>
+            <input type="text" class="variant-attribute-value w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" value="${escapeAttribute(value)}" placeholder="Ví dụ: Đen">
+        </div>
+        <button type="button" class="btn-remove-variant-attribute px-3 py-2 rounded-lg border border-red-200 text-red-600 text-xs font-bold hover:bg-red-50">
+            Xóa
+        </button>
+    `;
+
+    row.querySelector(".btn-remove-variant-attribute").addEventListener("click", () => {
+        row.remove();
+    });
+
+    DOM.variantAttributeList.appendChild(row);
+}
+
+// =========================================================
+// VARIANT FORM
+// =========================================================
+
+function resetVariantForm() {
+    DOM.variantName.value = "";
+    DOM.variantSku.value = "";
+    DOM.variantAttributeList.innerHTML = "";
+    DOM.variantUnit.value = "";
+    DOM.variantPrice.value = "";
+    DOM.variantDiscountPrice.value = "";
+    DOM.variantStock.value = "0";
+    DOM.variantMinOrderQuantity.value = "1";
+    DOM.variantIsActive.checked = true;
+    DOM.variantTierList.innerHTML = "";
+    state.editingVariantId = null;
+}
+
+function openVariantForm(variant = null) {
+    resetVariantForm();
+
+    if (variant) {
+        state.editingVariantId = variant.id || null;
+
+        DOM.variantName.value = variant.variant_name || "";
+        DOM.variantSku.value = variant.sku || "";
+        const attributes = variant.attributes || {};
+
+        Object.entries(attributes).forEach(([name, value]) => {
+            addVariantAttributeRow(name, value);
+        });
+        
+        DOM.variantUnit.value = variant.unit || "";
+        DOM.variantPrice.value = variant.price ?? "";
+        DOM.variantDiscountPrice.value = variant.discount_price ?? "";
+        DOM.variantStock.value = variant.stock_quantity ?? 0;
+        DOM.variantMinOrderQuantity.value = variant.min_order_quantity ?? 1;
+        DOM.variantIsActive.checked = variant.is_active !== false;
+
+        (variant.tiers || []).forEach((tier) => {
+            addVariantTierRow(tier);
+        });
+    }
+
+    DOM.variantForm.classList.remove("hidden");
+    DOM.variantName.focus();
+    
+    // GỌI LỆNH RENDER ĐỂ THU NHỎ DANH SÁCH XUỐNG DẠNG COMPACT
+    renderVariants();
+}
+
+function closeVariantForm() {
+    DOM.variantForm.classList.add("hidden");
+    resetVariantForm();
+    
+    // GỌI LỆNH RENDER ĐỂ BUNG DANH SÁCH RA BÌNH THƯỜNG
+    renderVariants();
+}
+
+function addVariantTierRow(tier = {}) {
+    const row = document.createElement("div");
+
+    row.className = "variant-tier-row grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-2 items-end border border-gray-200 bg-white rounded-lg p-3";
+
+    row.innerHTML = `
+        <div>
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Từ số lượng</label>
+            <input type="number" min="1" step="1" class="variant-tier-min w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" value="${tier.min_quantity ?? 1}">
+        </div>
+        <div>
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Đến số lượng</label>
+            <input type="number" min="1" step="1" class="variant-tier-max w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" value="${tier.max_quantity ?? ""}" placeholder="Không giới hạn">
+        </div>
+        <div>
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Đơn giá</label>
+            <input type="number" min="0" step="1" class="variant-tier-price w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" value="${tier.unit_price ?? ""}" placeholder="0">
+        </div>
+        <button type="button" class="btn-remove-variant-tier px-3 py-2 rounded-lg border border-red-200 text-red-600 text-xs font-bold hover:bg-red-50">Xóa</button>
+    `;
+
+    row.querySelector(".btn-remove-variant-tier").addEventListener("click", () => {
+        row.remove();
+    });
+
+    DOM.variantTierList.appendChild(row);
+}
+
+function getVariantFormData() {
+    const attributes = {};
+
+    DOM.variantAttributeList.querySelectorAll(".variant-attribute-row").forEach((row) => {
+        const name = row.querySelector(".variant-attribute-name").value.trim();
+        const value = row.querySelector(".variant-attribute-value").value.trim();
+
+        if (name && value) {
+            // ĐÃ FIX: Nối các giá trị lại bằng dấu phẩy nếu nhập trùng tên thuộc tính
+            if (attributes[name]) {
+                attributes[name] = attributes[name] + ", " + value;
+            } else {
+                attributes[name] = value;
+            }
+        }
+    });
+
+    const tiers = [...DOM.variantTierList.querySelectorAll(".variant-tier-row")].map((row) => {
+        const minInput = row.querySelector(".variant-tier-min");
+        const maxInput = row.querySelector(".variant-tier-max");
+        const priceInput = row.querySelector(".variant-tier-price");
+
+        return {
+            min_quantity: Number(minInput.value),
+            max_quantity: maxInput.value.trim() === "" ? null : Number(maxInput.value),
+            unit_price: Number(priceInput.value)
+        };
+    });
+
+    return {
+        id: state.editingVariantId || crypto.randomUUID(),
+        _isNew: !state.editingVariantId,
+        variant_name: DOM.variantName.value.trim(),
+        sku: DOM.variantSku.value.trim() ? DOM.variantSku.value.trim().toUpperCase() : null,
+        attributes,
+        unit: DOM.variantUnit.value.trim(),
+        price: DOM.variantPrice.value.trim() === "" ? null : Number(DOM.variantPrice.value),
+        discount_price: DOM.variantDiscountPrice.value.trim() === "" ? null : Number(DOM.variantDiscountPrice.value),
+        stock_quantity: Number(DOM.variantStock.value),
+        min_order_quantity: Number(DOM.variantMinOrderQuantity.value),
+        is_active: DOM.variantIsActive.checked,
+        tiers
+    };
+}
+
+function validateVariant(variant) {
+    if (!variant.variant_name) {
+        alert("Vui lòng nhập tên quy cách bán.");
+        return false;
+    }
+
+    if (variant.sku) {
+        variant.sku = String(variant.sku).trim().toUpperCase();
+    }
+
+    if (!variant.unit) {
+        alert("Vui lòng nhập đơn vị bán.");
+        return false;
+    }
+
+    if (variant.price !== null && (!Number.isInteger(variant.price) || variant.price < 0)) {
+        alert("Giá bán không hợp lệ.");
+        return false;
+    }
+
+    if (variant.discount_price !== null && (!Number.isInteger(variant.discount_price) || variant.discount_price < 0)) {
+        alert("Giá khuyến mãi không hợp lệ.");
+        return false;
+    }
+
+    if (!Number.isInteger(variant.stock_quantity) || variant.stock_quantity < 0) {
+        alert("Tồn kho phải là số nguyên >= 0.");
+        return false;
+    }
+
+    if (!Number.isInteger(variant.min_order_quantity) || variant.min_order_quantity < 1) {
+        alert("Số lượng tối thiểu phải >= 1.");
+        return false;
+    }
+
+    // Validate tier
+    for (const tier of variant.tiers) {
+        if (!Number.isInteger(tier.min_quantity) || tier.min_quantity < 1) {
+            alert("Số lượng bắt đầu của tier phải >= 1.");
+            return false;
+        }
+
+        if (tier.max_quantity !== null && (!Number.isInteger(tier.max_quantity) || tier.max_quantity < tier.min_quantity)) {
+            alert("Khoảng số lượng tier không hợp lệ.");
+            return false;
+        }
+
+        if (!Number.isInteger(tier.unit_price) || tier.unit_price < 0) {
+            alert("Đơn giá tier không hợp lệ.");
+            return false;
+        }
+    }
+
+    // Check overlap ở frontend
+    const sortedTiers = [...variant.tiers].sort((a, b) => a.min_quantity - b.min_quantity);
+
+    for (let i = 1; i < sortedTiers.length; i++) {
+        const previous = sortedTiers[i - 1];
+        const current = sortedTiers[i];
+
+        const previousMax = previous.max_quantity ?? Number.MAX_SAFE_INTEGER;
+
+        if (current.min_quantity <= previousMax) {
+            alert(
+                `Các mức giá đang bị trùng khoảng số lượng:\n` +
+                `${previous.min_quantity} - ${previous.max_quantity ?? "∞"} và ` +
+                `${current.min_quantity} - ${current.max_quantity ?? "∞"}`
+            );
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function renderVariants() {
+    const variants = state.variants || [];
+    
+    // Kiểm tra xem Form nhập liệu có đang mở hay không?
+    const isFormOpen = !DOM.variantForm.classList.contains("hidden");
+
+    // ==========================================
+    // TRƯỜNG HỢP 1: CHƯA CÓ BIẾN THỂ NÀO
+    // ==========================================
+    if (!variants.length) {
+        DOM.variantList.classList.add("hidden");
+        // Xóa sổ luôn cái bảng "Chưa có biến thể"
+        if (DOM.variantEmptyState) DOM.variantEmptyState.classList.add("hidden"); 
+
+        // Tự động bung Form ra cho Admin điền luôn
+        if (!isFormOpen) {
+            DOM.variantForm.classList.remove("hidden");
+            resetVariantForm();
+        }
+        return;
+    }
+
+    // ==========================================
+    // TRƯỜNG HỢP 2: ĐÃ CÓ BIẾN THỂ
+    // ==========================================
+    if (DOM.variantEmptyState) DOM.variantEmptyState.classList.add("hidden");
+    DOM.variantList.classList.remove("hidden");
+
+    DOM.variantList.innerHTML = variants.map((variant) => {
+        const attributes = Object.entries(variant.attributes || {});
+        const attributeText = attributes.length
+            ? attributes.map(([name, value]) => `${escapeHTML(name)}: ${escapeHTML(value)}`).join(" • ")
+            : "Không có thuộc tính phân loại";
+        const tierText = variant.tiers?.length
+            ? variant.tiers.map((tier) => {
+                const max = tier.max_quantity ?? "∞";
+                return `${tier.min_quantity}-${max}: ${formatCurrency(tier.unit_price)}`;
+            }).join(" • ")
+            : "Không có giá theo số lượng";
+
+        return `
+            <div class="variant-card border border-gray-200 rounded-xl bg-white transition-all duration-300 ${isFormOpen ? 'p-3 opacity-80 hover:opacity-100' : 'p-5'} ${variant.is_active === false ? 'opacity-60 bg-gray-50' : ''}" data-variant-id="${escapeAttribute(variant.id)}">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-sm font-black text-gray-800">${escapeHTML(variant.variant_name)}</span>
+                            ${variant.sku
+                                ? `<span class="px-2 py-1 rounded-md bg-gray-100 text-[11px] font-bold text-gray-600">SKU: ${escapeHTML(variant.sku)}</span>`
+                                : `<span class="px-2 py-1 rounded-md bg-gray-50 text-[11px] font-bold text-gray-400">Không có SKU</span>`
+                            }
+                            ${variant.is_active !== false
+                                ? `<span class="px-2 py-1 rounded-md bg-green-100 text-green-700 text-[11px] font-bold">Đang hoạt động</span>`
+                                : `<span class="px-2 py-1 rounded-md bg-gray-200 text-gray-600 text-[11px] font-bold">Tạm ẩn</span>`
+                            }
+                            
+                            <!-- HIỆN TÓM TẮT GIÁ & KHO KHI FORM ĐANG MỞ (COMPACT MODE) -->
+                            ${isFormOpen ? `
+                                <span class="text-xs text-kn-orange font-bold ml-2">${formatCurrency(variant.discount_price || variant.price)}</span>
+                                <span class="text-xs text-gray-400 font-medium ml-1">| Kho: ${Number(variant.stock_quantity || 0).toLocaleString("vi-VN")}</span>
+                            ` : ''}
+                        </div>
+
+                        <!-- CHI TIẾT SẼ BỊ ẨN ĐI KHI FORM ĐANG MỞ ĐỂ TIẾT KIỆM DIỆN TÍCH -->
+                        <div class="${isFormOpen ? 'hidden' : 'mt-4'}">
+                            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                <div>
+                                    <div class="text-[10px] uppercase text-gray-400 font-bold">Đơn vị bán</div>
+                                    <div class="text-xs font-bold text-gray-700 mt-1">${escapeHTML(variant.unit || "—")}</div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] uppercase text-gray-400 font-bold">Giá niêm yết</div>
+                                    <div class="text-xs font-bold text-gray-700 mt-1">
+                                        ${variant.price !== null ? formatCurrency(variant.price) : "—"}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] uppercase text-gray-400 font-bold">Giá khuyến mãi</div>
+                                    <div class="text-xs font-bold text-gray-700 mt-1">
+                                        ${variant.discount_price !== null ? formatCurrency(variant.discount_price) : "—"}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] uppercase text-gray-400 font-bold">Tồn kho</div>
+                                    <div class="text-xs font-bold text-gray-700 mt-1">
+                                        ${Number(variant.stock_quantity || 0).toLocaleString("vi-VN")}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] uppercase text-gray-400 font-bold">MOQ</div>
+                                    <div class="text-xs font-bold text-gray-700 mt-1">
+                                        ${Number(variant.min_order_quantity || 1).toLocaleString("vi-VN")}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div>
+                                    <div class="text-[10px] uppercase text-gray-400 font-bold">Thuộc tính phân loại</div>
+                                    <div class="text-xs text-gray-600 mt-1">${attributeText}</div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] uppercase text-gray-400 font-bold">Giá theo số lượng</div>
+                                    <div class="text-xs text-gray-600 mt-1">${escapeHTML(tierText)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 shrink-0">
+                        <!-- CÔNG TẮC BẬT/TẮT NHANH -->
+                        <div class="flex items-center border-r border-gray-200 pr-3 mr-1" title="${variant.is_active !== false ? 'Tắt hiển thị' : 'Bật hiển thị'}">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer btn-toggle-variant" data-id="${escapeAttribute(variant.id)}" ${variant.is_active !== false ? 'checked' : ''}>
+                                <div class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500 shadow-inner"></div>
+                            </label>
+                        </div>
+
+                        <button type="button" class="btn-edit-variant px-3 py-2 rounded-lg border border-gray-300 text-xs font-bold text-gray-600 hover:bg-gray-50" data-id="${escapeAttribute(variant.id)}">Sửa</button>
+                        <button type="button" class="btn-delete-variant px-3 py-2 rounded-lg border border-red-200 text-xs font-bold text-red-600 hover:bg-red-50" data-id="${escapeAttribute(variant.id)}">Xóa</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+function saveVariantDraft() {
+    const variant = getVariantFormData();
+
+    if (!validateVariant(variant)) {
+        return;
+    }
+
+    const existingIndex = state.variants.findIndex((item) => item.id === variant.id);
+
+    if (existingIndex >= 0) {
+        state.variants[existingIndex] = variant;
+    } else {
+        state.variants.push(variant);
+    }
+
+    renderVariants();
+    closeVariantForm();
 }
 
 /* =========================================================
@@ -639,7 +1045,6 @@ function escapeDropdownHTML(value) {
 /* =========================================================
    BỘ LỌC ĐA NĂNG (ADVANCED FILTERS)
 ========================================================= */
-
 function updateFilterSubCategories(categoryId, preserveSelection = false) {
     if (!DOM.filterSubCategory || !DOM.filterFamily) return;
 
@@ -1272,7 +1677,6 @@ async function updateDataQuality() {
             { key: "information", label: "Thông tin tổng thể", complete: completeInformation, missing: missingInformation, icon: "fa-clipboard-check" }
         ];
 
-        // ADDED FIX HERE
         if (DOM.dataQualityTotal) {
             DOM.dataQualityTotal.textContent = `${formatNumber(total)} sản phẩm`;
         }
@@ -1311,7 +1715,6 @@ async function updateDataQuality() {
     } catch (error) {
         console.error("Lỗi Data Quality:", error);
         
-        // ADDED FIX HERE
         if (DOM.dataQualityTotal) {
             DOM.dataQualityTotal.textContent = "Không thể tải dữ liệu";
         }
@@ -1414,33 +1817,112 @@ function renderPagination() {
 }
 
 /* =========================================================
+   LOAD PRODUCT VARIANTS
+========================================================= */
+
+async function loadProductVariants(productId) {
+    if (!productId) {
+        state.variants = [];
+        state.deletedVariantIds = [];
+        renderVariants();
+        return;
+    }
+
+    const { data: variants, error: variantError } = await window.supabaseClient
+        .from("product_variants")
+        .select(`id, product_id, sku, variant_name, attributes, price, discount_price, stock_quantity, min_order_quantity, unit, is_active, created_at, updated_at`)
+        .eq("product_id", productId)
+        .order("created_at", { ascending: true });
+
+    if (variantError) throw variantError;
+
+    const variantRows = variants || [];
+
+    if (!variantRows.length) {
+        state.variants = [];
+        state.deletedVariantIds = [];
+        renderVariants();
+        return;
+    }
+
+    const variantIds = variantRows.map(variant => variant.id);
+    let tiers = [];
+
+    // FIX LỖI CRASH KHI KHÔNG CÓ VARIANT
+    if (variantIds.length > 0) {
+        const { data: tierRows, error: tierError } = await window.supabaseClient
+            .from("product_variant_prices")
+            .select(`id, variant_id, min_quantity, max_quantity, unit_price, created_at, updated_at`)
+            .in("variant_id", variantIds)
+            .order("min_quantity", { ascending: true });
+
+        if (tierError) throw tierError;
+        tiers = tierRows || [];
+    }
+
+    state.variants = variantRows.map(variant => ({
+        ...variant,
+        _isNew: false,
+        tiers: tiers
+            .filter(tier => tier.variant_id === variant.id)
+            .map(tier => ({
+                id: tier.id,
+                min_quantity: tier.min_quantity,
+                max_quantity: tier.max_quantity,
+                unit_price: tier.unit_price
+            }))
+    }));
+
+    state.deletedVariantIds = [];
+    renderVariants();
+}
+
+/* =========================================================
    FORM ACTIONS (Add/Edit/Cancel)
 ========================================================= */
 function showAddForm() {
     clearTimeout(autoSlugTimer);
     ++autoSlugRequestId;
+
     state.editingId = null;
     state.editingSlugSource = "auto";
+
     if (DOM.form) DOM.form.reset();
+
     resetCatalogDropdowns();
     resetMediaInputs();
-    if (typeof CKEDITOR !== "undefined" && CKEDITOR.instances.description) CKEDITOR.instances.description.setData("");
+
+    // Reset variants
+    state.variants = [];
+    state.deletedVariantIds = [];
+    state.editingVariantId = null;
+
+    renderVariants();
+    closeVariantForm();
+
+    if (typeof CKEDITOR !== "undefined" && CKEDITOR.instances.description) {
+        CKEDITOR.instances.description.setData("");
+    }
+
     if (DOM.formTitle) DOM.formTitle.textContent = "Nhập Sản Phẩm Mới";
     if (DOM.btnSubmit) DOM.btnSubmit.textContent = "Nhập kho sản phẩm";
-    
+
     // Reset SEO
     if (DOM.slug) DOM.slug.value = "";
     if (DOM.metaTitle) DOM.metaTitle.value = "";
     if (DOM.metaDescription) DOM.metaDescription.value = "";
+
     if (DOM.isH1) DOM.isH1.checked = true;
     if (DOM.slugSourceLabel) DOM.slugSourceLabel.textContent = "Tự động";
     if (DOM.metaTitleCount) DOM.metaTitleCount.textContent = "0 ký tự";
     if (DOM.metaDescriptionCount) DOM.metaDescriptionCount.textContent = "0 ký tự";
     if (DOM.isActive) DOM.isActive.checked = true;
-    
+
     updateSeoPreview();
+
     DOM.listView?.classList.add("hidden");
     DOM.formView?.classList.remove("hidden");
+
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -1483,7 +1965,7 @@ function updateSeoPreview() {
     if (DOM.seoPreviewDescription) DOM.seoPreviewDescription.textContent = description;
 }
 
-function editProduct(id) {
+async function editProduct(id) {
     const item = state.products.find(p => String(p.id) === String(id));
     if (!item) { showToast("Không tìm thấy sản phẩm.", "error"); return; }
     
@@ -1535,6 +2017,16 @@ function editProduct(id) {
     }
     
     loadExistingMedia(item);
+    
+    try {
+        await loadProductVariants(item.id);
+    } catch (error) {
+        console.error("Lỗi tải biến thể sản phẩm:", error);
+        state.variants = [];
+        state.deletedVariantIds = [];
+        renderVariants();
+        showToast("Không thể tải biến thể sản phẩm.", "error");
+    }
     
     if (DOM.formTitle) DOM.formTitle.textContent = `Sửa Sản Phẩm: ${item.sku}`;
     if (DOM.btnSubmit) DOM.btnSubmit.textContent = "Cập nhật sản phẩm";
@@ -1700,9 +2192,16 @@ async function saveProduct(event) {
 
             if (mediaPayload.image_path || mediaPayload.images) {
                 btn.textContent = "Đang lưu ảnh...";
-                const { error: mediaError } = await window.supabaseClient.from("products").update(mediaPayload).eq("id", insertedProductId);
+                const { error: mediaError } = await window.supabaseClient
+                    .from("products")
+                    .update(mediaPayload)
+                    .eq("id", insertedProductId);
+
                 if (mediaError) throw mediaError;
             }
+
+            btn.textContent = "Đang lưu biến thể...";
+            await saveProductVariants(insertedProductId);
 
             state.currentPage = 1;
             showToast("Thêm sản phẩm thành công!", "success");
@@ -1744,6 +2243,9 @@ async function saveProduct(event) {
             btn.textContent = "Đang dọn ảnh cũ...";
             await cleanupRemovedMedia(productId, oldMainPath, oldGalleryPaths, finalMainPath, finalGalleryPaths);
 
+            btn.textContent = "Đang lưu biến thể...";
+            await saveProductVariants(productId);
+
             showToast("Đã cập nhật sản phẩm!", "success");
         }
 
@@ -1766,6 +2268,85 @@ async function saveProduct(event) {
         btn.disabled = false;
         btn.textContent = originalText;
     }
+}
+
+/* =========================================================
+   SAVE PRODUCT VARIANTS
+========================================================= */
+async function saveProductVariants(productId) {
+    if (!productId) {
+        throw new Error("Không xác định được product ID để lưu biến thể.");
+    }
+
+    const variants = state.variants || [];
+    const deletedVariantIds = [...(state.deletedVariantIds || [])];
+
+    if (deletedVariantIds.length > 0) {
+        const { error: deleteError } = await window.supabaseClient
+            .from("product_variants")
+            .delete()
+            .in("id", deletedVariantIds);
+        if (deleteError) throw deleteError;
+    }
+
+    if (variants.length === 0) {
+        state.deletedVariantIds = [];
+        return;
+    }
+
+    const variantPayload = variants.map((variant) => ({
+        id: variant.id,
+        product_id: productId,
+        sku: variant.sku?.trim() ? variant.sku.trim().toUpperCase() : null,
+        variant_name: variant.variant_name.trim(),
+        attributes: variant.attributes || {},
+        price: variant.price,
+        discount_price: variant.discount_price,
+        stock_quantity: variant.stock_quantity,
+        min_order_quantity: variant.min_order_quantity,
+        unit: variant.unit.trim(),
+        is_active: variant.is_active
+    }));
+
+    const { error: variantError } = await window.supabaseClient
+        .from("product_variants")
+        .upsert(variantPayload, { onConflict: "id" })
+        .select(`id, product_id, sku, variant_name, attributes, price, discount_price, stock_quantity, min_order_quantity, unit, is_active`);
+
+    if (variantError) throw variantError;
+
+    const variantIds = variants.map((variant) => variant.id);
+
+    if (variantIds.length > 0) {
+        const { error: deleteTierError } = await window.supabaseClient
+            .from("product_variant_prices")
+            .delete()
+            .in("variant_id", variantIds);
+        if (deleteTierError) throw deleteTierError;
+    }
+
+    const tierPayload = variants.flatMap((variant) =>
+        (variant.tiers || []).map((tier) => ({
+            variant_id: variant.id,
+            min_quantity: tier.min_quantity,
+            max_quantity: tier.max_quantity,
+            unit_price: tier.unit_price
+        }))
+    );
+
+    if (tierPayload.length > 0) {
+        const { error: tierError } = await window.supabaseClient
+            .from("product_variant_prices")
+            .insert(tierPayload);
+        if (tierError) throw tierError;
+    }
+
+    state.variants = variants.map((variant) => ({
+        ...variant,
+        _isNew: false
+    }));
+
+    state.deletedVariantIds = [];
 }
 
 /* =========================================================
@@ -1938,6 +2519,77 @@ function bindEvents() {
         if (actionBtn.dataset.pageAction === "prev" && state.currentPage > 1) { state.currentPage--; fetchProducts(); }
         if (actionBtn.dataset.pageAction === "next" && state.currentPage < totalPages) { state.currentPage++; fetchProducts(); }
     });
+
+    // SỰ KIỆN NÚT VARIANT (FIX 1: Thêm sự kiện nút thêm thuộc tính)
+    DOM.btnAddVariantAttribute?.addEventListener("click", () => {
+        addVariantAttributeRow();
+    });
+
+    DOM.btnAddVariant?.addEventListener("click", () => {
+        openVariantForm();
+    });
+
+    DOM.btnAddVariantTier?.addEventListener("click", () => {
+        addVariantTierRow();
+    });
+
+    DOM.btnCancelVariant?.addEventListener("click", () => {
+        closeVariantForm();
+    });
+
+    DOM.btnCancelVariantBottom?.addEventListener("click", () => {
+        closeVariantForm();
+    });
+
+    DOM.btnSaveVariant?.addEventListener("click", () => {
+        saveVariantDraft();
+    });
+
+    DOM.variantList?.addEventListener("click", (event) => {
+        const editButton = event.target.closest(".btn-edit-variant");
+        const deleteButton = event.target.closest(".btn-delete-variant");
+
+        if (editButton) {
+            const id = editButton.dataset.id;
+            const variant = state.variants.find((item) => item.id === id);
+            if (variant) openVariantForm(variant);
+            return;
+        }
+
+        if (deleteButton) {
+            const id = deleteButton.dataset.id;
+            const confirmed = confirm("Bạn có chắc muốn xóa biến thể này?");
+            if (!confirmed) return;
+
+            const variant = state.variants.find(item => item.id === id);
+            if (!variant) return;
+
+            // Variant đã tồn tại trong DB
+            if (!variant._isNew) {
+                if (!state.deletedVariantIds.includes(id)) {
+                    state.deletedVariantIds.push(id);
+                }
+            }
+
+            state.variants = state.variants.filter(item => item.id !== id);
+            renderVariants();
+        }
+    });
+    // SỰ KIỆN GẠT CÔNG TẮC TẮT/BẬT BIẾN THỂ TRỰC TIẾP
+    DOM.variantList?.addEventListener("change", (event) => {
+        if (event.target.classList.contains("btn-toggle-variant")) {
+            const id = event.target.dataset.id;
+            const isChecked = event.target.checked;
+            
+            // Tìm biến thể trong mảng nháp và cập nhật trạng thái
+            const variantIndex = state.variants.findIndex(item => item.id === id);
+            if (variantIndex > -1) {
+                state.variants[variantIndex].is_active = isChecked;
+                // Vẽ lại để cập nhật màu sắc và nhãn "Đang hoạt động" / "Tạm ẩn"
+                renderVariants();
+            }
+        }
+    });
 }
 
 function initCKEditor() {
@@ -2013,7 +2665,5 @@ function handleDataQualityClick(key) {
 }
 
 function formatNumber(value) {
-    return new Intl.NumberFormat("vi-VN").format(
-        Number(value || 0)
-    );
+    return new Intl.NumberFormat("vi-VN").format(Number(value || 0));
 }

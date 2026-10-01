@@ -2,18 +2,11 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Chi tiết sản phẩm | MRO Khang Nam</title>
 
-    <meta
-        name="description"
-        content="MRO Khang Nam phân phối hơn 100 thương hiệu vật tư công nghiệp chính hãng."
-    >
-
+    <meta name="description" content="MRO Khang Nam phân phối hơn 100 thương hiệu vật tư công nghiệp chính hãng.">
     <meta property="og:type" content="product">
     <meta property="og:title" content="Chi tiết sản phẩm | MRO Khang Nam">
     <meta property="og:description" content="MRO Khang Nam phân phối vật tư công nghiệp chính hãng.">
@@ -21,750 +14,263 @@
     <meta property="og:image" content="">
     <meta property="og:site_name" content="MRO Khang Nam">
 
-    <meta
-        name="robots"
-        content="index,follow"
-    >
-
-    <link
-        rel="icon"
-        type="image/png"
-        href="../assets/images/world mark.png"
-    >
+    <meta name="robots" content="index,follow">
+    <link rel="icon" type="image/png" href="../assets/images/world mark.png">
 
     <!-- FONT -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-        rel="stylesheet"
-    >
-
-    <!-- CSS CHUNG -->
-    <link
-        rel="stylesheet"
-        href="../assets/css/style.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="../assets/css/header.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="../assets/css/footer.css"
-    >
-
-    <!-- CSS RIÊNG TRANG -->
-    <link
-        rel="stylesheet"
-        href="../assets/css/product-detail.css"
-    >
+    <!-- CSS CHUNG & CSS RIÊNG -->
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/header.css">
+    <link rel="stylesheet" href="../assets/css/footer.css">
+    <link rel="stylesheet" href="../assets/css/product-detail.css">
 </head>
 
 <body class="product-detail-page">
 
     <!-- HEADER -->
-    <div
-        id="app-header"
-        class="site-header-placeholder"
-    ></div>
+    <div id="app-header" class="site-header-placeholder"></div>
 
-
-    <!-- =====================================================
-         HERO
-    ====================================================== -->
+    <!-- HERO -->
     <section class="product-detail-hero">
-
         <div class="product-detail-hero-overlay"></div>
-
         <div class="product-detail-container">
-
-            <nav
-                aria-label="Breadcrumb"
-                class="product-detail-breadcrumb"
-            >
-                <a
-                    id="bcHome"
-                    href="../index.html"
-                    class="product-detail-breadcrumb-link"
-                >
-                    Trang chủ
-                </a>
-
-                <span
-                    class="product-detail-breadcrumb-separator"
-                    aria-hidden="true"
-                >
-                    /
-                </span>
-
-                <a 
-    id="bcCategory"
-    href="#"
-    class="product-detail-breadcrumb-link"
->
-    Danh mục
-                </a>
-
-                <span 
-                    id="bcCategorySeparator"
-                    class="product-detail-breadcrumb-separator"
-                    aria-hidden="true"
-                >
-                    /
-                </span>
-
-                <a 
-                    id="bcSubcategory"
-                    href="#"
-                    class="product-detail-breadcrumb-link"
-                >
-                    Nhóm sản phẩm
-                </a>
-
-                <span 
-                    id="bcSubcategorySeparator"
-                    class="product-detail-breadcrumb-separator"
-                    aria-hidden="true"
-                >
-                    /
-                </span>
-
-                <a 
-                    id="bcFamily"
-                    href="#"
-                    class="product-detail-breadcrumb-link"
-                >
-                    Dòng sản phẩm
-                </a>
-
-                <span 
-                    id="bcFamilySeparator"
-                    class="product-detail-breadcrumb-separator"
-                    aria-hidden="true"
-                >
-                    /
-                </span>
-
-                <span 
-                    id="bcCurrentProduct"
-                    class="product-detail-breadcrumb-current is-loading"
-                >
-                    Đang tải...
-                </span>
+            <nav aria-label="Breadcrumb" class="product-detail-breadcrumb">
+                <a id="bcHome" href="../index.html" class="product-detail-breadcrumb-link">Trang chủ</a>
+                <span class="product-detail-breadcrumb-separator" aria-hidden="true">/</span>
+                <a id="bcCategory" href="#" class="product-detail-breadcrumb-link">Danh mục</a>
+                <span id="bcCategorySeparator" class="product-detail-breadcrumb-separator" aria-hidden="true">/</span>
+                <a id="bcSubcategory" href="#" class="product-detail-breadcrumb-link">Nhóm sản phẩm</a>
+                <span id="bcSubcategorySeparator" class="product-detail-breadcrumb-separator" aria-hidden="true">/</span>
+                <a id="bcFamily" href="#" class="product-detail-breadcrumb-link">Dòng sản phẩm</a>
+                <span id="bcFamilySeparator" class="product-detail-breadcrumb-separator" aria-hidden="true">/</span>
+                <span id="bcCurrentProduct" class="product-detail-breadcrumb-current is-loading">Đang tải...</span>
             </nav>
 
-
-            <h1 class="product-detail-hero-title">
-                Chi tiết Vật tư
-            </h1>
-
-            <p class="product-detail-hero-description">
-                Cung cấp giải pháp vật tư công nghiệp, trang thiết bị nhà xưởng chuẩn xác
-            </p>
-
+            <h1 class="product-detail-hero-title">Chi tiết Vật tư</h1>
+            <p class="product-detail-hero-description">Cung cấp giải pháp vật tư công nghiệp, trang thiết bị nhà xưởng chuẩn xác</p>
         </div>
-
     </section>
 
-
-    <!-- =====================================================
-         MAIN
-    ====================================================== -->
-
-    <main
-        id="mainContent"
-        class="product-detail-main is-hidden"
-    >
-
+    <!-- MAIN -->
+    <main id="mainContent" class="product-detail-main is-hidden">
         <div class="product-detail-layout">
 
-
-            <!-- =================================================
-                 LEFT CONTENT
-            ================================================= -->
-
+            <!-- LEFT CONTENT -->
             <div class="product-detail-primary">
 
-
-                <!-- =============================================
-                     BLOCK 1
-                     IMAGE + PRODUCT INFO
-                ============================================== -->
-
+                <!-- BLOCK 1: IMAGE + PRODUCT INFO -->
                 <section class="product-detail-main-card">
-
 
                     <!-- IMAGE -->
                     <div class="product-gallery">
-
                         <div class="product-main-image-wrapper">
-
                             <div class="product-badge-stack">
-
-                                <span
-                                    id="badgeOrigin"
-                                    class="product-badge badge-origin is-hidden"
-                                >
-                                    JAPAN
-                                </span>
-
-                                <span
-                                    id="badgeStatus"
-                                    class="product-badge is-hidden"
-                                ></span>
-
+                                <span id="badgeOrigin" class="product-badge badge-origin is-hidden">JAPAN</span>
+                                <span id="badgeStatus" class="product-badge is-hidden"></span>
                             </div>
-
-
-                            <img
-                                id="mainImage"
-                                src=""
-                                alt="Product Image"
-                                loading="eager"
-                                decoding="async"
-                                class="product-main-image"
-                            >
-
+                            <img id="mainImage" src="" alt="Product Image" loading="eager" decoding="async" class="product-main-image">
                         </div>
-
-
-                        <div
-                            id="thumbnailList"
-                            class="product-thumbnail-list"
-                        ></div>
-
+                        <div id="thumbnailList" class="product-thumbnail-list"></div>
                     </div>
-
 
                     <!-- PRODUCT INFO -->
                     <div class="product-main-info">
-
-
-                        <!-- BRAND -->
                         <div class="product-brand-row">
-
-                            <div
-                                id="brandLabelWrapper"
-                                class="product-brand-label-wrapper"
-                            >
-                                <span
-                                    id="brandLabel"
-                                    class="product-brand-label"
-                                >
-                                    BRAND
-                                </span>
+                            <div id="brandLabelWrapper" class="product-brand-label-wrapper">
+                                <span id="brandLabel" class="product-brand-label">BRAND</span>
                             </div>
-
                         </div>
 
-
-                        <h1
-                            id="productName"
-                            class="product-detail-name"
-                        >
-                            Tên sản phẩm
-                        </h1>
-
-
-                        <p
-                            id="shortDescription"
-                            class="product-short-description"
-                        >
-                            Đang cập nhật mô tả ngắn...
-                        </p>
-
+                        <h1 id="productName" class="product-detail-name">Tên sản phẩm</h1>
+                        <p id="shortDescription" class="product-short-description">Đang cập nhật mô tả ngắn...</p>
 
                         <!-- PRODUCT META -->
                         <div class="product-meta-box">
-
                             <ul class="product-meta-grid">
-
                                 <li class="product-meta-item">
                                     <span>Mã SKU</span>
-                                    <strong
-                                        id="detailSku"
-                                        class="product-meta-value product-meta-sku"
-                                    ></strong>
+                                    <strong id="detailSku" class="product-meta-value product-meta-sku"></strong>
                                 </li>
-
                                 <li class="product-meta-item">
                                     <span>Xuất xứ</span>
-                                    <strong
-                                        id="detailOrigin"
-                                        class="product-meta-value"
-                                    >
-                                        Đang cập nhật
-                                    </strong>
+                                    <strong id="detailOrigin" class="product-meta-value">Đang cập nhật</strong>
                                 </li>
-
                                 <li class="product-meta-item">
                                     <span>Thương hiệu</span>
-                                    <strong
-                                        id="detailBrand"
-                                        class="product-meta-value product-meta-brand"
-                                    ></strong>
+                                    <strong id="detailBrand" class="product-meta-value product-meta-brand"></strong>
                                 </li>
-
                                 <li class="product-meta-item">
                                     <span>Đơn vị tính</span>
-                                    <strong
-                                        id="detailUnit"
-                                        class="product-meta-value"
-                                    ></strong>
+                                    <strong id="detailUnit" class="product-meta-value"></strong>
                                 </li>
-
                             </ul>
-
                         </div>
-
 
                         <!-- PRICE -->
                         <div class="product-price-box">
-
-                            <div class="product-price-info">
-
-                                <span class="product-price-label">
-                                    Giá tham khảo
-                                </span>
-
-                                <span
-                                    id="detailPrice"
-                                    class="product-price-value"
-                                ></span>
-
+                            <!-- 1. Đưa thông tin Tồn kho sang bên trái -->
+                            <div class="product-stock-info" style="align-items: flex-start; text-align: left;">
+                                <span id="detailStock" class="product-stock-value stock-loading">Đang kiểm tra kho...</span>
+                                <span class="product-vat-note">(Chưa bao gồm VAT)</span>
                             </div>
 
-
-                            <div class="product-stock-info">
-
-                                <span
-                                    id="detailStock"
-                                    class="product-stock-value stock-loading"
-                                >
-                                    Đang kiểm tra kho...
-                                </span>
-
-                                <span class="product-vat-note">
-                                    (Chưa bao gồm VAT)
-                                </span>
-
+                            <!-- 2. Đưa phần Giá tiền qua bên phải -->
+                            <div class="product-price-info" style="align-items: flex-end; text-align: right;">
+                                <span class="product-price-label">Giá tham khảo</span>
+                                <span id="detailPrice" class="product-price-value"></span>
                             </div>
-
                         </div>
                         
-                        <!-- CHỌN SIZE (KÍCH THƯỚC) -->
-                        <div id="productSizeWrapper" class="product-size-wrapper is-hidden">
-                            <span class="product-size-label">
-                                Kích thước / Size: <strong id="selectedSizeText">Chưa chọn</strong>
-                            </span>
-                            <div id="productSizeList" class="product-size-list">
-                                <!-- JS sẽ bơm nút size vào đây -->
+                        <!-- QUY CÁCH BÁN / BIẾN THỂ (HỘP, THÙNG...) -->
+                        <div id="variantSection" class="product-variant-section is-hidden">
+                            <div class="product-variant-header">
+                                <span class="product-variant-title">Quy cách bán</span>
+                                <span id="variantSelectionHint" class="product-variant-hint">Chọn cách bạn muốn mua sản phẩm.</span>
+                            </div>
+                            <div id="variantList" class="product-variant-grid">
+                                <!-- Javascript sẽ tự động bơm các thẻ Hộp / Thùng vào đây -->
                             </div>
                         </div>
 
                         <!-- ACTION AREA -->
                         <div class="product-action-area">
-
-
                             <!-- QUANTITY -->
                             <div class="product-quantity-wrapper">
-
                                 <div class="product-quantity-control">
-
-                                    <button
-                                        type="button"
-                                        onclick="changeQty(-1)"
-                                        class="product-quantity-button"
-                                    >
-                                        -
-                                    </button>
-
-                                    <input
-                                        type="number"
-                                        id="buyQty"
-                                        value="1"
-                                        min="1"
-                                        class="product-quantity-input"
-                                    >
-
-                                    <button
-                                        type="button"
-                                        onclick="changeQty(1)"
-                                        class="product-quantity-button"
-                                    >
-                                        +
-                                    </button>
-
+                                    <button type="button" onclick="changeQty(-1)" class="product-quantity-button">-</button>
+                                    <input type="number" id="buyQty" value="1" min="1" class="product-quantity-input">
+                                    <button type="button" onclick="changeQty(1)" class="product-quantity-button">+</button>
                                 </div>
-
-
-                                <div
-                                    id="moqNote"
-                                    class="product-moq-note is-hidden"
-                                >
-                                    Tối thiểu:
-                                    <span id="moqVal">
-                                        1
-                                    </span>
+                                <div id="moqNote" class="product-moq-note is-hidden">
+                                    Tối thiểu: <span id="moqVal">1</span>
                                 </div>
-
                             </div>
-
 
                             <!-- DYNAMIC BUTTONS -->
-                            <div
-                                id="productActionButtons"
-                                class="product-action-buttons"
-                            ></div>
-
+                            <div id="productActionButtons" class="product-action-buttons"></div>
                         </div>
 
-
-                        <p class="product-action-note">
-                            * Mua hàng trực tiếp hoặc yêu cầu báo giá cho số lượng lớn.
-                        </p>
-
+                        <p class="product-action-note">* Mua hàng trực tiếp hoặc yêu cầu báo giá cho số lượng lớn.</p>
                     </div>
-
                 </section>
 
-
-                <!-- =============================================
-                     BLOCK 2
-                     TABS
-                ============================================== -->
-
+                <!-- BLOCK 2: TABS -->
                 <section class="product-tabs-card">
-
                     <div class="product-tabs-nav">
-
-                        <button
-                            type="button"
-                            onclick="switchTab('desc')"
-                            id="tabDescBtn"
-                            class="product-tab-button is-active"
-                        >
-                            Mô tả
-                        </button>
-
-                        <button
-                            type="button"
-                            onclick="switchTab('tech')"
-                            id="tabTechBtn"
-                            class="product-tab-button"
-                        >
-                            Thông số
-                        </button>
-
-                        <button
-                            type="button"
-                            onclick="switchTab('docs')"
-                            id="tabDocsBtn"
-                            class="product-tab-button"
-                        >
-                            Tài liệu
-                        </button>
-
+                        <button type="button" onclick="switchTab('desc')" id="tabDescBtn" class="product-tab-button is-active">Mô tả</button>
+                        <button type="button" onclick="switchTab('tech')" id="tabTechBtn" class="product-tab-button">Thông số</button>
+                        <button type="button" onclick="switchTab('docs')" id="tabDocsBtn" class="product-tab-button">Tài liệu</button>
                     </div>
-
 
                     <div class="product-tab-content">
-
-                        <div
-                            id="tabDescContent"
-                            class="product-detail-prose"
-                        >
-                            Đang tải mô tả...
+                        <div id="tabDescContent" class="product-detail-prose">Đang tải mô tả...</div>
+                        <div id="tabTechContent" class="product-detail-prose is-hidden">
+                            <p class="product-tech-intro">Dưới đây là thông số kỹ thuật chi tiết. Vui lòng tham khảo Datasheet gốc để có dữ liệu chính xác nhất.</p>
+                            <div id="techDetails" class="product-tech-details">Chưa có dữ liệu.</div>
                         </div>
-
-
-                        <div
-                            id="tabTechContent"
-                            class="product-detail-prose is-hidden"
-                        >
-
-                            <p class="product-tech-intro">
-                                Dưới đây là thông số kỹ thuật chi tiết.
-                                Vui lòng tham khảo Datasheet gốc để có dữ liệu chính xác nhất.
-                            </p>
-
-                            <div
-                                id="techDetails"
-                                class="product-tech-details"
-                            >
-                                Chưa có dữ liệu.
-                            </div>
-
+                        <div id="tabDocsContent" class="product-detail-prose is-hidden">
+                            <p class="product-docs-empty">Chưa có tài liệu tải về bổ sung cho sản phẩm này.</p>
                         </div>
-
-
-                        <div
-                            id="tabDocsContent"
-                            class="product-detail-prose is-hidden"
-                        >
-
-                            <p class="product-docs-empty">
-                                Chưa có tài liệu tải về bổ sung cho sản phẩm này.
-                            </p>
-
-                        </div>
-
                     </div>
-
                 </section>
-
             </div>
 
-
-            <!-- =================================================
-                 RIGHT SIDEBAR
-            ================================================== -->
-
+            <!-- RIGHT SIDEBAR -->
             <aside class="product-sale-sidebar">
-
                 <div class="product-sale-card">
-
                     <div class="product-sale-header">
-
-                        <h3>
-                            Đang giảm giá
-                        </h3>
-
+                        <h3>Đang giảm giá</h3>
                     </div>
-
-
                     <div class="product-sale-body">
-
-                        <div
-                            id="saleProductsSidebar"
-                            class="product-sale-list"
-                        ></div>
-
-
-                        <a
-                            href="/pages/promotions.html"
-                            class="product-sale-view-all"
-                        >
-                            Xem tất cả khuyến mãi
-                        </a>
-
+                        <div id="saleProductsSidebar" class="product-sale-list"></div>
+                        <a href="/pages/promotions.html" class="product-sale-view-all">Xem tất cả khuyến mãi</a>
                     </div>
-
                 </div>
 
                 <!-- CHÍNH SÁCH BÁN HÀNG -->
                 <div class="product-policy-card">
-                    <h3 class="product-policy-title">
-                        Chính sách bán hàng
-                    </h3>
+                    <h3 class="product-policy-title">Chính sách bán hàng</h3>
                     <ul class="product-policy-list">
                         <li class="product-policy-item">
-                            <svg class="product-policy-icon" fill="currentColor" viewBox="0 0 24 24">
-                                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm5.707 7.707a1 1 0 00-1.414-1.414L11 13.586 8.707 11.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l6-6z" clip-rule="evenodd"/>
-                            </svg>
-                            <span class="product-policy-text">Tư vấn trực giá trục tiếp: <strong>Miễn phí</strong></span>
+                            <svg class="product-policy-icon" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm5.707 7.707a1 1 0 00-1.414-1.414L11 13.586 8.707 11.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l6-6z" clip-rule="evenodd"/></svg>
+                            <span class="product-policy-text">Tư vấn báo giá trực tiếp: <strong>Miễn phí</strong></span>
                         </li>
                         <li class="product-policy-item">
-                            <svg class="product-policy-icon" fill="currentColor" viewBox="0 0 24 24">
-                                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm5.707 7.707a1 1 0 00-1.414-1.414L11 13.586 8.707 11.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l6-6z" clip-rule="evenodd"/>
-                            </svg>
-                            <span class="product-policy-text">Sản phẩm phát sinh lỗi - <strong>Cam kết bảo hành</strong></span>
+                            <svg class="product-policy-icon" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm5.707 7.707a1 1 0 00-1.414-1.414L11 13.586 8.707 11.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l6-6z" clip-rule="evenodd"/></svg>
+                            <span class="product-policy-text">Sản phẩm phát sinh lỗi - <strong>Cam kết đổi trả</strong></span>
                         </li>
                         <li class="product-policy-item">
-                            <svg class="product-policy-icon" fill="currentColor" viewBox="0 0 24 24">
-                                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm5.707 7.707a1 1 0 00-1.414-1.414L11 13.586 8.707 11.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l6-6z" clip-rule="evenodd"/>
-                            </svg>
-                            <span class="product-policy-text">Giao hàng toàn quốc <strong>nhanh chóng, thuận tiện</strong></span>
+                            <svg class="product-policy-icon" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm5.707 7.707a1 1 0 00-1.414-1.414L11 13.586 8.707 11.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l6-6z" clip-rule="evenodd"/></svg>
+                            <span class="product-policy-text">Giao hàng toàn quốc <strong>nhanh chóng, an toàn</strong></span>
                         </li>
                         <li class="product-policy-item">
-                            <svg class="product-policy-icon" fill="currentColor" viewBox="0 0 24 24">
-                                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm5.707 7.707a1 1 0 00-1.414-1.414L11 13.586 8.707 11.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l6-6z" clip-rule="evenodd"/>
-                            </svg>
+                            <svg class="product-policy-icon" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm5.707 7.707a1 1 0 00-1.414-1.414L11 13.586 8.707 11.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l6-6z" clip-rule="evenodd"/></svg>
                             <span class="product-policy-text">Tổng đài tiếp nhận thông tin <strong>24/7</strong></span>
                         </li>
                     </ul>
                 </div>
-
             </aside>
 
         </div>
 
-
-        <!-- =================================================
-             RELATED PRODUCTS
-        ================================================== -->
-
+        <!-- RELATED PRODUCTS -->
         <section class="product-related-section">
-
             <div class="product-related-header">
-
                 <div>
-
-                    <h3 class="product-related-title">
-                        Sản phẩm cùng dòng
-                    </h3>
-
-                    <p
-                        id="relatedIntro"
-                        class="product-related-intro"
-                    >
-                        Các sản phẩm liên quan bạn có thể quan tâm.
-                    </p>
-
+                    <h3 class="product-related-title">Sản phẩm cùng dòng</h3>
+                    <p id="relatedIntro" class="product-related-intro">Các sản phẩm liên quan bạn có thể quan tâm.</p>
                 </div>
-
-
-                <a
-                    href="#"
-                    id="viewAllRelated"
-                    class="product-related-view-all"
-                >
+                <a href="#" id="viewAllRelated" class="product-related-view-all">
                     Xem tất cả
-
-                    <svg
-                        class="product-related-arrow"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 5l7 7-7 7"
-                        ></path>
-                    </svg>
-
+                    <svg class="product-related-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </a>
-
             </div>
-
-
-            <div
-                id="relatedProductsGrid"
-                class="product-related-grid"
-            ></div>
-
+            <div id="relatedProductsGrid" class="product-related-grid"></div>
         </section>
-
     </main>
 
-
-    <!-- =====================================================
-         LOADING
-    ====================================================== -->
-
-    <div
-        id="loadingScreen"
-        class="product-detail-loading"
-    >
-
+    <!-- LOADING SCREEN -->
+    <div id="loadingScreen" class="product-detail-loading">
         <div class="product-loading-inner">
-
             <div class="product-loading-breadcrumb"></div>
-
             <div class="product-loading-card">
-
-                <div class="product-loading-gallery">
-                    <div class="skeleton-block product-loading-image"></div>
-                </div>
-
+                <div class="product-loading-gallery"><div class="skeleton-block product-loading-image"></div></div>
                 <div class="product-loading-info">
-
                     <div class="skeleton-line skeleton-small"></div>
-
                     <div class="skeleton-line skeleton-title"></div>
-
                     <div class="skeleton-line skeleton-full"></div>
-
                     <div class="skeleton-block product-loading-meta"></div>
-
                     <div class="skeleton-block product-loading-price"></div>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
-
-    <!-- =====================================================
-         ERROR
-    ====================================================== -->
-
-    <div
-        id="errorScreen"
-        class="product-detail-error is-hidden"
-    >
-
+    <!-- ERROR SCREEN -->
+    <div id="errorScreen" class="product-detail-error is-hidden">
         <div class="product-error-card">
-
-            <svg
-                class="product-error-icon"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                ></path>
-            </svg>
-
-
-            <h2>
-                Không tìm thấy sản phẩm!
-            </h2>
-
-            <p id="errorText">
-                Mã sản phẩm không tồn tại hoặc đã bị xóa.
-            </p>
-
-
-            <a
-                href="/pages/products.html"
-                class="product-error-button"
-            >
-                Quay lại Kho hàng
-            </a>
-
+            <svg class="product-error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <h2>Không tìm thấy sản phẩm!</h2>
+            <p id="errorText">Mã sản phẩm không tồn tại hoặc đã bị xóa khỏi hệ thống.</p>
+            <a href="/pages/products.html" class="product-error-button">Quay lại Kho hàng</a>
         </div>
-
     </div>
-
 
     <!-- FOOTER -->
     <div id="app-footer"></div>
 
-
-    <!-- =====================================================
-         JS
-    ====================================================== -->
-
+    <!-- JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <script src="../assets/js/common/supabase.js"></script>
     <script src="../assets/js/common/utils.js"></script>
     <script src="../assets/js/common/auth.js"></script>
-
     <script src="../assets/components/header.js"></script>
     <script src="../assets/components/footer.js"></script>
-
     <script src="../assets/js/users/auth-ui.js"></script>
-    <script src="../assets/js/users/cart.js"></script>
     <script src="../assets/js/users/product-detail.js"></script>
-
 </body>
 </html>

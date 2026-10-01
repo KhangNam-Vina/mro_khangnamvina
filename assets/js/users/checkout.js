@@ -12,6 +12,31 @@ let checkoutTotalAmount = 0;
 
 const CHECKOUT_MIN_QTY = 1;
 const CHECKOUT_MAX_QTY = 1000000;
+const CHECKOUT_IMAGE_CDN_BASE = "https://mrokhangnam-image.khangnamvn.workers.dev";
+
+// ========================================================
+// 0. HELPERS (FORMAT & URL)
+// ========================================================
+function buildCheckoutImageUrl(imagePath) {
+    if (!imagePath) return "../assets/images/world mark.png";
+    const cleanPath = String(imagePath).trim();
+    if (!cleanPath || cleanPath.includes("via.placeholder.com")) return "../assets/images/world mark.png";
+    if (/^https?:\/\//i.test(cleanPath)) return cleanPath;
+    return `${CHECKOUT_IMAGE_CDN_BASE}/${cleanPath.replace(/^\/+/, "")}`;
+}
+
+// Hàm lấy giá tiền tương thích cả SP cũ và Biến thể mới
+function getCheckoutProductPrice(item) {
+    if (!item) return 0;
+    if (item.unit_price) return Number(item.unit_price);
+    
+    const discountPrice = Number(item.discount_price);
+    const regularPrice = Number(item.price);
+    if (Number.isFinite(discountPrice) && discountPrice > 0 && discountPrice < regularPrice) {
+        return discountPrice;
+    }
+    return Number.isFinite(regularPrice) ? regularPrice : 0;
+}
 
 // ========================================================
 // 1. INIT CHECKOUT (ĐÃ NÂNG CẤP AUTO-FILL CHỐNG LỖI)
@@ -52,9 +77,7 @@ async function initCheckout() {
 
     currentUser = session.user;
 
-    // ========================================================
     // TỰ ĐỘNG ĐIỀN THÔNG TIN GIAO HÀNG TỪ DATABASE
-    // ========================================================
     try {
         const { data: profile, error } = await window.supabaseClient
             .from('profiles')
@@ -78,7 +101,6 @@ async function initCheckout() {
         if (nameInput && !nameInput.value) nameInput.value = profileName || fallbackName;
         if (addressInput && !addressInput.value) addressInput.value = profileAddress || "";
         
-        // [BỔ SUNG]: Dữ liệu auto-fill cũng phải được lọc bỏ chữ, chỉ giữ lại tối đa 11 số
         if (phoneInput && !phoneInput.value) {
             const rawPhone = profilePhone || currentUser.phone || "";
             phoneInput.value = rawPhone.replace(/[^0-9]/g, '').slice(0, 11);
@@ -92,7 +114,7 @@ async function initCheckout() {
 }
 
 // ========================================================
-// 2. RENDER MINI BILL
+// 2. RENDER MINI BILL (ĐÃ SỬA LỖI GIÁ & HÌNH ẢNH)
 // ========================================================
 function renderCheckoutBill() {
     const container = document.getElementById("checkoutItemsContainer");
@@ -105,24 +127,29 @@ function renderCheckoutBill() {
     checkoutTotalAmount = 0;
 
     shoppingCart.forEach(item => {
-        const price = Number(item.price) || 0;
-        const qty = Math.max(1, Number(item.qty) || 1);
+        // Sử dụng hàm getCheckoutProductPrice để lấy đúng giá B2B
+        const price = getCheckoutProductPrice(item);
+        const minQty = Number(item.min_order_quantity) || 1;
+        const qty = Math.max(minQty, Number(item.qty) || 1);
         const itemSubtotal = price * qty;
         
         checkoutTotalAmount += itemSubtotal;
         
         const priceFormat = formatCurrency(price);
-        const image = item.image || "https://via.placeholder.com/150?text=No+Image";
+        
+        // Sử dụng hàm buildCheckoutImageUrl để lấy đúng hình ảnh
+        const image = buildCheckoutImageUrl(item.image);
+        
         const safeName = escapeHTML(item.name || "Sản phẩm");
         const safeUnit = escapeHTML(item.unit || "Cái");
 
-        const normalizedSize = item.size !== undefined && item.size !== null ? String(item.size).trim() : "";
-        const sizeHTML = normalizedSize ? `<span class="checkout-item-size">Size: <strong>${escapeHTML(normalizedSize)}</strong></span>` : "";
+        // Không hiển thị riêng lẻ Size nếu nó đã nằm trong Tên Sản Phẩm (như cách Giỏ hàng đang gộp)
+        const sizeHTML = ""; 
 
         html += `
             <article class="checkout-item">
                 <div class="checkout-item-image">
-                    <img src="${escapeAttribute(image)}" alt="${safeName}" loading="lazy">
+                    <img src="${escapeAttribute(image)}" alt="${safeName}" loading="lazy" onerror="this.src='../assets/images/world mark.png'">
                 </div>
                 <div class="checkout-item-info">
                     <h4 class="checkout-item-name" title="${safeName}">${safeName}</h4>
@@ -163,7 +190,6 @@ async function handleOrderSubmit(event) {
         return;
     }
 
-    // [BỔ SUNG]: KIỂM TRA ĐỊNH DẠNG SỐ ĐIỆN THOẠI (10 - 11 SỐ, BẮT ĐẦU BẰNG 0)
     const phoneRegex = /^0[0-9]{9,10}$/;
     if (!phoneRegex.test(shippingPhone)) {
         alert("Số điện thoại không hợp lệ! Vui lòng nhập đúng 10-11 chữ số bắt đầu bằng số 0.");
@@ -194,12 +220,17 @@ async function handleOrderSubmit(event) {
         const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
         const orderCode = `ORD-${dateStr}-${timePart}-${randomPart}`;
 
+        // ĐÃ FIX: Truyền thêm Dữ liệu Variant và Attributes xuống DB
         orderItemsData = shoppingCart.map(item => ({
-            product_id: item.id || item.product_id || null,
+            product_id: item.product_id || item.id || null,
             product_name: item.name || item.product_name || "Sản phẩm",
             sku: item.sku || "",
             size: item.size !== undefined && item.size !== null && String(item.size).trim() ? String(item.size).trim() : null,
-            quantity: Number(item.qty)
+            quantity: Number(item.qty),
+            // Các dữ liệu B2B mở rộng cho hóa đơn (Mặc dù RPC cũ có thể không lưu nhưng truyền sẵn để dùng sau)
+            unit_price: getCheckoutProductPrice(item),
+            variant_id: item.variant_id || null,
+            attributes: item.attributes || null
         }));
 
         const { data: newOrderId, error: orderError } = await window.supabaseClient.rpc("create_order_transaction", {
@@ -257,7 +288,7 @@ function setSubmitLoading(button, loading) {
     } else {
         button.disabled = false;
         button.classList.remove("is-disabled");
-        button.innerHTML = "Đặt hàng";
+        button.innerHTML = "XÁC NHẬN ĐẶT HÀNG";
     }
 }
 
@@ -316,11 +347,9 @@ document.addEventListener("DOMContentLoaded", () => {
         form.addEventListener("submit", handleOrderSubmit);
     }
 
-    // [BỔ SUNG]: ÉP BUỘC CHỈ ĐƯỢC NHẬP SỐ VÀ TỐI ĐA 11 SỐ VÀO Ô ĐIỆN THOẠI
     const phoneInput = document.getElementById("shippingPhone");
     if (phoneInput) {
         phoneInput.addEventListener("input", function() {
-            // Xóa mọi ký tự không phải là số (0-9) và cắt chuỗi không cho quá 11 số
             this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);
         });
     }

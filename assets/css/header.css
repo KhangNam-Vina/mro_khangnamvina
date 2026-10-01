@@ -68,14 +68,14 @@
 }
 
 .header-logo img {
-    height: 2.5rem;
+    height: 3.5rem; /* Cũ là 2.5rem - Tăng lên 3.5rem cho Mobile */
     width: auto;
     object-fit: contain;
 }
 
 @media (min-width: 768px) {
     .header-logo img {
-        height: 3rem;
+        height: 4.5rem; /* Cũ là 3rem - Tăng lên 4.5rem cho Desktop */
     }
 }
 
