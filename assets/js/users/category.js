@@ -4,67 +4,6 @@
 // TỐI ƯU HÓA CSS RESPONSIVE CHO MOBILE (CHIA 2 CỘT) + FIX LỖI SKELETON
 // ========================================================
 
-// ========================================================
-// BƠM CSS TỐI ƯU MOBILE & DESKTOP (PURE CSS CHUẨN)
-// ========================================================
-(function injectCategoryMobileStyles() {
-    if (document.getElementById('mro-category-responsive-css')) return;
-    const style = document.createElement('style');
-    style.id = 'mro-category-responsive-css';
-    style.innerHTML = `
-        /* ================== MOBILE & TABLET (< 992px) ================== */
-        @media (max-width: 991px) {
-            
-            /* Ép Danh mục thành lưới 2 cột thay vì 1 cột kéo dài */
-            .catalog-category-grid {
-                display: grid !important;
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 12px !important;
-            }
-            
-            /* FIX LỖI "BÓNG MA" SKELETON: Đảm bảo class is-hidden được ưu tiên tuyệt đối */
-            .catalog-category-grid.is-hidden,
-            #skeletonLoading.is-hidden {
-                display: none !important;
-            }
-
-            /* Tinh chỉnh chiều cao thẻ cho gọn gàng */
-            .catalog-category-card {
-                min-height: 110px !important;
-                padding: 12px 8px !important;
-                justify-content: center !important;
-                align-items: center !important;
-                display: flex !important;
-            }
-
-            /* Tinh chỉnh font chữ cho Mobile */
-            .catalog-category-title {
-                font-size: 13px !important;
-                line-height: 1.3 !important;
-                margin-bottom: 4px !important;
-                text-align: center !important;
-            }
-
-            .catalog-category-count {
-                font-size: 10px !important;
-                padding: 3px 6px !important;
-            }
-
-            /* Khoảng cách Header và số lượng SP */
-            .catalog-section-header {
-                flex-direction: column !important;
-                align-items: stretch !important;
-                gap: 12px !important;
-            }
-
-            .catalog-counter-wrapper {
-                justify-content: flex-start !important;
-            }
-        }
-    `;
-    document.head.appendChild(style);
-})();
-
 async function loadCategories() {
     const skeleton = document.getElementById('skeletonLoading');
     const grid = document.getElementById('categoryGrid');

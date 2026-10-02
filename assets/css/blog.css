@@ -12,7 +12,6 @@ Trang:
 Font: Inter
 ========================================================= */
 
-
 /* =========================================================
 1. BASE
 ========================================================= */
@@ -37,18 +36,11 @@ Font: Inter
 .blog-layout {
     width: min(1536px, calc(100% - 32px));
     margin: 0 auto;
-
     display: grid;
-
-    grid-template-columns:
-        minmax(0, 2fr)
-        minmax(280px, 1fr);
-
+    grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
     gap: 32px;
-
     align-items: start;
 }
-
 
 /* =========================================================
 2. HERO
@@ -59,11 +51,7 @@ Font: Inter
     overflow: hidden;
     margin: 0;
     padding: 48px 0;
-    background: linear-gradient(
-        110deg,
-        #003370 0%,
-        #00479b 100%
-    );
+    background: linear-gradient(110deg, #003370 0%, #00479b 100%);
     color: #ffffff;
     box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
 }
@@ -78,12 +66,7 @@ Font: Inter
 .blog-hero-container {
     position: relative;
     z-index: 2;
-
-    width: min(
-        1536px,
-        calc(100% - 32px)
-    );
-
+    width: min(1536px, calc(100% - 32px));
     margin: 0 auto;
 }
 
@@ -92,11 +75,8 @@ Font: Inter
     flex-wrap: wrap;
     align-items: center;
     gap: 8px;
-
     margin-bottom: 24px;
-
     color: #d1d5db;
-
     font-size: 13px;
     font-weight: 500;
 }
@@ -123,36 +103,21 @@ Font: Inter
 
 .blog-hero-title {
     margin: 0 0 24px;
-
     color: #ffffff;
-
-    font-size: clamp(
-        30px,
-        4vw,
-        40px
-    );
-
+    font-size: clamp(30px, 4vw, 40px);
     line-height: 1.2;
-
     font-weight: 900;
-
     text-transform: uppercase;
-
     letter-spacing: 0.02em;
 }
 
 .blog-hero-description {
     max-width: 760px;
-
     margin: 0;
-
     color: #e5e7eb;
-
     font-size: 14px;
-
     line-height: 1.7;
 }
-
 
 /* =========================================================
 3. CONTENT
@@ -162,7 +127,6 @@ Font: Inter
     min-width: 0;
 }
 
-
 /* =========================================================
 4. FILTER BAR
 ========================================================= */
@@ -170,16 +134,11 @@ Font: Inter
 .blog-filter-bar {
     display: flex;
     flex-wrap: wrap;
-
     justify-content: space-between;
     align-items: center;
-
     gap: 16px;
-
     padding-bottom: 16px;
-
     margin-bottom: 32px;
-
     border-bottom: 1px solid #e5e7eb;
 }
 
@@ -189,37 +148,26 @@ Font: Inter
     gap: 8px;
 }
 
-.blog-category-btn {
+.blog-category-btn, .cat-btn {
     min-height: 34px;
-
     padding: 6px 16px;
-
     border: 0;
-
     border-radius: 999px;
-
     background: #e5e7eb;
-
     color: #374151;
-
     font-family: inherit;
-
     font-size: 12px;
     font-weight: 700;
-
     cursor: pointer;
-
-    transition:
-        background-color 0.2s ease,
-        color 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.blog-category-btn:hover {
+.blog-category-btn:hover, .cat-btn:hover {
     background: #ff5e00;
     color: #ffffff;
 }
 
-.blog-category-btn.is-active {
+.blog-category-btn.is-active, .cat-btn.is-active {
     background: #00479b;
     color: #ffffff;
 }
@@ -227,25 +175,16 @@ Font: Inter
 .blog-count {
     display: inline-flex;
     align-items: center;
-
     min-height: 30px;
-
     padding: 4px 12px;
-
     border: 1px solid #e5e7eb;
-
     border-radius: 6px;
-
     background: #ffffff;
-
     color: #6b7280;
-
     font-size: 13px;
     font-weight: 700;
-
     white-space: nowrap;
 }
-
 
 /* =========================================================
 5. SKELETON
@@ -260,12 +199,7 @@ Font: Inter
     background: #ffffff;
     border: 1px solid #e5e7eb;
     border-radius: 12px;
-
-    animation:
-        blog-pulse
-        1.5s
-        ease-in-out
-        infinite;
+    animation: blog-pulse 1.5s ease-in-out infinite;
 }
 
 .blog-skeleton-featured {
@@ -275,13 +209,7 @@ Font: Inter
 
 .blog-skeleton-grid {
     display: grid;
-
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(0, 1fr)
-        );
-
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px;
 }
 
@@ -290,17 +218,9 @@ Font: Inter
 }
 
 @keyframes blog-pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.5;
-    }
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
 }
-
 
 /* =========================================================
 6. FEATURED POST
@@ -312,34 +232,18 @@ Font: Inter
 
 .blog-featured-card {
     display: block;
-
     overflow: hidden;
-
     background: #ffffff;
-
-    border:
-        1px solid #e5e7eb;
-
+    border: 1px solid #e5e7eb;
     border-radius: 12px;
-
     color: inherit;
-
     text-decoration: none;
-
-    box-shadow:
-        0 2px 6px
-        rgba(15, 23, 42, 0.05);
-
-    transition:
-        box-shadow 0.3s ease,
-        transform 0.3s ease;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .blog-featured-card:hover {
-    box-shadow:
-        0 12px 28px
-        rgba(15, 23, 42, 0.12);
-
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
     transform: translateY(-2px);
 }
 
@@ -350,61 +254,41 @@ Font: Inter
 
 .blog-featured-image-wrapper {
     position: relative;
-
     width: 100%;
     height: 256px;
-
     overflow: hidden;
-
     background: #f5f6f8;
 }
 
 .blog-featured-image {
     display: block;
-
     width: 100%;
     height: 100%;
-
     object-fit: cover;
-
-    transition:
-        transform 0.7s ease;
+    transition: transform 0.7s ease;
 }
 
-.blog-featured-card:hover
-.blog-featured-image {
+.blog-featured-card:hover .blog-featured-image {
     transform: scale(1.05);
 }
 
 .blog-featured-badge {
     position: absolute;
-
     top: 16px;
     left: 16px;
-
     z-index: 2;
-
     padding: 6px 12px;
-
     border-radius: 5px;
-
     background: #ff5e00;
-
     color: #ffffff;
-
     font-size: 12px;
     font-weight: 900;
-
     text-transform: uppercase;
-
-    box-shadow:
-        0 2px 6px
-        rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 
 .blog-featured-content {
     padding: 24px;
-
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -414,13 +298,9 @@ Font: Inter
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-
     gap: 16px;
-
     margin-bottom: 16px;
-
     color: #6b7280;
-
     font-size: 12px;
     font-weight: 700;
 }
@@ -428,71 +308,51 @@ Font: Inter
 .blog-meta-item {
     display: inline-flex;
     align-items: center;
-
     gap: 4px;
 }
 
 .blog-meta-icon {
     width: 16px;
     height: 16px;
-
     color: #00479b;
 }
 
 .blog-featured-title {
     margin: 0 0 16px;
-
     color: #1f2937;
-
     font-size: 26px;
     line-height: 1.35;
-
     font-weight: 900;
-
     display: -webkit-box;
-
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
-
     overflow: hidden;
-
     transition: color 0.2s ease;
 }
 
-.blog-featured-card:hover
-.blog-featured-title {
+.blog-featured-card:hover .blog-featured-title {
     color: #00479b;
 }
 
 .blog-featured-summary {
     margin: 0 0 20px;
-
     color: #4b5563;
-
     font-size: 14px;
     line-height: 1.7;
-
     display: -webkit-box;
-
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
-
     overflow: hidden;
 }
 
 .blog-read-more {
     display: inline-flex;
     align-items: center;
-
     gap: 8px;
-
     color: #00479b;
-
     font-size: 14px;
     font-weight: 800;
-
     text-decoration: none;
-
     transition: color 0.2s ease;
 }
 
@@ -503,16 +363,12 @@ Font: Inter
 .blog-read-more-icon {
     width: 16px;
     height: 16px;
-
-    transition:
-        transform 0.3s ease;
+    transition: transform 0.3s ease;
 }
 
-.blog-featured-card:hover
-.blog-read-more-icon {
+.blog-featured-card:hover .blog-read-more-icon {
     transform: translateX(5px);
 }
-
 
 /* =========================================================
 7. BLOG GRID
@@ -520,93 +376,55 @@ Font: Inter
 
 .blog-grid {
     display: grid;
-
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(0, 1fr)
-        );
-
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px;
 }
 
 .blog-card {
     display: flex;
     flex-direction: column;
-
     min-width: 0;
-
     height: 100%;
-
     overflow: hidden;
-
     background: #ffffff;
-
-    border:
-        1px solid #e5e7eb;
-
+    border: 1px solid #e5e7eb;
     border-radius: 12px;
-
-    box-shadow:
-        0 2px 6px
-        rgba(15, 23, 42, 0.04);
-
-    transition:
-        box-shadow 0.3s ease,
-        border-color 0.3s ease,
-        transform 0.3s ease;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+    transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
 }
 
 .blog-card:hover {
     border-color: rgba(255, 94, 0, 0.5);
-
-    box-shadow:
-        0 12px 28px
-        rgba(15, 23, 42, 0.10);
-
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.10);
     transform: translateY(-3px);
 }
 
 .blog-card-image-link {
     display: block;
-
     height: 208px;
-
     overflow: hidden;
-
     position: relative;
-
-    border-bottom:
-        1px solid #f3f4f6;
-
+    border-bottom: 1px solid #f3f4f6;
     background: #f5f6f8;
-
     text-decoration: none;
 }
 
 .blog-card-image {
     width: 100%;
     height: 100%;
-
     display: block;
-
     object-fit: cover;
-
-    transition:
-        transform 0.7s ease;
+    transition: transform 0.7s ease;
 }
 
-.blog-card:hover
-.blog-card-image {
+.blog-card:hover .blog-card-image {
     transform: scale(1.08);
 }
 
 .blog-card-body {
     flex: 1;
-
     display: flex;
     flex-direction: column;
-
     padding: 24px;
 }
 
@@ -614,18 +432,12 @@ Font: Inter
     display: flex;
     justify-content: space-between;
     align-items: center;
-
     gap: 12px;
-
     margin-bottom: 12px;
-
     color: #9ca3af;
-
     font-size: 11px;
     font-weight: 700;
-
     text-transform: uppercase;
-
     letter-spacing: 0.05em;
 }
 
@@ -636,71 +448,47 @@ Font: Inter
 
 .blog-card-title {
     margin: 0 0 12px;
-
     color: #1f2937;
-
     font-size: 18px;
-
     line-height: 1.45;
-
     font-weight: 900;
-
     display: -webkit-box;
-
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
-
     overflow: hidden;
-
     transition: color 0.2s ease;
 }
 
-.blog-card:hover
-.blog-card-title {
+.blog-card:hover .blog-card-title {
     color: #00479b;
 }
 
 .blog-card-summary {
     margin: 0 0 20px;
-
     color: #6b7280;
-
     font-size: 14px;
-
     line-height: 1.7;
-
     display: -webkit-box;
-
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
-
     overflow: hidden;
 }
 
 .blog-card-read-more {
     display: inline-flex;
     align-items: center;
-
     gap: 4px;
-
     margin-top: auto;
-
     color: #00479b;
-
     font-size: 14px;
     font-weight: 800;
-
     text-decoration: none;
-
-    transition:
-        color 0.2s ease;
+    transition: color 0.2s ease;
 }
 
-.blog-card:hover
-.blog-card-read-more {
+.blog-card:hover .blog-card-read-more {
     color: #ff5e00;
 }
-
 
 /* =========================================================
 8. SIDEBAR
@@ -708,53 +496,35 @@ Font: Inter
 
 .blog-sidebar {
     position: sticky;
-
     top: 96px;
-
     display: flex;
     flex-direction: column;
-
     gap: 32px;
 }
 
 .blog-sidebar-card {
     padding: 24px;
-
     background: #ffffff;
-
-    border:
-        1px solid #e5e7eb;
-
+    border: 1px solid #e5e7eb;
     border-radius: 12px;
-
-    box-shadow:
-        0 2px 8px
-        rgba(15, 23, 42, 0.05);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
 }
 
 .blog-sidebar-title {
     display: flex;
     align-items: center;
-
     margin: 0 0 16px;
-
     color: #00479b;
-
     font-size: 15px;
-
     font-weight: 900;
-
     text-transform: uppercase;
 }
 
 .blog-sidebar-title-icon {
     width: 20px;
     height: 20px;
-
     margin-right: 8px;
-
     color: #ff5e00;
-
     flex-shrink: 0;
 }
 
@@ -765,64 +535,37 @@ Font: Inter
 .blog-search-input {
     width: 100%;
     height: 42px;
-
     box-sizing: border-box;
-
-    padding:
-        0 44px 0 16px;
-
-    border:
-        1px solid #d1d5db;
-
+    padding: 0 44px 0 16px;
+    border: 1px solid #d1d5db;
     border-radius: 6px;
-
     background: #ffffff;
-
     color: #1f2937;
-
     font-family: inherit;
-
     font-size: 13px;
-
     outline: none;
-
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .blog-search-input:focus {
     border-color: #ff5e00;
-
-    box-shadow:
-        0 0 0 3px
-        rgba(255, 94, 0, 0.08);
+    box-shadow: 0 0 0 3px rgba(255, 94, 0, 0.08);
 }
 
 .blog-search-button {
     position: absolute;
-
     right: 8px;
     top: 50%;
-
     width: 30px;
     height: 30px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
-    transform:
-        translateY(-50%);
-
+    transform: translateY(-50%);
     border: 0;
-
     background: transparent;
-
     color: #9ca3af;
-
     cursor: pointer;
-
     transition: color 0.2s ease;
 }
 
@@ -835,7 +578,6 @@ Font: Inter
     height: 18px;
 }
 
-
 /* =========================================================
 9. SIDEBAR LIST
 ========================================================= */
@@ -843,24 +585,16 @@ Font: Inter
 .blog-sidebar-list {
     display: flex;
     flex-direction: column;
-
     gap: 16px;
 }
 
 .blog-sidebar-post {
     display: flex;
-
     gap: 12px;
-
     align-items: center;
-
     padding-bottom: 12px;
-
-    border-bottom:
-        1px solid #f3f4f6;
-
+    border-bottom: 1px solid #f3f4f6;
     color: inherit;
-
     text-decoration: none;
 }
 
@@ -872,93 +606,62 @@ Font: Inter
 .blog-sidebar-post-image-wrapper {
     width: 64px;
     height: 64px;
-
     flex-shrink: 0;
-
     overflow: hidden;
-
-    border:
-        1px solid #f3f4f6;
-
+    border: 1px solid #f3f4f6;
     border-radius: 5px;
-
     background: #f5f6f8;
 }
 
 .blog-sidebar-post-image {
     width: 100%;
     height: 100%;
-
     display: block;
-
     object-fit: cover;
-
-    transition:
-        transform 0.3s ease;
+    transition: transform 0.3s ease;
 }
 
-.blog-sidebar-post:hover
-.blog-sidebar-post-image {
+.blog-sidebar-post:hover .blog-sidebar-post-image {
     transform: scale(1.08);
 }
 
 .blog-sidebar-post-content {
     min-width: 0;
-
     flex: 1;
 }
 
 .blog-sidebar-post-title {
     margin: 0;
-
     color: #1f2937;
-
     font-size: 12px;
-
     line-height: 1.45;
-
     font-weight: 700;
-
     display: -webkit-box;
-
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
-
     overflow: hidden;
-
-    transition:
-        color 0.2s ease;
+    transition: color 0.2s ease;
 }
 
-.blog-sidebar-post:hover
-.blog-sidebar-post-title {
+.blog-sidebar-post:hover .blog-sidebar-post-title {
     color: #00479b;
 }
 
 .blog-sidebar-post-date {
     display: block;
-
     margin-top: 5px;
-
     color: #9ca3af;
-
     font-size: 10px;
 }
 
 .blog-sidebar-empty {
     margin: 0;
-
     padding: 16px;
-
     color: #6b7280;
-
     font-size: 12px;
-
     font-style: italic;
-
     text-align: center;
 }
-
 
 /* =========================================================
 10. SIDEBAR SKELETON
@@ -966,45 +669,35 @@ Font: Inter
 
 .blog-sidebar-skeleton {
     display: flex;
-
     gap: 12px;
 }
 
 .blog-sidebar-skeleton-image {
     width: 64px;
     height: 64px;
-
     flex-shrink: 0;
-
     border-radius: 5px;
-
     background: #e5e7eb;
 }
 
 .blog-sidebar-skeleton-content {
     flex: 1;
-
     display: flex;
     flex-direction: column;
-
     gap: 8px;
-
     padding-top: 4px;
 }
 
 .blog-sidebar-skeleton-line {
     width: 100%;
     height: 10px;
-
     border-radius: 4px;
-
     background: #e5e7eb;
 }
 
 .blog-sidebar-skeleton-line.short {
     width: 65%;
 }
-
 
 /* =========================================================
 11. EMPTY
@@ -1013,43 +706,29 @@ Font: Inter
 .blog-empty {
     display: flex;
     flex-direction: column;
-
     align-items: center;
     justify-content: center;
-
     min-height: 260px;
-
     padding: 48px 20px;
-
     background: #ffffff;
-
-    border:
-        1px dashed #d1d5db;
-
+    border: 1px dashed #d1d5db;
     border-radius: 12px;
-
     text-align: center;
 }
 
 .blog-empty-icon {
     width: 48px;
     height: 48px;
-
     margin-bottom: 12px;
-
     color: #d1d5db;
 }
 
 .blog-empty-title {
     margin: 0;
-
     color: #1f2937;
-
     font-size: 18px;
-
     font-weight: 800;
 }
-
 
 /* =========================================================
 12. ERROR
@@ -1057,25 +736,15 @@ Font: Inter
 
 .blog-error {
     grid-column: 1 / -1;
-
     padding: 40px 20px;
-
     background: #fef2f2;
-
-    border:
-        1px solid #fee2e2;
-
+    border: 1px solid #fee2e2;
     border-radius: 8px;
-
     color: #dc2626;
-
     font-size: 14px;
-
     font-weight: 700;
-
     text-align: center;
 }
-
 
 /* =========================================================
 13. PAGINATION
@@ -1083,70 +752,43 @@ Font: Inter
 
 .blog-pagination {
     display: flex;
-
     justify-content: center;
     align-items: center;
-
     flex-wrap: wrap;
-
     gap: 8px;
-
     margin-top: 48px;
-
     margin-bottom: 16px;
 }
 
 .blog-pagination-button {
     min-width: 40px;
     min-height: 36px;
-
     display: inline-flex;
-
     align-items: center;
     justify-content: center;
-
-    padding:
-        6px 12px;
-
-    border:
-        1px solid #d1d5db;
-
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
     border-radius: 6px;
-
     background: #ffffff;
-
     color: #6b7280;
-
     font-family: inherit;
-
     font-size: 13px;
-
     font-weight: 700;
-
     cursor: pointer;
-
-    transition:
-        background-color 0.2s ease,
-        border-color 0.2s ease,
-        color 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .blog-pagination-button:hover {
     background: #fff7ed;
-
     border-color: #ff5e00;
-
     color: #ff5e00;
 }
 
 .blog-pagination-button.is-active {
     background: #00479b;
-
     border-color: #00479b;
-
     color: #ffffff;
 }
-
 
 /* =========================================================
 14. STATE HELPERS
@@ -1160,133 +802,123 @@ Font: Inter
     display: flex !important;
 }
 
-
 /* =========================================================
-15. RESPONSIVE
+15. RESPONSIVE (TỐI ƯU MOBILE CHUẨN)
 ========================================================= */
 
 @media (max-width: 1199px) {
-
     .blog-layout {
-        grid-template-columns:
-            minmax(0, 2fr)
-            minmax(260px, 1fr);
-
+        grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
         gap: 24px;
     }
-
 }
 
-
-@media (max-width: 900px) {
-
+@media (max-width: 991px) {
+    /* 1. Reset lưới về 1 cột dọc (Stacking) */
     .blog-layout {
-        grid-template-columns: 1fr;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 32px !important;
+    }
+    
+    /* 2. Đưa nội dung chính và sidebar về 100% chiều rộng */
+    .blog-main, .blog-sidebar {
+        width: 100% !important;
+        padding: 0 !important;
     }
 
+    /* 3. Tối ưu khu vực Menu Thể loại (Trượt ngang) */
+    .blog-filter-bar {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+        border-bottom: none !important;
+    }
+    .blog-category-filters {
+        width: 100% !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        padding-bottom: 8px !important;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    .blog-category-filters::-webkit-scrollbar {
+        display: none;
+    }
+    .blog-count {
+        align-self: flex-start !important;
+        margin-bottom: 16px !important;
+    }
+
+    /* 4. Đảo vị trí Sidebar Tìm kiếm lên trên cùng */
+    /* Mẹo: Dùng flex order để đẩy cục Search lên trên list bài viết */
     .blog-sidebar {
-        position: static;
+        display: contents !important; /* Phá vỡ cấu trúc cha để sắp xếp con */
+    }
+    .blog-sidebar-card:first-child {
+        order: -1 !important; /* Đẩy cục Tìm kiếm lên trên cùng */
+        margin-bottom: 24px !important;
+    }
+    .blog-sidebar-card:last-child {
+        order: 99 !important; /* Đẩy cục Bài mới nhất xuống dưới cùng */
+        margin-top: 32px !important;
     }
 
+    /* 5. Thu gọn Bài Nổi Bật */
+    .blog-featured-inner {
+        flex-direction: column !important;
+    }
     .blog-featured-image-wrapper {
-        height: 280px;
+        height: 200px !important;
+    }
+    .blog-featured-content {
+        padding: 16px !important;
+    }
+    .blog-featured-title {
+        font-size: 20px !important;
+        line-height: 1.4 !important;
+    }
+    .blog-featured-summary {
+        font-size: 14px !important;
+        -webkit-line-clamp: 3 !important;
     }
 
+    /* 6. Danh sách Bài viết (Grid) */
+    .blog-grid, #blogGrid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 16px !important;
+    }
+    .blog-card {
+        min-height: unset !important;
+    }
+    .blog-card-image-link {
+        height: 140px !important;
+    }
+    .blog-card-body {
+        padding: 12px !important;
+    }
+    .blog-card-title {
+        font-size: 15px !important;
+        margin-bottom: 8px !important;
+    }
+    .blog-card-summary {
+        font-size: 13px !important;
+        -webkit-line-clamp: 3 !important;
+    }
 }
-
 
 @media (max-width: 768px) {
-
-    .blog-main {
-        padding:
-            32px 12px 48px;
-    }
-
-    .blog-layout,
-    .blog-hero-container {
-        width:
-            calc(100% - 24px);
-    }
-
-    .blog-hero {
-        padding:
-            40px 0;
-    }
-
-    .blog-hero-title {
-        font-size: 28px;
-    }
-
-    .blog-filter-bar {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .blog-category-filters {
-        width: 100%;
-    }
-
-    .blog-count {
-        align-self: flex-start;
-    }
-
-    .blog-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .blog-skeleton-grid {
-        grid-template-columns: 1fr;
-    }
-
+    .blog-hero { padding: 40px 0; }
+    .blog-hero-title { font-size: 28px; }
 }
-
 
 @media (max-width: 600px) {
-
-    .blog-featured-image-wrapper {
-        height: 220px;
+    /* Đưa danh sách bài viết về 1 cột trên ĐT nhỏ */
+    .blog-grid, #blogGrid {
+        grid-template-columns: 1fr !important;
     }
-
-    .blog-featured-content {
-        padding: 20px;
-    }
-
-    .blog-featured-title {
-        font-size: 22px;
-    }
-
     .blog-card-image-link {
-        height: 200px;
+        height: 200px !important;
     }
-
-    .blog-card-body {
-        padding: 20px;
-    }
-
-    .blog-sidebar-card {
-        padding: 20px;
-    }
-
-}
-
-
-@media (max-width: 420px) {
-
-    .blog-hero-title {
-        font-size: 25px;
-    }
-
-    .blog-featured-title {
-        font-size: 20px;
-    }
-
-    .blog-card-title {
-        font-size: 17px;
-    }
-
-    .blog-category-btn {
-        padding:
-            6px 12px;
-    }
-
 }

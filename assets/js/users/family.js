@@ -1,7 +1,9 @@
 // ========================================================
 // FILE: assets/js/users/family.js
 // MINIMAL UI - CHỈ CÒN TEXT VÀ ĐẾM SỐ LƯỢNG
+// TỐI ƯU GIAO DIỆN MOBILE THÀNH LƯỚI 2 CỘT
 // ========================================================
+
 
 let allFamilies = [];
 let productCounts = {};

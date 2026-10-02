@@ -1,6 +1,7 @@
 // ========================================================
 // FILE: assets/js/users/promotions.js
 // TRANG SẢN PHẨM KHUYẾN MÃI
+// ĐÃ BƠM CSS TỐI ƯU MOBILE RESPONSIVE + BỘ LỌC DẠNG NGĂN KÉO (ACCORDION)
 // ========================================================
 
 const ITEMS_PER_PAGE = 20;
@@ -23,7 +24,6 @@ function buildPromotionImageUrl(imagePath) {
         return "../assets/images/world mark.png";
     }
 
-    // An toàn trong giai đoạn chuyển đổi
     if (/^https?:\/\//i.test(cleanPath)) {
         return cleanPath;
     }
@@ -145,26 +145,26 @@ function updatePromotionSEO() {
 }
 
 const isLocal =
-            window.location.hostname === '127.0.0.1' ||
-            window.location.hostname === 'localhost';
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname === 'localhost';
 
-        function buildPromotionProductUrl(item) {
+function buildPromotionProductUrl(item) {
 
-            if (!item?.slug) {
-                return isLocal
-                    ? `product-detail.html?id=${encodeURIComponent(item?.id || '')}`
-                    : `/pages/product-detail.html?id=${encodeURIComponent(item?.id || '')}`;
-            }
+    if (!item?.slug) {
+        return isLocal
+            ? `product-detail.html?id=${encodeURIComponent(item?.id || '')}`
+            : `/pages/product-detail.html?id=${encodeURIComponent(item?.id || '')}`;
+    }
 
-            const slug =
-                encodeURIComponent(
-                    String(item.slug).trim()
-                );
+    const slug =
+        encodeURIComponent(
+            String(item.slug).trim()
+        );
 
-            return isLocal
-                ? `/pages/product-detail.html?slug=${slug}`
-                : `/${slug}.html`;
-        }
+    return isLocal
+        ? `/pages/product-detail.html?slug=${slug}`
+        : `/${slug}.html`;
+}
 
 // ========================================================
 // 1. FETCH PRODUCTS
@@ -540,7 +540,7 @@ async function fetchFilteredProducts() {
         ) {
 
             container.innerHTML = `
-                <div class="promotion-empty">
+                <div class="promotion-empty" style="grid-column: 1 / -1;">
 
                     <svg
                         class="promotion-empty-icon"
@@ -1193,6 +1193,34 @@ async function loadSidebar() {
 
 }
 
+// ========================================================
+// INIT KHỞI TẠO BỘ LỌC NGĂN KÉO TRÊN MOBILE
+// ========================================================
+function initMobileFilterAccordion() {
+    if (window.innerWidth > 991) return; // Chỉ chạy trên Mobile
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasSubcat = urlParams.has('sub_category_id');
+    const hasBrand = urlParams.has('brand_id');
+
+    document.querySelectorAll('.products-filter-card').forEach(card => {
+        // Tự động mở ngăn kéo nếu người dùng đang tick chọn bên trong
+        const isSubcatCard = card.querySelector('#sidebarCategoryList');
+        const isBrandCard = card.querySelector('#sidebarBrandList');
+        
+        if ((isSubcatCard && hasSubcat) || (isBrandCard && hasBrand)) {
+            card.classList.add('is-open');
+        }
+
+        const title = card.querySelector('.products-filter-title');
+        if (title && !title.dataset.accordionBound) {
+            title.dataset.accordionBound = 'true';
+            title.addEventListener('click', () => {
+                card.classList.toggle('is-open');
+            });
+        }
+    });
+}
 
 // ========================================================
 // 3. LOCAL SEARCH
@@ -1589,6 +1617,9 @@ window.addEventListener(
         initSort();
 
         await loadSidebar();
+        
+        // Bật ngăn kéo cho Bộ lọc trên Mobile
+        initMobileFilterAccordion();
 
         await fetchFilteredProducts();
 
@@ -1601,7 +1632,7 @@ window.addEventListener(
             try {
 
                 const user =
-                    await window.checkCustomerAuth();
+                    await checkCustomerAuth();
 
 
                 if (user) {

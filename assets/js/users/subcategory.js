@@ -1,7 +1,9 @@
 // ========================================================
 // FILE: assets/js/users/subcategory.js
 // ĐÃ XÓA ICON EMOJI ĐỂ GIAO DIỆN CHUẨN B2B MINIMALISM
+// TỐI ƯU GIAO DIỆN MOBILE THÀNH LƯỚI 2 CỘT + FIX DANH MỤC LIÊN QUAN THÀNH LƯỚI VUÔNG VỨC
 // ========================================================
+
 
 let allSubCats = [];
 let productCounts = {};

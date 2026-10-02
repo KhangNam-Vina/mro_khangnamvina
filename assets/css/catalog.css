@@ -2892,3 +2892,461 @@
 
 }
 /* ========================================================= PHẦN CẦN THÊM / THAY THẾ Category statistics + Product count ========================================================= */ /* ========================================================= CATEGORY COUNTER ========================================================= */ .catalog-counter { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-height: 44px; padding: 7px 16px; box-sizing: border-box; border: 1px solid #e5e7eb; border-radius: 10px; background: #fff; color: #6b7280; font-size: 13px; font-weight: 700; white-space: nowrap; box-shadow: 0 2px 6px rgba(15, 23, 42, .05); } .catalog-counter-number { margin: 0 2px; color: #ff5e00; font-size: 20px; line-height: 1; font-weight: 900; } .catalog-counter-separator { margin: 0 3px; color: #d1d5db; font-size: 15px; font-weight: 700; } /* ========================================================= CATEGORY CARD PRODUCT COUNT ========================================================= */ .catalog-category-count { position: relative; z-index: 2; display: inline-flex; align-items: center; justify-content: center; margin-top: 7px; padding: 4px 8px; border-radius: 5px; background: #f3f4f6; color: #9ca3af; font-size: 10px; line-height: 1; font-weight: 700; white-space: nowrap; transition: background-color .2s ease, color .2s ease; } /* Category có sản phẩm */ .catalog-category-card:hover .catalog-category-count { background: #fff7ed; color: #ff5e00; } /* Category chưa có sản phẩm */ .catalog-category-count.is-empty { background: #f9fafb; color: #b0b7c3; font-weight: 600; } .catalog-category-card:hover .catalog-category-count.is-empty { background: #f3f4f6; color: #9ca3af; } /* ========================================================= RESPONSIVE ========================================================= */ @media (max-width: 600px) { .catalog-counter { align-self: flex-start; max-width: 100%; padding: 7px 12px; font-size: 12px; } .catalog-counter-number { font-size: 18px; } }
+
+@media (max-width: 991px) {
+            /* =======================================
+               1. LƯỚI 2 CỘT VÀ FIX LỖI BÓNG MA SKELETON
+               ======================================= */
+            .subcategory-grid, #subCategoryContainer {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 12px !important;
+            }
+            
+            /* Fix triệt để lỗi Skeleton không chịu ẩn */
+            .subcategory-grid.is-hidden, 
+            #subCategoryContainer.is-hidden,
+            #skeletonLoading.is-hidden {
+                display: none !important;
+            }
+
+            /* Tinh chỉnh chiều cao thẻ */
+            .subcategory-card {
+                min-height: 100px !important;
+                padding: 12px !important;
+                justify-content: center !important;
+                align-items: center !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+            .subcategory-card-title {
+                font-size: 13px !important;
+                line-height: 1.3 !important;
+                margin-top: 0 !important;
+                margin-bottom: 6px !important;
+                text-align: center !important;
+            }
+            .subcategory-card-count {
+                font-size: 10px !important;
+                padding: 3px 6px !important;
+                margin-top: auto !important;
+            }
+
+            /* =======================================
+               2. THANH CÔNG CỤ TÌM KIẾM
+               ======================================= */
+            .subcategory-section-header {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 12px !important;
+            }
+            .subcategory-tools {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                width: 100% !important;
+                gap: 12px !important;
+            }
+            .subcategory-search-wrapper,
+            .subcategory-search-box {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .subcategory-counter-wrapper {
+                justify-content: flex-start !important;
+            }
+
+            /* =======================================
+               3. DANH MỤC LIÊN QUAN (LƯỚI 2 CỘT VUÔNG VỨC ĐỀU NHAU)
+               ======================================= */
+            .subcategory-related-list {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+                padding-bottom: 12px !important;
+            }
+            .subcategory-related-link {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                text-align: center !important;
+                white-space: normal !important; /* Chữ dài tự rớt dòng bên trong nút */
+                font-size: 11px !important;
+                line-height: 1.4 !important;
+                padding: 8px 10px !important;
+                min-height: 48px !important;
+                height: 100% !important; /* Ép các nút bằng chiều cao với nhau */
+                box-sizing: border-box !important;
+            }
+        }
+
+@media (max-width: 991px) {
+            /* Ép Danh mục thành lưới 2 cột trên điện thoại */
+            .family-grid, #familyContainer {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 12px !important;
+            }
+            
+            /* Tinh chỉnh chiều cao thẻ và padding cho gọn gàng */
+            .subcategory-card { /* Tên class HTML đang dùng là subcategory-card */
+                min-height: 100px !important;
+                padding: 12px !important;
+                justify-content: center !important;
+                align-items: center !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+
+            /* Tinh chỉnh font chữ cho Mobile */
+            .subcategory-card-title {
+                font-size: 13px !important;
+                line-height: 1.3 !important;
+                margin-top: 0 !important;
+                margin-bottom: 6px !important;
+                text-align: center !important;
+            }
+
+            .subcategory-card-count {
+                font-size: 10px !important;
+                padding: 3px 6px !important;
+                margin-top: auto !important;
+            }
+
+            /* Các thanh công cụ */
+            .family-section-header {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 12px !important;
+            }
+            .family-tools {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                width: 100% !important;
+                gap: 12px !important;
+            }
+            .family-search-wrapper,
+            .family-search-wrapper .catalog-search-box {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .family-counter-wrapper {
+                justify-content: flex-start !important;
+            }
+        }
+
+@media (max-width: 991px) {
+            
+            /* Ép Danh mục thành lưới 2 cột thay vì 1 cột kéo dài */
+            .catalog-category-grid {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 12px !important;
+            }
+            
+            /* FIX LỖI "BÓNG MA" SKELETON: Đảm bảo class is-hidden được ưu tiên tuyệt đối */
+            .catalog-category-grid.is-hidden,
+            #skeletonLoading.is-hidden {
+                display: none !important;
+            }
+
+            /* Tinh chỉnh chiều cao thẻ cho gọn gàng */
+            .catalog-category-card {
+                min-height: 110px !important;
+                padding: 12px 8px !important;
+                justify-content: center !important;
+                align-items: center !important;
+                display: flex !important;
+            }
+
+            /* Tinh chỉnh font chữ cho Mobile */
+            .catalog-category-title {
+                font-size: 13px !important;
+                line-height: 1.3 !important;
+                margin-bottom: 4px !important;
+                text-align: center !important;
+            }
+
+            .catalog-category-count {
+                font-size: 10px !important;
+                padding: 3px 6px !important;
+            }
+
+            /* Khoảng cách Header và số lượng SP */
+            .catalog-section-header {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 12px !important;
+            }
+
+            .catalog-counter-wrapper {
+                justify-content: flex-start !important;
+            }
+        }
+
+        @media (max-width: 991px) {
+            .catalog-products-layout {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 16px !important;
+            }
+            
+            .products-sidebar {
+                width: 100% !important;
+                padding-right: 0 !important;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            /* ==============================================
+               1. BỘ LỌC DẠNG NGĂN KÉO (ACCORDION) TRÊN MOBILE
+               ============================================== */
+            .products-filter-card {
+                padding: 12px 16px !important;
+                margin-bottom: 0 !important;
+                box-shadow: none !important;
+                border: 1px solid #e5e7eb !important;
+                border-radius: 8px !important;
+                background: #fff !important;
+            }
+            
+            .products-filter-title {
+                font-size: 13px !important;
+                margin-bottom: 0 !important; /* Bỏ margin để gọn khi đóng */
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                cursor: pointer;
+                user-select: none;
+            }
+
+            /* Tạo mũi tên V bên phải Tiêu đề */
+            .products-filter-title::after {
+                content: "";
+                display: inline-block;
+                width: 8px;
+                height: 8px;
+                border-right: 2px solid #6b7280;
+                border-bottom: 2px solid #6b7280;
+                transform: rotate(45deg);
+                transition: transform 0.3s;
+            }
+
+            /* Khi mở ngăn kéo thì tạo khoảng cách và xoay mũi tên */
+            .products-filter-card.is-open .products-filter-title {
+                margin-bottom: 12px !important;
+            }
+            .products-filter-card.is-open .products-filter-title::after {
+                transform: rotate(-135deg); /* Xoay ngược lên */
+            }
+
+            /* Mặc định ẨN nội dung (Thanh tìm kiếm & Danh sách) khi CHƯA MỞ */
+            .products-filter-card:not(.is-open) .products-local-search,
+            .products-filter-card:not(.is-open) .products-filter-list {
+                display: none !important;
+            }
+
+            .products-filter-list {
+                max-height: 200px !important; /* Rút ngắn chiều cao nếu danh sách quá dài */
+            }
+
+            /* ==============================================
+               2. CHIA LƯỚI SẢN PHẨM THÀNH 2 CỘT
+               ============================================== */
+            .products-grid {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+            }
+
+            /* ==============================================
+               3. TỐI ƯU KÍCH THƯỚC THẺ SẢN PHẨM TRÊN MOBILE
+               ============================================== */
+            .product-card {
+                min-width: unset !important;
+                border-radius: 6px !important;
+            }
+            .product-card-image {
+                height: 140px !important;
+                padding: 8px !important;
+            }
+            .product-card-image img {
+                max-height: 120px !important;
+            }
+            .product-card-body {
+                padding: 10px !important;
+                min-height: auto !important;
+            }
+            .product-card-name {
+                font-size: 12px !important;
+                line-height: 1.4 !important;
+                margin-bottom: 8px !important;
+            }
+            .product-meta {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 4px !important;
+            }
+            .product-price-normal,
+            .product-price-sale {
+                font-size: 13px !important;
+            }
+            .product-badge {
+                font-size: 9px !important;
+                padding: 3px 6px !important;
+            }
+            
+            /* ==============================================
+               4. THANH TOOLBAR (SẮP XẾP)
+               ============================================== */
+            .products-toolbar {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px !important;
+                margin-bottom: 16px !important;
+            }
+            .products-sort {
+                width: 100% !important;
+            }
+        }
+
+@media (max-width: 991px) {
+            .catalog-products-layout {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 16px !important;
+            }
+            
+            .products-sidebar {
+                width: 100% !important;
+                padding-right: 0 !important;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            /* ==============================================
+               1. BỘ LỌC DẠNG NGĂN KÉO (ACCORDION) TRÊN MOBILE
+               ============================================== */
+            .products-filter-card {
+                padding: 12px 16px !important;
+                margin-bottom: 0 !important;
+                box-shadow: none !important;
+                border: 1px solid #e5e7eb !important;
+                border-radius: 8px !important;
+                background: #fff !important;
+            }
+            
+            .products-filter-title {
+                font-size: 13px !important;
+                margin-bottom: 0 !important;
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                cursor: pointer;
+                user-select: none;
+            }
+
+            .products-filter-title::after {
+                content: "";
+                display: inline-block;
+                width: 8px;
+                height: 8px;
+                border-right: 2px solid #6b7280;
+                border-bottom: 2px solid #6b7280;
+                transform: rotate(45deg);
+                transition: transform 0.3s;
+            }
+
+            .products-filter-card.is-open .products-filter-title {
+                margin-bottom: 12px !important;
+            }
+            .products-filter-card.is-open .products-filter-title::after {
+                transform: rotate(-135deg);
+            }
+
+            .products-filter-card:not(.is-open) .products-local-search,
+            .products-filter-card:not(.is-open) .products-filter-list {
+                display: none !important;
+            }
+
+            .products-filter-list {
+                max-height: 200px !important;
+            }
+
+            /* ==============================================
+               2. CHIA LƯỚI SẢN PHẨM THÀNH 2 CỘT
+               ============================================== */
+            .products-grid {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+            }
+
+            /* ==============================================
+               3. TỐI ƯU KÍCH THƯỚC THẺ SẢN PHẨM TRÊN MOBILE
+               ============================================== */
+            .product-card {
+                min-width: unset !important;
+                border-radius: 6px !important;
+            }
+            .product-card-image {
+                height: 140px !important;
+                padding: 8px !important;
+            }
+            .product-card-image img {
+                max-height: 120px !important;
+            }
+            .product-card-body {
+                padding: 10px !important;
+                min-height: auto !important;
+            }
+            .product-card-name {
+                font-size: 12px !important;
+                line-height: 1.4 !important;
+                margin-bottom: 8px !important;
+            }
+            .product-meta {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 4px !important;
+            }
+            .product-price-normal,
+            .product-price-sale {
+                font-size: 13px !important;
+            }
+            .product-badge {
+                font-size: 9px !important;
+                padding: 3px 6px !important;
+            }
+            
+            /* Điều chỉnh riêng cho trang Promotions */
+            .promotion-price-row {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 6px !important;
+                padding-top: 8px !important;
+            }
+            .product-price-discount {
+                align-items: flex-start !important;
+            }
+            .promotion-discount-badge {
+                right: 4px !important;
+                top: 4px !important;
+                font-size: 8px !important;
+                padding: 2px 4px !important;
+            }
+
+            /* ==============================================
+               4. THANH TOOLBAR (SẮP XẾP)
+               ============================================== */
+            .products-toolbar {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 12px !important;
+                margin-bottom: 16px !important;
+            }
+            .products-sort {
+                width: 100% !important;
+            }
+        }
