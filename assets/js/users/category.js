@@ -1,8 +1,69 @@
 // ========================================================
 // FILE: assets/js/users/category.js
 // QUẢN LÝ DANH MỤC GỐC
-// Luồng: Category -> Subcategory -> Family -> Products
+// TỐI ƯU HÓA CSS RESPONSIVE CHO MOBILE (CHIA 2 CỘT) + FIX LỖI SKELETON
 // ========================================================
+
+// ========================================================
+// BƠM CSS TỐI ƯU MOBILE & DESKTOP (PURE CSS CHUẨN)
+// ========================================================
+(function injectCategoryMobileStyles() {
+    if (document.getElementById('mro-category-responsive-css')) return;
+    const style = document.createElement('style');
+    style.id = 'mro-category-responsive-css';
+    style.innerHTML = `
+        /* ================== MOBILE & TABLET (< 992px) ================== */
+        @media (max-width: 991px) {
+            
+            /* Ép Danh mục thành lưới 2 cột thay vì 1 cột kéo dài */
+            .catalog-category-grid {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 12px !important;
+            }
+            
+            /* FIX LỖI "BÓNG MA" SKELETON: Đảm bảo class is-hidden được ưu tiên tuyệt đối */
+            .catalog-category-grid.is-hidden,
+            #skeletonLoading.is-hidden {
+                display: none !important;
+            }
+
+            /* Tinh chỉnh chiều cao thẻ cho gọn gàng */
+            .catalog-category-card {
+                min-height: 110px !important;
+                padding: 12px 8px !important;
+                justify-content: center !important;
+                align-items: center !important;
+                display: flex !important;
+            }
+
+            /* Tinh chỉnh font chữ cho Mobile */
+            .catalog-category-title {
+                font-size: 13px !important;
+                line-height: 1.3 !important;
+                margin-bottom: 4px !important;
+                text-align: center !important;
+            }
+
+            .catalog-category-count {
+                font-size: 10px !important;
+                padding: 3px 6px !important;
+            }
+
+            /* Khoảng cách Header và số lượng SP */
+            .catalog-section-header {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 12px !important;
+            }
+
+            .catalog-counter-wrapper {
+                justify-content: flex-start !important;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+})();
 
 async function loadCategories() {
     const skeleton = document.getElementById('skeletonLoading');
@@ -11,15 +72,9 @@ async function loadCategories() {
     const categoryCounter = document.getElementById('totalCategoriesCount');
     const productCounter = document.getElementById('totalProductsCount');
 
-    // Không có grid thì dừng
-    if (!grid || !skeleton) {
-        return;
-    }
+    if (!grid || !skeleton) return;
 
     try {
-        // ==================================================
-        // LẤY DANH MỤC GỐC (Đã bổ sung gọi trường 'slug')
-        // ==================================================
         const { data: categories, error: categoryError } = await window.supabaseClient
             .from('categories')
             .select('id, name, slug') 
@@ -28,18 +83,12 @@ async function loadCategories() {
 
         if (categoryError) throw categoryError;
 
-        // ==================================================
-        // LẤY PRODUCT CATEGORY ID (Để đếm số sản phẩm)
-        // ==================================================
         const { data: products, error: productError } = await window.supabaseClient
             .from('products')
             .select('category_id');
 
         if (productError) throw productError;
 
-        // ==================================================
-        // TÍNH SỐ PRODUCT THEO CATEGORY
-        // ==================================================
         const productCountByCategory = new Map();
         let totalProducts = 0;
 
@@ -54,20 +103,12 @@ async function loadCategories() {
             });
         }
 
-        // ==================================================
-        // CẬP NHẬT TỔNG SỐ
-        // ==================================================
         if (categoryCounter) categoryCounter.textContent = Array.isArray(categories) ? categories.length : 0;
         if (productCounter) productCounter.textContent = totalProducts;
 
-        // ==================================================
-        // ẨN SKELETON
-        // ==================================================
+        // ẨN SKELETON (Mượt mà, không bị hiện bóng ma nữa)
         skeleton.classList.add('is-hidden');
 
-        // ==================================================
-        // XỬ LÝ KHÔNG CÓ HOẶC CÓ CATEGORY
-        // ==================================================
         if (!Array.isArray(categories) || categories.length === 0) {
             grid.classList.add('is-hidden');
             emptyState?.classList.remove('is-hidden');
@@ -77,16 +118,12 @@ async function loadCategories() {
         emptyState?.classList.add('is-hidden');
         grid.classList.remove('is-hidden');
 
-        // ==================================================
-        // RENDER CATEGORY (ĐÃ XÓA ICON, DÙNG SLUG)
-        // ==================================================
         let html = '';
 
         categories.forEach((category) => {
             const categoryName = category?.name ? String(category.name).trim() : 'Danh mục';
             const safeName = escapeCategoryHTML(categoryName);
 
-            // Category luôn ưu tiên slug
             const categorySlug = category?.slug
                 ? String(category.slug).trim()
                 : '';
@@ -103,11 +140,9 @@ async function loadCategories() {
                 )
                 : '#';
 
-            // Đếm số sản phẩm
             const categoryProductCount = productCountByCategory.get(category.id) || 0;
             const productCountText = categoryProductCount > 0 ? `${categoryProductCount} sản phẩm` : 'Chưa có sản phẩm';
 
-            // Dựng HTML Card (Không còn div chứa Icon)
             html += `
                 <a href="${targetUrl}" class="catalog-category-card" aria-label="Xem danh mục ${safeName}">
                     <h2 class="catalog-category-title">${safeName}</h2>
@@ -133,9 +168,6 @@ async function loadCategories() {
     }
 }
 
-// ========================================================
-// ESCAPE HTML
-// ========================================================
 function escapeCategoryHTML(value) {
     if (value === null || value === undefined) return '';
     const div = document.createElement('div');
@@ -143,9 +175,6 @@ function escapeCategoryHTML(value) {
     return div.innerHTML;
 }
 
-// ========================================================
-// AUTH UI
-// ========================================================
 async function initCategoryAuthUI() {
     if (typeof window.checkCustomerAuth !== 'function') return;
     try {
@@ -162,30 +191,24 @@ async function initCategoryAuthUI() {
     }
 }
 
-// ========================================================
-// SEO
-// ========================================================
 function updateCategorySEO() {
     const canonical = new URL(
         '/pages/category.html',
         window.location.origin
     ).href;
 
-    // Canonical
     const canonicalUrl = document.getElementById('canonicalUrl');
 
     if (canonicalUrl) {
         canonicalUrl.href = canonical;
     }
 
-    // Open Graph URL
     const ogUrl = document.querySelector('meta[property="og:url"]');
 
     if (ogUrl) {
         ogUrl.setAttribute('content', canonical);
     }
 
-    // JSON-LD
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "CollectionPage",
@@ -226,9 +249,6 @@ function updateCategorySEO() {
     jsonLdScript.textContent = JSON.stringify(jsonLd);
 }
 
-// ========================================================
-// INIT
-// ========================================================
 document.addEventListener('DOMContentLoaded', async () => {
     updateCategorySEO();
 

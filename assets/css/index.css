@@ -754,48 +754,69 @@
 
 
 /* =========================================================
-   PRODUCT NAME
+   PRODUCT NAME (FIX LỖI CẮT MẤT CHÂN CHỮ)
 ========================================================= */
-
 .product-name {
     display: -webkit-box;
-
     margin: 0 0 12px;
-
     color: #00479b;
-
-    font-size: 15px;
-    line-height: 1.4;
-
+    font-size: 14px; /* Chỉnh lại size 14px cho tinh tế */
+    line-height: 1.5; /* Nới lỏng khoảng cách dòng */
     font-weight: 800;
-
     text-decoration: none;
-
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 2; /* Ép tối đa 2 dòng */
     -webkit-box-orient: vertical;
-
     overflow: hidden;
-
-    min-height: 42px;
-
+    text-overflow: ellipsis; /* Hiện dấu ... nếu quá dài */
+    min-height: 42px; /* 14px * 1.5 * 2 dòng */
+    padding-bottom: 2px; /* Chừa 1 xíu không gian cho phần đuôi chữ (g,y,p) */
     transition: color 0.2s ease;
 }
-
 .product-name:hover {
     color: #ff5e00;
 }
 
-
 /* =========================================================
-   PRODUCT META
+   PRODUCT META (CHỨA SKU & UNIT)
 ========================================================= */
-
 .product-meta {
     margin-top: auto;
-
     padding-top: 10px;
-
     border-top: 1px solid #eef0f3;
+    display: flex;
+    flex-direction: column;
+    gap: 6px; /* Tạo khoảng cách đều giữa SKU và Đơn vị */
+}
+
+/* =========================================================
+   SKU + UNIT (FIX LỖI TRÀN 4 DÒNG)
+========================================================= */
+.product-sku,
+.product-unit {
+    display: block; /* Ép nằm riêng 1 dòng */
+    width: 100%;
+    color: #4b5563;
+    background: #f5f6f8;
+    font-size: 11px; /* Hạ size xuống 1 chút cho gọn */
+    line-height: 1.4;
+    padding: 4px 8px;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.product-sku {
+    font-family: monospace;
+    font-weight: 700;
+    
+    /* 3 dòng ma thuật ép text hiển thị 1 dòng và cắt bằng dấu 3 chấm */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-unit {
+    font-weight: 600;
+    width: fit-content; /* Ô đơn vị chỉ ôm vừa đủ chữ */
 }
 
 
@@ -1080,4 +1101,100 @@ body {
 
 .category-title-link:hover {
     color: inherit;
+}
+
+/* =========================================================
+   TỐI ƯU MOBILE RESPONSIVE (ĐÃ TÁCH TỪ JS SANG)
+========================================================= */
+#categoryGrid {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+/* DESKTOP (Mặc định): Ẩn từ ô thứ 9 trở đi nếu chưa bấm Xem tất cả */
+#categoryGrid:not(.is-expanded) > .category-card:nth-child(n+9) {
+    display: none !important;
+}
+
+@media (max-width: 991px) {
+    /* --- 1. HERO SECTION --- */
+    .home-hero-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    .home-hero-actions a {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 8px;
+    }
+    .home-hero-image-wrapper {
+        margin-top: 24px;
+    }
+
+    /* --- 2. DANH MỤC (MOBILE): Chia 2 cột, Ẩn từ ô thứ 5 --- */
+    #categoryGrid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+    #categoryGrid:not(.is-expanded) > .category-card:nth-child(n+5) {
+        display: none !important;
+    }
+    /* Ẩn bớt mục con trên điện thoại cho đỡ dài */
+    .category-list .category-item:nth-child(n+3) {
+        display: none !important;
+    }
+    
+    .category-view-more-wrapper {
+        grid-column: 1 / -1;
+        margin-top: 16px;
+    }
+    #btnToggleCategories {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* --- 3. NGÀNH HÀNG & BLOG (MOBILE): Trượt ngang --- */
+    #industriesGrid,
+    #homeBlogGrid {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        scroll-snap-type: x mandatory;
+        padding-bottom: 15px;
+        -webkit-overflow-scrolling: touch;
+    }
+    #industriesGrid { gap: 12px !important; }
+    #homeBlogGrid { gap: 16px !important; }
+    
+    #industriesGrid::-webkit-scrollbar,
+    #homeBlogGrid::-webkit-scrollbar { 
+        display: none; 
+    }
+    
+    #industriesGrid .industry-card {
+        flex: 0 0 42% !important; /* Hiển thị ~2.5 ô để dụ vuốt */
+        min-width: 130px !important;
+        scroll-snap-align: start;
+    }
+    
+    #homeBlogGrid .blog-card {
+        flex: 0 0 85% !important; /* 1 bài to, lòi 1 xíu bài thứ 2 */
+        min-width: 260px !important;
+        scroll-snap-align: start;
+    }
+
+    /* --- 4. THANH TRƯỢT SẢN PHẨM (MOBILE) --- */
+    .product-slider-track {
+        gap: 12px !important;
+    }
+    .product-slider-track .product-card {
+        flex: 0 0 60% !important; /* Mở rộng thẻ sản phẩm để dễ nhìn hơn */
+        min-width: 220px !important;
+    }
+
+    /* Ẩn nút xem tất cả mặc định (dùng nút mobile riêng) */
+    .btn-view-all {
+         display: none !important;
+    }
 }

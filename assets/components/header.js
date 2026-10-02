@@ -1,7 +1,7 @@
 // ========================================================
 // FILE: assets/components/header.js
 // COMPONENT HEADER & MENU DÙNG CHUNG TOÀN BỘ WEBSITE
-// ĐÃ TÍCH HỢP TỰ ĐỘNG CẬP NHẬT LOGO & FAVICON TỪ ADMIN
+// ĐÃ TỐI ƯU HÓA SIÊU GỌN GÀNG CHO GIAO DIỆN MOBILE (2 DÒNG)
 // ========================================================
 
 const renderHeader = () => {
@@ -16,9 +16,158 @@ const renderHeader = () => {
     const pagesPath = isRoot ? 'pages/' : '';
 
     // ====================================================
-    // HEADER HTML
+    // HEADER HTML & CSS
     // ====================================================
     const headerHTML = `
+        <style>
+            /* ====== TỐI ƯU TRẢI NGHIỆM MOBILE HEADER (LAYOUT 2 DÒNG) ====== */
+            .mobile-user-icon { display: none; }
+            .search-icon-mobile { display: none; }
+
+            @media (max-width: 991px) {
+                .header-top {
+                    padding: 10px 15px !important;
+                    background: #fff;
+                    border-bottom: 1px solid #f3f4f6;
+                }
+                .header-container {
+                    display: grid !important;
+                    grid-template-columns: 40px 1fr 40px !important; 
+                    row-gap: 12px;
+                    column-gap: 10px;
+                    align-items: center;
+                }
+
+                /* --- HÀNG 1: LOGO (GIỮA) & ĐĂNG NHẬP (PHẢI) --- */
+                .header-logo {
+                    grid-column: 2 / 3;
+                    grid-row: 1 / 2;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                .header-logo img { 
+                    max-height: 48px !important; /* PHÓNG BỰ LOGO */
+                    width: auto !important;
+                    object-fit: contain;
+                }
+                
+                .header-account-wrapper {
+                    grid-column: 3 / 4;
+                    grid-row: 1 / 2;
+                    margin: 0 !important;
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                }
+                
+                /* Đổi Nút Đăng nhập thành Icon Người */
+                .btn-guest-login {
+                    padding: 0 !important;
+                    border: none !important;
+                    background: transparent !important;
+                    color: #00479b !important;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .mobile-user-icon { 
+                    display: block !important; 
+                    width: 28px; 
+                    height: 28px; 
+                }
+                .desktop-text { display: none !important; }
+                
+                .btn-user-profile { margin: 0 !important; }
+                .user-avatar { 
+                    width: 32px !important; 
+                    height: 32px !important; 
+                    font-size: 11px !important; 
+                }
+                .user-text { display: none !important; } 
+
+                /* --- HÀNG 2: MENU (TRÁI) - TÌM KIẾM (GIỮA) - GIỎ HÀNG (PHẢI) --- */
+                .mobile-toggle-btn {
+                    grid-column: 1 / 2;
+                    grid-row: 2 / 3;
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-start;
+                    color: #00479b;
+                    background: transparent;
+                    border: none;
+                    padding: 0;
+                    cursor: pointer;
+                }
+                .mobile-toggle-btn svg { width: 32px; height: 32px; }
+
+                /* Ô Tìm kiếm style mới (Xám nhạt, viền mỏng, có icon kính lúp) */
+                .header-search-wrapper {
+                    grid-column: 2 / 3;
+                    grid-row: 2 / 3;
+                    width: 100%;
+                    margin: 0;
+                }
+                .header-search-box {
+                    height: 40px !important;
+                    background: #f3f4f6 !important;
+                    border: 1px solid #e5e7eb !important;
+                    border-radius: 8px !important;
+                    display: flex;
+                    align-items: center;
+                    padding: 0 12px !important;
+                }
+                .search-icon-mobile {
+                    display: block !important;
+                    width: 20px; 
+                    height: 20px;
+                    color: #6b7280;
+                    flex-shrink: 0;
+                }
+                .search-input {
+                    flex: 1;
+                    font-size: 14px !important;
+                    padding: 0 10px !important;
+                    border: none !important;
+                    background: transparent !important;
+                    outline: none !important;
+                    width: 100%;
+                }
+                .search-btn {
+                    display: none !important; /* Ẩn nút Xanh trên mobile */
+                }
+
+                .nav-mobile-cart {
+                    grid-column: 3 / 4;
+                    grid-row: 2 / 3;
+                    position: relative;
+                    color: #00479b;
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-end;
+                    padding: 0;
+                    text-decoration: none;
+                }
+                .nav-mobile-cart svg { width: 30px; height: 30px; }
+                .nav-mobile-cart .cart-badge {
+                    position: absolute;
+                    top: -6px;
+                    right: -6px;
+                    background: #ff5e00;
+                    color: #fff;
+                    font-size: 10px;
+                    padding: 2px 5px;
+                    border-radius: 10px;
+                    font-weight: 900;
+                    line-height: 1;
+                }
+            }
+            
+            @media (min-width: 992px) {
+                .mobile-toggle-btn, .nav-mobile-cart { display: none !important; }
+            }
+        </style>
+
         <div class="site-header-wrapper">
 
             <!-- ==================================================
@@ -27,34 +176,42 @@ const renderHeader = () => {
             <header class="header-top">
                 <div class="header-container">
 
+                    <!-- [MOBILE] HAMBURGER MENU -->
+                    <button id="mobileMenuToggle" type="button" aria-label="Mở menu" class="mobile-toggle-btn" aria-expanded="false">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+
                     <!-- LOGO -->
                     <a href="${rootPath}index.html" class="header-logo" aria-label="MRO Khang Nam - Trang chủ">
                         <img id="mainSiteLogo" src="${rootPath}assets/images/world mark.png" alt="MRO Khang Nam Logo">
                     </a>
 
-                    <!-- ==================================================
-                         SEARCH
-                    =================================================== -->
+                    <!-- SEARCH -->
                     <div class="header-search-wrapper">
                         <div class="header-search-box">
-                            <input id="productSearchInput" type="search" aria-label="Tìm kiếm sản phẩm" placeholder="Tìm kiếm theo mã SKU, tên sản phẩm..." class="search-input">
+                            <svg class="search-icon-mobile" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            <input id="productSearchInput" type="search" aria-label="Tìm kiếm sản phẩm" placeholder="Tìm kiếm mã SKU, tên sản phẩm..." class="search-input">
                             <button id="btnSearchSubmit" type="button" aria-label="Tìm kiếm sản phẩm" class="search-btn">Tìm Kiếm</button>
                         </div>
                     </div>
 
-                    <!-- ==================================================
-                         ACCOUNT & LOGIN
-                    =================================================== -->
+                    <!-- ACCOUNT & LOGIN -->
                     <div class="header-account-wrapper">
-                        <!-- NÚT ĐĂNG NHẬP -->
-                        <a id="btnGuestLogin" href="${pagesPath}login.html" class="btn-guest-login d-none">Đăng nhập</a>
-
-                        <!-- NÚT TÀI KHOẢN -->
+                        <a id="btnGuestLogin" href="${pagesPath}login.html" class="btn-guest-login d-none" title="Đăng nhập">
+                            <svg class="mobile-user-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            <span class="desktop-text">Đăng nhập</span>
+                        </a>
                         <a id="btnUserProfile" href="${pagesPath}profile.html" class="btn-user-profile d-none">
                             <div class="user-avatar">TK</div>
                             <span class="user-text">Tài khoản</span>
                         </a>
                     </div>
+
+                    <!-- [MOBILE] GIỎ HÀNG -->
+                    <a href="${pagesPath}cart.html" aria-label="Giỏ hàng" class="nav-mobile-cart">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        <span id="shoppingCartCountMobile" class="cart-badge d-none">0</span>
+                    </a>
 
                 </div>
             </header>
@@ -65,29 +222,8 @@ const renderHeader = () => {
             <nav class="header-nav" aria-label="Điều hướng chính">
                 <div class="nav-container">
 
-                    <!-- ==================================================
-                         MOBILE NAV HEADER
-                    =================================================== -->
-                    <div class="nav-mobile-header">
-                        <div class="nav-mobile-toggle-group">
-                            <button id="mobileMenuToggle" type="button" aria-label="Mở menu" aria-expanded="false" class="mobile-toggle-btn">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                            </button>
-                            <span class="nav-mobile-title">Danh Mục</span>
-                        </div>
-
-                        <!-- CART MOBILE -->
-                        <a href="${pagesPath}cart.html" aria-label="Giỏ hàng" class="nav-mobile-cart">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                            <span id="shoppingCartCountMobile" class="cart-badge d-none">0</span>
-                        </a>
-                    </div>
-
-                    <!-- ==================================================
-                         DESKTOP NAV
-                    =================================================== -->
+                    <!-- DESKTOP NAV -->
                     <div class="nav-desktop-wrapper">
-
                         <ul id="mainNavMenu" class="nav-menu-list">
                             <li><a href="${rootPath}index.html" class="nav-link">Trang Chủ</a></li>
                             <li><a href="${pagesPath}products.html" class="nav-link">Sản Phẩm</a></li>
@@ -99,11 +235,8 @@ const renderHeader = () => {
                             <li><a href="${pagesPath}contact.html" class="nav-link">Liên Hệ</a></li>
                         </ul>
 
-                        <!-- ==================================================
-                             RIGHT ACTIONS
-                        =================================================== -->
+                        <!-- RIGHT ACTIONS (DESKTOP) -->
                         <div class="nav-actions-right">
-
                             <!-- BÁO GIÁ -->
                             <a href="${pagesPath}rfq.html" class="nav-action-item cart-action" aria-label="Trung tâm báo giá">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -117,14 +250,10 @@ const renderHeader = () => {
                                 <span class="action-text">Giỏ Hàng</span>
                                 <span id="shoppingCartCountDesktop" class="cart-badge d-none">0</span>
                             </a>
-
                         </div>
-
                     </div>
 
-                    <!-- ==================================================
-                         MOBILE MENU DROPDOWN
-                    =================================================== -->
+                    <!-- MOBILE MENU DROPDOWN -->
                     <div id="mobileNavDropdown" class="nav-mobile-dropdown">
                         <div class="nav-mobile-dropdown-inner">
                             <a href="${rootPath}index.html" class="mobile-nav-link">Trang Chủ</a>
@@ -153,7 +282,6 @@ const renderHeader = () => {
     headerContainer.innerHTML = headerHTML;
     headerContainer.classList.remove('site-header-placeholder');
 
-    // GỌI HÀM CẬP NHẬT LOGO TỪ DATABASE SAU KHI RENDER HTML XONG
     applyDynamicHeaderSettings();
 
     // ====================================================
@@ -209,13 +337,11 @@ async function applyDynamicHeaderSettings() {
             .maybeSingle();
 
         if (data && data.logo_url && data.logo_url.trim() !== "") {
-            // Thay đổi Logo trên Header
             const mainLogo = document.getElementById('mainSiteLogo');
             if (mainLogo) {
                 mainLogo.src = data.logo_url;
             }
             
-            // Thay đổi luôn Favicon (Icon trên tab trình duyệt)
             let link = document.querySelector("link[rel~='icon']");
             if (!link) {
                 link = document.createElement('link');

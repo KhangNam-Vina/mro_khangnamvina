@@ -1,7 +1,128 @@
 // ========================================================
 // FILE: assets/js/users/index.js
-// TRANG CHỦ MRO KHANG NAM
+// TRANG CHỦ MRO KHANG NAM (TỐI ƯU CHUẨN RESPONSIVE CSS)
 // ========================================================
+
+// ========================================================
+// BƠM CSS TỐI ƯU MOBILE & DESKTOP (PURE CSS CHUẨN)
+// ========================================================
+(function injectResponsiveStyles() {
+    if (document.getElementById('mro-index-responsive-css')) return;
+    const style = document.createElement('style');
+    style.id = 'mro-index-responsive-css';
+    style.innerHTML = `
+        /* ================== DANH MỤC SẢN PHẨM ================== */
+        #categoryGrid {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        /* DESKTOP (Mặc định): Ẩn từ ô thứ 9 trở đi nếu chưa bấm Xem tất cả */
+        #categoryGrid:not(.is-expanded) > .category-card:nth-child(n+9) {
+            display: none !important;
+        }
+
+        /* ================== MOBILE & TABLET (< 992px) ================== */
+        @media (max-width: 991px) {
+            /* 1. DANH MỤC (MOBILE): Chia 2 cột, Ẩn từ ô thứ 5 */
+            #categoryGrid {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 12px !important;
+            }
+            #categoryGrid:not(.is-expanded) > .category-card:nth-child(n+5) {
+                display: none !important;
+            }
+            /* Ẩn bớt mục con trên điện thoại cho đỡ dài */
+            .category-list .category-item:nth-child(n+3) {
+                display: none !important;
+            }
+
+            /* 2. NGÀNH HÀNG (MOBILE): Trượt ngang */
+            #industriesGrid {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                scroll-snap-type: x mandatory;
+                gap: 12px !important;
+                padding-bottom: 15px;
+                -webkit-overflow-scrolling: touch;
+            }
+            #industriesGrid::-webkit-scrollbar { display: none; }
+            #industriesGrid .industry-card {
+                flex: 0 0 42% !important; /* Hiển thị ~2.5 ô để dụ vuốt */
+                min-width: 130px !important;
+                scroll-snap-align: start;
+            }
+
+            /* 3. BLOG (MOBILE): Trượt ngang */
+            #homeBlogGrid {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                scroll-snap-type: x mandatory;
+                gap: 16px !important;
+                padding-bottom: 15px;
+                -webkit-overflow-scrolling: touch;
+            }
+            #homeBlogGrid::-webkit-scrollbar { display: none; }
+            #homeBlogGrid .blog-card {
+                flex: 0 0 85% !important; /* 1 bài to, lòi 1 xíu bài thứ 2 */
+                min-width: 260px !important;
+                scroll-snap-align: start;
+            }
+
+            /* 4. THANH TRƯỢT SẢN PHẨM (MOBILE) - FIX LỖI ẨN HÌNH DO LAZYLOAD */
+            .product-slider {
+                overflow-x: auto !important; /* Bật vuốt tự nhiên để Lazyload hoạt động */
+                overflow-y: hidden !important;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                mask-image: none !important; /* Xóa mask gradient tránh lỗi hiển thị iOS */
+                -webkit-mask-image: none !important;
+                padding-bottom: 16px !important; /* Chừa chỗ cho bóng đổ shadow */
+            }
+            .product-slider::-webkit-scrollbar { 
+                display: none; 
+            }
+            .product-slider-track {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                min-width: max-content !important; /* Quan trọng: Ép track bung đủ độ dài */
+                width: max-content !important;
+                gap: 12px !important;
+                padding: 0 12px !important; /* Cách lề 2 bên điện thoại */
+            }
+            .product-slider-track .product-card {
+                flex: 0 0 160px !important; /* Fix cứng chiều rộng Card không bị móp */
+                min-width: 160px !important;
+                width: 160px !important;
+                margin: 0 !important; /* Gỡ margin của PC để dùng gap */
+                scroll-snap-align: start;
+            }
+            .product-slider-track[aria-hidden="true"] {
+                display: none !important; /* Ẩn cái track nhân bản Auto-scroll trên Mobile */
+            }
+
+            /* 5. TỐI ƯU LẠI TỶ LỆ THẺ CARD TRÊN MOBILE */
+            .product-image-link {
+                height: 160px !important;
+                padding: 8px !important;
+            }
+            .product-img {
+                max-height: 140px !important;
+            }
+            .product-info {
+                min-height: auto !important;
+                padding: 12px !important;
+            }
+            .product-name {
+                font-size: 13px !important;
+                margin-bottom: 8px !important;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+})();
 
 let HOMEPAGE_SETTINGS = {};
 
@@ -24,7 +145,7 @@ async function loadHomepageSettings() {
 
 function getHomepageSetting(sectionKey) { return HOMEPAGE_SETTINGS[sectionKey] || null; }
 function isHomepageSectionActive(sectionKey) { const setting = getHomepageSetting(sectionKey); return setting ? setting.is_active !== false : true; }
-function getHomepageItemLimit(sectionKey, fallback = 20) { const setting = getHomepageSetting(sectionKey); return (setting && Number(setting.item_limit) > 0) ? Number(setting.item_limit) : fallback; }
+function getHomepageItemLimit(sectionKey, fallback = 12) { const setting = getHomepageSetting(sectionKey); return (setting && Number(setting.item_limit) > 0) ? Number(setting.item_limit) : fallback; }
 
 function applySectionUI(sectionKey, sectionId, titleId, descId) {
     const sectionEl = document.getElementById(sectionId);
@@ -65,7 +186,7 @@ function applyHeroSettings() {
 }
 
 // ========================================================
-// 3. MAIN CATEGORIES (Đã ráp Logic Tick Chọn)
+// 3. MAIN CATEGORIES
 // ========================================================
 async function loadMainCategories() {
     if (!applySectionUI('categories', 'categoriesSection', 'categoriesTitleText', null)) return;
@@ -73,7 +194,7 @@ async function loadMainCategories() {
     try {
         const setting = getHomepageSetting('categories');
         const selectedIds = setting?.config?.selected_items || [];
-        const itemLimit = getHomepageItemLimit('categories', 20);
+        const itemLimit = getHomepageItemLimit('categories', 20); 
         
         let query = window.supabaseClient.from('categories').select('*, sub_categories(*)').eq('is_active', true);
         if (selectedIds.length > 0) { query = query.in('id', selectedIds); } 
@@ -85,18 +206,41 @@ async function loadMainCategories() {
         
         const subCategoryLimit = Number(setting?.config?.sub_category_limit) > 0 ? Number(setting.config.sub_category_limit) : 4;
         let html = '';
-        (data || []).forEach(cat => {
+        
+        (data || []).forEach((cat) => {
             const sortedSub = Array.isArray(cat.sub_categories) ? [...cat.sub_categories].sort((a,b) => a.name.localeCompare(b.name)) : [];
             let subHTML = sortedSub.slice(0, subCategoryLimit).map(sub => `<li class="category-item"><span class="category-dot"></span><a href="pages/family.html?slug=${encodeURIComponent(sub.slug)}" class="category-link">${escapeIndexHTML(sub.name)}</a></li>`).join('');
             const initials = String(cat.name||'').trim().split(/\s+/).slice(0, 3).map(w => w[0]).join('').toUpperCase();
+            
             html += `<div class="category-card"><div class="category-watermark">${escapeIndexHTML(initials)}</div><div class="category-header"><h3 class="category-title"><a href="pages/subcategory.html?slug=${encodeURIComponent(cat.slug)}" class="category-title-link">${escapeIndexHTML(cat.name)}</a></h3><div class="category-divider"></div></div><ul class="category-list">${subHTML}</ul></div>`;
         });
+
+        if (data && data.length > 4) {
+            html += `
+                <div class="category-view-more-wrapper" style="grid-column: 1 / -1; display: flex; justify-content: center; margin-top: 16px;">
+                    <button type="button" id="btnToggleCategories" style="background: #f8fafc; border: 1px solid #cbd5e1; color: #0f172a; padding: 10px 24px; border-radius: 24px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                        <span id="btnToggleCatText">Xem tất cả danh mục</span>
+                        <svg id="btnToggleCatIcon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="transition: transform 0.3s;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                </div>
+            `;
+        }
         grid.innerHTML = html;
+
+        const btnToggle = document.getElementById('btnToggleCategories');
+        if (btnToggle) {
+            btnToggle.addEventListener('click', () => {
+                grid.classList.toggle('is-expanded');
+                const isExp = grid.classList.contains('is-expanded');
+                document.getElementById('btnToggleCatText').textContent = isExp ? 'Thu gọn' : 'Xem tất cả danh mục';
+                document.getElementById('btnToggleCatIcon').style.transform = isExp ? 'rotate(180deg)' : 'rotate(0)';
+            });
+        }
     } catch (error) { console.error("Lỗi tải Category:", error); }
 }
 
 // ========================================================
-// 4. BRANDS (Đã ráp Logic Tick Chọn)
+// 4. BRANDS
 // ========================================================
 async function loadBrandsToMarquee() {
     if (!applySectionUI('brands', 'brandsSection', 'brandsTitleText', null)) return;
@@ -104,7 +248,7 @@ async function loadBrandsToMarquee() {
     try {
         const setting = getHomepageSetting('brands');
         const selectedIds = setting?.config?.selected_items || [];
-        const itemLimit = getHomepageItemLimit('brands', 50);
+        const itemLimit = getHomepageItemLimit('brands', 30); 
 
         let query = window.supabaseClient.from('brands').select('*');
         if (selectedIds.length > 0) { query = query.in('id', selectedIds); } 
@@ -120,37 +264,25 @@ async function loadBrandsToMarquee() {
     } catch (error) { console.error("Lỗi Brand:", error); }
 }
 
+// ========================================================
+// HELPER SẢN PHẨM & ẢNH
+// ========================================================
 const INDEX_IMAGE_CDN_BASE = "https://mrokhangnam-image.khangnamvn.workers.dev";
+const INDEX_PRODUCT_LIMIT = 12; 
 
 function buildIndexImageUrl(imagePath) {
     if (!imagePath) return "assets/images/world mark.png";
     let p = String(imagePath).trim();
     if (!p) return "assets/images/world mark.png";
-
-    // Xử lý trường hợp URL bị bọc trong JSON Array (VD: '["https://..."]')
     try {
         const parsed = JSON.parse(p);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-            p = String(parsed[0]).trim();
-        }
-    } catch (e) {
-        // Không phải JSON, bỏ qua
-    }
-
+        if (Array.isArray(parsed) && parsed.length > 0) p = String(parsed[0]).trim();
+    } catch (e) {}
     if (/^https?:\/\//i.test(p)) return p;
-
-    if (p.startsWith('../assets/')) {
-        return p.replace('../', '');
-    }
-
-    if (p.startsWith('assets/')) {
-        return p;
-    }
-
+    if (p.startsWith('../assets/')) return p.replace('../', '');
+    if (p.startsWith('assets/')) return p;
     return `${INDEX_IMAGE_CDN_BASE}/${p.replace(/^\/+/, "")}`;
 }
-
-const INDEX_PRODUCT_LIMIT = 20;
 
 async function fetchProductsByCategory(categoryId = null, limit = INDEX_PRODUCT_LIMIT) {
     let q = window.supabaseClient.from('products').select(`id, sku, name, slug, image_path, unit, category_id, stock_quantity, price, discount_price, badge, created_at, brands(name)`).order('created_at', { ascending: false }).limit(limit);
@@ -280,7 +412,7 @@ async function loadCategoryShowcase(sectionNumber) {
 }
 
 // ========================================================
-// 7. INDUSTRIES (Đã ráp Logic Tick Chọn)
+// 7. INDUSTRIES
 // ========================================================
 async function loadIndustries() {
     if (!applySectionUI('industries', 'industriesSection', 'industriesTitleText', null)) return;
@@ -288,7 +420,7 @@ async function loadIndustries() {
     try {
         const setting = getHomepageSetting('industries');
         const selectedIds = setting?.config?.selected_items || [];
-        const limit = getHomepageItemLimit('industries', 6);
+        const limit = getHomepageItemLimit('industries', 8); 
 
         let query = window.supabaseClient.from('industries').select('*').neq('is_active', false);
         if (selectedIds.length > 0) { query = query.in('id', selectedIds); } 
@@ -298,7 +430,7 @@ async function loadIndustries() {
         const { data, error } = await query;
         if (error) throw error;
 
-        const defaultIcons = ['🏭','🍜','⚡','🏗️','🚗','🧪','⛏️','🏥','⚙️','🔧','📦','💻'];
+        const defaultIcons = ['🏭','🍜','⚡','🏗','🚗','🧪','⛏️','🏥','⚙️','🔧','📦','💻'];
         let html = (data || []).map((item, index) => {
             const iconHtml = item.icon_url ? `<img src="${escapeIndexHTML(item.icon_url)}" class="industry-icon-img">` : `<div class="industry-icon-fallback">${defaultIcons[index % defaultIcons.length]}</div>`;
             return `<a href="pages/products.html?industry_id=${item.id}" class="industry-card"><div class="industry-icon-wrapper">${iconHtml}</div><h3 class="industry-name">${escapeIndexHTML(item.name)}</h3></a>`;
@@ -308,7 +440,7 @@ async function loadIndustries() {
 }
 
 // ========================================================
-// 8. BLOG (Đã ráp Logic Tick Chọn)
+// 8. BLOG
 // ========================================================
 async function loadHomeBlogs() {
     if (!applySectionUI('blog', 'blogSection', 'blogTitleText', null)) return;
@@ -346,22 +478,58 @@ window.scrollProductSection = function(sliderId, amount) {
     setTimeout(() => { slider.style.scrollBehavior = 'auto'; }, 400);
 };
 
+// ========================================================
+// CHỈNH SỬA AUTO-SCROLL (TẮT TRÊN MOBILE ĐỂ TRÁNH LỖI)
+// ========================================================
 function initDragAndScroll(sliderId, speed = 1) {
     const slider = document.getElementById(sliderId); if (!slider) return;
     if (slider._cancelSlider) slider._cancelSlider(); slider.style.scrollBehavior = 'auto';
     let animationFrame = null, resizeObserver = null, isPointerDown = false, isDragging = false, isHovering = false, startX = 0, startScrollLeft = 0, loopWidth = 0;
     const DRAG_THRESHOLD = 8, DRAG_SPEED = 1.5; slider.isDraggingActive = false;
-    const calculateLoopWidth = () => { const tracks = slider.querySelectorAll('.product-slider-track, .brand-track-group'); if (tracks.length < 2) { loopWidth = 0; return; } loopWidth = tracks[1].offsetLeft - tracks[0].offsetLeft; if (loopWidth <= 0) loopWidth = tracks[0].scrollWidth; };
-    const normalizeScroll = () => { if (!loopWidth || loopWidth <= 0) return; if (slider.scrollLeft >= loopWidth) slider.scrollLeft -= loopWidth; else if (slider.scrollLeft <= 0) slider.scrollLeft += loopWidth; };
-    const animate = () => { if (!isPointerDown && !isHovering && loopWidth > 0) { slider.scrollLeft += speed; normalizeScroll(); } animationFrame = requestAnimationFrame(animate); };
+    
+    const calculateLoopWidth = () => { 
+        const tracks = slider.querySelectorAll('.product-slider-track, .brand-track-group'); 
+        if (tracks.length < 2) { loopWidth = 0; return; } 
+        loopWidth = tracks[1].offsetLeft - tracks[0].offsetLeft; 
+        if (loopWidth <= 0) loopWidth = tracks[0].scrollWidth; 
+    };
+    
+    const normalizeScroll = () => { 
+        if (!loopWidth || loopWidth <= 0) return; 
+        if (slider.scrollLeft >= loopWidth) slider.scrollLeft -= loopWidth; 
+        else if (slider.scrollLeft <= 0) slider.scrollLeft += loopWidth; 
+    };
+    
+    const animate = () => { 
+        // ĐIỀU KIỆN CHÍNH: Chỉ Auto-scroll khi KHÔNG PHẢI Mobile (màn hình > 991px)
+        if (window.innerWidth > 991 && !isPointerDown && !isHovering && loopWidth > 0) { 
+            slider.scrollLeft += speed; 
+            normalizeScroll(); 
+        } 
+        animationFrame = requestAnimationFrame(animate); 
+    };
+    
     const onPointerDown = e => { if (e.pointerType === 'mouse' && e.button !== 0) return; isPointerDown = true; isDragging = false; slider.isDraggingActive = false; startX = e.clientX; startScrollLeft = slider.scrollLeft; slider.style.cursor = 'grabbing'; slider.style.scrollBehavior = 'auto'; };
     const onPointerMove = e => { if (!isPointerDown) return; const distance = e.clientX - startX; if (!isDragging) { if (Math.abs(distance) < DRAG_THRESHOLD) return; isDragging = true; slider.isDraggingActive = true; slider.setPointerCapture?.(e.pointerId); } e.preventDefault(); slider.scrollLeft = startScrollLeft - (distance * DRAG_SPEED); normalizeScroll(); };
     const stopDragging = e => { if (!isPointerDown) return; isPointerDown = false; const wasDragging = isDragging; isDragging = false; slider.style.cursor = 'grab'; if (wasDragging) { slider.isDraggingActive = true; try { slider.releasePointerCapture?.(e?.pointerId); } catch(err){} setTimeout(() => { slider.isDraggingActive = false; }, 150); } else { slider.isDraggingActive = false; } };
     const onPointerCancel = e => { isPointerDown = false; isDragging = false; slider.isDraggingActive = false; slider.style.cursor = 'grab'; try { slider.releasePointerCapture?.(e?.pointerId); } catch(err){} };
-    slider.addEventListener('pointerdown', onPointerDown); slider.addEventListener('pointermove', onPointerMove, { passive: false }); slider.addEventListener('pointerup', stopDragging); slider.addEventListener('pointercancel', onPointerCancel); slider.addEventListener('mouseenter', () => isHovering = true); slider.addEventListener('mouseleave', () => isHovering = false);
+    
+    slider.addEventListener('pointerdown', onPointerDown); 
+    slider.addEventListener('pointermove', onPointerMove, { passive: false }); 
+    slider.addEventListener('pointerup', stopDragging); 
+    slider.addEventListener('pointercancel', onPointerCancel); 
+    slider.addEventListener('mouseenter', () => isHovering = true); 
+    slider.addEventListener('mouseleave', () => isHovering = false);
     slider.querySelectorAll('img').forEach(el => { el.setAttribute('draggable', 'false'); el.addEventListener('dragstart', e => e.preventDefault()); });
-    calculateLoopWidth(); animationFrame = requestAnimationFrame(animate); slider.style.cursor = 'grab'; slider.style.userSelect = 'none';
-    resizeObserver = new ResizeObserver(() => { calculateLoopWidth(); normalizeScroll(); }); resizeObserver.observe(slider);
+    
+    calculateLoopWidth(); 
+    animationFrame = requestAnimationFrame(animate); 
+    slider.style.cursor = 'grab'; 
+    slider.style.userSelect = 'none';
+    
+    resizeObserver = new ResizeObserver(() => { calculateLoopWidth(); normalizeScroll(); }); 
+    resizeObserver.observe(slider);
+    
     slider._cancelSlider = () => { if (animationFrame) cancelAnimationFrame(animationFrame); if (resizeObserver) resizeObserver.disconnect(); slider.removeEventListener('pointerdown', onPointerDown); slider.removeEventListener('pointermove', onPointerMove); slider.removeEventListener('pointerup', stopDragging); slider.removeEventListener('pointercancel', onPointerCancel); slider.removeEventListener('mouseenter', () => isHovering = true); slider.removeEventListener('mouseleave', () => isHovering = false); };
 }
 
