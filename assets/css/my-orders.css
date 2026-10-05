@@ -822,21 +822,166 @@
 .btn-view-detail { min-width: 58px; min-height: 32px; display: inline-flex; align-items: center; justify-content: center; padding: 0 12px; background: #eff6ff; border: 1px solid #dbeafe; border-radius: 6px; color: #00479b; font-size: 12px; font-weight: 800; text-decoration: none; transition: all .2s; }
 .btn-view-detail:hover { background: #00479b; border-color: #00479b; color: #fff; }
 
-/* MEDIA QUERIES */
+/* =========================================================
+   MEDIA QUERIES (TỐI ƯU MOBILE & TABLET)
+========================================================= */
+
 @media (max-width: 850px) { 
-    .orders-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } 
+    .orders-stats-grid { 
+        grid-template-columns: repeat(2, minmax(0, 1fr)); 
+    } 
 }
+
 @media (max-width: 700px) {
-    .orders-content-header { flex-direction: column; align-items: flex-start; }
-    .orders-create-btn { width: 100%; }
-    .orders-filter-bar { flex-direction: column; align-items: stretch; }
-    .orders-search { width: 100%; }
-    .orders-filter-tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
+    /* Điều chỉnh Header & Search cho gọn */
+    .orders-content-header { 
+        flex-direction: column; 
+        align-items: stretch; 
+        gap: 16px;
+    }
+    
+    .orders-content-title {
+        font-size: 20px;
+    }
+    
+    .orders-create-btn { 
+        width: 100%; 
+        justify-content: center;
+    }
+    
+    .orders-filter-bar { 
+        flex-direction: column; 
+        align-items: stretch; 
+        gap: 12px;
+        padding: 12px;
+    }
+    
+    .orders-search { 
+        width: 100%; 
+    }
+    
+    .orders-filter-tabs { 
+        flex-wrap: nowrap; 
+        overflow-x: auto; 
+        padding-bottom: 4px; 
+        /* Ẩn thanh cuộn trên thiết bị di động để nhìn sạch hơn */
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    .orders-filter-tabs::-webkit-scrollbar {
+        display: none;
+    }
+    
+    /* Cho phép cuộn ngang bảng dữ liệu trên Mobile */
+    .orders-card-body {
+        overflow-x: auto;
+    }
+    
+    /* Thiết lập độ rộng tối thiểu cho bảng để không bị ép chữ quá hẹp */
+    .orders-data-table {
+        min-width: 600px;
+    }
+    
+    /* Điều chỉnh nhẹ kích thước text trong bảng */
+    .orders-data-table th, 
+    .orders-data-table td {
+        padding: 12px 10px;
+        font-size: 12px;
+    }
 }
+
 @media (max-width: 560px) { 
-    .orders-stats-grid { gap: 10px; } 
-    .orders-stat-card { padding: 14px; } 
-    .orders-stat-value { font-size: 24px; } 
-    .orders-content-title { font-size: 20px; } 
-    .orders-state-container { padding: 40px 16px; }
+    .orders-stats-grid { 
+        gap: 10px; 
+    } 
+    
+    .orders-stat-card { 
+        padding: 12px; 
+    } 
+    
+    .orders-stat-value { 
+        font-size: 22px; 
+    } 
+    
+    .orders-content-title { 
+        font-size: 18px; 
+    } 
+    
+    .orders-state-container { 
+        padding: 40px 16px; 
+    }
+    
+    /* Nếu có modal chi tiết đơn hàng (tương lai), thu nhỏ padding */
+    .order-detail-modal-content {
+        padding: 16px;
+    }
+}
+
+/* =========================================================
+   FIX: CĂN GIỮA MỤC PHÂN TRANG (PAGINATION)
+========================================================= */
+.pagination,
+.pagination-container,
+.pagination-wrapper,
+.mro-pagination,
+nav[aria-label="Pagination"] {
+    display: flex !important;
+    justify-content: center !important; /* Ép toàn bộ cục phân trang ra giữa */
+    align-items: center !important;
+    width: 100% !important;
+    margin-top: 24px !important; /* Cách cái bảng phía trên ra 1 chút cho thoáng */
+    margin-bottom: 8px !important;
+}
+
+/* Nếu bên trong là thẻ ul/li thì ép các nút nằm ngang hàng */
+.pagination ul,
+.mro-pagination ul {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style: none !important;
+}
+/* =========================================================
+   FIX: ÉP CĂN GIỮA PHÂN TRANG TRÊN MOBILE
+========================================================= */
+@media (max-width: 768px) {
+    .pagination,
+    .pagination-container,
+    .pagination-wrapper,
+    .mro-pagination,
+    nav[aria-label="Pagination"] {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .pagination ul,
+    .mro-pagination ul {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        width: 100% !important;
+        gap: 6px !important;
+    }
+
+    /* Thu nhỏ nút phân trang trên mobile để không bị tràn ép ra góc */
+    .pagination li a,
+    .pagination li span,
+    .pagination-link,
+    .page-link,
+    .mro-pagination button {
+        padding: 5px 10px !important;
+        font-size: 12px !important;
+        min-width: 32px !important;
+        height: 32px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
 }

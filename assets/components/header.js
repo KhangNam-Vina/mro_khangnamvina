@@ -21,151 +21,7 @@ const renderHeader = () => {
     const headerHTML = `
         <style>
             /* ====== TỐI ƯU TRẢI NGHIỆM MOBILE HEADER (LAYOUT 2 DÒNG) ====== */
-            .mobile-user-icon { display: none; }
-            .search-icon-mobile { display: none; }
-
-            @media (max-width: 991px) {
-                .header-top {
-                    padding: 10px 15px !important;
-                    background: #fff;
-                    border-bottom: 1px solid #f3f4f6;
-                }
-                .header-container {
-                    display: grid !important;
-                    grid-template-columns: 40px 1fr 40px !important; 
-                    row-gap: 12px;
-                    column-gap: 10px;
-                    align-items: center;
-                }
-
-                /* --- HÀNG 1: LOGO (GIỮA) & ĐĂNG NHẬP (PHẢI) --- */
-                .header-logo {
-                    grid-column: 2 / 3;
-                    grid-row: 1 / 2;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                }
-                .header-logo img { 
-                    max-height: 48px !important; /* PHÓNG BỰ LOGO */
-                    width: auto !important;
-                    object-fit: contain;
-                }
-                
-                .header-account-wrapper {
-                    grid-column: 3 / 4;
-                    grid-row: 1 / 2;
-                    margin: 0 !important;
-                    display: flex;
-                    justify-content: flex-end;
-                    align-items: center;
-                }
-                
-                /* Đổi Nút Đăng nhập thành Icon Người */
-                .btn-guest-login {
-                    padding: 0 !important;
-                    border: none !important;
-                    background: transparent !important;
-                    color: #00479b !important;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-                .mobile-user-icon { 
-                    display: block !important; 
-                    width: 28px; 
-                    height: 28px; 
-                }
-                .desktop-text { display: none !important; }
-                
-                .btn-user-profile { margin: 0 !important; }
-                .user-avatar { 
-                    width: 32px !important; 
-                    height: 32px !important; 
-                    font-size: 11px !important; 
-                }
-                .user-text { display: none !important; } 
-
-                /* --- HÀNG 2: MENU (TRÁI) - TÌM KIẾM (GIỮA) - GIỎ HÀNG (PHẢI) --- */
-                .mobile-toggle-btn {
-                    grid-column: 1 / 2;
-                    grid-row: 2 / 3;
-                    display: flex;
-                    align-items: center;
-                    justify-content: flex-start;
-                    color: #00479b;
-                    background: transparent;
-                    border: none;
-                    padding: 0;
-                    cursor: pointer;
-                }
-                .mobile-toggle-btn svg { width: 32px; height: 32px; }
-
-                /* Ô Tìm kiếm style mới (Xám nhạt, viền mỏng, có icon kính lúp) */
-                .header-search-wrapper {
-                    grid-column: 2 / 3;
-                    grid-row: 2 / 3;
-                    width: 100%;
-                    margin: 0;
-                }
-                .header-search-box {
-                    height: 40px !important;
-                    background: #f3f4f6 !important;
-                    border: 1px solid #e5e7eb !important;
-                    border-radius: 8px !important;
-                    display: flex;
-                    align-items: center;
-                    padding: 0 12px !important;
-                }
-                .search-icon-mobile {
-                    display: block !important;
-                    width: 20px; 
-                    height: 20px;
-                    color: #6b7280;
-                    flex-shrink: 0;
-                }
-                .search-input {
-                    flex: 1;
-                    font-size: 14px !important;
-                    padding: 0 10px !important;
-                    border: none !important;
-                    background: transparent !important;
-                    outline: none !important;
-                    width: 100%;
-                }
-                .search-btn {
-                    display: none !important; /* Ẩn nút Xanh trên mobile */
-                }
-
-                .nav-mobile-cart {
-                    grid-column: 3 / 4;
-                    grid-row: 2 / 3;
-                    position: relative;
-                    color: #00479b;
-                    display: flex;
-                    align-items: center;
-                    justify-content: flex-end;
-                    padding: 0;
-                    text-decoration: none;
-                }
-                .nav-mobile-cart svg { width: 30px; height: 30px; }
-                .nav-mobile-cart .cart-badge {
-                    position: absolute;
-                    top: -6px;
-                    right: -6px;
-                    background: #ff5e00;
-                    color: #fff;
-                    font-size: 10px;
-                    padding: 2px 5px;
-                    border-radius: 10px;
-                    font-weight: 900;
-                    line-height: 1;
-                }
-            }
             
-            @media (min-width: 992px) {
-                .mobile-toggle-btn, .nav-mobile-cart { display: none !important; }
-            }
         </style>
 
         <div class="site-header-wrapper">
@@ -262,12 +118,12 @@ const renderHeader = () => {
                             <a href="${pagesPath}brands.html" class="mobile-nav-link">Thương Hiệu</a>
                             <a href="${pagesPath}industries.html" class="mobile-nav-link">Ngành Hàng</a>
                             <a href="${pagesPath}rfq.html" class="mobile-nav-link">Trung Tâm Báo Giá</a>
+                            <a href="${pagesPath}cart.html" class="mobile-nav-link">Giỏi hàng</a>
                             <a href="${pagesPath}blog.html" class="mobile-nav-link">Bài Viết</a>
                             <a href="${pagesPath}about.html" class="mobile-nav-link">Giới Thiệu</a>
                             <a href="${pagesPath}contact.html" class="mobile-nav-link">Liên Hệ</a>
                         </div>
                     </div>
-
                 </div>
             </nav>
         </div>

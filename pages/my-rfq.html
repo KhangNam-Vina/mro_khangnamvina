@@ -20,6 +20,7 @@
 
     <!-- CSS RIÊNG -->
     <link rel="stylesheet" href="../assets/css/my-rfq.css">
+    <link rel="stylesheet" href="../assets/css/profile-nav.css">
 </head>
 
 <body class="my-rfq-page">
@@ -110,22 +111,7 @@
                         </div>
                     </div>
 
-                    <!-- FILTER & TABLE -->
-                    <div class="my-rfq-table-card">
-                        <div class="my-rfq-filter-bar">
-                            <div id="statusFilterContainer" class="my-rfq-filter-tabs">
-                                <button type="button" onclick="filterByStatus('ALL', this)" class="status-btn is-active">Tất cả</button>
-                                <button type="button" onclick="filterByStatus('Chờ xử lý', this)" class="status-btn">Đang xử lý</button>
-                                <button type="button" onclick="filterByStatus('Đã báo giá', this)" class="status-btn">Đã báo giá</button>
-                                <button type="button" onclick="filterByStatus('Từ chối', this)" class="status-btn">Đã hủy</button>
-                            </div>
-                            <div class="my-rfq-search">
-                                <input type="text" id="searchRfqInput" class="my-rfq-search-input" placeholder="Tìm theo Mã RFQ..." autocomplete="off">
-                                <svg class="my-rfq-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                            </div>
-                        </div>
-
-                        <div class="my-rfq-table-wrapper">
+                    <div class="my-rfq-table-wrapper">
                             <table class="my-rfq-table">
                                 <thead>
                                     <tr>
@@ -145,21 +131,10 @@
                                     </tr>
                                 </tbody>
                             </table>
+                        </div> <!-- Đóng wrapper ở đây -->
                             
-                            <!-- BỘ PHÂN TRANG -->
-                            <div id="rfqPagination" class="no-print" style="display: flex; justify-content: center; gap: 6px; margin-top: 20px; padding: 20px 0 24px 0; border-top: 1px solid #f3f4f6;"></div>
-                        </div>
-
-                        <!-- EMPTY -->
-                        <div id="emptyState" class="my-rfq-empty is-hidden">
-                            <div class="my-rfq-empty-icon">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2-2z"></path></svg>
-                            </div>
-                            <h3 class="my-rfq-empty-title">Bạn chưa có yêu cầu báo giá nào</h3>
-                            <p class="my-rfq-empty-description">Tạo yêu cầu báo giá mới ngay hôm nay để nhận báo giá chiết khấu tốt nhất từ Khang Nam.</p>
-                            <a href="quick-order.html" class="my-rfq-empty-button">Tạo RFQ Đầu Tiên</a>
-                        </div>
-                    </div>
+                        <!-- BỘ PHÂN TRANG (Đã đưa ra ngoài) -->
+                        <div id="rfqPagination" class="no-print pagination-wrapper"></div>
                 </section>
             </div>
         </div>

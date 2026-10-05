@@ -375,3 +375,116 @@
     background: #fff7ed;
     border-color: #ff5e00;
 }
+
+/* =========================================================
+   TỐI ƯU MOBILE RESPONSIVE - TRANG CHI TIẾT SẢN PHẨM
+========================================================= */
+
+/* 1. MỞ KHÓA MÔ TẢ NGẮN (Hiển thị full 100% chữ) */
+.product-short-description {
+    -webkit-line-clamp: unset !important;
+    display: block !important;
+}
+
+@media (max-width: 991px) {
+    /* ===================================================
+       2. SẢN PHẨM CÙNG DÒNG (RELATED) - TRƯỢT NGANG
+    =================================================== */
+    .product-related-grid {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        padding-bottom: 16px !important;
+        gap: 12px !important;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Ẩn thanh cuộn Firefox */
+    }
+    
+    .product-related-grid::-webkit-scrollbar {
+        display: none; /* Ẩn thanh cuộn Chrome/Safari */
+    }
+    
+    .related-product-card {
+        flex: 0 0 72% !important; /* Chiếm 72% màn hình, chừa mép thẻ tiếp theo */
+        scroll-snap-align: start;
+        min-width: unset !important;
+    }
+
+    /* ===================================================
+       3. ĐANG GIẢM GIÁ (SALE) - TRƯỢT NGANG GỌN GÀNG
+    =================================================== */
+    .product-sale-list {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        padding-bottom: 12px !important;
+        gap: 12px !important;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    
+    .product-sale-list::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .product-sale-item {
+        flex: 0 0 85% !important; /* Dài hơn xíu để hiện đủ giá và tên */
+        scroll-snap-align: start;
+        margin-bottom: 0 !important;
+    }
+
+    /* ===================================================
+       4. CHÍNH SÁCH BÁN HÀNG - LƯỚI 2 CỘT 
+    =================================================== */
+    .product-policy-list {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 16px 12px !important;
+    }
+    
+    .product-policy-item {
+        flex-direction: column !important; /* Icon nằm trên, chữ nằm dưới */
+        align-items: flex-start !important;
+        gap: 6px !important;
+    }
+    
+    .product-policy-text {
+        font-size: 11px !important;
+        line-height: 1.4 !important;
+    }
+}
+
+/* Fix nhẹ cho màn hình điện thoại siêu nhỏ */
+@media (max-width: 400px) {
+    .related-product-card { flex: 0 0 82% !important; }
+    .product-sale-item { flex: 0 0 90% !important; }
+}
+
+/* =========================================================
+   FIX: ÉP KHUNG GIÁ & TỒN KHO NẰM NGANG TRÊN MOBILE
+========================================================= */
+@media (max-width: 768px) {
+    .product-price-box {
+        flex-direction: row !important; /* Ép nằm trên 1 hàng ngang */
+        align-items: center !important; /* Canh giữa 2 khối */
+        justify-content: space-between !important; /* Đẩy khối giá sang trái, tồn kho sang phải */
+    }
+
+    .product-stock-info {
+        align-items: flex-end !important; /* Ép chữ khối tồn kho dạt lề phải */
+        text-align: right !important;
+    }
+}
+
+/* Tinh chỉnh riêng cho các dòng điện thoại siêu nhỏ (iPhone 5/SE) để không bị đùn chữ */
+@media (max-width: 400px) {
+    .product-price-value {
+        font-size: 18px !important; /* Thu nhỏ giá một chút */
+    }
+    
+    .product-stock-value {
+        font-size: 10px !important; /* Thu nhỏ chữ "Liên hệ đặt hàng" một chút */
+    }
+}

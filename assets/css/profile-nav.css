@@ -1,0 +1,131 @@
+/* =========================================================
+   BOTTOM NAVIGATION BAR - PROFILE (MRO KHANG NAM)
+   Áp dụng chung cho 4 trang: 
+   Profile, My Orders, My RFQ, Purchased Products
+========================================================= */
+
+@media (max-width: 850px) {
+    /* ĐỘN ĐÁY VÀO TRỰC TIẾP KHỐI NỘI DUNG CHÍNH */
+    /* Chiêu này hất tung cái nút Lưu và Footer lên trên 120px */
+    .profile-main,
+    .profile-main-content,
+    .my-rfq-main,
+    .purchased-main {
+        padding-bottom: 120px !important; 
+    }
+
+    /* BẤNG LUÔN CỤM NÚT ZALO / HOTLINE LÊN TRÊN THANH NAV */
+    .floating-actions {
+        bottom: 90px !important;
+        transition: bottom 0.3s ease;
+    }
+
+    /* 1. Đóng đinh Sidebar dưới đáy màn hình */
+    .profile-sidebar {
+        position: fixed !important;
+        top: auto !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 9999 !important;
+        
+        /* Giao diện Bo tròn chuẩn App */
+        border-radius: 20px 20px 0 0 !important; 
+        border: none !important;
+        border-top: 1px solid #e5e7eb !important;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08) !important;
+        background: #ffffff !important;
+        
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Ẩn khối Avatar và Tên */
+    .profile-sidebar-profile {
+        display: none !important;
+    }
+
+    /* 2. Dàn 5 nút thành 1 hàng ngang chia đều */
+    .profile-sidebar-nav {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        justify-content: space-between !important;
+        align-items: stretch !important;
+        gap: 0 !important; 
+        
+        /* Hỗ trợ thanh vuốt Home (Safe Area) trên iPhone */
+        padding: 10px 4px calc(10px + env(safe-area-inset-bottom)) !important; 
+        margin: 0 !important;
+    }
+
+    /* 3. Style cho từng nút (Tab) */
+    .profile-sidebar-link, 
+    .profile-sidebar-logout {
+        position: relative !important;
+        flex: 1 1 20% !important; 
+        min-height: 48px !important;
+        padding: 4px 2px !important;
+        border-radius: 8px !important;
+        background: transparent !important;
+        border: none !important;
+        
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        
+        color: #6b7280 !important;
+        font-size: 10px !important;
+        font-weight: 600 !important;
+        text-align: center !important;
+        line-height: 1.25 !important;
+        
+        white-space: normal !important; 
+        word-wrap: break-word !important;
+    }
+
+    .profile-sidebar-icon {
+        margin: 0 0 4px 0 !important;
+        width: 24px !important;
+        height: 24px !important;
+        color: #9ca3af !important;
+    }
+
+    /* 4. Trạng thái ĐANG CHỌN (Active) */
+    .profile-sidebar-link.is-active {
+        background: transparent !important;
+        color: #00479b !important;
+        font-weight: 900 !important;
+    }
+
+    .profile-sidebar-link.is-active .profile-sidebar-icon {
+        color: #00479b !important;
+    }
+
+    .profile-sidebar-link.is-active::before {
+        content: "";
+        position: absolute;
+        top: -10px; 
+        left: 50%;
+        transform: translateX(-50%);
+        width: 24px;
+        height: 3px;
+        background-color: #00479b;
+        border-radius: 3px;
+    }
+
+    /* 5. Nút Đăng Xuất */
+    .profile-sidebar-logout {
+        color: #ef4444 !important;
+    }
+    
+    .profile-sidebar-logout .profile-sidebar-icon {
+        color: #ef4444 !important;
+    }
+
+    /* 6. Ẩn đường kẻ phân cách ngang (Divider) cũ */
+    .profile-sidebar-divider {
+        display: none !important;
+    }
+}

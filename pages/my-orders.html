@@ -19,6 +19,7 @@
 
     <!-- CSS RIÊNG -->
     <link rel="stylesheet" href="../assets/css/my-orders.css">
+    <link rel="stylesheet" href="../assets/css/profile-nav.css">
 </head>
 <body class="profile-page-wrapper">
 
@@ -111,42 +112,7 @@
                     </div>
                 </div>
 
-                <!-- BẢNG DỮ LIỆU & BỘ LỌC -->
-                <div class="orders-card-wrapper">
-                    <!-- FILTER BAR -->
-                    <div class="orders-filter-bar no-print">
-                        <div class="orders-filter-tabs">
-                            <button type="button" onclick="filterOrdersByStatus('ALL', this)" class="order-status-btn is-active">Tất cả</button>
-                            <button type="button" onclick="filterOrdersByStatus('Đang xử lý', this)" class="order-status-btn">Đang xử lý</button>
-                            <button type="button" onclick="filterOrdersByStatus('Đang giao', this)" class="order-status-btn">Đang giao</button>
-                            <button type="button" onclick="filterOrdersByStatus('Đã hoàn thành', this)" class="order-status-btn">Đã hoàn thành</button>
-                            <button type="button" onclick="filterOrdersByStatus('Đã hủy', this)" class="order-status-btn">Đã hủy</button>
-                        </div>
-                        
-                        <div class="orders-search">
-                            <input type="text" id="searchOrderInput" class="orders-search-input" placeholder="Tìm theo Mã đơn hàng..." autocomplete="off">
-                            <svg class="orders-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        </div>
-                    </div>
-                    
-                    <div class="orders-card-body">
-                        <!-- Khung chờ Load -->
-                        <div id="ordersLoading" class="orders-state-container">
-                            <div class="orders-loading-spinner"></div>
-                            <p class="orders-state-text">Đang tải danh sách đơn hàng...</p>
-                        </div>
-
-                        <!-- Khung trống -->
-                        <div id="emptyOrdersState" class="orders-state-container d-none">
-                            <div class="orders-empty-icon">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                            </div>
-                            <h3 class="orders-empty-heading">Chưa có đơn hàng nào</h3>
-                            <p class="orders-empty-desc">Bạn chưa thực hiện đơn mua hàng trực tiếp nào trên hệ thống.</p>
-                            <a href="products.html" class="orders-create-btn" style="margin-top: 20px;">Đi đến Cửa hàng</a>
-                        </div>
-
-                        <!-- Bảng dữ liệu -->
+                <!-- Bảng dữ liệu -->
                         <div class="table-responsive d-none" id="ordersTableWrapper">
                             <table class="orders-data-table">
                                 <thead>
@@ -162,12 +128,10 @@
                                     <!-- Dữ liệu được JS bơm vào đây -->
                                 </tbody>
                             </table>
+                        </div> <!-- Đóng table-responsive ở đây -->
                             
-                            <!-- BỘ PHÂN TRANG -->
-                            <div id="ordersPagination" class="no-print" style="display: flex; justify-content: center; gap: 6px; margin-top: 20px; padding: 20px 0 24px 0; border-top: 1px solid #f3f4f6;"></div>
-                        </div>
-                    </div>
-                </div>
+                        <!-- BỘ PHÂN TRANG (Đã đưa ra ngoài) -->
+                        <div id="ordersPagination" class="no-print pagination-wrapper"></div>
             </div>
         </div>
     </main>

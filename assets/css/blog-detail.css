@@ -19,18 +19,11 @@ body {
 
 .blog-detail-page {
     min-height: 100vh;
-
     display: flex;
     flex-direction: column;
-
     background: #f8fafc;
     color: #1f2937;
-
-    font-family:
-        "Inter",
-        Arial,
-        Helvetica,
-        sans-serif;
+    font-family: "Inter", Arial, Helvetica, sans-serif;
 }
 
 .blog-detail-page > main {
@@ -43,393 +36,146 @@ body {
 
 
 /* =========================================================
-   BLOG DETAIL HERO
-   ĐỒNG BỘ 100% VỚI BLOG.HTML
+   2. BLOG DETAIL HERO
 ========================================================= */
 
 .blog-detail-hero {
     position: relative;
     overflow: hidden;
-
     margin: 0;
     padding: 48px 0;
-
-    background:
-        linear-gradient(
-            110deg,
-            #003370 0%,
-            #00479b 100%
-        );
-
+    background: linear-gradient(110deg, #003370 0%, #00479b 100%);
     color: #ffffff;
-
-    box-shadow:
-        0 2px 8px
-        rgba(
-            15,
-            23,
-            42,
-            0.08
-        );
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
 }
-
-
-/* Overlay */
 
 .blog-detail-hero-overlay {
     position: absolute;
-
     inset: 0;
-
-    background:
-        rgba(
-            0,
-            71,
-            155,
-            0.6
-        );
-
+    background: rgba(0, 71, 155, 0.6);
     pointer-events: none;
 }
 
-
-/* =========================================================
-   CONTAINER
-   GIỐNG HỆT BLOG.HTML
-========================================================= */
-
 .blog-detail-hero .blog-detail-container {
-
     position: relative;
-
     z-index: 2;
-
-    width: min(
-        1536px,
-        calc(100% - 32px)
-    );
-
+    width: min(1536px, calc(100% - 32px));
     max-width: none;
-
     margin: 0 auto;
-
     padding: 0;
-
     box-sizing: border-box;
 }
 
-
 /* =========================================================
-   BREADCRUMB
+   3. BREADCRUMB (AUTO-TRUNCATE THÔNG MINH CHO PC & MOBILE)
 ========================================================= */
 
 .blog-detail-hero .blog-detail-breadcrumb {
-
     display: flex;
-
-    flex-wrap: wrap;
-
+    flex-wrap: nowrap;
     align-items: center;
-
     gap: 8px;
-
     margin-bottom: 24px;
-
     color: #d1d5db;
-
     font-size: 13px;
-
     font-weight: 500;
+    width: 100%;
 }
 
-
-.blog-detail-hero
-.blog-detail-breadcrumb-link {
-
+.blog-detail-hero .blog-detail-breadcrumb-link {
     color: #d1d5db;
-
     text-decoration: none;
-
-    transition:
-        color 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: color 0.2s ease;
 }
 
-
-.blog-detail-hero
-.blog-detail-breadcrumb-link:hover {
-
+.blog-detail-hero .blog-detail-breadcrumb-link:hover {
     color: #ff5e00;
 }
 
-
-.blog-detail-hero
-.blog-detail-breadcrumb-separator {
-
+.blog-detail-hero .blog-detail-breadcrumb-separator {
     color: #6b7280;
+    flex-shrink: 0;
 }
 
-
-.blog-detail-hero
-.blog-detail-breadcrumb-current {
-
+.blog-detail-hero .blog-detail-breadcrumb-current {
     color: #ffffff;
-
     font-weight: 700;
-
-    max-width: none;
-
-    overflow: visible;
-
+    
+    /* Cắt chữ tự động siêu mượt trên mọi màn hình */
+    display: block;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
     white-space: nowrap;
-
-    text-overflow: unset;
+    text-overflow: ellipsis;
 }
-
 
 /* =========================================================
    HERO CONTENT
 ========================================================= */
 
 .blog-detail-hero .blog-detail-header-inner {
-
     width: 100%;
-
     max-width: 900px;
 }
 
-
-/* Category */
-
-.blog-detail-hero
-.blog-detail-category-badge {
-
+.blog-detail-hero .blog-detail-category-badge {
     display: inline-block;
-
     padding: 4px 12px;
-
     margin-bottom: 16px;
-
-    background:
-        rgba(
-            255,
-            255,
-            255,
-            0.10
-        );
-
-    border:
-        1px solid
-        rgba(
-            255,
-            255,
-            255,
-            0.20
-        );
-
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.20);
     border-radius: 4px;
-
     color: #ffffff;
-
     font-size: 12px;
-
     font-weight: 800;
-
     text-transform: uppercase;
-
     letter-spacing: 0.05em;
-
     text-decoration: none;
 }
 
-
-.blog-detail-hero
-.blog-detail-category-badge:hover {
-
+.blog-detail-hero .blog-detail-category-badge:hover {
     background: #ff5e00;
-
     border-color: #ff5e00;
 }
 
-
-/* =========================================================
-   TITLE
-========================================================= */
-
-.blog-detail-hero
-.blog-detail-hero-title {
-
+.blog-detail-hero .blog-detail-hero-title {
     max-width: 900px;
-
     margin: 0 0 24px;
-
     color: #ffffff;
-
-    font-size: clamp(
-        30px,
-        4vw,
-        40px
-    );
-
+    font-size: clamp(30px, 4vw, 40px);
     line-height: 1.2;
-
     font-weight: 900;
-
     letter-spacing: 0.02em;
 }
 
-
-/* =========================================================
-   META
-========================================================= */
-
-.blog-detail-hero
-.blog-detail-meta-hero {
-
+.blog-detail-hero .blog-detail-meta-hero {
     display: flex;
-
     flex-wrap: wrap;
-
     align-items: center;
-
     gap: 10px;
-
     color: #cbd5e1;
-
     font-size: 14px;
-
     font-weight: 500;
 }
 
-
-.blog-detail-hero
-.blog-detail-meta-hero
-.meta-item {
-
+.blog-detail-hero .blog-detail-meta-hero .meta-item {
     display: inline-flex;
-
     align-items: center;
-
     gap: 6px;
-
     white-space: nowrap;
 }
 
-
-.blog-detail-hero
-.blog-detail-meta-hero
-.meta-divider {
-
+.blog-detail-hero .blog-detail-meta-hero .meta-divider {
     color: #94a3b8;
-}
-
-
-/* =========================================================
-   9. MAIN ARTICLE CONTAINER
-   CŨNG DÙNG CHUNG TRỤC 1280PX
-========================================================= */
-
-.blog-detail-main {
-    width: min(
-        1280px,
-        calc(100% - 32px)
-    );
-
-    margin: 0 auto;
-
-    padding: 32px 0 64px;
-
-    flex: 1 0 auto;
-
-    box-sizing: border-box;
-}
-
-
-/* =========================================================
-   10. RESPONSIVE HERO
-========================================================= */
-
-@media (max-width: 768px) {
-
-    .blog-detail-container,
-    .blog-detail-main {
-        width:
-            calc(100% - 24px);
-    }
-
-
-    .blog-detail-hero {
-        padding:
-            32px 0 36px;
-    }
-
-
-    .blog-detail-breadcrumb {
-        margin-bottom: 18px;
-
-        font-size: 11px;
-    }
-
-
-    .blog-detail-breadcrumb-current {
-        max-width: 100%;
-
-        white-space: normal;
-    }
-
-
-    .blog-detail-header-inner {
-        max-width: 100%;
-    }
-
-
-    .blog-detail-hero-title {
-        max-width: 100%;
-
-        font-size: 30px;
-
-        line-height: 1.2;
-    }
-
-
-    .blog-detail-meta-hero {
-        font-size: 11px;
-    }
-}
-
-
-@media (max-width: 480px) {
-
-    .blog-detail-container,
-    .blog-detail-main {
-        width:
-            calc(100% - 20px);
-    }
-
-
-    .blog-detail-hero {
-        padding:
-            28px 0 32px;
-    }
-
-
-    .blog-detail-hero-title {
-        font-size: 25px;
-    }
-
-
-    .blog-detail-category-badge {
-        font-size: 10px;
-    }
-
-
-    .blog-detail-breadcrumb {
-        font-size: 10px;
-    }
 }
 
 /* =========================================================
    4. LOADING / ERROR
-   ========================================================= */
+========================================================= */
+
 .blog-detail-loading {
     display: flex;
     flex-direction: column;
@@ -510,12 +256,15 @@ body {
 
 /* =========================================================
    5. MAIN ARTICLE LAYOUT
-   QUAN TRỌNG:
-   - Cột trái: 820px
-   - Khoảng cách: 32px
-   - Sidebar: 300px
-   - Không dùng grid-template-columns trên flex
-   ========================================================= */
+========================================================= */
+.blog-detail-main {
+    width: min(1280px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 32px 0 64px;
+    flex: 1 0 auto;
+    box-sizing: border-box;
+}
+
 .blog-detail-layout {
     display: grid;
     grid-template-columns: minmax(0, 820px) minmax(280px, 300px);
@@ -544,7 +293,7 @@ body {
 
 /* =========================================================
    6. ARTICLE HEADER
-   ========================================================= */
+========================================================= */
 .blog-detail-header {
     margin-bottom: 24px;
     text-align: left;
@@ -602,7 +351,7 @@ body {
 
 /* =========================================================
    7. HERO IMAGE
-   ========================================================= */
+========================================================= */
 .blog-detail-thumb-wrapper {
     width: 100%;
     aspect-ratio: 16 / 8;
@@ -622,7 +371,7 @@ body {
 
 /* =========================================================
    8. ARTICLE TYPOGRAPHY
-   ========================================================= */
+========================================================= */
 .blog-detail-content {
     width: 100%;
     color: #334155;
@@ -755,7 +504,7 @@ body {
 
 /* =========================================================
    9. HIGHLIGHT
-   ========================================================= */
+========================================================= */
 .blog-highlight-block {
     margin: 32px 0;
     padding: 20px 24px;
@@ -781,7 +530,7 @@ body {
 
 /* =========================================================
    10. CTA
-   ========================================================= */
+========================================================= */
 .blog-cta-block {
     margin: 56px 0;
     padding: 40px 32px;
@@ -823,7 +572,7 @@ body {
 
 /* =========================================================
    11. RELATED PRODUCTS
-   ========================================================= */
+========================================================= */
 .blog-related-products-wrapper {
     margin-top: 48px;
 }
@@ -900,7 +649,7 @@ body {
 
 /* =========================================================
    12. UPDATE / NAVIGATION
-   ========================================================= */
+========================================================= */
 .blog-detail-update {
     display: flex;
     flex-wrap: wrap;
@@ -958,7 +707,7 @@ body {
 
 /* =========================================================
    13. SIDEBAR
-   ========================================================= */
+========================================================= */
 .blog-detail-toc-card {
     padding: 20px;
     background: #fff;
@@ -1136,16 +885,14 @@ body {
 
 /* =========================================================
    14. FOOTER SAFETY
-   Nếu footer nằm ngoài .blog-detail-page thì không can thiệp.
-   Nếu footer nằm trong page flex thì luôn nằm sau nội dung.
-   ========================================================= */
+========================================================= */
 .blog-detail-page footer {
     flex-shrink: 0;
 }
 
 /* =========================================================
    15. RESPONSIVE
-   ========================================================= */
+========================================================= */
 
 /* Tablet */
 @media (max-width: 1100px) {
@@ -1159,19 +906,23 @@ body {
     }
 }
 
-/* <= 900px: chuyển sidebar xuống dưới */
+/* <= 900px: Tối ưu sidebar trên mobile, đẩy mục lục lên trên cùng */
 @media (max-width: 900px) {
     .blog-detail-layout {
-        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
         gap: 40px;
     }
 
-    .blog-detail-sidebar {
-        width: 100%;
+    .blog-detail-sidebar,
+    .blog-detail-sidebar-sticky {
+        display: contents;
     }
 
-    .blog-detail-sidebar-sticky {
-        position: static;
+    .blog-detail-toc-card {
+        order: -1;
+        width: 100%;
+        margin-bottom: -16px;
     }
 
     .blog-detail-content {
@@ -1193,9 +944,23 @@ body {
     .blog-detail-container {
         width: calc(100% - 24px);
     }
+    
+    .blog-detail-hero {
+        padding: 32px 0 36px;
+    }
 
-    .blog-detail-title {
+    .blog-detail-header-inner {
+        max-width: 100%;
+    }
+
+    .blog-detail-hero-title {
+        max-width: 100%;
         font-size: 30px;
+        line-height: 1.2;
+    }
+    
+    .blog-detail-meta-hero {
+        font-size: 11px;
     }
 
     .blog-detail-thumb-wrapper {
@@ -1242,6 +1007,14 @@ body {
 
     .blog-detail-container {
         width: calc(100% - 20px);
+    }
+    
+    .blog-detail-hero {
+        padding: 28px 0 32px;
+    }
+
+    .blog-detail-category-badge {
+        font-size: 10px;
     }
 
     .blog-detail-title {
@@ -1313,3 +1086,35 @@ body {
     }
 }
 
+/* =========================================================
+   FIX: THU GỌN KHOẢNG CÁCH CÁC BLOCK TRÊN MOBILE
+========================================================= */
+@media (max-width: 900px) {
+    .blog-detail-layout {
+        gap: 24px !important; /* Giảm khoảng cách tổng thể từ 40px xuống 24px */
+    }
+}
+
+@media (max-width: 768px) {
+    /* Ép gọn lề của khối CTA (Cần giải pháp cho doanh nghiệp) */
+    .blog-cta-block {
+        margin: 32px 0 16px !important; 
+    }
+    
+    /* Thu hẹp khoảng trống phía trên chữ "Chia sẻ" */
+    .blog-detail-share {
+        margin-top: 8px !important;
+    }
+
+    /* Kéo khối "Bài viết khác" xích lên trên */
+    .blog-detail-related {
+        margin-top: 16px !important;
+        padding-top: 16px !important;
+    }
+    
+    /* Thu gọn khoảng cách của 2 nút bài trước/bài sau (nếu có) */
+    .blog-detail-navigation {
+        margin-top: 24px !important;
+        padding-top: 16px !important;
+    }
+}

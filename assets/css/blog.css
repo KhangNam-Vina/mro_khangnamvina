@@ -803,7 +803,7 @@ Font: Inter
 }
 
 /* =========================================================
-15. RESPONSIVE (TỐI ƯU MOBILE CHUẨN)
+15. RESPONSIVE (TỐI ƯU MOBILE CHUẨN - FIX LỖI FOOTER)
 ========================================================= */
 
 @media (max-width: 1199px) {
@@ -814,26 +814,61 @@ Font: Inter
 }
 
 @media (max-width: 991px) {
-    /* 1. Reset lưới về 1 cột dọc (Stacking) */
+    /* Ép layout thành 1 cột dọc (Flex) */
     .blog-layout {
         display: flex !important;
         flex-direction: column !important;
-        gap: 32px !important;
+        gap: 24px !important; /* Khoảng cách đều tăm tắp giữa các khối */
     }
     
-    /* 2. Đưa nội dung chính và sidebar về 100% chiều rộng */
-    .blog-main, .blog-sidebar {
-        width: 100% !important;
-        padding: 0 !important;
+    /* TUYỆT KỸ: Phá vỏ bọc của 2 cột trái/phải để trộn thẻ con */
+    .blog-content, .blog-sidebar {
+        display: contents !important; 
     }
 
-    /* 3. Tối ưu khu vực Menu Thể loại (Trượt ngang) */
-    .blog-filter-bar {
+    /* ===================================
+       THỨ TỰ HIỂN THỊ CHUẨN XÁC TRÊN MOBILE
+       =================================== */
+       
+    /* 1. Khối Tìm kiếm (Bung full 100% chiều ngang) */
+    .blog-sidebar > .blog-sidebar-card:nth-child(1) {
+        order: 1 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        margin-bottom: 0 !important;
+    }
+
+    /* 2. Khối Bài viết mới nhất */
+    .blog-sidebar > .blog-sidebar-card:nth-child(2) {
+        order: 2 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        margin-bottom: 0 !important;
+    }
+
+    /* 3. Các danh mục bộ lọc (Vuốt ngang) */
+    .blog-content > .blog-filter-bar {
+        order: 3 !important;
+        width: 100% !important;
         flex-direction: column !important;
         align-items: flex-start !important;
         gap: 12px !important;
         border-bottom: none !important;
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
     }
+
+    /* 4. Các bài viết chính (Featured, Lưới bài viết, Phân trang...) */
+    .blog-content > #blogContainer {
+        order: 4 !important;
+        width: 100% !important;
+        margin-bottom: 0 !important;
+    }
+
+    /* ===================================
+       TỐI ƯU KÍCH THƯỚC TRÊN MOBILE
+       =================================== */
+
     .blog-category-filters {
         width: 100% !important;
         flex-wrap: nowrap !important;
@@ -842,70 +877,26 @@ Font: Inter
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
     }
-    .blog-category-filters::-webkit-scrollbar {
-        display: none;
-    }
-    .blog-count {
-        align-self: flex-start !important;
-        margin-bottom: 16px !important;
-    }
+    .blog-category-filters::-webkit-scrollbar { display: none; }
+    .blog-count { align-self: flex-start !important; margin-bottom: 8px !important; }
 
-    /* 4. Đảo vị trí Sidebar Tìm kiếm lên trên cùng */
-    /* Mẹo: Dùng flex order để đẩy cục Search lên trên list bài viết */
-    .blog-sidebar {
-        display: contents !important; /* Phá vỡ cấu trúc cha để sắp xếp con */
-    }
-    .blog-sidebar-card:first-child {
-        order: -1 !important; /* Đẩy cục Tìm kiếm lên trên cùng */
-        margin-bottom: 24px !important;
-    }
-    .blog-sidebar-card:last-child {
-        order: 99 !important; /* Đẩy cục Bài mới nhất xuống dưới cùng */
-        margin-top: 32px !important;
-    }
+    .blog-featured-inner { flex-direction: column !important; }
+    .blog-featured-image-wrapper { height: 200px !important; }
+    .blog-featured-content { padding: 16px !important; }
+    .blog-featured-title { font-size: 20px !important; line-height: 1.4 !important; }
+    .blog-featured-summary { font-size: 14px !important; -webkit-line-clamp: 3 !important; }
 
-    /* 5. Thu gọn Bài Nổi Bật */
-    .blog-featured-inner {
-        flex-direction: column !important;
-    }
-    .blog-featured-image-wrapper {
-        height: 200px !important;
-    }
-    .blog-featured-content {
-        padding: 16px !important;
-    }
-    .blog-featured-title {
-        font-size: 20px !important;
-        line-height: 1.4 !important;
-    }
-    .blog-featured-summary {
-        font-size: 14px !important;
-        -webkit-line-clamp: 3 !important;
-    }
-
-    /* 6. Danh sách Bài viết (Grid) */
+    /* Lưới bài viết (2 cột song song) */
     .blog-grid, #blogGrid {
         display: grid !important;
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 16px !important;
     }
-    .blog-card {
-        min-height: unset !important;
-    }
-    .blog-card-image-link {
-        height: 140px !important;
-    }
-    .blog-card-body {
-        padding: 12px !important;
-    }
-    .blog-card-title {
-        font-size: 15px !important;
-        margin-bottom: 8px !important;
-    }
-    .blog-card-summary {
-        font-size: 13px !important;
-        -webkit-line-clamp: 3 !important;
-    }
+    .blog-card { min-height: unset !important; }
+    .blog-card-image-link { height: 140px !important; }
+    .blog-card-body { padding: 12px !important; }
+    .blog-card-title { font-size: 15px !important; margin-bottom: 8px !important; }
+    .blog-card-summary { font-size: 13px !important; -webkit-line-clamp: 3 !important; }
 }
 
 @media (max-width: 768px) {
@@ -914,11 +905,6 @@ Font: Inter
 }
 
 @media (max-width: 600px) {
-    /* Đưa danh sách bài viết về 1 cột trên ĐT nhỏ */
-    .blog-grid, #blogGrid {
-        grid-template-columns: 1fr !important;
-    }
-    .blog-card-image-link {
-        height: 200px !important;
-    }
+    .blog-grid, #blogGrid { grid-template-columns: 1fr !important; }
+    .blog-card-image-link { height: 200px !important; }
 }

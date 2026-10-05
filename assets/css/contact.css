@@ -1001,20 +1001,23 @@
     }
 
     .contact-layout {
-        grid-template-columns: 1fr;
-
+        display: flex !important; /* Chuyển Grid thành Flex để dễ đảo thứ tự */
+        flex-direction: column !important; /* Xếp thành cột dọc */
         gap: 24px;
     }
 
+    /* Đưa cột Form lên trên cùng */
+    .contact-form-column {
+        order: 1 !important;
+        width: 100%;
+    }
+
+    /* Đưa cột Sidebar (Map + Uy tín) xuống dưới */
     .contact-sidebar {
+        order: 2 !important;
+        width: 100%;
         display: grid;
-
-        grid-template-columns:
-            repeat(
-                2,
-                minmax(0, 1fr)
-            );
-
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 24px;
     }
 

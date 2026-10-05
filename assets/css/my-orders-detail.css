@@ -554,6 +554,11 @@
 }
 
 @media (max-width: 900px) {
+    /* FIX LỖI ÉP TRÁI: Phá vỡ lưới 2 cột, ép nội dung bung full 100% màn hình */
+    .profile-layout-grid { 
+        grid-template-columns: 1fr !important; 
+    }
+
     .profile-sidebar { position: static; }
     .profile-sidebar-nav { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
     .profile-sidebar-divider { grid-column:1 / -1; }
@@ -576,16 +581,44 @@
 }
 
 @media (max-width: 560px) {
-    .profile-sidebar-nav { grid-template-columns:1fr; }
-    .profile-sidebar-divider,.profile-sidebar-logout { grid-column:auto; }
-    .order-summary-grid { grid-template-columns:1fr; }
-    .order-summary-item,.order-summary-item:nth-child(2) { border-right:0; border-bottom:1px solid #f3f4f6; }
-    .order-summary-item:last-child { border-bottom:0; }
-    .order-detail-code { font-size:20px; }
-    .order-total-box { align-items:flex-end; flex-direction:column; gap:8px; }
+    /* Căn giữa và mở rộng đều 2 bên mép trên màn hình nhỏ */
+    .profile-container, 
+    .profile-layout-grid {
+        width: calc(100% - 20px) !important;
+    }
+
+    /* Đưa thanh Nav xuống dưới cùng */
+    .profile-sidebar-nav { grid-template-columns: 1fr; }
+    .profile-sidebar-divider, .profile-sidebar-logout { grid-column: auto; }
     
+    /* Gộp các ô trong khối Summary thành 2 cột để tiết kiệm không gian */
+    .order-summary-grid { 
+        grid-template-columns: repeat(2, 1fr); 
+    }
+    .order-summary-item {
+        padding: 16px; 
+        border-right: 1px solid #f3f4f6; 
+        border-bottom: 1px solid #f3f4f6; 
+    }
+    .order-summary-item:nth-child(even) { border-right: 0; }
+    .order-summary-item:nth-last-child(-n+2) { border-bottom: 0; }
+    
+    /* Căn chỉnh kích thước text cho gọn */
+    .order-summary-label { font-size: 11px; }
+    .order-summary-value { font-size: 13px; }
+    .order-summary-total { font-size: 16px; }
+    .order-detail-code { font-size: 18px; word-break: break-all; } 
+    
+    /* Gom phần tổng tiền và nút về cuối */
+    .order-total-box { 
+        align-items: flex-end; 
+        flex-direction: column; 
+        gap: 8px; 
+    }
+    
+    /* Đảo ngược thứ tự nút */
     .order-detail-actions {
-        flex-direction: column-reverse;
+        flex-direction: column;
         gap: 12px;
     }
     .order-detail-actions a,
@@ -593,14 +626,22 @@
         width: 100%;
         justify-content: center;
     }
-}
-
-@media print {
-    #app-header,#app-footer,.profile-sidebar,.order-detail-actions { display:none !important; }
-    .profile-page-wrapper,.profile-main-content { background:#fff; }
-    .profile-main-content { padding:0; }
-    .profile-layout-grid { display:block; width:100%; }
-    .order-detail-card { border:0; box-shadow:none; }
+    
+    /* Ép bảng hiển thị thanh cuộn thay vì tràn màn hình */
+    .order-items-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; 
+        margin-bottom: 16px; 
+    }
+    .order-items-table {
+        min-width: 600px; 
+    }
+    
+    /* Tối ưu khoảng cách cho thông tin giao hàng */
+    .shipping-info-grid {
+        padding: 16px;
+        gap: 12px;
+    }
 }
 
 /* =========================================================

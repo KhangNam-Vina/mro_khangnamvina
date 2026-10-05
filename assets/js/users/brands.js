@@ -51,6 +51,8 @@ async function initBrandsPage() {
         buildAZFilter();
         renderFeaturedBrands();
         renderFilteredBrands();
+        
+        toggleFeaturedSection();
 
         const searchInput = document.getElementById('searchBrand');
 
@@ -154,6 +156,47 @@ function buildAZFilter() {
 
 
 // ========================================================
+// ẨN / HIỆN KHỐI THƯƠNG HIỆU NỔI BẬT
+// ========================================================
+function toggleFeaturedSection() {
+    const featuredGrid = document.getElementById('featuredBrands');
+    if (!featuredGrid) return;
+    
+    let featuredSection = document.querySelector('.brands-featured-section');
+    if (!featuredSection) {
+        featuredSection = featuredGrid.parentElement;
+    }
+
+    if (!featuredSection) return;
+
+    const searchInput = document.getElementById('searchBrand');
+    const keyword = searchInput ? searchInput.value.trim() : '';
+
+    if (currentLetterFilter !== 'ALL' || keyword !== '') {
+        featuredSection.classList.add('is-hidden');
+    } else {
+        featuredSection.classList.remove('is-hidden');
+    }
+}
+
+// ========================================================
+// CẬP NHẬT TIÊU ĐỀ ĐỘNG
+// ========================================================
+function updateListTitle(type, value) {
+    const titleEl = document.querySelector('.brands-list-title');
+    if (!titleEl) return;
+
+    if (type === 'ALL') {
+        titleEl.innerHTML = `TẤT CẢ THƯƠNG HIỆU <span id="currentFilterText" class="brands-current-filter"></span>`;
+    } else if (type === 'LETTER') {
+        titleEl.innerHTML = `THƯƠNG HIỆU <span id="currentFilterText" class="brands-current-filter">(Bắt đầu bằng chữ ${value})</span>`;
+    } else if (type === 'SEARCH') {
+        titleEl.innerHTML = `KẾT QUẢ TÌM KIẾM <span id="currentFilterText" class="brands-current-filter">("${value}")</span>`;
+    }
+}
+
+
+// ========================================================
 // FILTER LETTER
 // ========================================================
 
@@ -195,7 +238,6 @@ window.filterByLetter = function(letter) {
 
 
     if (letter !== 'ALL') {
-
         currentFilteredData =
             allBrandsData.filter(
                 brand =>
@@ -203,32 +245,15 @@ window.filterByLetter = function(letter) {
                         .toUpperCase()
                         .startsWith(letter)
             );
-
-        const filterText =
-            document.getElementById(
-                'currentFilterText'
-            );
-
-        if (filterText) {
-            filterText.innerText =
-                `(Bắt đầu bằng chữ ${letter})`;
-        }
+            
+        updateListTitle('LETTER', letter);
 
     } else {
-
-        currentFilteredData =
-            allBrandsData;
-
-        const filterText =
-            document.getElementById(
-                'currentFilterText'
-            );
-
-        if (filterText) {
-            filterText.innerText = '';
-        }
+        currentFilteredData = allBrandsData;
+        updateListTitle('ALL', '');
     }
 
+    toggleFeaturedSection();
     renderFilteredBrands();
 };
 
@@ -250,16 +275,6 @@ function handleSearch(event) {
 
         currentLetterFilter = 'ALL';
 
-        const filterText =
-            document.getElementById(
-                'currentFilterText'
-            );
-
-        if (filterText) {
-            filterText.innerText =
-                `(Kết quả tìm kiếm: "${keyword}")`;
-        }
-
         document
             .querySelectorAll('#azFilter button')
             .forEach(button => {
@@ -274,19 +289,12 @@ function handleSearch(event) {
         document
             .getElementById('btn-filter-ALL')
             ?.classList.add('is-active');
+            
+        updateListTitle('SEARCH', event.target.value.trim());
 
     } else {
-
-        const filterText =
-            document.getElementById(
-                'currentFilterText'
-            );
-
-        if (filterText) {
-            filterText.innerText = '';
-        }
+        updateListTitle('ALL', '');
     }
-
 
     currentFilteredData =
         allBrandsData.filter(
@@ -296,6 +304,7 @@ function handleSearch(event) {
                     .includes(keyword)
         );
 
+    toggleFeaturedSection();
     renderFilteredBrands();
 }
 

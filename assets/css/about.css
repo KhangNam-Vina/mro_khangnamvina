@@ -902,210 +902,154 @@
 
 
 /* =========================================================
-   10. RESPONSIVE
+   TỐI ƯU MOBILE RESPONSIVE CHO TRANG ABOUT (GIỚI THIỆU)
 ========================================================= */
 
-@media (max-width: 1024px) {
-
-    .about-container {
-        width:
-            min(
-                960px,
-                calc(100% - 32px)
-            );
-    }
-
-    .about-benefits-grid {
-        grid-template-columns:
-            repeat(
-                2,
-                minmax(0, 1fr)
-            );
-    }
-}
-
-
-@media (max-width: 768px) {
-
+@media (max-width: 991px) {
+    /* =========================================
+       1. KHU VỰC HERO (Tiêu đề chính)
+       ========================================= */
     .about-hero {
-        padding: 40px 0;
+        padding: 40px 16px !important;
+    }
+    
+    #heroHeading {
+        font-size: 28px !important;
+        line-height: 1.35 !important;
+        margin-bottom: 16px !important;
+    }
+    
+    #heroDescription {
+        font-size: 14px !important;
+        line-height: 1.6 !important;
     }
 
-    .about-hero-title {
-        font-size: 30px;
+    /* =========================================
+       2. KHU VỰC KPI (Các con số thống kê)
+       ========================================= */
+    .about-kpi-grid,
+    .kpi-container {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 16px !important;
+        padding: 0 16px !important;
     }
-
-    .about-kpi-grid {
-        grid-template-columns:
-            repeat(
-                2,
-                minmax(0, 1fr)
-            );
-    }
-
-    .about-kpi-item:nth-child(2)::after {
-        display: none;
-    }
-
-    .about-kpi-item:nth-child(1)::after,
-    .about-kpi-item:nth-child(3)::after {
-        display: block;
-    }
-
-    .about-benefits-grid {
-        grid-template-columns:
-            repeat(
-                2,
-                minmax(0, 1fr)
-            );
-    }
-
-    .about-why-section {
-        padding: 48px 0;
-    }
-
-    .about-section-heading h2 {
-        font-size: 26px;
-    }
-
-    .about-rich-content {
-        padding:
-            24px 20px;
-
-        font-size: 14px;
-    }
-
-    .about-rich-content h1 {
-        font-size: 28px;
-    }
-
-    .about-rich-content h2 {
-        font-size: 20px;
-    }
-
-    .about-rich-content h3 {
-        font-size: 18px;
-    }
-
-    .about-rich-content h4 {
-        font-size: 15px;
-    }
-
-    .about-rich-content table {
-        min-width: 600px;
-    }
-}
-
-
-@media (max-width: 600px) {
-
-    .about-container {
-        width:
-            calc(100% - 24px);
-    }
-
-    .about-hero {
-        padding: 34px 0;
-    }
-
-    .about-breadcrumb {
-        margin-bottom: 18px;
-    }
-
-    .about-hero-title {
-        font-size: 27px;
-    }
-
-    .about-hero-description {
-        font-size: 13px;
-    }
-
-    .about-kpi-section {
-        margin-top: -24px;
-    }
-
-    .about-kpi-grid {
-        grid-template-columns: 1fr;
-    }
-
+    
     .about-kpi-item {
-        padding:
-            24px 16px;
+        padding: 16px 12px !important;
     }
 
-    .about-kpi-item::after {
-        display: none !important;
+    .about-kpi-number,
+    .kpi-number {
+        font-size: 24px !important;
     }
 
-    .about-kpi-number {
-        font-size: 34px;
+    /* =========================================
+       3. TẦM NHÌN & SỨ MỆNH
+       ========================================= */
+    .about-vision-mission {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 24px !important;
     }
 
-    .about-kpi-label {
-        font-size: 11px;
+    /* =========================================
+       4. TẠI SAO CHỌN MRO (BENEFITS) - FIX LỖI BÓP NGHẸT
+       ========================================= */
+    .about-why-section {
+        padding: 40px 16px !important;
+    }
+    
+    .about-section-heading h2 {
+        font-size: 24px !important;
+        margin-bottom: 12px !important;
     }
 
     .about-benefits-grid {
-        grid-template-columns: 1fr;
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important; /* Chia 2 cột trên Tablet */
+        gap: 16px !important;
     }
-
+    
     .about-benefit-card {
-        min-height: auto;
+        min-height: unset !important;
+        padding: 20px 16px !important;
     }
 
-    .about-rich-content {
-        padding:
-            20px 16px;
-
-        font-size: 14px;
-
-        line-height: 1.75;
+    /* =========================================
+       5. KHU VỰC NỘI DUNG ĐỘNG (RICH TEXT TỪ CKEDITOR)
+       ========================================= */
+    .about-content-wrapper {
+        padding: 24px 16px !important;
     }
 
-    .about-rich-content h1 {
-        font-size: 26px;
+    #dynamicHtmlContent {
+        font-size: 15px !important;
+        line-height: 1.7 !important;
     }
 
-    .about-rich-content h2 {
-        font-size: 20px;
+    #dynamicHtmlContent img {
+        max-width: 100% !important;
+        height: auto !important;
+        object-fit: contain !important;
+        border-radius: 8px !important;
+    }
+    
+    #dynamicHtmlContent iframe {
+        max-width: 100% !important;
     }
 
-    .about-rich-content h3 {
-        font-size: 18px;
-    }
-
-    .about-rich-content ul,
-    .about-rich-content ol {
-        padding-left: 20px;
+    #dynamicHtmlContent table {
+        display: block !important;
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        border-collapse: collapse !important;
     }
 }
 
-
-@media (max-width: 420px) {
-
-    .about-container {
-        width:
-            calc(100% - 20px);
+/* =========================================================
+   MÀN HÌNH ĐIỆN THOẠI SIÊU NHỎ (< 600px)
+========================================================= */
+/* =========================================================
+   MÀN HÌNH ĐIỆN THOẠI SIÊU NHỎ (< 600px)
+========================================================= */
+@media (max-width: 600px) {
+    /* Đưa lưới KPI về 1 cột dọc (Nếu bro muốn KPI cũng 2 cột thì đổi 1fr thành repeat(2, 1fr) nha) */
+    .about-kpi-grid,
+    .kpi-container {
+        grid-template-columns: 1fr !important;
     }
-
-    .about-hero-title {
-        font-size: 24px;
+    
+    /* FIX: Ép 4 thẻ "Tại sao chọn" thành lưới 2 cột (2x2) */
+    .about-benefits-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important; /* Giảm khoảng cách cho đỡ chật */
     }
-
-    .about-section-heading h2 {
-        font-size: 23px;
+    
+    /* Thu nhỏ nội dung bên trong thẻ để vừa vặn hoàn hảo với 2 cột */
+    .about-benefit-card {
+        padding: 16px 10px !important;
     }
-
-    .about-kpi-number {
-        font-size: 32px;
+    
+    .about-benefit-icon {
+        width: 48px !important;
+        height: 48px !important;
+        margin-bottom: 12px !important;
     }
-
-    .about-rich-content {
-        padding:
-            18px 14px;
+    
+    .about-benefit-icon svg {
+        width: 24px !important;
+        height: 24px !important;
     }
-
-    .about-rich-content h2 {
-        font-size: 19px;
+    
+    .about-benefit-card h3 {
+        font-size: 14px !important;
+        margin-bottom: 6px !important;
+    }
+    
+    .about-benefit-card p {
+        font-size: 12px !important;
+        line-height: 1.5 !important;
     }
 }

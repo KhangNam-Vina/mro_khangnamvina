@@ -457,78 +457,73 @@
 }
 
 @media (max-width: 700px) {
-    .my-rfq-hero {
-        padding: 38px 0 42px;
-    }
+    .my-rfq-hero { padding: 38px 0 42px; }
+    .my-rfq-hero-title { font-size: 29px; }
+    .my-rfq-main { padding: 28px 0 48px; }
 
-    .my-rfq-hero-title {
-        font-size: 29px;
-    }
-
-    .my-rfq-main {
-        padding: 28px 0 48px;
-    }
-
+    /* Tối ưu Header: Bố cục dọc, nút Tạo Yêu Cầu Full-width dễ bấm */
     .my-rfq-content-header {
-        align-items: flex-start;
         flex-direction: column;
-    }
-
-    .my-rfq-create-button {
-        width: 100%;
-    }
-
-    .my-rfq-filter-bar {
         align-items: stretch;
+        gap: 16px;
+    }
+    .my-rfq-create-button { width: 100%; }
+
+    /* Tối ưu Thanh lọc và Tìm kiếm */
+    .my-rfq-filter-bar {
         flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 12px 16px;
     }
+    .my-rfq-search { width: 100%; }
 
-    .my-rfq-search {
-        width: 100%;
-    }
-
+    /* Vuốt ngang mượt mà cho các Tab trạng thái (Ẩn thanh cuộn xấu xí) */
     .my-rfq-filter-tabs {
         width: 100%;
         overflow-x: auto;
         flex-wrap: nowrap;
-        padding-bottom: 2px;
+        padding-bottom: 4px;
+        -webkit-overflow-scrolling: touch; /* Cuộn mượt trên iOS */
+        scrollbar-width: none;
+    }
+    .my-rfq-filter-tabs::-webkit-scrollbar { display: none; }
+    
+    /* Bảng dữ liệu cho phép vuốt ngang mượt */
+    .my-rfq-table-wrapper {
+        -webkit-overflow-scrolling: touch;
     }
 }
 
 @media (max-width: 560px) {
-    .my-rfq-container {
-        width: calc(100% - 20px);
-    }
+    .my-rfq-container { width: calc(100% - 20px); }
 
-    .profile-sidebar-nav {
-        grid-template-columns: 1fr;
-    }
+    .profile-sidebar-nav { grid-template-columns: 1fr; }
+    .profile-sidebar-divider, .profile-sidebar-logout { grid-column: auto; }
 
-    .profile-sidebar-divider,
-    .profile-sidebar-logout {
-        grid-column: auto;
-    }
+    /* Tối ưu thẻ Thống kê (Stats) */
+    .my-rfq-stats-grid { gap: 10px; }
+    .my-rfq-stat-card { padding: 12px; }
+    .my-rfq-stat-value { font-size: 22px; }
+    .my-rfq-stat-label { font-size: 10px; }
 
-    .my-rfq-stats-grid {
-        gap: 10px;
-    }
+    .my-rfq-content-title { font-size: 18px; }
 
-    .my-rfq-stat-card {
-        padding: 14px;
+    /* Ép kích thước bảng để không bị bóp méo chữ, cho phép người dùng vuốt ngang */
+    .my-rfq-table { min-width: 680px; }
+    .my-rfq-table th, .my-rfq-table td { padding: 12px 10px; font-size: 12px; }
+    
+    /* Nút "Xem chi tiết" gọn hơn trên Mobile để không chiếm chỗ */
+    .btn-view-detail {
+        min-width: unset;
+        padding: 0 10px;
+        font-size: 11px;
     }
-
-    .my-rfq-stat-value {
-        font-size: 24px;
-    }
-
-    .my-rfq-content-title {
-        font-size: 20px;
-    }
-
-    .my-rfq-table th,
-    .my-rfq-table td {
-        padding: 12px 14px;
-    }
+    
+    /* Tối ưu giao diện khung trống (Empty State) */
+    .my-rfq-empty { padding: 40px 16px; }
+    .my-rfq-empty-icon { width: 64px; height: 64px; font-size: 28px; margin-bottom: 12px; }
+    .my-rfq-empty-title { font-size: 18px; }
 }
 
 @media print {
@@ -564,5 +559,114 @@
     .my-rfq-table {
         min-width: 0;
         table-layout: auto;
+    }
+}
+
+/* =========================================================
+   FIX: LỖI ĐÈ CHỮ TRONG BẢNG RFQ (MÃ RFQ QUÁ DÀI)
+========================================================= */
+
+/* Hủy chế độ ép chiều rộng cứng, mở rộng bảng để có không gian chứa chữ */
+.my-rfq-table {
+    table-layout: auto !important; 
+    min-width: 850px !important;   
+}
+
+/* Đảm bảo cột Mã RFQ có đủ diện tích (tối thiểu 240px) và ép rớt dòng nếu cần */
+.rfq-col-code-head, 
+.rfq-col-code { 
+    width: auto !important;
+    min-width: 240px !important; 
+    white-space: normal !important; 
+    word-break: break-word !important;
+}
+
+/* Thả tự do cho các cột còn lại tự co giãn vừa đẹp */
+.rfq-col-date-head, .rfq-col-date { 
+    width: auto !important; 
+    min-width: 140px !important; 
+}
+
+.rfq-col-company-head, .rfq-col-company { 
+    width: auto !important; 
+    min-width: 180px !important; 
+}
+
+.rfq-col-status-head, .rfq-col-status { 
+    width: auto !important; 
+    min-width: 140px !important; 
+}
+
+.rfq-col-action-head, .rfq-col-action { 
+    width: auto !important; 
+    min-width: 100px !important; 
+}
+
+/* =========================================================
+   FIX: CĂN GIỮA MỤC PHÂN TRANG (PAGINATION)
+========================================================= */
+.pagination,
+.pagination-container,
+.pagination-wrapper,
+.mro-pagination,
+nav[aria-label="Pagination"] {
+    display: flex !important;
+    justify-content: center !important; /* Ép toàn bộ cục phân trang ra giữa */
+    align-items: center !important;
+    width: 100% !important;
+    margin-top: 24px !important; /* Cách cái bảng phía trên ra 1 chút cho thoáng */
+    margin-bottom: 8px !important;
+}
+
+/* Nếu bên trong là thẻ ul/li thì ép các nút nằm ngang hàng */
+.pagination ul,
+.mro-pagination ul {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style: none !important;
+}
+/* =========================================================
+   FIX: ÉP CĂN GIỮA PHÂN TRANG TRÊN MOBILE
+========================================================= */
+@media (max-width: 768px) {
+    .pagination,
+    .pagination-container,
+    .pagination-wrapper,
+    .mro-pagination,
+    nav[aria-label="Pagination"] {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .pagination ul,
+    .mro-pagination ul {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        width: 100% !important;
+        gap: 6px !important;
+    }
+
+    /* Thu nhỏ nút phân trang trên mobile để không bị tràn ép ra góc */
+    .pagination li a,
+    .pagination li span,
+    .pagination-link,
+    .page-link,
+    .mro-pagination button {
+        padding: 5px 10px !important;
+        font-size: 12px !important;
+        min-width: 32px !important;
+        height: 32px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
 }

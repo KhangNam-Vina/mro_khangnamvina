@@ -967,3 +967,35 @@ document.addEventListener(
         }
     }
 );
+
+// ========================================================
+// 13. TÁI CẤU TRÚC LAYOUT TRÊN MOBILE (FIX KÍCH THƯỚC & KHOẢNG CÁCH)
+// ========================================================
+function restructureMobileLayout() {
+    if (window.innerWidth > 991) return;
+
+    const blogMain = document.querySelector('.blog-main > .blog-layout');
+    const contentSection = document.querySelector('.blog-content');
+    const sidebar = document.querySelector('.blog-sidebar');
+    
+    if (!blogMain || !contentSection || !sidebar) return;
+
+    const searchCard = sidebar.children[0];
+    const latestPostsCard = sidebar.children[1];
+
+    if (!searchCard || !latestPostsCard) return;
+
+    blogMain.insertBefore(latestPostsCard, contentSection);
+    blogMain.insertBefore(searchCard, latestPostsCard);
+
+    sidebar.remove();
+
+    // FIX TẠI ĐÂY: Ép 2 khối này dài 100% và xóa sạch khoảng trống dư thừa
+    searchCard.style.width = '100%';
+    searchCard.style.marginBottom = '0';
+    
+    latestPostsCard.style.width = '100%';
+    latestPostsCard.style.marginBottom = '0';
+}
+
+window.addEventListener('load', restructureMobileLayout);
