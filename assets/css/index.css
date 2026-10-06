@@ -1198,3 +1198,37 @@ body {
          display: none !important;
     }
 }
+
+/* =========================================================
+   FIX MOBILE: MỞ RỘNG THANH TRƯỢT THƯƠNG HIỆU NỔI BẬT (CANH TRÁI)
+========================================================= */
+@media (max-width: 991px) {
+    /* Đẩy tiêu đề và thanh trượt thành 2 dòng (trên/dưới) */
+    .brand-marquee-inner {
+        flex-direction: column !important; 
+        align-items: flex-start !important; /* Đổi từ center thành flex-start để canh trái */
+        gap: 12px !important;
+    }
+    
+    /* Canh lề trái cho tiêu đề thẳng hàng với các phần khác */
+    .brand-marquee-label {
+        padding-right: 0 !important;
+        padding-left: 16px !important; /* Đẩy vào 1 xíu cho bằng mép màn hình */
+        border-right: none !important; 
+        text-align: left !important; /* Đổi từ center thành left */
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Trả lại không gian 100% chiều ngang cho thanh trượt */
+    .brand-marquee-track {
+        margin-left: 0 !important; 
+        width: 100% !important;
+    }
+    
+    /* Thu nhỏ tên thương hiệu 1 chút & giảm khoảng cách để hiện được nhiều chữ hơn */
+    .brand-link {
+        font-size: 16px !important; 
+        padding: 0 16px !important; 
+    }
+}

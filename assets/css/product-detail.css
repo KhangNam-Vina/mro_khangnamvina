@@ -502,3 +502,46 @@
         display: none !important;
     }
 }
+
+/* =========================================================
+   FIX MOBILE: ĐƯA KHỐI "ĐANG GIẢM GIÁ" THÀNH 2 CỘT NGANG
+========================================================= */
+@media (max-width: 768px) {
+    /* 1. Ép danh sách thành dạng lưới 2 cột ngang */
+    .product-sale-list {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+        overflow-x: hidden !important; /* Tắt hiệu ứng trượt ngang nếu có */
+    }
+
+    /* 2. Đảo thẻ sản phẩm: Hình lên trên, chữ xuống dưới để nhét vừa nửa màn hình */
+    .product-sale-item {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        padding: 12px !important;
+    }
+
+    /* 3. Trả lại không gian cho hình ảnh hiển thị to rõ */
+    .product-sale-image {
+        width: 100% !important;
+        height: 100px !important;
+        margin-bottom: 8px !important;
+        border: none !important; /* Bỏ viền trong nếu nhìn rối */
+    }
+
+    /* 4. Canh giữa thông tin và ép giá tiền thẳng hàng */
+    .product-sale-info {
+        width: 100% !important;
+        align-items: center !important;
+    }
+    
+    .product-sale-prices {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 2px !important;
+        margin-top: 8px !important;
+    }
+}
