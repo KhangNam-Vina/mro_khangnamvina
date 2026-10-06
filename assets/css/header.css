@@ -597,15 +597,16 @@
 }
 
 /* =========================================================
-   FIX LỖI MENU MOBILE ĐẨY NỘI DUNG XUỐNG DƯỚI
+   FIX LỖI MENU MOBILE ĐẨY NỘI DUNG XUỐNG DƯỚI & GHIM HEADER
 ========================================================= */
 @media (max-width: 991px) {
-    /* 1. Biến thanh Header trắng thành mỏ neo (gốc tọa độ) */
+    /* 1. Ghim thanh Header dính chặt trên đỉnh màn hình (Sticky) */
     header, 
     #app-header, 
     .header-main {
-        position: relative !important;
-        z-index: 9999 !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1000 !important; /* Hạ z-index xuống 1000 thay vì 9999 để không nuốt màn hình */
     }
 
     /* 2. Ép Menu Mobile nổi lên trên không trung (Tha cho Breadcrumb) */
@@ -619,7 +620,7 @@
         top: 100% !important; 
         left: 0 !important;
         width: 100% !important;
-        z-index: 9998 !important;
+        z-index: 998 !important; /* Hạ xuống 998 */
         box-shadow: 0 12px 24px rgba(0, 30, 70, 0.2) !important; 
     }
 }

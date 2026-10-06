@@ -218,3 +218,23 @@
     border-color: #e5e7eb;
 }
 
+/* Tăng cường độ ưu tiên để ép kích thước Icon đều nhau trên mọi trang */
+    .profile-sidebar-link .profile-sidebar-icon,
+    .profile-sidebar-logout .profile-sidebar-icon,
+    .profile-sidebar-icon {
+        width: 24px !important;
+        height: 24px !important;
+        min-width: 24px !important; /* Chống bị ép bẹp bởi Flexbox */
+        min-height: 24px !important;
+        margin: 0 0 4px 0 !important;
+        color: #9ca3af !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    /* Ép luôn thẻ SVG bên trong phòng khi HTML các trang viết khác nhau */
+    .profile-sidebar-icon svg {
+        width: 24px !important;
+        height: 24px !important;
+    }

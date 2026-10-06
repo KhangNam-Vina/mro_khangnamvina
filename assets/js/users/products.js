@@ -895,6 +895,54 @@ function initSortDropdown() {
 // 9. INIT
 // ========================================================
 window.addEventListener('load', async () => {
+
+    // --- BỘ GIẢI MÃ URL MỚI (TỰ ĐỘNG CHUYỂN ĐỔI SLUG SANG ID) ---
+    const urlParams = new URLSearchParams(window.location.search);
+    let needUrlUpdate = false;
+    const isUUID = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
+
+    // 1. Kiểm tra Category (Danh mục)
+    const cat = urlParams.get('category');
+    if (cat && !urlParams.has('category_id')) {
+        if (isUUID(cat)) {
+            urlParams.set('category_id', cat);
+        } else {
+            const { data } = await window.supabaseClient.from('categories').select('id').eq('slug', cat).maybeSingle();
+            if (data) urlParams.set('category_id', data.id);
+        }
+        urlParams.delete('category'); 
+        needUrlUpdate = true;
+    }
+
+    // 2. Kiểm tra Sub Category (Nhóm hàng)
+    const subCat = urlParams.get('sub_category');
+    if (subCat && !urlParams.has('sub_category_id')) {
+        if (isUUID(subCat)) {
+            urlParams.set('sub_category_id', subCat);
+        } else {
+            const { data } = await window.supabaseClient.from('sub_categories').select('id').eq('slug', subCat).maybeSingle();
+            if (data) urlParams.set('sub_category_id', data.id);
+        }
+        urlParams.delete('sub_category');
+        needUrlUpdate = true;
+    }
+
+    // 3. Kiểm tra Family (Dòng sản phẩm)
+    const fam = urlParams.get('family');
+    if (fam) {
+        if (!urlParams.has('slug')) {
+            urlParams.set('slug', fam); // products.js mặc định dùng 'slug' làm tham số cho Family
+        }
+        urlParams.delete('family');
+        needUrlUpdate = true;
+    }
+
+    // Áp dụng URL mới (ẩn danh) trước khi các hàm tải sản phẩm bắt đầu chạy
+    if (needUrlUpdate) {
+        window.history.replaceState({}, '', window.location.pathname + '?' + urlParams.toString());
+    }
+    // -------------------------------------------------------------
+
     initSortDropdown();
     await loadSidebar();
     

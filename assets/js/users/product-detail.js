@@ -684,14 +684,32 @@ window.addToRFQCart = function() {
 // ========================================================
 function renderStaticInfo(item) {
     const brandName = item.brands?.name || "OEM";
-    const catName = item.categories ? item.categories.name : 'Danh mục';
-    const subCatName = item.sub_categories ? item.sub_categories.name : 'Nhóm hàng';
-    const famName = item.families ? item.families.name : 'Dòng sản phẩm';
 
-    document.getElementById("bcCategory").innerText = catName;
-    document.getElementById("bcSubcategory").innerText = subCatName;
-    document.getElementById("bcFamily").innerText = famName;
+    // 1. Cập nhật Tên và Link cho Cấp Danh mục
+    const elCategory = document.getElementById("bcCategory");
+    if (item.categories) {
+        elCategory.innerText = item.categories.name;
+        // Gắn link trỏ về trang Sản phẩm + truyền tham số lọc theo category
+        elCategory.href = `products.html?category=${item.categories.slug || item.categories.id}`;
+    }
 
+    // 2. Cập nhật Tên và Link cho Cấp Nhóm hàng (Sub-category)
+    const elSubCat = document.getElementById("bcSubcategory");
+    if (item.sub_categories) {
+        elSubCat.innerText = item.sub_categories.name;
+        // Gắn link trỏ về trang Sản phẩm + truyền tham số lọc theo sub_category
+        elSubCat.href = `products.html?sub_category=${item.sub_categories.slug || item.sub_categories.id}`;
+    }
+
+    // 3. Cập nhật Tên và Link cho Cấp Dòng sản phẩm (Family)
+    const elFamily = document.getElementById("bcFamily");
+    if (item.families) {
+        elFamily.innerText = item.families.name;
+        // Gắn link trỏ về trang Sản phẩm + truyền tham số lọc theo family
+        elFamily.href = `products.html?family=${item.families.slug || item.families.id}`;
+    }
+
+    // Cập nhật các thông tin Text khác như cũ
     document.getElementById("bcCurrentProduct").innerText = item.name;
     document.getElementById("brandLabel").innerText = brandName;
     document.getElementById("productName").innerText = item.name;

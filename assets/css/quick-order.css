@@ -2252,3 +2252,37 @@
     }
 }
 
+/* =========================================================
+   FIX MOBILE: CHIA KHỐI THỐNG KÊ (DASHBOARD) THÀNH 2 CỘT
+========================================================= */
+@media (max-width: 768px) {
+    /* Ép khung chứa 4 thẻ thành dạng lưới 2 cột */
+    .quick-order-dashboard {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important; /* Chia 2 cột đều nhau */
+        gap: 12px !important; /* Khoảng cách giữa các thẻ */
+    }
+
+    /* Thu nhỏ padding bên trong thẻ để vừa vặn không gian hẹp */
+    .quick-order-stat-card {
+        padding: 12px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        text-align: center !important;
+    }
+
+    /* Thu nhỏ chữ tiêu đề */
+    .quick-order-stat-label {
+        font-size: 10px !important;
+        margin-bottom: 4px !important;
+        white-space: nowrap !important; /* Chống rớt dòng làm xấu layout */
+    }
+
+    /* Thu nhỏ con số lại một chút để không bị tràn */
+    .quick-order-stat-value {
+        font-size: 22px !important; 
+        margin: 0 !important;
+    }
+}

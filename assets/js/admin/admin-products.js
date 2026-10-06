@@ -24,6 +24,306 @@ const ORIGIN_OPTIONS = [
 let autoSlugTimer = null;
 let autoSlugRequestId = 0;
 
+// =========================================================
+// PRODUCT FORM DRAFT
+// =========================================================
+const PRODUCT_DRAFT_PREFIX = "mro_admin_product_draft_v1";
+let productDraftSaveTimer = null;
+let restoringProductDraft = false;
+
+function getProductDraftKey(productId = state.editingId) {
+    return `${PRODUCT_DRAFT_PREFIX}_${productId ? `edit_${productId}` : "new"}`;
+}
+
+function getProductDraft() {
+    try {
+        const raw = localStorage.getItem(getProductDraftKey());
+        return raw ? JSON.parse(raw) : null;
+    } catch (error) {
+        console.warn("Không thể đọc bản nháp sản phẩm:", error);
+        return null;
+    }
+}
+
+function clearProductDraft(productId = state.editingId) {
+    try {
+        localStorage.removeItem(getProductDraftKey(productId));
+    } catch (error) {
+        console.warn("Không thể xóa bản nháp sản phẩm:", error);
+    }
+}
+
+function collectProductDraft() {
+    const fields = {};
+
+    DOM.form?.querySelectorAll("input, select, textarea").forEach((el) => {
+        if (!el.id) return;
+        if (el.type === "file") return;
+        if (el.id === "description") return;
+
+        fields[el.id] = {
+            type: el.type,
+            value: el.value,
+            checked: el.type === "checkbox" || el.type === "radio"
+                ? el.checked
+                : undefined
+        };
+    });
+
+    return {
+        version: 1,
+        editingId: state.editingId || null,
+        editingSlugSource: state.editingSlugSource || "auto",
+
+        fields,
+
+        description: getDescriptionValue(),
+
+        variants: JSON.parse(JSON.stringify(state.variants || [])),
+        deletedVariantIds: [...(state.deletedVariantIds || [])],
+
+        // Chỉ lưu path/url hiện có.
+        // File mới đang nằm trong input sẽ không được lưu.
+        mediaDraft: {
+            mainPath: state.mediaDraft.mainPath || null,
+            mainUrl: state.mediaDraft.mainUrl || null,
+            mainRemoved: !!state.mediaDraft.mainRemoved,
+            existingGallery: [...(state.mediaDraft.existingGallery || [])],
+            removedGallery: [...(state.mediaDraft.removedGallery || [])]
+        },
+
+        savedAt: Date.now()
+    };
+}
+
+function saveProductDraftNow() {
+    if (restoringProductDraft) return;
+    if (!DOM.formView || DOM.formView.classList.contains("hidden")) return;
+
+    try {
+        const draft = collectProductDraft();
+
+        // Không tạo bản nháp rỗng khi vừa bấm "Thêm sản phẩm"
+        const hasMeaningfulData =
+            !!document.getElementById("sku")?.value.trim() ||
+            !!document.getElementById("name")?.value.trim() ||
+            !!draft.description?.trim() ||
+            !!document.getElementById("short_description")?.value.trim() ||
+            !!document.getElementById("specifications")?.value.trim() ||
+            draft.variants.length > 0;
+
+        if (!hasMeaningfulData && !state.editingId) {
+            clearProductDraft(null);
+            return;
+        }
+
+        localStorage.setItem(
+            getProductDraftKey(),
+            JSON.stringify(draft)
+        );
+    } catch (error) {
+        console.warn("Không thể lưu bản nháp sản phẩm:", error);
+    }
+}
+
+function scheduleProductDraftSave() {
+    if (restoringProductDraft) return;
+
+    clearTimeout(productDraftSaveTimer);
+
+    productDraftSaveTimer = setTimeout(() => {
+        saveProductDraftNow();
+    }, 300);
+}
+
+function applyProductDraft(draft) {
+    if (!draft) return;
+
+    restoringProductDraft = true;
+
+    try {
+        state.editingSlugSource = draft.editingSlugSource || "auto";
+
+        const fields = draft.fields || {};
+
+        // Khôi phục các input/select/checkbox thông thường
+        Object.entries(fields).forEach(([id, data]) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+
+            if (el.type === "checkbox" || el.type === "radio") {
+                el.checked = !!data.checked;
+            } else if (el.type !== "file") {
+                el.value = data.value ?? "";
+            }
+        });
+
+        // Khôi phục danh mục theo đúng thứ tự phụ thuộc
+        const categoryValue = fields.category_id?.value || "";
+        if (DOM.category) {
+            DOM.category.value = categoryValue;
+            updateSubCategories(categoryValue);
+        }
+
+        const subCategoryValue = fields.sub_category_id?.value || "";
+        if (DOM.subCategory) {
+            DOM.subCategory.value = subCategoryValue;
+            updateFamilies(subCategoryValue);
+        }
+
+        const familyValue = fields.family_id?.value || "";
+        if (DOM.family) {
+            DOM.family.value = familyValue;
+        }
+
+        // Khôi phục SEO
+        if (DOM.slugSourceLabel) {
+            DOM.slugSourceLabel.textContent =
+                state.editingSlugSource === "manual"
+                    ? "Thủ công"
+                    : "Tự động";
+        }
+
+        // Khôi phục mô tả CKEditor
+        if (typeof CKEDITOR !== "undefined" && CKEDITOR.instances.description) {
+            CKEDITOR.instances.description.setData(draft.description || "");
+        } else {
+            const description = document.getElementById("description");
+            if (description) {
+                description.value = draft.description || "";
+            }
+        }
+
+        // Khôi phục biến thể
+        state.variants = Array.isArray(draft.variants)
+            ? draft.variants
+            : [];
+
+        state.deletedVariantIds = Array.isArray(draft.deletedVariantIds)
+            ? draft.deletedVariantIds
+            : [];
+
+        renderVariants();
+
+        // Khôi phục media đã tồn tại trong DB.
+        // File mới chưa upload thì không thể khôi phục.
+        if (draft.mediaDraft) {
+            state.mediaDraft = {
+                ...state.mediaDraft,
+                mainPath: draft.mediaDraft.mainPath || null,
+                mainUrl: draft.mediaDraft.mainUrl || null,
+                mainRemoved: !!draft.mediaDraft.mainRemoved,
+                existingGallery: [...(draft.mediaDraft.existingGallery || [])],
+                removedGallery: [...(draft.mediaDraft.removedGallery || [])],
+                pendingMainFile: null,
+                pendingExtraFiles: []
+            };
+
+            renderMainImagePreview(state.mediaDraft.mainUrl);
+            renderCompleteGalleryPreview();
+        }
+
+        updateSeoCounters();
+        updateSeoPreview();
+
+    } finally {
+        restoringProductDraft = false;
+    }
+}
+
+async function restoreProductDraftOnLoad() {
+    // Ưu tiên draft đang sửa sản phẩm cụ thể.
+    // Nếu không có thì kiểm tra draft "Thêm sản phẩm".
+    let draft = null;
+
+    try {
+        const editKeys = [];
+
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+
+            if (key?.startsWith(`${PRODUCT_DRAFT_PREFIX}_edit_`)) {
+                editKeys.push(key);
+            }
+        }
+
+        // Nếu đang có nhiều draft edit, lấy draft mới nhất.
+        for (const key of editKeys) {
+            try {
+                const candidate = JSON.parse(localStorage.getItem(key));
+                if (
+                    candidate &&
+                    (!draft || (candidate.savedAt || 0) > (draft.savedAt || 0))
+                ) {
+                    draft = candidate;
+                }
+            } catch (_) {}
+        }
+
+        if (!draft) {
+            const newDraftRaw = localStorage.getItem(
+                getProductDraftKey(null)
+            );
+
+            if (newDraftRaw) {
+                draft = JSON.parse(newDraftRaw);
+            }
+        }
+    } catch (error) {
+        console.warn("Không thể kiểm tra bản nháp:", error);
+        return;
+    }
+
+    if (!draft) return;
+
+    const savedTime = draft.savedAt
+        ? new Date(draft.savedAt).toLocaleString("vi-VN")
+        : "";
+
+    const shouldRestore = confirm(
+        `Bạn có một bản nháp sản phẩm chưa lưu${savedTime ? ` (${savedTime})` : ""}.\n\n` +
+        `Bạn có muốn khôi phục bản nháp không?`
+    );
+
+    if (!shouldRestore) {
+        clearProductDraft(draft.editingId || null);
+        return;
+    }
+
+    try {
+        if (draft.editingId) {
+            const exists = state.products.some(
+                p => String(p.id) === String(draft.editingId)
+            );
+
+            if (!exists) {
+                showToast(
+                    "Sản phẩm của bản nháp không còn tồn tại.",
+                    "error"
+                );
+                clearProductDraft(draft.editingId);
+                return;
+            }
+
+            await editProduct(draft.editingId);
+        } else {
+            showAddForm();
+        }
+
+        // Chờ form + CKEditor render xong
+        await new Promise(resolve => requestAnimationFrame(resolve));
+
+        initCKEditor();
+        applyProductDraft(draft);
+
+        showToast("Đã khôi phục bản nháp sản phẩm.", "success");
+
+    } catch (error) {
+        console.error("Lỗi khôi phục bản nháp:", error);
+        showToast("Không thể khôi phục bản nháp.", "error");
+    }
+}
+
 const state = {
     products: [],
     categories: [],
@@ -734,6 +1034,9 @@ function saveVariantDraft() {
 
     renderVariants();
     closeVariantForm();
+
+    // Variant vừa được thêm/sửa -> cập nhật bản nháp
+    scheduleProductDraftSave();
 }
 
 /* =========================================================
@@ -1923,17 +2226,30 @@ function showAddForm() {
     DOM.listView?.classList.add("hidden");
     DOM.formView?.classList.remove("hidden");
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // CKEditor được khởi tạo sau khi form đã hiện
+    requestAnimationFrame(() => {
+        initCKEditor();
+});
+
+window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function cancelForm() {
     clearTimeout(autoSlugTimer);
+    clearTimeout(productDraftSaveTimer);
     ++autoSlugRequestId;
+
+    // Hủy form = bỏ luôn bản nháp hiện tại
+    clearProductDraft(state.editingId);
+
     state.editingId = null;
     state.editingSlugSource = "auto";
+
     resetMediaInputs();
+
     DOM.formView?.classList.add("hidden");
     DOM.listView?.classList.remove("hidden");
+
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -2033,6 +2349,16 @@ async function editProduct(id) {
     
     DOM.listView?.classList.add("hidden");
     DOM.formView?.classList.remove("hidden");
+
+    // Đảm bảo CKEditor đã tồn tại trước khi chỉnh sửa
+    requestAnimationFrame(() => {
+        initCKEditor();
+
+        if (typeof CKEDITOR !== "undefined" && CKEDITOR.instances.description) {
+            CKEDITOR.instances.description.setData(item.description || "");
+        }
+    });
+
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -2249,6 +2575,9 @@ async function saveProduct(event) {
             showToast("Đã cập nhật sản phẩm!", "success");
         }
 
+        // Lưu thành công -> xóa bản nháp
+        clearProductDraft(state.editingId);
+
         cancelForm();
         await fetchProducts();
         await updateDataQuality();
@@ -2419,6 +2748,9 @@ function bindEvents() {
     DOM.btnBack?.addEventListener("click", cancelForm);
     DOM.btnCancel?.addEventListener("click", cancelForm);
     DOM.form?.addEventListener("submit", saveProduct);
+    // AUTOSAVE DRAFT
+    DOM.form?.addEventListener("input", scheduleProductDraftSave);
+    DOM.form?.addEventListener("change", scheduleProductDraftSave);
 
     DOM.category?.addEventListener("change", e => updateSubCategories(e.target.value));
     DOM.subCategory?.addEventListener("change", e => updateFamilies(e.target.value));
@@ -2573,6 +2905,7 @@ function bindEvents() {
 
             state.variants = state.variants.filter(item => item.id !== id);
             renderVariants();
+            scheduleProductDraftSave();
         }
     });
     // SỰ KIỆN GẠT CÔNG TẮC TẮT/BẬT BIẾN THỂ TRỰC TIẾP
@@ -2583,10 +2916,14 @@ function bindEvents() {
             
             // Tìm biến thể trong mảng nháp và cập nhật trạng thái
             const variantIndex = state.variants.findIndex(item => item.id === id);
-            if (variantIndex > -1) {
+           if (variantIndex > -1) {
                 state.variants[variantIndex].is_active = isChecked;
-                // Vẽ lại để cập nhật màu sắc và nhãn "Đang hoạt động" / "Tạm ẩn"
+
+                // Vẽ lại để cập nhật màu sắc và nhãn
                 renderVariants();
+
+                // Lưu trạng thái variant vào bản nháp
+                scheduleProductDraftSave();
             }
         }
     });
@@ -2594,16 +2931,57 @@ function bindEvents() {
 
 function initCKEditor() {
     if (typeof CKEDITOR === "undefined") return;
+
     const desc = document.getElementById("description");
     if (!desc) return;
-    if (!CKEDITOR.instances.description) CKEDITOR.replace("description", { height: 250 });
+
+    if (!CKEDITOR.instances.description) {
+        const editor = CKEDITOR.replace("description", {
+            height: 300,
+            toolbar: [
+                {
+                    name: "basicstyles",
+                    items: ["Bold", "Italic", "Underline", "Strike"]
+                },
+                {
+                    name: "paragraph",
+                    items: [
+                        "NumberedList",
+                        "BulletedList",
+                        "Outdent",
+                        "Indent",
+                        "Blockquote"
+                    ]
+                },
+                {
+                    name: "styles",
+                    items: ["Format", "Font", "FontSize"]
+                },
+                {
+                    name: "colors",
+                    items: ["TextColor", "BGColor"]
+                },
+                {
+                    name: "insert",
+                    items: ["Link", "Table", "HorizontalRule"]
+                },
+                {
+                    name: "document",
+                    items: ["Undo", "Redo", "RemoveFormat"]
+                }
+                      ]
+        });
+
+        editor.on("change", () => {
+            scheduleProductDraftSave();
+        });
+    }
 }
 
 /* =========================================================
    INIT
 ========================================================= */
 document.addEventListener("DOMContentLoaded", async () => {
-    initCKEditor();
     initBrandOriginDropdowns();
     bindEvents();
     bindMediaPreviewEvents();
@@ -2611,6 +2989,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadAllDropdowns();
     await fetchProducts();
     await updateDataQuality();
+
+    // Kiểm tra và khôi phục bản nháp sau khi dữ liệu sản phẩm đã load
+    await restoreProductDraftOnLoad();
 });
 
 /* GLOBAL EXPORTS */
