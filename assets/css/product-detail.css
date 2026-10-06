@@ -488,3 +488,17 @@
         font-size: 10px !important; /* Thu nhỏ chữ "Liên hệ đặt hàng" một chút */
     }
 }
+
+@media (max-width: 768px) {
+    /* Ép đường dẫn tự động rớt dòng nếu cần (nhưng giờ nó ngắn nên sẽ nằm 1 dòng) */
+    .product-detail-breadcrumb {
+        flex-wrap: wrap !important;
+        font-size: 11px !important;
+    }
+    
+    /* Ẩn cái tên sản phẩm dài ngoằn và dấu "/" cuối cùng đi */
+    #bcCurrentProduct,
+    #bcFamilySeparator {
+        display: none !important;
+    }
+}
