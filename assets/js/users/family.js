@@ -29,8 +29,8 @@ async function fetchFamilies() {
     }
 
     try {
-        // TÌM NHÓM HÀNG BẰNG SLUG HOẶC ID
-        let subCatQuery = window.supabaseClient.from('sub_categories').select('id, name, slug');
+        // TÌM NHÓM HÀNG BẰNG SLUG HOẶC ID + KẾT NỐI VỚI CATEGORY
+        let subCatQuery = window.supabaseClient.from('sub_categories').select('id, name, slug, category_id, categories(id, name, slug)');
         if (subCatSlug) {
             subCatQuery = subCatQuery.eq('slug', subCatSlug);
         } else {
@@ -81,9 +81,26 @@ async function fetchFamilies() {
         // UPDATE SEO & BREADCRUMB
         if (subCatInfo) {
             const name = subCatInfo.name;
+            const categoryInfo = subCatInfo.categories; // Lấy data danh mục từ bảng categories
+            
+            // Xử lý tiêu đề trang
             if (title) title.textContent = name;
-            if (bcSubCategory) bcSubCategory.textContent = name;
             document.title = `${name} - Dòng sản phẩm | MRO Khang Nam`;
+
+            // Xử lý Breadcrumb
+            if (bcSubCategory) bcSubCategory.textContent = name;
+            
+            const bcCategory = document.getElementById('bcCategory');
+            if (bcCategory && categoryInfo) {
+                const isLocal = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
+                bcCategory.textContent = categoryInfo.name;
+                
+                // Gắn link quay về trang danh mục (Category)
+                const catSlug = categoryInfo.slug ? String(categoryInfo.slug).trim() : '';
+                bcCategory.href = catSlug 
+                    ? (isLocal ? `/pages/subcategory.html?slug=${encodeURIComponent(catSlug)}` : `/${encodeURIComponent(catSlug)}.html`) 
+                    : '/pages/category.html';
+            }
         }
 
         skeleton?.classList.add('is-hidden');

@@ -3350,3 +3350,48 @@
                 width: 100% !important;
             }
         }
+
+        /* =========================================================
+   FIX MOBILE: BREADCRUMB 1 DÒNG + TỰ ĐỘNG CẮT CHỮ DÀI (DẤU ...)
+========================================================= */
+@media (max-width: 768px) {
+    /* 1. Ép toàn bộ Breadcrumb nằm trên 1 dòng, không cho rớt xuống */
+    .catalog-breadcrumb,
+    .subcategory-breadcrumb,
+    .product-detail-breadcrumb {
+        flex-wrap: nowrap !important;
+        overflow: hidden !important; 
+        width: 100% !important;
+        padding-bottom: 0 !important;
+        font-size: 11px !important; /* Hạ font xíu để hiển thị được nhiều chữ hơn */
+    }
+
+    /* 2. Các thẻ chứa chữ (Trang chủ, Tên danh mục, Tên sản phẩm) */
+    .catalog-breadcrumb-link,
+    .catalog-breadcrumb-current,
+    .subcategory-breadcrumb-link,
+    .subcategory-breadcrumb-current,
+    .product-detail-breadcrumb-link,
+    .product-detail-breadcrumb-current {
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important; /* Biến phần chữ dư thừa thành dấu ... */
+        min-width: 0 !important; /* Bắt buộc có dòng này thì Flexbox mới chịu cắt chữ */
+        flex-shrink: 1 !important; /* Cho phép thẻ tự động co nhỏ lại nếu bị chật chỗ */
+        display: block !important;
+    }
+
+    /* Đặt giới hạn cho cái tên sản phẩm cuối cùng (thường là dài nhất) để nó không "ăn" hết chỗ của các danh mục cha */
+    .catalog-breadcrumb-current,
+    .subcategory-breadcrumb-current,
+    .product-detail-breadcrumb-current {
+        max-width: 45% !important; 
+    }
+
+    /* 3. Giữ nguyên dấu phân cách ( / ), cấm không cho nó bị bóp méo hay biến mất */
+    .catalog-breadcrumb-separator,
+    .subcategory-breadcrumb-separator,
+    .product-detail-breadcrumb-separator {
+        flex-shrink: 0 !important;
+    }
+}
