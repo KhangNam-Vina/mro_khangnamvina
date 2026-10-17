@@ -545,3 +545,54 @@
         margin-top: 8px !important;
     }
 }
+
+/* =========================================================
+   CHUẨN HÓA HIỂN THỊ NỘI DUNG CKEDITOR TRÊN TRANG KHÁCH
+========================================================= */
+/* 1. Chống méo tỷ lệ ảnh khi xem trên Mobile (vô hiệu hóa height cứng của CKEditor) */
+.product-detail-prose img {
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: 8px;
+    margin: 16px auto;
+}
+
+/* 2. Định dạng Bảng (Table) khi Admin kẻ bảng hoặc copy từ Excel/Word vào mô tả */
+.product-detail-prose table {
+    width: 100% !important;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13px;
+    background: #fff;
+}
+
+.product-detail-prose th,
+.product-detail-prose td {
+    border: 1px solid #e5e7eb;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.product-detail-prose th {
+    background: #f3f4f6;
+    color: #111827;
+    font-weight: 800;
+}
+
+.product-detail-prose tr:nth-child(even) td {
+    background: #f9fafb;
+}
+
+/* 3. Cho phép cuộn ngang nếu bảng quá rộng trên màn hình điện thoại */
+@media (max-width: 768px) {
+    .product-detail-prose {
+        overflow-x: auto;
+    }
+    .product-detail-prose table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+}

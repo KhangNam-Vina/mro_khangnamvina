@@ -11,7 +11,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- CKEditor -->
-    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.22.1/full-all/ckeditor.js"></script>
 
     <!-- Tailwind Config -->
     <script>
@@ -106,51 +106,6 @@
                     ================================================== -->
 
                     <div id="catalogDashboard" class="mb-6">
-
-                        <!-- HEADER TỔNG QUAN -->
-                        <!-- 
-
-                            <h3
-                                class="text-base font-bold text-gray-800 flex items-center gap-2">
-
-                                <svg
-                                    class="w-5 h-5 text-kn-blue"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24">
-
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
-                                    </path>
-
-                                </svg>
-
-                                Tổng quan Catalog
-                            </h3>
-
-                            <div
-                                class="flex items-baseline gap-1.5 bg-white px-4 py-1.5 rounded-full border border-gray-200 shadow-sm">
-
-                                <span class="text-sm font-medium text-gray-500">
-                                    Tổng cộng:
-                                </span>
-
-                                <span
-                                    id="dataQualityTotal"
-                                    class="text-lg font-black text-kn-blue">
-                                    0
-                                </span>
-
-                                <span class="text-sm text-gray-500">
-                                    sản phẩm
-                                </span>
-
-                            </div>
-
-                        </div> -->
 
                         <!-- TẦNG 1 -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
@@ -1692,118 +1647,108 @@
                         </div>
 
                         <!-- =================================================
-                             4. HÌNH ẢNH & TÀI LIỆU
+                             4. HÌNH ẢNH & TÀI LIỆU (BỐ CỤC 2 CỘT TRỰC QUAN)
                         ================================================== -->
 
-                        <div
-                            class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                        <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
 
-                            <div
-                                class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-
-                                <h3
-                                    class="text-sm font-black text-kn-blue uppercase tracking-wider flex items-center gap-2">
-
-                                    <span
-                                        class="bg-blue-100 text-kn-blue w-6 h-6 rounded-full flex items-center justify-center text-xs">
-                                        4
-                                    </span>
-
-                                    Hình ảnh & Tài liệu
-
-                                </h3>
-
+                            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-sm font-black text-kn-blue uppercase tracking-wider flex items-center gap-2">
+                                        <span class="bg-blue-100 text-kn-blue w-6 h-6 rounded-full flex items-center justify-center text-xs">
+                                            4
+                                        </span>
+                                        Hình ảnh & Tài liệu
+                                    </h3>
+                                    <p class="text-xs text-gray-400 mt-1">
+                                        Quản lý ảnh đại diện chính, bộ sưu tập ảnh phụ và tài liệu kỹ thuật PDF.
+                                    </p>
+                                </div>
                             </div>
 
                             <div class="p-6 space-y-6">
 
-                                <!-- MAIN IMAGE -->
-                                <div>
+                                <!-- HÀNG 1: ẢNH ĐẠI DIỆN (TRÁI) & ẢNH PHỤ GALLERY (PHẢI) -->
+                                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
 
-                                    <label
-                                        class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">
-                                        Ảnh đại diện
-                                    </label>
+                                    <!-- CỘT TRÁI (4 CỘT): ẢNH ĐẠI DIỆN -->
+                                    <div class="lg:col-span-4 flex flex-col">
+                                        <label class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">
+                                            Ảnh đại diện chính <span class="text-kn-orange">*</span>
+                                        </label>
 
-                                    <div
-                                        class="border-2 border-dashed border-gray-300 bg-gray-50 rounded-xl p-5 hover:border-kn-blue transition">
-
-                                        <div
-                                            class="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+                                        <div class="flex-1 border-2 border-dashed border-gray-300 bg-gray-50/70 rounded-xl p-5 hover:border-kn-blue transition flex flex-col items-center justify-center text-center gap-4">
 
                                             <div
                                                 id="mainImagePreview"
-                                                class="w-28 h-28 rounded-lg border border-gray-200 bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
-
-                                                <span
-                                                    class="text-xs text-gray-400">
-                                                    Chưa có ảnh
-                                                </span>
-
+                                                class="w-36 h-36 rounded-xl border border-gray-200 bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                                                <span class="text-xs text-gray-400">Chưa có ảnh</span>
                                             </div>
 
-                                            <div class="flex-1">
-
+                                            <div class="w-full">
                                                 <input
                                                     type="file"
                                                     id="image_file"
                                                     accept="image/*"
-                                                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-blue-100 file:text-kn-blue hover:file:bg-blue-200 cursor-pointer transition">
+                                                    class="block w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-kn-blue hover:file:bg-blue-200 cursor-pointer transition">
 
-                                                <p
-                                                    class="mt-2 text-xs text-gray-400">
-                                                    Chọn 1 ảnh chính (Vuông, Nền trắng, &lt; 2MB).
+                                                <p class="mt-2 text-[11px] text-gray-400">
+                                                    Khuyên dùng ảnh vuông (1:1), nền trắng, dung lượng &lt; 2MB.
                                                 </p>
-
                                             </div>
 
                                         </div>
-
                                     </div>
 
-                                </div>
-
-                                <!-- EXTRA IMAGES -->
-                                <div>
-
-                                    <label
-                                        class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">
-                                        Ảnh phụ Gallery
-                                    </label>
-
-                                    <div
-                                        class="border-2 border-dashed border-gray-300 bg-gray-50 rounded-xl p-5 hover:border-kn-blue transition">
-
-                                        <input
-                                            type="file"
-                                            id="extra_image_files"
-                                            multiple
-                                            accept="image/*"
-                                            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-blue-100 file:text-kn-blue hover:file:bg-blue-200 cursor-pointer transition">
-
-                                        <div
-                                            id="extraImagesPreview"
-                                            class="mt-4 grid grid-cols-3 sm:grid-cols-6 gap-3">
+                                    <!-- CỘT PHẢI (8 CỘT): ẢNH PHỤ GALLERY -->
+                                    <div class="lg:col-span-8 flex flex-col">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide">
+                                                Bộ sưu tập ảnh phụ (Gallery)
+                                            </label>
+                                            <span class="text-[11px] text-gray-400">Có thể chọn nhiều ảnh cùng lúc</span>
                                         </div>
 
+                                        <div class="flex-1 border-2 border-dashed border-gray-300 bg-gray-50/70 rounded-xl p-5 hover:border-kn-blue transition flex flex-col justify-between">
+
+                                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-200/80">
+                                                <input
+                                                    type="file"
+                                                    id="extra_image_files"
+                                                    multiple
+                                                    accept="image/*"
+                                                    class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-kn-blue hover:file:bg-blue-200 cursor-pointer transition">
+                                            </div>
+
+                                            <!-- KHUNG HIỂN THỊ THUMBNAIL GALLERY -->
+                                            <div
+                                                id="extraImagesPreview"
+                                                class="mt-4 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6 gap-3 min-h-[112px] items-start">
+                                            </div>
+
+                                        </div>
                                     </div>
 
                                 </div>
 
-                                <!-- DATASHEET -->
-                                <div>
-
+                                <!-- HÀNG 2: LINK DATASHEET (PDF) -->
+                                <div class="pt-4 border-t border-gray-100">
                                     <label
+                                        for="inDatasheet"
                                         class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">
-                                        Link Datasheet (PDF)
+                                        Link tài liệu kỹ thuật / Datasheet (PDF)
                                     </label>
 
-                                    <input
-                                        type="text"
-                                        id="inDatasheet"
-                                        class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-kn-blue shadow-sm"
-                                        placeholder="https://...">
-
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-red-500 font-black text-xs">
+                                            PDF
+                                        </div>
+                                        <input
+                                            type="text"
+                                            id="inDatasheet"
+                                            class="w-full border border-gray-300 rounded-lg pl-12 pr-4 py-2.5 text-sm outline-none focus:border-kn-blue focus:ring-1 focus:ring-kn-blue shadow-sm"
+                                            placeholder="https://... (Dán link Google Drive hoặc link file PDF trực tiếp)">
+                                    </div>
                                 </div>
 
                             </div>
@@ -1811,83 +1756,88 @@
                         </div>
 
                         <!-- =================================================
-                             5. NỘI DUNG
+                             5. NỘI DUNG CHI TIẾT (MÔ TẢ CHI TIẾT LÀM CHỦ ĐẠO)
                         ================================================== -->
 
-                        <div
-                            class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                        <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
 
-                            <div
-                                class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-
-                                <h3
-                                    class="text-sm font-black text-kn-blue uppercase tracking-wider flex items-center gap-2">
-
-                                    <span
-                                        class="bg-blue-100 text-kn-blue w-6 h-6 rounded-full flex items-center justify-center text-xs">
-                                        5
-                                    </span>
-
-                                    Nội dung chi tiết
-
-                                </h3>
-
+                            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-sm font-black text-kn-blue uppercase tracking-wider flex items-center gap-2">
+                                        <span class="bg-blue-100 text-kn-blue w-6 h-6 rounded-full flex items-center justify-center text-xs">
+                                            5
+                                        </span>
+                                        Nội dung chi tiết
+                                    </h3>
+                                    <p class="text-xs text-gray-400 mt-1">
+                                        Soạn thảo bài viết giới thiệu sản phẩm, thông số kỹ thuật và tóm tắt hiển thị.
+                                    </p>
+                                </div>
                             </div>
 
                             <div class="p-6 space-y-6">
 
-                                <!-- SHORT DESCRIPTION -->
-                                <div>
-
-                                    <label
-                                        class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">
-
-                                        Mô tả ngắn
-
-                                        <span
-                                            class="text-gray-400 font-normal lowercase">
-                                            (Dành cho SEO)
+                                <!-- KHỐI CHỦ ĐẠO (FULL 100% CHIỀU NGANG): MÔ TẢ CHI TIẾT -->
+                                <div class="border-2 border-blue-100 bg-blue-50/20 rounded-xl p-5 shadow-sm">
+                                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                                        <div class="flex items-center gap-2">
+                                            <label
+                                                for="description"
+                                                class="text-sm font-black text-kn-blue uppercase tracking-wide">
+                                                Mô tả chi tiết sản phẩm
+                                            </label>
+                                            <span class="px-2.5 py-0.5 rounded-full bg-kn-blue text-white text-[10px] font-extrabold uppercase tracking-wider">
+                                                Nội dung chủ đạo
+                                            </span>
+                                        </div>
+                                        <span class="text-xs text-gray-500">
+                                            💡 Hỗ trợ <strong>Ctrl + V</strong> để dán ảnh trực tiếp hoặc bấm icon Ảnh trên thanh công cụ
                                         </span>
-
-                                    </label>
+                                    </div>
 
                                     <textarea
-                                        id="short_description"
-                                        rows="3"
-                                        class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm outline-none focus:border-kn-blue shadow-sm"></textarea>
-
+                                        id="description"
+                                        rows="12"
+                                        class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm outline-none focus:border-kn-blue shadow-sm bg-white"></textarea>
                                 </div>
 
-                                <!-- SPECIFICATIONS / DESCRIPTION -->
-                                <div
-                                    class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <!-- KHỐI PHỤ TRỢ (CHIA 2 CỘT CÂN ĐỐI): MÔ TẢ NGẮN & THÔNG SỐ KỸ THUẬT -->
+                                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
 
-                                    <div>
+                                    <!-- CỘT TRÁI (5 CỘT): MÔ TẢ NGẮN -->
+                                    <div class="lg:col-span-5 flex flex-col">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <label
+                                                for="short_description"
+                                                class="block text-xs font-bold text-gray-700 uppercase tracking-wide">
+                                                Mô tả ngắn
+                                            </label>
+                                            <span class="text-[11px] text-gray-400">Hiển thị ngay dưới tên SP & hỗ trợ SEO</span>
+                                        </div>
 
-                                        <label
-                                            class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">
-                                            Thông số kỹ thuật
-                                        </label>
+                                        <textarea
+                                            id="short_description"
+                                            rows="6"
+                                            placeholder="Nhập đoạn tóm tắt ngắn gọn (2 - 3 câu) nêu bật công dụng chính của sản phẩm..."
+                                            class="flex-1 w-full border border-gray-300 rounded-lg px-4 py-3 text-sm outline-none focus:border-kn-blue focus:ring-1 focus:ring-kn-blue shadow-sm resize-y"></textarea>
+                                    </div>
+
+                                    <!-- CỘT PHẢI (7 CỘT): THÔNG SỐ KỸ THUẬT -->
+                                    <div class="lg:col-span-7 flex flex-col">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <label
+                                                for="specifications"
+                                                class="block text-xs font-bold text-gray-700 uppercase tracking-wide">
+                                                Thông số kỹ thuật
+                                            </label>
+                                            <span class="text-[11px] text-gray-400">Hiển thị ở Tab Thông số</span>
+                                        </div>
 
                                         <textarea
                                             id="specifications"
-                                            rows="7"
-                                            class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm font-mono outline-none focus:border-kn-blue shadow-sm"></textarea>
-
-                                    </div>
-
-                                    <div>
-
-                                        <label
-                                            class="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">
-                                            Mô tả chi tiết
-                                        </label>
-
-                                        <textarea
-                                            id="description"
-                                            rows="7"
-                                            class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm outline-none focus:border-kn-blue shadow-sm"></textarea>
-
+                                            rows="6"
+                                            placeholder="VD:&#10;- Chất liệu: Thép không gỉ&#10;- Kích thước: 30 x 14 x 4 cm&#10;- Quy cách đóng gói: Thùng 100 miếng..."
+                                            class="flex-1 w-full border border-gray-300 rounded-lg px-4 py-3 text-sm font-mono outline-none focus:border-kn-blue focus:ring-1 focus:ring-kn-blue shadow-sm resize-y"></textarea>
                                     </div>
 
                                 </div>

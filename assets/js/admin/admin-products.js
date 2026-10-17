@@ -3037,6 +3037,53 @@ function bindEvents() {
     });
 }
 
+/* =========================================================
+   UPLOAD ẢNH TRONG MÔ TẢ CHI TIẾT (CKEDITOR -> SUPABASE)
+========================================================= */
+async function uploadDescriptionImage(file) {
+    validateImageFile(file);
+    const folderId = state.editingId || "desc-shared";
+    const fileName = createStorageFileName(file, "desc");
+    const storagePath = [STORAGE_PRODUCT_PREFIX, folderId, "description", fileName].join("/");
+
+    const { error } = await window.supabaseClient.storage
+        .from(STORAGE_BUCKET)
+        .upload(storagePath, file, {
+            cacheControl: "31536000",
+            upsert: false,
+            contentType: file.type
+        });
+
+    if (error) throw new Error(`Upload ảnh mô tả thất bại: ${error.message}`);
+    return buildProductImageUrl(storagePath);
+}
+
+function triggerDescriptionImageUpload(editor) {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/jpeg,image/png,image/webp,image/gif";
+    input.multiple = true;
+
+    input.addEventListener("change", async () => {
+        const files = Array.from(input.files || []);
+        if (!files.length) return;
+
+        showToast(`Đang tải ${files.length} ảnh vào mô tả...`, "success");
+        for (const file of files) {
+            try {
+                const imageUrl = await uploadDescriptionImage(file);
+                editor.insertHtml(`<p><img src="${escapeAttribute(imageUrl)}" alt="" style="max-width:100%; height:auto;" /></p>`);
+            } catch (err) {
+                console.error(err);
+                showToast(err.message || "Lỗi tải ảnh mô tả", "error");
+            }
+        }
+        scheduleProductDraftSave();
+    });
+
+    input.click();
+}
+
 function initCKEditor() {
     if (typeof CKEDITOR === "undefined") return;
 
@@ -3045,39 +3092,87 @@ function initCKEditor() {
 
     if (!CKEDITOR.instances.description) {
         const editor = CKEDITOR.replace("description", {
-            height: 300,
+            height: 480,
+            versionCheck: false, // Tắt vĩnh viễn bảng cảnh báo đỏ 4.22.1
+            allowedContent: true, // Cho phép giữ nguyên style, bảng biểu, class tùy chỉnh
+            extraPlugins: "justify,colorbutton,font,colordialog",
             toolbar: [
-                {
-                    name: "basicstyles",
-                    items: ["Bold", "Italic", "Underline", "Strike"]
-                },
-                {
-                    name: "paragraph",
-                    items: [
-                        "NumberedList",
-                        "BulletedList",
-                        "Outdent",
-                        "Indent",
-                        "Blockquote"
-                    ]
-                },
                 {
                     name: "styles",
                     items: ["Format", "Font", "FontSize"]
+                },
+                {
+                    name: "basicstyles",
+                    items: ["Bold", "Italic", "Underline", "Strike", "-", "RemoveFormat"]
                 },
                 {
                     name: "colors",
                     items: ["TextColor", "BGColor"]
                 },
                 {
-                    name: "insert",
-                    items: ["Link", "Table", "HorizontalRule"]
+                    name: "align",
+                    items: ["JustifyLeft", "JustifyCenter", "JustifyRight", "JustifyBlock"]
                 },
                 {
-                    name: "document",
-                    items: ["Undo", "Redo", "RemoveFormat"]
+                    name: "paragraph",
+                    items: ["NumberedList", "BulletedList", "-", "Outdent", "Indent", "-", "Blockquote"]
+                },
+                {
+                    name: "insert",
+                    items: ["UploadImageBtn", "Image", "Table", "HorizontalRule", "Link", "Unlink"]
+                },
+                {
+                    name: "tools",
+                    items: ["Maximize", "Source", "-", "Undo", "Redo"]
                 }
-                      ]
+            ]
+        });
+
+        // 1. Thêm nút "Chèn ảnh từ máy" lên thanh công cụ
+        editor.addCommand("uploadImageToSupabase", {
+            exec: function (ed) {
+                triggerDescriptionImageUpload(ed);
+            }
+        });
+
+        editor.ui.addButton("UploadImageBtn", {
+            label: "Tải ảnh từ máy lên",
+            command: "uploadImageToSupabase",
+            toolbar: "insert,0",
+            icon: "image"
+        });
+
+        // 2. Bắt sự kiện Ctrl+V (Paste ảnh chụp màn hình / Copy file ảnh) hoặc Kéo thả ảnh
+        editor.on("paste", async function (evt) {
+            const dataTransfer = evt.data?.dataTransfer;
+            if (!dataTransfer) return;
+
+            const filesCount = dataTransfer.getFilesCount ? dataTransfer.getFilesCount() : 0;
+            if (filesCount > 0) {
+                const imageFiles = [];
+                for (let i = 0; i < filesCount; i++) {
+                    const file = dataTransfer.getFile(i);
+                    if (file && file.type && file.type.startsWith("image/")) {
+                        imageFiles.push(file);
+                    }
+                }
+
+                if (imageFiles.length > 0) {
+                    evt.cancel(); // Chặn dán Base64 nặng nề
+                    showToast("Đang tải ảnh vừa dán lên hệ thống...", "success");
+
+                    for (const file of imageFiles) {
+                        try {
+                            const imageUrl = await uploadDescriptionImage(file);
+                            editor.insertHtml(`<p><img src="${escapeAttribute(imageUrl)}" alt="" style="max-width:100%; height:auto;" /></p>`);
+                        } catch (err) {
+                            console.error(err);
+                            showToast(err.message || "Không thể dán ảnh.", "error");
+                        }
+                    }
+                    scheduleProductDraftSave();
+                }
+            }
         });
 
         editor.on("change", () => {
@@ -3085,7 +3180,6 @@ function initCKEditor() {
         });
     }
 }
-
 /* =========================================================
    INIT
 ========================================================= */
