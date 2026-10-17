@@ -824,6 +824,23 @@ function validateVariant(variant) {
 
     if (variant.sku) {
         variant.sku = String(variant.sku).trim().toUpperCase();
+        const mainSku = document.getElementById("sku")?.value?.trim().toUpperCase() || "";
+
+        if (mainSku && variant.sku === mainSku) {
+            alert(
+                "Mã SKU của biến thể không được trùng với Mã SKU gốc của sản phẩm.\n\n" +
+                "💡 Mẹo: Nếu biến thể này dùng chung mã SKU với sản phẩm gốc, bạn chỉ cần ĐỂ TRỐNG ô SKU của biến thể."
+            );
+            return false;
+        }
+
+        const isDuplicateInList = (state.variants || []).some(
+            item => item.id !== variant.id && item.sku && String(item.sku).trim().toUpperCase() === variant.sku
+        );
+        if (isDuplicateInList) {
+            alert(`Mã SKU "${variant.sku}" đã được sử dụng cho một biến thể khác trong sản phẩm này.`);
+            return false;
+        }
     }
 
     if (!variant.unit) {
@@ -893,30 +910,31 @@ function validateVariant(variant) {
 
 function renderVariants() {
     const variants = state.variants || [];
-    
-    // Kiểm tra xem Form nhập liệu có đang mở hay không?
-    const isFormOpen = !DOM.variantForm.classList.contains("hidden");
+    const hasVariants = variants.length > 0;
+    const isFormOpen = DOM.variantForm && !DOM.variantForm.classList.contains("hidden");
 
-    // ==========================================
-    // TRƯỜNG HỢP 1: CHƯA CÓ BIẾN THỂ NÀO
-    // ==========================================
-    if (!variants.length) {
+    const defaultPricingSection = document.getElementById("defaultPricingSection");
+    const variantSyncNotice = document.getElementById("variantSyncNotice");
+
+    // TỰ ĐỘNG CHUYỂN ĐỔI GIỮA CHẾ ĐỘ MẶC ĐỊNH VÀ CHẾ ĐỘ BIẾN THỂ
+    if (hasVariants || isFormOpen) {
+        defaultPricingSection?.classList.add("hidden");
+        variantSyncNotice?.classList.remove("hidden");
+    } else {
+        defaultPricingSection?.classList.remove("hidden");
+        variantSyncNotice?.classList.add("hidden");
+    }
+
+    if (DOM.variantEmptyState) DOM.variantEmptyState.classList.add("hidden");
+
+    // TRƯỜNG HỢP 1: CHƯA CÓ BIẾN THỂ NÀO (Giữ nguyên trạng thái đóng của Form nếu người dùng không bấm Mở)
+    if (!hasVariants) {
         DOM.variantList.classList.add("hidden");
-        // Xóa sổ luôn cái bảng "Chưa có biến thể"
-        if (DOM.variantEmptyState) DOM.variantEmptyState.classList.add("hidden"); 
-
-        // Tự động bung Form ra cho Admin điền luôn
-        if (!isFormOpen) {
-            DOM.variantForm.classList.remove("hidden");
-            resetVariantForm();
-        }
+        DOM.variantList.innerHTML = "";
         return;
     }
 
-    // ==========================================
     // TRƯỜNG HỢP 2: ĐÃ CÓ BIẾN THỂ
-    // ==========================================
-    if (DOM.variantEmptyState) DOM.variantEmptyState.classList.add("hidden");
     DOM.variantList.classList.remove("hidden");
 
     DOM.variantList.innerHTML = variants.map((variant) => {
@@ -939,21 +957,19 @@ function renderVariants() {
                             <span class="text-sm font-black text-gray-800">${escapeHTML(variant.variant_name)}</span>
                             ${variant.sku
                                 ? `<span class="px-2 py-1 rounded-md bg-gray-100 text-[11px] font-bold text-gray-600">SKU: ${escapeHTML(variant.sku)}</span>`
-                                : `<span class="px-2 py-1 rounded-md bg-gray-50 text-[11px] font-bold text-gray-400">Không có SKU</span>`
+                                : `<span class="px-2 py-1 rounded-md bg-gray-50 text-[11px] font-bold text-gray-400">Dùng SKU gốc</span>`
                             }
                             ${variant.is_active !== false
                                 ? `<span class="px-2 py-1 rounded-md bg-green-100 text-green-700 text-[11px] font-bold">Đang hoạt động</span>`
                                 : `<span class="px-2 py-1 rounded-md bg-gray-200 text-gray-600 text-[11px] font-bold">Tạm ẩn</span>`
                             }
                             
-                            <!-- HIỆN TÓM TẮT GIÁ & KHO KHI FORM ĐANG MỞ (COMPACT MODE) -->
                             ${isFormOpen ? `
                                 <span class="text-xs text-kn-orange font-bold ml-2">${formatCurrency(variant.discount_price || variant.price)}</span>
                                 <span class="text-xs text-gray-400 font-medium ml-1">| Kho: ${Number(variant.stock_quantity || 0).toLocaleString("vi-VN")}</span>
                             ` : ''}
                         </div>
 
-                        <!-- CHI TIẾT SẼ BỊ ẨN ĐI KHI FORM ĐANG MỞ ĐỂ TIẾT KIỆM DIỆN TÍCH -->
                         <div class="${isFormOpen ? 'hidden' : 'mt-4'}">
                             <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
                                 <div>
@@ -1000,7 +1016,6 @@ function renderVariants() {
                     </div>
 
                     <div class="flex items-center gap-3 shrink-0">
-                        <!-- CÔNG TẮC BẬT/TẮT NHANH -->
                         <div class="flex items-center border-r border-gray-200 pr-3 mr-1" title="${variant.is_active !== false ? 'Tắt hiển thị' : 'Bật hiển thị'}">
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" class="sr-only peer btn-toggle-variant" data-id="${escapeAttribute(variant.id)}" ${variant.is_active !== false ? 'checked' : ''}>
@@ -1058,15 +1073,55 @@ function normalizeProductSizes(product) {
 }
 
 function renderProductSizes(product) {
+    const variants = Array.isArray(product?.product_variants) ? product.product_variants : [];
+
+    // 1. NẾU CÓ BIẾN THỂ (PRODUCT VARIANTS)
+    if (variants.length > 0) {
+        return `
+            <div class="flex flex-wrap items-center gap-1.5 min-w-[160px] max-w-[260px]">
+                ${variants.map(v => {
+                    const isActive = v.is_active !== false;
+                    const badgeClass = isActive
+                        ? "bg-blue-50 border-blue-200 text-kn-blue"
+                        : "bg-gray-100 border-gray-200 text-gray-400 line-through";
+                    const unitNote = v.unit && v.unit.toLowerCase() !== String(v.variant_name || "").toLowerCase()
+                        ? ` (${escapeHTML(v.unit)})`
+                        : "";
+                    return `
+                        <span class="inline-flex items-center px-2 py-1 rounded-md border text-[10px] font-black leading-none whitespace-nowrap ${badgeClass}" title="${isActive ? 'Đang bật' : 'Tạm ẩn'}">
+                            ${escapeHTML(v.variant_name)}${unitNote}
+                        </span>
+                    `;
+                }).join("")}
+            </div>
+        `;
+    }
+
+    // 2. NẾU KHÔNG CÓ BIẾN THỂ NHƯNG CÓ SIZE HỖ TRỢ (AVAILABLE_SIZES)
     const sizes = normalizeProductSizes(product);
-    if (sizes.length === 0) return `<span class="text-xs text-gray-400 italic">—</span>`;
+    const defaultUnit = product?.unit || "Cái";
+    const moq = Number(product?.min_order_quantity) || 1;
+
+    if (sizes.length > 0) {
+        return `
+            <div class="flex flex-col gap-1 min-w-[160px] max-w-[260px]">
+                <span class="text-[11px] font-bold text-gray-600">ĐVT: ${escapeHTML(defaultUnit)}${moq > 1 ? ` • MOQ: ${moq}` : ''}</span>
+                <div class="flex flex-wrap items-center gap-1">
+                    ${sizes.map(size => `
+                        <span class="inline-flex items-center px-2 py-0.5 rounded bg-indigo-50 border border-indigo-100 text-indigo-700 text-[10px] font-extrabold leading-none whitespace-nowrap">
+                            Size: ${escapeHTML(size)}
+                        </span>
+                    `).join("")}
+                </div>
+            </div>
+        `;
+    }
+
+    // 3. SẢN PHẨM ĐƠN CƠ BẢN (HIỂN THỊ ĐƠN VỊ MẶC ĐỊNH)
     return `
-        <div class="flex flex-wrap items-center gap-1.5 min-w-[160px] max-w-[260px]">
-            ${sizes.map(size => `
-                <span class="inline-flex items-center px-2 py-1 rounded-md bg-blue-50 border border-blue-100 text-kn-blue text-[10px] font-black leading-none whitespace-nowrap">
-                    ${escapeHTML(size)}
-                </span>
-            `).join("")}
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-100 border border-gray-200 text-gray-700 text-[11px] font-bold whitespace-nowrap">
+            <span>ĐVT: ${escapeHTML(defaultUnit)}</span>
+            ${moq > 1 ? `<span class="text-gray-400 font-normal">| MOQ: ${moq}</span>` : ""}
         </div>
     `;
 }
@@ -1814,7 +1869,7 @@ async function fetchProducts() {
 
         let query = window.supabaseClient
             .from("products")
-            .select("*, brands(name)", { count: "exact" });
+            .select("*, brands(name), product_variants(id, variant_name, unit, price, discount_price, stock_quantity, min_order_quantity, is_active)", { count: "exact" });
 
         const logicGroups = [];
 
@@ -2042,8 +2097,33 @@ function renderProducts() {
     DOM.tableBody.innerHTML = state.products.map((item, index) => {
         const brandName = item.brands?.name || "OEM";
         const imageUrl = buildProductImageUrl(item.image_path);
-        
         const isChecked = item.is_active !== false ? "checked" : "";
+
+        // TỰ ĐỘNG TÍNH GIÁ & TỒN KHO NẾU CÓ BIẾN THỂ
+        const variants = Array.isArray(item.product_variants) ? item.product_variants : [];
+        const activeVariants = variants.filter(v => v.is_active !== false);
+
+        let displayPriceHTML = formatCurrency(item.discount_price || item.price);
+        let displayStock = Number(item.stock_quantity) || 0;
+
+        if (variants.length > 0) {
+            const targetVars = activeVariants.length > 0 ? activeVariants : variants;
+            displayStock = activeVariants.reduce((sum, v) => sum + (Number(v.stock_quantity) || 0), 0);
+
+            const validPrices = targetVars
+                .map(v => Number(v.discount_price || v.price || 0))
+                .filter(p => p > 0);
+
+            if (validPrices.length > 0) {
+                const minP = Math.min(...validPrices);
+                const maxP = Math.max(...validPrices);
+                displayPriceHTML = minP === maxP
+                    ? formatCurrency(minP)
+                    : `${formatCurrency(minP)} <span class="text-gray-400 text-xs font-normal">→</span> ${formatCurrency(maxP)}`;
+            } else {
+                displayPriceHTML = "Liên hệ";
+            }
+        }
 
         const imageHTML = imageUrl
             ? `<img src="${escapeAttribute(imageUrl)}" alt="${escapeAttribute(item.name)}" class="w-10 h-10 object-contain mx-auto border border-gray-200 rounded-lg bg-white" loading="lazy" onerror="this.onerror=null;this.src='../assets/images/world mark.png';">`
@@ -2057,8 +2137,8 @@ function renderProducts() {
                 <td class="px-4 py-3 font-bold text-gray-800 text-sm align-middle leading-snug">${escapeHTML(item.name)}</td>
                 <td class="px-4 py-3 text-gray-600 text-xs font-bold uppercase align-middle">${escapeHTML(brandName)}</td>
                 <td class="px-4 py-3 align-middle">${renderProductSizes(item)}</td>
-                <td class="px-4 py-3 text-gray-800 font-bold text-sm whitespace-nowrap text-right align-middle">${formatCurrency(item.price)}</td>
-                <td class="px-4 py-3 text-center align-middle"><span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold ${Number(item.stock_quantity) > 0 ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'}">${Number(item.stock_quantity) > 0 ? Number(item.stock_quantity) : "Hết hàng"}</span></td>
+                <td class="px-4 py-3 text-gray-800 font-bold text-sm whitespace-nowrap text-right align-middle">${displayPriceHTML}</td>
+                <td class="px-4 py-3 text-center align-middle"><span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold ${displayStock > 0 ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'}">${displayStock > 0 ? displayStock.toLocaleString("vi-VN") : "Hết hàng"}</span></td>
                 
                 <td class="px-4 py-3 text-center align-middle w-32">
                     <label class="relative inline-flex items-center cursor-pointer" title="${item.is_active !== false ? 'Đang hiển thị' : 'Đang ẩn'}">
@@ -2334,6 +2414,7 @@ async function editProduct(id) {
     
     loadExistingMedia(item);
     
+    closeVariantForm();
     try {
         await loadProductVariants(item.id);
     } catch (error) {
@@ -2395,21 +2476,48 @@ function getAvailableSizes() {
 }
 
 function buildProductPayload(brandId) {
+    const allVariants = state.variants || [];
+    let finalPrice = document.getElementById("price").value || null;
+    let finalDiscountPrice = document.getElementById("discount_price").value || null;
+    let finalUnit = document.getElementById("unit").value || "Cái";
+    let finalStock = document.getElementById("stock_quantity").value || 0;
+    let finalMoq = document.getElementById("min_order_quantity").value || 1;
+    let finalSizes = getAvailableSizes();
+
+    // NẾU CÓ BIẾN THỂ -> TỰ ĐỘNG ĐỒNG BỘ TỪ BIẾN THỂ RA BẢNG PRODUCTS
+    if (allVariants.length > 0) {
+        const activeVariants = allVariants.filter(v => v.is_active !== false);
+        const targetVariants = activeVariants.length > 0 ? activeVariants : allVariants;
+        const primaryVariant = targetVariants[0];
+
+        finalPrice = primaryVariant.price ?? null;
+        finalDiscountPrice = primaryVariant.discount_price ?? null;
+        finalUnit = primaryVariant.unit?.trim() || "Cái";
+        finalMoq = primaryVariant.min_order_quantity ?? 1;
+
+        // Cộng tổng tồn kho của tất cả các biến thể đang bật
+        finalStock = activeVariants.reduce((sum, v) => sum + (Number(v.stock_quantity) || 0), 0);
+
+        // Tự động nạp danh sách tên quy cách bán vào available_sizes để hiện tag ngoài bảng Admin
+        const variantNames = [...new Set(targetVariants.map(v => v.variant_name?.trim()).filter(Boolean))];
+        finalSizes = variantNames.length > 0 ? variantNames : null;
+    }
+
     return {
         sku: document.getElementById("sku").value.trim(),
         name: document.getElementById("name").value.trim(),
-        available_sizes: getAvailableSizes(),
+        available_sizes: finalSizes,
         category_id: document.getElementById("category_id").value || null,
         sub_category_id: document.getElementById("sub_category_id").value || null,
         family_id: document.getElementById("family_id").value || null,
         industry_id: document.getElementById("industrySelect").value || null,
         brand_id: brandId,
         origin: document.getElementById("origin_input").value.trim() || null,
-        price: document.getElementById("price").value || null,
-        discount_price: document.getElementById("discount_price").value || null,
-        unit: document.getElementById("unit").value || "Cái",
-        stock_quantity: document.getElementById("stock_quantity").value || 0,
-        min_order_quantity: document.getElementById("min_order_quantity").value || 1,
+        price: finalPrice,
+        discount_price: finalDiscountPrice,
+        unit: finalUnit,
+        stock_quantity: finalStock,
+        min_order_quantity: finalMoq,
         badge: document.getElementById("badge").value || null,
         datasheet_url: document.getElementById("inDatasheet").value.trim() || null,
         short_description: document.getElementById("short_description").value.trim() || null,

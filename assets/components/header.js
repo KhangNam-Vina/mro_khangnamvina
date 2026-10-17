@@ -51,6 +51,33 @@ const renderHeader = () => {
                         </div>
                     </div>
 
+                    
+                    <!-- HOTLINE DESKTOP: LẤY TỪ CẤU HÌNH WEBSITE -->
+                    <a id="headerHotline"
+                        class="header-hotline"
+                        href="#"
+                        aria-label="Gọi hotline hỗ trợ"
+                        style="visibility: hidden;">
+                        <svg viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round"
+                             aria-hidden="true">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2
+                                     19.79 19.79 0 0 1-8.63-3.07
+                                     19.5 19.5 0 0 1-6-6
+                                     A19.79 19.79 0 0 1 2.12 4.18
+                                     2 2 0 0 1 4.11 2h3a2 2 0 0 1
+                                     2 1.72c.12.96.36 1.9.72 2.8
+                                     a2 2 0 0 1-.45 2.11L8.11 9.89
+                                     a16 16 0 0 0 6 6l1.27-1.27
+                                     a2 2 0 0 1 2.11-.45
+                                     c.9.36 1.84.6 2.8.72
+                                     A2 2 0 0 1 22 16.92z"/>
+                        </svg>
+                        <span id="headerHotlineNumber"></span>
+                    </a>
+
+
                     <!-- ACCOUNT & LOGIN -->
                     <div class="header-account-wrapper">
                         <a id="btnGuestLogin" href="${pagesPath}login.html" class="btn-guest-login d-none" title="Đăng nhập">
@@ -143,8 +170,13 @@ const renderHeader = () => {
     const headerContainer = document.getElementById('app-header');
     if (!headerContainer) return;
     
-    headerContainer.innerHTML = headerHTML;
-    headerContainer.classList.remove('site-header-placeholder');
+   // Chỉ dựng header khi chưa có nội dung.
+    // Tránh thay thế DOM nếu header đã được render.
+    if (!headerContainer.querySelector('.site-header-wrapper')) {
+        headerContainer.innerHTML = headerHTML;
+    }
+
+headerContainer.classList.remove('site-header-placeholder');
 
     applyDynamicHeaderSettings();
 
@@ -191,33 +223,67 @@ const renderHeader = () => {
 // ========================================================
 // HÀM LẤY LOGO TỪ DATABASE VÀ CẬP NHẬT
 // ========================================================
+
 async function applyDynamicHeaderSettings() {
     if (!window.supabaseClient) return;
+
     try {
         const { data, error } = await window.supabaseClient
             .from('website_settings')
-            .select('logo_url')
+            .select('logo_url, hotline')
             .eq('id', 1)
             .maybeSingle();
 
-        if (data && data.logo_url && data.logo_url.trim() !== "") {
+        if (error) throw error;
+
+        // ========================================
+        // 1. LẤY LOGO TỪ DATABASE VÀ CẬP NHẬT
+        // ========================================
+        if (data?.logo_url && data.logo_url.trim() !== '') {
             const mainLogo = document.getElementById('mainSiteLogo');
+
             if (mainLogo) {
                 mainLogo.src = data.logo_url;
             }
-            
+
+            // Cập nhật favicon của website
             let link = document.querySelector("link[rel~='icon']");
+
             if (!link) {
                 link = document.createElement('link');
                 link.rel = 'icon';
                 document.head.appendChild(link);
             }
+
             link.href = data.logo_url;
         }
+
+        // ========================================
+        // 2. LẤY HOTLINE TỪ DATABASE VÀ CẬP NHẬT
+        // ========================================
+        const hotlineEl = document.getElementById('headerHotline');
+        const hotlineNumberEl = document.getElementById('headerHotlineNumber');
+        const hotline = String(data?.hotline || '').trim();
+
+        if (hotlineEl && hotlineNumberEl) {
+            const telNumber = hotline.replace(/[^\d+]/g, '');
+
+            if (hotline && telNumber.replace(/\D/g, '').length > 0) {
+                hotlineNumberEl.textContent = hotline;
+                hotlineEl.href = `tel:${telNumber}`;
+                hotlineEl.style.visibility = 'visible';
+            } else {
+                hotlineEl.style.visibility = 'hidden';
+            }
+        }
+
     } catch (error) {
-        console.error('Lỗi tải logo từ cấu hình:', error);
+        console.error('Lỗi tải cấu hình logo và hotline:', error);
     }
 }
+
+
+
 
 // ========================================================
 // SEARCH
