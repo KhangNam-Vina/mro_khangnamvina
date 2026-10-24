@@ -701,12 +701,14 @@ function renderStaticInfo(item) {
         elSubCat.href = `products.html?sub_category=${item.sub_categories.slug || item.sub_categories.id}`;
     }
 
-    // 3. Cập nhật Tên và Link cho Cấp Dòng sản phẩm (Family)
+    // 3. Cập nhật Tên và Link cho Cấp Dòng sản phẩm (Family) theo slug
     const elFamily = document.getElementById("bcFamily");
-    if (item.families) {
+    if (item.families && elFamily) {
         elFamily.innerText = item.families.name;
-        // Gắn link trỏ về trang Sản phẩm + truyền tham số lọc theo family
-        elFamily.href = `products.html?family=${item.families.slug || item.families.id}`;
+        const famSlug = item.families.slug ? String(item.families.slug).trim() : "";
+        elFamily.href = famSlug
+            ? `products.html?slug=${encodeURIComponent(famSlug)}`
+            : `products.html?family_id=${encodeURIComponent(item.families.id)}`;
     }
 
     // Cập nhật các thông tin Text khác như cũ
@@ -768,28 +770,66 @@ window.switchTab = function(tab) {
 
 async function loadRelatedProducts(currentItem) {
     const grid = document.getElementById("relatedProductsGrid");
+    const viewAllBtn = document.getElementById("viewAllRelated");
     if (!grid) return;
 
-    let queryColumn = "family_id";
-    let queryValue = currentItem.family_id;
+    const familySlug = currentItem?.families?.slug ? String(currentItem.families.slug).trim() : "";
+    const subCatSlug = currentItem?.sub_categories?.slug ? String(currentItem.sub_categories.slug).trim() : "";
 
-    if (!queryValue) {
-        queryColumn = "sub_category_id";
-        queryValue = currentItem.sub_category_id;
+    // 1. Cập nhật link theo SLUG cho nút "Xem tất cả" (#viewAllRelated)
+    if (viewAllBtn) {
+        if (familySlug) {
+            viewAllBtn.href = `products.html?slug=${encodeURIComponent(familySlug)}`;
+            viewAllBtn.classList.remove("is-hidden");
+        } else if (subCatSlug) {
+            viewAllBtn.href = `products.html?sub_category=${encodeURIComponent(subCatSlug)}`;
+            viewAllBtn.classList.remove("is-hidden");
+        } else if (currentItem?.family_id) {
+            viewAllBtn.href = `products.html?family_id=${encodeURIComponent(currentItem.family_id)}`;
+            viewAllBtn.classList.remove("is-hidden");
+        } else {
+            viewAllBtn.classList.add("is-hidden");
+        }
     }
 
-    if (!queryValue) {
+    // Kiểm tra nếu sản phẩm không thuộc dòng hay nhóm hàng nào
+    if (!familySlug && !subCatSlug && !currentItem?.family_id && !currentItem?.sub_category_id) {
         grid.innerHTML = `<p class="related-product-message">Không có sản phẩm cùng dòng.</p>`;
         return;
     }
 
     try {
-        const { data, error } = await window.supabaseClient
+        let query = window.supabaseClient
             .from("products")
-            .select(`*, brands(id, name)`)
-            .eq(queryColumn, queryValue)
-            .neq("id", currentItem.id)
-            .limit(4);
+            .select(
+                familySlug
+                    ? `*, brands(id, name), families!inner(slug)`
+                    : subCatSlug
+                    ? `*, brands(id, name), sub_categories!inner(slug)`
+                    : `*, brands(id, name)`
+            )
+            .eq("is_active", true);
+
+        // 2. Ưu tiên lọc sản phẩm cùng dòng theo SLUG
+        if (familySlug) {
+            query = query.eq("families.slug", familySlug);
+        } else if (currentItem?.family_id) {
+            query = query.eq("family_id", currentItem.family_id);
+        } else if (subCatSlug) {
+            query = query.eq("sub_categories.slug", subCatSlug);
+        } else {
+            query = query.eq("sub_category_id", currentItem.sub_category_id);
+        }
+
+        // 3. Loại trừ sản phẩm hiện tại theo SLUG (nếu có) hoặc ID
+        const currentProductSlug = currentItem?.slug ? String(currentItem.slug).trim() : "";
+        if (currentProductSlug) {
+            query = query.neq("slug", currentProductSlug);
+        } else {
+            query = query.neq("id", currentItem.id);
+        }
+
+        const { data, error } = await query.limit(4);
 
         if (error) throw error;
         if (!data || data.length === 0) {
@@ -822,6 +862,7 @@ async function loadRelatedProducts(currentItem) {
             `;
         });
     } catch (err) {
+        console.error("Lỗi tải sản phẩm cùng dòng:", err);
         grid.innerHTML = `<p class="related-product-error">Lỗi tải dữ liệu sản phẩm cùng dòng.</p>`;
     }
 }

@@ -315,18 +315,28 @@ async function fetchFilteredProducts() {
         let resolvedFamilyId = familyId || null;
         let familyInfo = null;
 
-        if (familySlug) {
-            const { data, error } = await window.supabaseClient
+        if (familySlug || familyId) {
+            const lookupVal = String(familySlug || familyId).trim();
+            const isNumericId = /^\d+$/.test(lookupVal);
+
+            let famQuery = window.supabaseClient
                 .from('families')
-                .select('id, name, slug, sub_category_id, sub_categories(name, slug, category_id, categories(name, slug))')
-                .eq('slug', familySlug)
-                .single();
+                .select('id, name, slug, sub_category_id, sub_categories(name, slug, category_id, categories(name, slug))');
 
+            // Nếu trên URL là số (VD: 34) và không tìm thấy theo slug thì tìm theo id
+            if (familySlug && !isNumericId) {
+                famQuery = famQuery.eq('slug', lookupVal);
+            } else {
+                famQuery = famQuery.eq('id', Number(lookupVal));
+            }
+
+            const { data, error } = await famQuery.maybeSingle();
             if (error) throw error;
-            if (!data) throw new Error('Không tìm thấy dòng sản phẩm.');
 
-            familyInfo = data;
-            resolvedFamilyId = data.id;
+            if (data) {
+                familyInfo = data;
+                resolvedFamilyId = data.id;
+            }
         }
 
         let pageTitleText = 'Tất cả sản phẩm';
@@ -641,10 +651,21 @@ async function loadSidebar() {
         let resolvedSidebarFamilyId = familyId || null;
 
         if (familySlug) {
-            const { data: familyInfo, error: familyError } = await window.supabaseClient.from('families').select('id').eq('slug', familySlug).single();
+            const lookupVal = String(familySlug).trim();
+            const isNumericId = /^\d+$/.test(lookupVal);
+
+            let famSidebarQuery = window.supabaseClient.from('families').select('id');
+            if (!isNumericId) {
+                famSidebarQuery = famSidebarQuery.eq('slug', lookupVal);
+            } else {
+                famSidebarQuery = famSidebarQuery.eq('id', Number(lookupVal));
+            }
+
+            const { data: familyInfo, error: familyError } = await famSidebarQuery.maybeSingle();
             if (familyError) throw familyError;
-            if (!familyInfo) throw new Error('Không tìm thấy dòng sản phẩm.');
-            resolvedSidebarFamilyId = familyInfo.id;
+            if (familyInfo) {
+                resolvedSidebarFamilyId = familyInfo.id;
+            }
         }
 
         let prodQuery = window.supabaseClient.from('products').select('sub_category_id, brands(id, name)').eq('is_active', true);
@@ -896,28 +917,28 @@ function initSortDropdown() {
 // ========================================================
 window.addEventListener('load', async () => {
 
-    // --- BỘ GIẢI MÃ URL MỚI (TỰ ĐỘNG CHUYỂN ĐỔI SLUG SANG ID) ---
+    // --- BỘ GIẢI MÃ URL MỚI (HỖ TRỢ CẢ SLUG VÀ ID SỐ NGUYÊN) ---
     const urlParams = new URLSearchParams(window.location.search);
     let needUrlUpdate = false;
-    const isUUID = (str) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
+    const isNumericId = (str) => /^\d+$/.test(String(str || '').trim());
 
     // 1. Kiểm tra Category (Danh mục)
     const cat = urlParams.get('category');
     if (cat && !urlParams.has('category_id')) {
-        if (isUUID(cat)) {
+        if (isNumericId(cat)) {
             urlParams.set('category_id', cat);
         } else {
             const { data } = await window.supabaseClient.from('categories').select('id').eq('slug', cat).maybeSingle();
             if (data) urlParams.set('category_id', data.id);
         }
-        urlParams.delete('category'); 
+        urlParams.delete('category');
         needUrlUpdate = true;
     }
 
     // 2. Kiểm tra Sub Category (Nhóm hàng)
     const subCat = urlParams.get('sub_category');
     if (subCat && !urlParams.has('sub_category_id')) {
-        if (isUUID(subCat)) {
+        if (isNumericId(subCat)) {
             urlParams.set('sub_category_id', subCat);
         } else {
             const { data } = await window.supabaseClient.from('sub_categories').select('id').eq('slug', subCat).maybeSingle();
@@ -927,17 +948,27 @@ window.addEventListener('load', async () => {
         needUrlUpdate = true;
     }
 
-    // 3. Kiểm tra Family (Dòng sản phẩm)
-    const fam = urlParams.get('family');
+    // 3. Kiểm tra Family (Dòng sản phẩm) - Ưu tiên chuyển sang SLUG
+    const fam = urlParams.get('family') || urlParams.get('family_id') || urlParams.get('slug');
     if (fam) {
-        if (!urlParams.has('slug')) {
-            urlParams.set('slug', fam); // products.js mặc định dùng 'slug' làm tham số cho Family
+        if (isNumericId(fam)) {
+            // Nếu truyền vào ID số (VD: 34), kiểm tra xem dưới DB đã có slug chưa
+            const { data } = await window.supabaseClient.from('families').select('id, slug').eq('id', Number(fam)).maybeSingle();
+            if (data?.slug) {
+                urlParams.set('slug', data.slug);
+                urlParams.delete('family_id');
+            } else {
+                urlParams.set('family_id', fam);
+                urlParams.delete('slug');
+            }
+        } else {
+            urlParams.set('slug', fam);
+            urlParams.delete('family_id');
         }
         urlParams.delete('family');
         needUrlUpdate = true;
     }
 
-    // Áp dụng URL mới (ẩn danh) trước khi các hàm tải sản phẩm bắt đầu chạy
     if (needUrlUpdate) {
         window.history.replaceState({}, '', window.location.pathname + '?' + urlParams.toString());
     }
